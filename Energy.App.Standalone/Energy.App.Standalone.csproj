@@ -4,21 +4,22 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
 
   <ItemGroup>
     <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="MudBlazor" Version="6.5.0" />
+	<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
+	<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
-  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
@@ -27,8 +28,5 @@
 
 
 
-  <ItemGroup>
-    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-  </ItemGroup>
 
 </Project>

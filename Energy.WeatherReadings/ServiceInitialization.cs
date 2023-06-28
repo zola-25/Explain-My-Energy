@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Energy.WeatherReadings.Interfaces;
-using Microsoft.Extensions.Configuration;
+﻿using Energy.WeatherReadings.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -30,13 +23,13 @@ namespace Energy.WeatherReadings
         {
             ArgumentException.ThrowIfNullOrEmpty(nameof(config));
 
-            var options = new WeatherDataOptions();
+            WeatherDataOptions options = new WeatherDataOptions();
             config(options);
 
-            if (String.IsNullOrWhiteSpace(options.HistoricalApi))  throw new ArgumentException(nameof(options.HistoricalApi));
-            if (String.IsNullOrWhiteSpace(options.ForecastApi))  throw new ArgumentException(nameof(options.ForecastApi));
-            if (String.IsNullOrWhiteSpace(options.ClimateApi))  throw new ArgumentException(nameof(options.ClimateApi));
-            if (String.IsNullOrWhiteSpace(options.PostcodeLocationApi))  throw new ArgumentException(nameof(options.PostcodeLocationApi));
+            if (String.IsNullOrWhiteSpace(options.HistoricalApi)) throw new ArgumentException(nameof(options.HistoricalApi));
+            if (String.IsNullOrWhiteSpace(options.ForecastApi)) throw new ArgumentException(nameof(options.ForecastApi));
+            if (String.IsNullOrWhiteSpace(options.ClimateApi)) throw new ArgumentException(nameof(options.ClimateApi));
+            if (String.IsNullOrWhiteSpace(options.PostcodeLocationApi)) throw new ArgumentException(nameof(options.PostcodeLocationApi));
 
 
             services.Configure(config);

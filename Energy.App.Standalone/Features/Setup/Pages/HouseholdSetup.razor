@@ -1,0 +1,160 @@
+﻿@page "/HouseholdSetup"
+
+@inherits FluxorComponent
+@inject IState<HouseholdState> HouseholdState
+@inject IDispatcher Dispatcher
+
+<PageTitle>Household Setup</PageTitle>
+
+
+@if (_readyToInteract)
+{
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="p-2 mt-2">
+
+
+
+                <EditForm  Model="@_householdDetails" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit" >
+
+                    <MudCard Elevation="0">
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h5">Household Setup</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <ObjectGraphDataAnnotationsValidator  />
+                            <ValidationSummary />
+                            <div class="my-3">
+                                <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
+                                               Placeholder="Select Move-in Date"
+                                               Clearable="true"
+                                               DateFormat="D"
+                                               MaxDate="DateTime.Today"></MudDatePicker>
+                            </div>
+
+                            <div class="my-3">
+                                <MudTextField  For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required
+                                              Placeholder="IHD MAC ID"></MudTextField>
+                            </div>
+                            <div class="my-3">
+                                <MudAutocomplete @bind-Value="_householdDetails.OutCode"
+                                                 For="@(() => _householdDetails.OutCode)"
+                                                 T="OutCode" CoerceText="true"
+                                                 Clearable="true"
+                                                          Required
+                                                 ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
+                                                 MinCharacters="2"
+                                                 OnClearButtonClick="ClearPostalArea"
+                                                 SearchFuncWithCancel="SearchOutCodes"></MudAutocomplete>
+
+                            </div>
+                            <MudText>What is your home's primary heating source?</MudText>
+                            <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
+                                <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
+                                <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
+                            </MudRadioGroup>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
+
+                            <MudText Color="Color.Success" hidden="@(!_submitSuccessful)">
+                                @_saveResponseMessage
+                            </MudText>
+                        </MudCardActions>
+                    </MudCard>
+                </EditForm>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="p-2">
+                @*<MeterSetupTable></MeterSetupTable>*@
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@code
+{
+
+    //[Inject]
+    //UserState UserState { get; set; }
+
+    private HouseholdDetails _householdDetails = new();
+
+
+    private async Task<IEnumerable<OutCode>> SearchOutCodes(string inputString, CancellationToken ctx)
+    {
+        return await OutCodeLookup.SearchOutCodes(inputString, ctx);
+    }
+
+
+
+    string _saveResponseMessage = string.Empty;
+    bool _submitSuccessful;
+
+    bool _readyToInteract;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SetHouseholdInputs();
+        return;
+    }
+
+    private Task SetHouseholdInputs()
+    {
+        _householdDetails = new HouseholdDetails()
+        {
+            IhdMacId = HouseholdState.Value.IhdMacId,
+            MoveInDate = HouseholdState.Value.MoveInDate,
+            OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
+            PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
+        };
+
+        SubscribeToAction<NotifyHouseholdReadyAction>(ShowSuccessMessage);
+        SubscribeToAction<HouseholdSubmitFailureAction>(HandleSubmitFailure);
+
+
+        _readyToInteract = true;
+        return Task.CompletedTask;
+    }
+
+    private void HandleSubmitFailure(HouseholdSubmitFailureAction obj)
+    {
+        _submitSuccessful = false;
+        _saveResponseMessage = String.Empty;
+    }
+
+    private void ShowSuccessMessage(NotifyHouseholdReadyAction obj)
+    {
+        _submitSuccessful = true;
+        _saveResponseMessage = "Household Details Saved";
+    }
+
+
+    private async Task HandleValidSubmit()
+    {
+        Dispatcher.Dispatch(new HouseholdSubmitSuccessAction(
+            _householdDetails.MoveInDate, _householdDetails.IhdMacId, _householdDetails.OutCode.OutCodeCharacters, _householdDetails.PrimaryHeatSource));
+
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Dispatcher.Dispatch(new HouseholdSubmitFailureAction());
+    }
+
+    private void ClearPostalArea()
+    {
+        _householdDetails.OutCode = null;
+    }
+
+    
+}

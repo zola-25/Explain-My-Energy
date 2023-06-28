@@ -1,0 +1,228 @@
+﻿@inherits FluxorComponent
+@inject IState<HouseholdState> HouseholdState
+@inject IDispatcher Dispatcher
+
+@if (HouseholdState.Value.Saved && _meterStatusList != null)
+{
+    <MudPaper Class="p-3" Elevation="0">
+        <MudText Typo="Typo.h5">Meter Setup</MudText>
+    </MudPaper>
+
+    <MudTable Items="@_meterStatusList.Values" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Type</MudTh>
+            <MudTh>Add / Remove </MudTh>
+            <MudTh>MPAN / MPRN</MudTh>
+            <MudTh>Authorized</MudTh>
+            <MudTh>Reload Data</MudTh>
+            <MudTh>Current Tariff</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Type">@context.MeterType</MudTd>
+            <MudTd DataLabel="Add / Remove">
+
+                @if (context.Added)
+                {
+                    <MudButton Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.GlobalId))">Remove</MudButton>
+                }
+                else
+                {
+                    <MudLink Underline="Underline.None" Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")"><MudButton Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Add</MudButton></MudLink>
+                }
+            </MudTd>
+            <MudTd DataLabel="MPAN / MPRN">@context.Mpxn</MudTd>
+            <MudTd DataLabel="Authorized">
+                @if (context.Authorized)
+                {
+                    <MudText Color="Color.Success">Authorized</MudText>
+                }
+                else
+                {
+                    <MudLink Underline="Underline.None" Href="@($"/MeterAuthorization/{context.MeterType}")"><MudButton Color="Color.Default" Disabled="@(!context.Added)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small" >Authorize</MudButton></MudLink>
+
+                }
+            </MudTd>
+            <MudTd DataLabel="Reload Data">
+                @if (context.Authorized)
+                {
+                    @if (!context.Loading)
+                    {
+                        <MudButton Color="Color.Secondary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small" @onclick="@(async () => await ImportData(context.GlobalId))">Reload</MudButton>
+                    }
+                    else
+                    {
+                        <MudProgressCircular Indeterminate="true"></MudProgressCircular>
+                    }
+                }
+
+            </MudTd>
+            <MudTd DataLabel="Current Tariff">
+                @if (context.Added)
+                {
+                    @if (context.HasActiveTariff)
+                    {
+                        <MudText Typo="Typo.body2">@context.TariffUnitRateText</MudText>
+                        <MudText Typo="Typo.body2">@context.TariffStandingChargeText</MudText>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Warning">No active tariff set</MudAlert>
+                    }
+                }
+            </MudTd>
+            <MudTd DataLabel="Set Tariffs">
+                
+                <MudLink Underline="Underline.None"
+                         Href="@($"/Tariffs/{context.MeterType}")">
+                    <MudButton Color="Color.Primary" 
+                               Disabled="@(!context.Added)" 
+                               ButtonType="ButtonType.Button" 
+                               Variant="Variant.Filled" 
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.CurrencyPound">Tariffs</MudButton>
+                </MudLink>
+            </MudTd>
+        </RowTemplate>
+
+    </MudTable>
+
+    <MudMessageBox @ref="DeleteBox" Title="Warning" CancelText="Cancel">
+        <MessageContent>
+            This will remove the meter with all associated data,<br/>
+            including Energy Readings and Tariffs
+            <br/>
+            <br />
+            <strong>This cannot be undone</strong>
+            <br />
+            <br />
+
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Text" Class="ml-2" Color="Color.Error" Size="Size.Small">Delete</MudButton>
+        </YesButton>
+        <CancelButton>
+            <MudButton Variant="Variant.Text"  Color="Color.Default" Size="Size.Small">Cancel</MudButton>
+        </CancelButton>
+    </MudMessageBox>
+
+}
+
+
+@code {
+
+    [Inject] UserState UserState { get; set; }
+    [Inject] NavigationManager NavManager { get; set; }
+    [Inject] IMeterApi MeterApi { get; set; }
+    [Inject] MeterSetupState MeterState { get; set; }
+    [Inject] IEnergyDataProcessor EnergyDataProcessor { get; set; }
+    [Inject] private IDialogService DialogService { get; set; }
+
+    Dictionary<MeterType, MeterStatus> _meterStatusList;
+
+    private record MeterStatus
+    {
+        public Guid GlobalId { get; init; }
+        public MeterType MeterType { get; init; }
+
+        public bool Added { get; init; }
+        public string Mpxn { get; init; }
+        public bool Authorized { get; init; }
+        public bool Loading { get; init; }
+
+        public bool HasActiveTariff { get; init; }
+        public string TariffUnitRateText { get; init; }
+        public string TariffStandingChargeText { get; set; }
+    }
+
+
+    protected override void OnParametersSet()
+    {
+        SetMeterStatusList();
+    }
+
+    private void SetMeterStatusList()
+    {
+        _meterStatusList = new Meter[2]
+        {
+            MeterState.ElectricityMeter ?? new Meter
+            {
+                MeterType = MeterType.Electricity,
+            },
+            MeterState.GasMeter ?? new Meter
+            {
+                MeterType = MeterType.Gas
+            }
+        }.Select(MeterToStatus).ToDictionary(status => status.MeterType);
+    }
+
+    private MeterStatus MeterToStatus(Meter meter)
+    {
+
+        string tariffUnitRateText = "No active tariff set";
+        bool hasAnyTariffs = meter.TariffDetails?.Any() ?? false;
+
+        TariffDetail currentTariff = null;
+        if (hasAnyTariffs)
+        {
+            currentTariff = meter.TariffDetails.eCurrentTariff();
+        }
+
+        string tariffStandingChargeText = String.Empty;
+
+        if (currentTariff != null)
+        {
+            tariffUnitRateText = currentTariff.eTariffUnitRateText();
+            tariffStandingChargeText = $"Standing Charge: {currentTariff.DailyStandingChargePence:N0}p/Day";
+        }
+
+        return new MeterStatus()
+            {
+                Added = meter.GlobalId != Guid.Empty,
+                Authorized = meter.Authorized,
+                Loading = meter.QueueFreshImport,
+                GlobalId = meter.GlobalId,
+                MeterType = meter.MeterType,
+                Mpxn = meter.Mpxn,
+                HasActiveTariff = hasAnyTariffs && currentTariff != null,
+                TariffUnitRateText = tariffUnitRateText,
+                TariffStandingChargeText = tariffStandingChargeText
+            };
+    }
+
+    MudMessageBox DeleteBox { get; set; }
+
+    private async Task RemoveMeterAsync(Guid globalId)
+    {
+        bool? result = await DeleteBox.Show();
+
+        if (result == null || result == false)
+        {
+            return;
+        }
+
+        var meter = MeterState[globalId];
+
+        await EnergyDataProcessor.RemoveData(meter);
+        await MeterApi.RemoveMeterAsync(globalId);
+        await MeterState.RemoveMeter(globalId);
+        SetMeterStatusList();
+    }
+
+    private async Task ImportData(Guid globalId)
+    {
+        var meter = MeterState[globalId];
+        if (meter.Authorized)
+        {
+            meter.QueueFreshImport = true;
+            _meterStatusList[meter.MeterType] = MeterToStatus(meter);
+            StateHasChanged();
+
+            await EnergyDataProcessor.ReloadData(meter);
+        }
+        meter.QueueFreshImport = false;
+        _meterStatusList[meter.MeterType] = MeterToStatus(meter);
+
+        StateHasChanged();
+    }
+}

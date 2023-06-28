@@ -1,7 +1,18 @@
-﻿<MudPaper class="py-3" Elevation="0">
+﻿@inherits FluxorComponent
+@inject IState<HouseholdState> HouseholdState
+
+<MudPaper class="py-3" Elevation="0">
     <MudNavMenu Color="Color.Info" Bordered="true">
-        <MudNavLink Href="/HouseholdSetup" Disabled="@(!_userSet)" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
-            Household Setup
+        <MudNavLink Href="/HouseholdSetup"  Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
+            Household Setup @if (HouseholdState.Value.Invalid || !HouseholdState.Value.Saved)
+            {
+                <MudIcon Color="Color.Warning" Icon="@Icons.Material.Filled.Settings"></MudIcon>
+                <MudTooltip>Setup Required</MudTooltip>
+            } else if (HouseholdState.Value.Saved)
+            {
+                <MudIcon Color="Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
+            }
+
         </MudNavLink>
         
         <MudDivider></MudDivider>
@@ -38,6 +49,5 @@
     string _gasHref;
     string _electricityHref;
 
-    bool _userSet;
 
 }

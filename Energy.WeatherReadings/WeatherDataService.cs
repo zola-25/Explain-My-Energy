@@ -21,9 +21,9 @@ public class WeatherDataService : IWeatherDataService
 
     public async Task<List<DailyWeatherReading>> GetForOutCode(string outCode, DateTime? latestHistorical = null, DateTime? latestReading = null)
     {
-        var outCodeLocation = await _outCodeLocationLookup.LocationLookup(outCode);
+        OutCodeLocation outCodeLocation = await _outCodeLocationLookup.LocationLookup(outCode);
 
-        var weatherUpdateRange = new OutCodeWeatherUpdateRanges()
+        OutCodeWeatherUpdateRanges weatherUpdateRange = new OutCodeWeatherUpdateRanges()
         {
             LatestHistoricalUtc = latestHistorical,
             LatestReadingUtc = latestReading,
@@ -39,11 +39,11 @@ public class WeatherDataService : IWeatherDataService
 
     private async Task<List<DailyWeatherReading>> GetWeatherReadingsFromMeteo(OutCodeWeatherUpdateRanges outcodeUpdateRange)
     {
-        var readingsToUpsert = new List<DailyWeatherReading>();
+        List<DailyWeatherReading> readingsToUpsert = new List<DailyWeatherReading>();
         try
         {
             await _weatherApiCalls.LoadHistorical(outcodeUpdateRange, readingsToUpsert);
-        } 
+        }
         catch (WeatherApiResponseException badResponseException)
         {
             LogBadResponse(badResponseException);
@@ -56,7 +56,7 @@ public class WeatherDataService : IWeatherDataService
         try
         {
             await _weatherApiCalls.LoadForecast(outcodeUpdateRange, readingsToUpsert);
-        } 
+        }
         catch (WeatherApiResponseException badResponseException)
         {
             LogBadResponse(badResponseException);
@@ -70,7 +70,7 @@ public class WeatherDataService : IWeatherDataService
         try
         {
             await _weatherApiCalls.LoadClimate(outcodeUpdateRange, readingsToUpsert);
-        } 
+        }
         catch (WeatherApiResponseException badResponseException)
         {
             LogBadResponse(badResponseException);

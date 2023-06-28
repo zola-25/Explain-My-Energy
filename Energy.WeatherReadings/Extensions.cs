@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Energy.WeatherReadings
 {
@@ -10,9 +6,9 @@ namespace Energy.WeatherReadings
     {
         public static string BuildQueryString(this Dictionary<string, string> queryParameters)
         {
-            var queryStringBuilder = new StringBuilder();
+            StringBuilder queryStringBuilder = new StringBuilder();
 
-            foreach (var parameter in queryParameters)
+            foreach (KeyValuePair<string, string> parameter in queryParameters)
             {
                 if (queryStringBuilder.Length > 0)
                 {

@@ -1,6 +1,6 @@
 ﻿namespace Energy.Shared
 {
-    public class DailyWeatherReading 
+    public class DailyWeatherReading
     {
         public string OutCode { get; set; }
 

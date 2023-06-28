@@ -1,13 +1,10 @@
-﻿using System.Net;
-using Energy.App.Standalone.Features.Weather.Pages;
-using Energy.App.Standalone.Models;
-using Energy.Shared;
+﻿using Energy.Shared;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
 
 namespace Energy.App.Standalone.Features.Weather.Store
 {
-    public record WeatherState 
+    public record WeatherState
     {
         public bool Loading { get; init; }
         public List<DailyWeatherReading> WeatherReadings { get; init; }
@@ -15,7 +12,10 @@ namespace Energy.App.Standalone.Features.Weather.Store
 
     public class WeatherFeature : Feature<WeatherState>
     {
-        public override string GetName() => nameof(WeatherFeature);
+        public override string GetName()
+        {
+            return nameof(WeatherFeature);
+        }
 
         protected override WeatherState GetInitialState()
         {
@@ -46,15 +46,15 @@ namespace Energy.App.Standalone.Features.Weather.Store
             WeatherReadings = weatherReadings;
         }
     }
-    
 
 
-    public static class WeatherReducers 
+
+    public static class WeatherReducers
     {
         [ReducerMethod]
-        public static WeatherState OnStoreReadingsReducer(WeatherState state, WeatherStoreReadingsAction action) 
+        public static WeatherState OnStoreReadingsReducer(WeatherState state, WeatherStoreReadingsAction action)
         {
-            return state with 
+            return state with
             {
                 WeatherReadings = action.WeatherReadings,
                 Loading = false
@@ -71,7 +71,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
             };
         }
 
-        
+
     }
 
     public class WeatherEffects
@@ -84,9 +84,9 @@ namespace Energy.App.Standalone.Features.Weather.Store
         }
 
         [EffectMethod]
-        public async Task LoadReadings(WeatherLoadReadingsAction loadReadingsAction, IDispatcher dispatcher) 
+        public async Task LoadReadings(WeatherLoadReadingsAction loadReadingsAction, IDispatcher dispatcher)
         {
-            var forecasts = await _weatherDataService.GetForOutCode(loadReadingsAction.OutCode);
+            List<DailyWeatherReading> forecasts = await _weatherDataService.GetForOutCode(loadReadingsAction.OutCode);
             dispatcher.Dispatch(new WeatherStoreReadingsAction(forecasts));
         }
     }

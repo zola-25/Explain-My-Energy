@@ -12,7 +12,7 @@
 
 
 <button class="btn btn-primary" @onclick="LoadWeatherData">Load Data</button>
-<InputText bind-Value="@Outcode" DisplayName="Outcode"></InputText>
+<input type="text" placeholder="Postal Area" @bind-value="@Outcode" />
 
 @if (WeatherState.Value.Loading)
 {
@@ -29,7 +29,10 @@ else
             <tr>
                 <th>Date</th>
                 <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
+                <th>Temp Min</th>
+                <th>Temp Max</th>
+                <th>Temp Avg</th>
+
                 <th>Historical?</th>
                 <th>Recent Forecast?</th>
                 <th>Near Term Forecast?</th>
@@ -44,7 +47,10 @@ else
                 <tr>
                     <td>@weatherReading.ReadDate.ToShortDateString()</td>
                     <td>@weatherReading.TemperatureAverage</td>
-                    <td>@weatherReading.TemperatureFahrenheit</td>
+                    <td>@weatherReading.TemperatureMin</td>
+                    <td>@weatherReading.TemperatureMax</td>
+                    <td>@((weatherReading.TemperatureMin + weatherReading.TemperatureMax)/2d)</td>
+
                     <td>@weatherReading.IsHistorical</td>
                     <td>@weatherReading.IsRecentForecast</td>
                     <td>@weatherReading.IsNearForecast</td>

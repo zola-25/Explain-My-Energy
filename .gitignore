@@ -39,9 +39,9 @@ bld/
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 
-wwwroot/**/service-worker.published.js
-wwwroot/js/**
-wwwroot/**/appsettings*
+**/wwwroot/**/service-worker.published.js
+**/wwwroot/js/**
+**/wwwroot/**/appsettings*
 
 **/launchSettings.json
 
@@ -125,7 +125,6 @@ ipch/
 
 # Rider
 .idea/
-.idea/*
 
 # Visual Studio profiler
 *.psess
@@ -411,3 +410,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/.editorconfig

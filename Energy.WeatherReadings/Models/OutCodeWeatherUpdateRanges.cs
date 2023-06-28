@@ -26,9 +26,9 @@ public record OutCodeWeatherUpdateRanges
     public (DateTime start, DateTime end, bool update) GetHistoricalRange()
     {
 
-        var utcToday = UtcToday;
-        var utcTwoMonthsAgo = utcToday.AddDays(-60);
-        var oneYearAgo = utcToday.AddYears(-1);
+        DateTime utcToday = UtcToday;
+        DateTime utcTwoMonthsAgo = utcToday.AddDays(-60);
+        DateTime oneYearAgo = utcToday.AddYears(-1);
 
         if (!HasAnyReadings)
         {

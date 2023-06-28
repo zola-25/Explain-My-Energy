@@ -1,7 +1,7 @@
-﻿using Energy.WeatherReadings.Interfaces;
+﻿using Energy.Shared;
+using Energy.WeatherReadings.Interfaces;
 using Energy.WeatherReadings.Models;
 using System.Text.Json;
-using Energy.Shared;
 
 namespace Energy.WeatherReadings
 {
@@ -18,14 +18,14 @@ namespace Energy.WeatherReadings
 
         public async Task LoadHistorical(OutCodeWeatherUpdateRanges outCodeUpdateRange, List<DailyWeatherReading> dailyWeatherReadings)
         {
-            var historicalRange = outCodeUpdateRange.GetHistoricalRange();
+            (DateTime start, DateTime end, bool update) historicalRange = outCodeUpdateRange.GetHistoricalRange();
 
             if (!historicalRange.update)
             {
                 return;
             }
 
-            var queryParameters = new Dictionary<string, string>()
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
                 { "latitude", outCodeUpdateRange.Latitude.ToString("G") },
                 { "longitude", outCodeUpdateRange.Longitude.ToString("G") },
@@ -40,11 +40,11 @@ namespace Energy.WeatherReadings
                 { "timeformat", "unixtime" }
             };
 
-            var queryString = queryParameters.BuildQueryString();
-            var urlHistorical = $"archive?{queryString}";
+            string queryString = queryParameters.BuildQueryString();
+            string urlHistorical = $"archive?{queryString}";
 
-            var httpClientHistorical = _httpClientFactory.CreateClient("Historical");
-            var response = await httpClientHistorical.GetAsync(urlHistorical);
+            HttpClient httpClientHistorical = _httpClientFactory.CreateClient("Historical");
+            HttpResponseMessage response = await httpClientHistorical.GetAsync(urlHistorical);
 
             ValidateResponse(WeatherReadingType.Historical,
                 historicalRange.start,
@@ -54,10 +54,10 @@ namespace Energy.WeatherReadings
                 urlHistorical);
 
 
-            var respString = await response.Content.ReadAsStringAsync();
+            string respString = await response.Content.ReadAsStringAsync();
 
 
-            using (var doc = JsonDocument.Parse(respString))
+            using (JsonDocument doc = JsonDocument.Parse(respString))
             {
                 JsonElement root = doc.RootElement;
                 JsonElement dailyJson = root.GetProperty("daily");
@@ -89,7 +89,7 @@ namespace Energy.WeatherReadings
 
                 for (int i = 0; i < time.Length; i++)
                 {
-                    var reading = new DailyWeatherReading
+                    DailyWeatherReading reading = new DailyWeatherReading
                     {
                         ReadDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
@@ -118,9 +118,9 @@ namespace Energy.WeatherReadings
 
         public async Task LoadForecast(OutCodeWeatherUpdateRanges outCodeUpdateRange, List<DailyWeatherReading> dailyWeatherReadings)
         {
-            var forecastRange = outCodeUpdateRange.GetNearTermForecastRange();
+            (DateTime start, DateTime end) forecastRange = outCodeUpdateRange.GetNearTermForecastRange();
 
-            var queryParameters = new Dictionary<string, string>()
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
                 { "latitude", outCodeUpdateRange.Latitude.ToString("G") },
                 { "longitude", outCodeUpdateRange.Longitude.ToString("G") },
@@ -133,12 +133,12 @@ namespace Energy.WeatherReadings
             };
 
 
-            var queryString = queryParameters.BuildQueryString();
-            var urlForecast = $"forecast?{queryString}";
+            string queryString = queryParameters.BuildQueryString();
+            string urlForecast = $"forecast?{queryString}";
 
-            var httpClientForecast = _httpClientFactory.CreateClient("Forecast");
+            HttpClient httpClientForecast = _httpClientFactory.CreateClient("Forecast");
 
-            var response = await httpClientForecast.GetAsync(urlForecast);
+            HttpResponseMessage response = await httpClientForecast.GetAsync(urlForecast);
 
             ValidateResponse(WeatherReadingType.Forecast,
                 forecastRange.start,
@@ -148,8 +148,8 @@ namespace Energy.WeatherReadings
                 urlForecast);
 
 
-            var respString = await response.Content.ReadAsStringAsync();
-            using (var doc = JsonDocument.Parse(respString))
+            string respString = await response.Content.ReadAsStringAsync();
+            using (JsonDocument doc = JsonDocument.Parse(respString))
             {
                 JsonElement root = doc.RootElement;
                 JsonElement dailyJson = root.GetProperty("daily");
@@ -178,14 +178,14 @@ namespace Energy.WeatherReadings
 
                 for (int i = 0; i < time.Length; i++)
                 {
-                    var readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
-                    var reading = new DailyWeatherReading
+                    DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
+                    DailyWeatherReading reading = new DailyWeatherReading
                     {
                         ReadDate = readDate,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
-                        TemperatureAverage = (temperature_2m_max[i] ?? 0 + temperature_2m_min[i] ?? 0) / 2,
                         ApparentTemperatureMin = apparent_temperature_min[i],
                         ApparentTemperatureMax = apparent_temperature_max[i],
+                        TemperatureAverage = Math.Round(((temperature_2m_max[i] ?? 0) + (temperature_2m_min[i] ?? 0)) / 2d, 2),
                         TemperatureMin = temperature_2m_min[i],
                         TemperatureMax = temperature_2m_max[i],
                         Sunrise = sunrise[i].HasValue
@@ -212,9 +212,9 @@ namespace Energy.WeatherReadings
 
         public async Task LoadClimate(OutCodeWeatherUpdateRanges outCodeUpdateRange, List<DailyWeatherReading> dailyWeatherReadings)
         {
-            var climateRange = outCodeUpdateRange.GetLongTermForecastRange();
+            (DateTime start, DateTime end) climateRange = outCodeUpdateRange.GetLongTermForecastRange();
 
-            var queryParameters = new Dictionary<string, string>()
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
                 { "latitude", outCodeUpdateRange.Latitude.ToString("G") },
                 { "longitude", outCodeUpdateRange.Longitude.ToString("G") },
@@ -225,12 +225,12 @@ namespace Energy.WeatherReadings
                 { "timeformat", "unixtime" }
             };
 
-            var queryString = queryParameters.BuildQueryString();
-            var urlClimate = $"climate?{queryString}";
+            string queryString = queryParameters.BuildQueryString();
+            string urlClimate = $"climate?{queryString}";
 
-            var httpClientClimate = _httpClientFactory.CreateClient("Climate");
+            HttpClient httpClientClimate = _httpClientFactory.CreateClient("Climate");
 
-            var response = await httpClientClimate.GetAsync(urlClimate);
+            HttpResponseMessage response = await httpClientClimate.GetAsync(urlClimate);
 
             ValidateResponse(WeatherReadingType.Climate,
                 climateRange.start,
@@ -239,7 +239,7 @@ namespace Energy.WeatherReadings
                 response,
                 urlClimate);
 
-            var respString = await response.Content.ReadAsStringAsync();
+            string respString = await response.Content.ReadAsStringAsync();
             using (JsonDocument doc = JsonDocument.Parse(respString))
             {
 
@@ -256,8 +256,8 @@ namespace Energy.WeatherReadings
 
                 for (int i = 0; i < time.Length; i++)
                 {
-                    var readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
-                    var reading = new DailyWeatherReading
+                    DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
+                    DailyWeatherReading reading = new DailyWeatherReading
                     {
                         ReadDate = readDate,
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
@@ -288,7 +288,7 @@ namespace Energy.WeatherReadings
         {
             if (!response.IsSuccessStatusCode)
             {
-                var badResponse = new WeatherApiBadResponse()
+                WeatherApiBadResponse badResponse = new WeatherApiBadResponse()
                 {
                     UpdateType = updateType,
                     StatusCode = (int)response.StatusCode,
