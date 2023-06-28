@@ -1,0 +1,43 @@
+﻿<MudPaper class="py-3" Elevation="0">
+    <MudNavMenu Color="Color.Info" Bordered="true">
+        <MudNavLink Href="/HouseholdSetup" Disabled="@(!_userSet)" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
+            Household Setup
+        </MudNavLink>
+        
+        <MudDivider></MudDivider>
+        
+        <MudNavLink Disabled="_electricityDisabled" Class="menu-nav-item" Href="@_electricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
+            <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Electricity)">Electricity</MeterNavLinkContent>
+        </MudNavLink>
+        <MudNavLink Disabled="_gasDisabled" Class="menu-nav-item" Href="@_gasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
+            <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Gas)">Gas</MeterNavLinkContent>
+        </MudNavLink>
+
+    </MudNavMenu>
+</MudPaper>
+
+<style>
+    
+    .menu-nav-item a {
+        text-decoration: none;
+    }
+
+    .active-nav-item {
+        background-color: lightgrey
+    }
+</style>
+
+@code {
+
+    MeterType _heaterMeterType;
+
+
+    bool _gasDisabled;
+    bool _electricityDisabled;
+
+    string _gasHref;
+    string _electricityHref;
+
+    bool _userSet;
+
+}

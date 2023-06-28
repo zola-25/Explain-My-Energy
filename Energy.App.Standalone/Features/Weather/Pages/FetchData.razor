@@ -1,0 +1,68 @@
+﻿@page "/fetchdata"
+@inherits FluxorComponent
+@using Energy.App.Standalone.Features.Weather.Store
+@using Energy.Shared
+@inject IDispatcher Dispatcher
+@inject IState<WeatherState> WeatherState
+
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+
+<button class="btn btn-primary" @onclick="LoadWeatherData">Load Data</button>
+<InputText bind-Value="@Outcode" DisplayName="Outcode"></InputText>
+
+@if (WeatherState.Value.Loading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!WeatherState.Value.WeatherReadings.Any())
+{
+    <p><em>No weather readings loaded</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Historical?</th>
+                <th>Recent Forecast?</th>
+                <th>Near Term Forecast?</th>
+                <th>Climate Forecast?</th>
+                <th>Weather code</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var weatherReading in WeatherState.Value.WeatherReadings)
+            {
+                <tr>
+                    <td>@weatherReading.ReadDate.ToShortDateString()</td>
+                    <td>@weatherReading.TemperatureAverage</td>
+                    <td>@weatherReading.TemperatureFahrenheit</td>
+                    <td>@weatherReading.IsHistorical</td>
+                    <td>@weatherReading.IsRecentForecast</td>
+                    <td>@weatherReading.IsNearForecast</td>
+                    <td>@weatherReading.IsClimateForecast</td>
+                    <td>@weatherReading.Icon</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private void LoadWeatherData()
+    {
+        Dispatcher.Dispatch(new WeatherLoadReadingsAction(Outcode));
+    }
+
+    public string Outcode { get; set; }
+
+}
