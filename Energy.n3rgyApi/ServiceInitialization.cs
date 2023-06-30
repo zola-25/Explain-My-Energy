@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Energy.n3rgyApi.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -21,7 +22,7 @@ namespace Energy.n3rgyApi
         {
             ArgumentException.ThrowIfNullOrEmpty(nameof(config));
 
-            var options = new N3rgyOptions();
+            N3rgyOptions options = new N3rgyOptions();
             config(options);
 
             if (string.IsNullOrWhiteSpace(options.GasApi))
@@ -44,9 +45,13 @@ namespace Energy.n3rgyApi
             }).AddPolicyHandler(GetRetryPolicy());
 
 
+            services.AddTransient<IConsumptionDataRetriever, ConsumptionDataRetriever>();
+
             // Register other services here if needed
             return services;
         }
+
+
 
         static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         {

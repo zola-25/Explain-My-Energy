@@ -31,8 +31,24 @@ public static class ValidationExtensions
         return !meterIdentifier.eIsValidMpan();
     }
 
+    public static bool eIsDigitsOnly(this string str)
+    {
+        foreach (char c in str)
+        {
+            if (c < '0' || c > '9')
+                return false;
+        }
+
+        return true;
+    }
+
     public static bool eIsValidMprn(this string meterIdentifier)
     {
+        if (!meterIdentifier.eIsDigitsOnly())
+        {
+            return false;
+        }
+
         char[] characters = meterIdentifier.ToCharArray();
 
         char[] checkChars = characters[^2..^0];

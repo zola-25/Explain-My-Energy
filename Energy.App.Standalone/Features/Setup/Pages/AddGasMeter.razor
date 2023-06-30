@@ -16,65 +16,75 @@
                     </MudCardHeader>
                     <MudCardContent>
 
-
                         <DataAnnotationsValidator />
 
-                        <MudTextField For="@(() => GasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@GasMeter.Mpxn" Placeholder="MPRN"></MudTextField>
-                        <ValidationMessage For="@(() => GasMeter.Mpxn)" />
-                            
+
+                        <MudTextField For="@(() => GasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@GasMeter.Mpxn" Placeholder="MPRN" Required></MudTextField>
+
                         <MudText Class="mt-5">
                             <p>Don't know your Gas Meter's MPRN number?</p>
-                            <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i  class="fa">&#xf08e;</i></MudLink></p>
+                            <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i class="fa">&#xf08e;</i></MudLink></p>
                         </MudText>
 
 
                     </MudCardContent>
-                    <MudCardActions>
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
-                        <MudText Color="Color.Success" hidden="@(!_submitSuccessful)">
-                            Gas Meter Valid - proceed to authorize?
+                    <MudCardActions Class="d-block">
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
-                            <MudTooltip Text="Proceed to Authorize Meter for data access?">
-                                <MudLink Underline="Underline.None" Href="@($"/MeterAuthorization/{MeterType.Gas}")">
-                                    <MudButton  Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
-                                </MudLink>
-                            </MudTooltip>
-                        </MudText>
-                    </MudCardActions>
-                </MudCard>
-            </EditForm>
+                            <MudGrid Spacing="2" Class="mt-2" hidden=" @(!_submitSuccessful)">
+                                <MudItem>
 
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+                                    <MudText Color="Color.Success">
+                                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
 
-@code
+                                        Gas Meter Valid - proceed to authorize?
+                                    </MudText>
+                                </MudItem>
+                                <MudItem>
+                                    <MudTooltip Text="Proceed to Authorize Meter for data access?">
+                                        <MudLink Underline="Underline.None" Href="@($"/MeterAuthorization/{MeterType.Gas}")">
+                                            <MudButton Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                                        </MudLink>
+                                    </MudTooltip>
+                                </MudItem>
+                            </MudGrid>
+
+                        </MudCardActions>
+                    </MudCard>
+                </EditForm>
+
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @code
     {
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    private Meter GasMeter { get; set; } 
+    private Meter GasMeter { get; set; }
 
     protected bool _submitSuccessful;
 
     protected bool _addingNotUpdating;
 
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
         SubscribeToAction<NotifyGasMeterInitialSetupValidAction>(SetupValidAction);
         MapGasMeter();
 
     }
 
-    private void MapGasMeter ()
+    private void MapGasMeter()
     {
         var meterState = MeterSetupState.Value.GasMeter;
         if (meterState.InitialSetupValid)
         {
             _addingNotUpdating = false;
-        } else
+        }
+        else
         {
             _addingNotUpdating = true;
         }
@@ -93,7 +103,8 @@
         if (_addingNotUpdating)
         {
             Dispatcher.Dispatch(new GasMeterInitialAddAction(GasMeter));
-        } else
+        }
+        else
         {
             Dispatcher.Dispatch(new GasMeterInitialUpdateAction(GasMeter));
         }

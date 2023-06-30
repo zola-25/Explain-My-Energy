@@ -1,9 +1,8 @@
-﻿using Energy.App.Standalone.Features.Setup.Store;
+﻿using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using System.Text;
-using TimeZoneConverter;
 
 namespace Energy.App.Standalone.Extensions;
 
@@ -26,6 +25,34 @@ public static class Extensions
     {
         TimeZoneInfo timeZone = AppDefaults.GetUkTimezone();
         return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
+    }
+
+    public static List<HourOfDayPrice> eMapToHourOfDayPrice(this IEnumerable<HourOfDayPriceState> hourOfDayPriceStates)
+    {
+        return hourOfDayPriceStates.Select(c => new HourOfDayPrice
+        {
+            HourOfDay = c.HourOfDay,
+            PencePerKWh = c.PencePerKWh
+        }).ToList();
+    }
+
+    public static TariffDetail eMapToTariffDto(this TariffDetailState tariffDetailState)
+    {
+        return new TariffDetail
+        {
+            DailyStandingChargePence = tariffDetailState.DailyStandingChargePence,
+            DateAppliesFrom = tariffDetailState.DateAppliesFrom,
+            GlobalId = tariffDetailState.GlobalId,
+            HourOfDayPrices = tariffDetailState.HourOfDayPrices.eMapToHourOfDayPrice(),
+            IsHourOfDayFixed = tariffDetailState.IsHourOfDayFixed,
+            PencePerKWh = tariffDetailState.PencePerKWh
+        };
+    }
+
+    public static TariffDetailState eCurrentTariffState(this IEnumerable<TariffDetailState> tariffDetails)
+    {
+        return tariffDetails.Where(c => DateTime.Today >= (c.DateAppliesFrom ?? DateTime.MaxValue))
+            .MaxBy(c => c.DateAppliesFrom);
     }
 
     public static TariffDetail eCurrentTariff(this IEnumerable<TariffDetail> tariffDetails)
@@ -79,6 +106,20 @@ public static class Extensions
         return $"{meter.GlobalId}-basicReadings";
     }
 
+    
+    public static string eTariffUnitRateText(this TariffDetailState tariffDetailState)
+    {
+
+        if (tariffDetailState.IsHourOfDayFixed)
+        {
+            return $"Unit Rate: {tariffDetailState.PencePerKWh:N0}p/kWh";
+        }
+
+        HourOfDayPriceState maxCost = tariffDetailState.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
+        HourOfDayPriceState minCost = tariffDetailState.HourOfDayPrices.MinBy(c => c.PencePerKWh);
+        return $"Variable Unit Rate: {minCost.PencePerKWh:N0}p/kWh - {maxCost.PencePerKWh:N0}p/kWh";
+    }
+
     public static string eTariffUnitRateText(this TariffDetail tariffDetail)
     {
 
@@ -99,6 +140,11 @@ public static class Extensions
     public static string eDateToMinimal(this DateTime date)
     {
         return date.eToString("ddd dnn MMM", useExtendedSpecifiers: true);
+    }
+
+    public static bool eUpToDate(this DateTime? latestReading)
+    {
+        return latestReading.HasValue && latestReading >= DateTime.Today.AddDays(-1).Date;
     }
 
     public static IEnumerable<DateTime> eGenerateAllDatesBetween(this DateTime startDate, DateTime endDate)

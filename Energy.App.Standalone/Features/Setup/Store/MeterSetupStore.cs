@@ -1,8 +1,11 @@
 ﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
+using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Features.Setup.Store
 {
@@ -13,6 +16,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         public MeterState GasMeter { get; init; }
         public MeterState ElectricityMeter { get; init; }
 
+        [property: JsonIgnore]
         public IEnumerable<MeterState> MeterStates => new MeterState[] { GasMeter, ElectricityMeter }.eToIEnumerable();
 
         public MeterState this[MeterType meterType]
@@ -129,7 +133,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         }
     }
 
-    
+
 
     public class ElectricityMeterSuccessfulAuthorizationAction
     {
@@ -141,20 +145,13 @@ namespace Energy.App.Standalone.Features.Setup.Store
 
     }
 
-    public class MeterDeleteAction
+    public class GasMeterDeleteAction
     {
-        public MeterType MeterType { get; }
-        public Guid MeterId { get; }
-
-
-        public MeterDeleteAction(MeterType meterType, Guid meterId)
-        {
-            MeterType = meterType;
-            MeterId = meterId;
-        }
     }
 
-
+    public class ElectricityMeterDeleteAction
+    {
+    }
 
     public class NotifyGasMeterInitialSetupValidAction
     {
@@ -172,7 +169,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnElectricityMeterInitialAddReducer(MeterSetupState meterSetupState, ElectricityMeterInitialAddAction addSuccessAction)
         {
-            var meterState = meterSetupState.ElectricityMeter;
+            MeterState meterState = meterSetupState.ElectricityMeter;
             return meterSetupState with
             {
                 ElectricityMeter = meterState with
@@ -190,7 +187,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnElectricityMeterInitialUpdateReducer(MeterSetupState meterSetupState, ElectricityMeterInitialUpdateAction updateSuccessAction)
         {
-            var meterState = meterSetupState.ElectricityMeter;
+            MeterState meterState = meterSetupState.ElectricityMeter;
             return meterSetupState with
             {
                 ElectricityMeter = meterState with
@@ -207,7 +204,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnGasMeterInitialAddReducer(MeterSetupState meterSetupState, GasMeterInitialAddAction addSuccessAction)
         {
-            var meterState = meterSetupState.GasMeter;
+            MeterState meterState = meterSetupState.GasMeter;
             return meterSetupState with
             {
                 GasMeter = meterState with
@@ -224,7 +221,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnGasMeterInitialUpdateReducer(MeterSetupState meterSetupState, GasMeterInitialUpdateAction updateSuccessAction)
         {
-            var meterState = meterSetupState.GasMeter;
+            MeterState meterState = meterSetupState.GasMeter;
             return meterSetupState with
             {
                 GasMeter = meterState with
@@ -239,7 +236,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnElectricityMeterAuthorizationReducer(MeterSetupState meterSetupState, ElectricityMeterSuccessfulAuthorizationAction authorizationAction)
         {
-            var meterState = meterSetupState.ElectricityMeter;
+            MeterState meterState = meterSetupState.ElectricityMeter;
             return meterSetupState with
             {
                 ElectricityMeter = meterState with
@@ -252,7 +249,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static MeterSetupState OnGasMeterAuthorizationReducer(MeterSetupState meterSetupState, GasMeterSuccessfulAuthorizationAction authorizationAction)
         {
-            var meterState = meterSetupState.GasMeter;
+            MeterState meterState = meterSetupState.GasMeter;
             return meterSetupState with
             {
                 GasMeter = meterState with
@@ -263,40 +260,67 @@ namespace Energy.App.Standalone.Features.Setup.Store
         }
 
         [ReducerMethod]
-        public static MeterSetupState OnMeterDeleteReducer(MeterSetupState meterSetupState, MeterDeleteAction deleteAction)
+        public static MeterSetupState OnGasMeterDeleteReducer(MeterSetupState meterSetupState, GasMeterDeleteAction deleteAction)
         {
-            MeterState resettedMeterState = Utilities.GetMeterInitialState(deleteAction.MeterType);
-            return Utilities.UpdateForMeter(meterSetupState, resettedMeterState);
+            MeterState resettedMeterState = Utilities.GetMeterInitialState(MeterType.Gas);
+            return meterSetupState with
+            {
+                GasMeter = resettedMeterState
+            };
         }
 
-
+        [ReducerMethod]
+        public static MeterSetupState OnElectricityMeterDeleteReducer(MeterSetupState meterSetupState, ElectricityMeterDeleteAction deleteAction)
+        {
+            MeterState resettedMeterState = Utilities.GetMeterInitialState(MeterType.Electricity);
+            return meterSetupState with
+            {
+                ElectricityMeter = resettedMeterState
+            };
+        }
 
     }
     public class MeterSetupEffects
     {
 
         [EffectMethod(typeof(GasMeterInitialAddAction))]
-        public async Task NotifyGasInitialAddSuccess(IDispatcher dispatcher)
+        public void NotifyGasInitialAddSuccess(IDispatcher dispatcher)
         {
+            dispatcher.Dispatch(new GasInitiateSetDefaultTariffsAction());
+
             dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
         }
 
         [EffectMethod(typeof(GasMeterInitialUpdateAction))]
-        public async Task NotifyGasInitialUpdateSuccess(IDispatcher dispatcher)
+        public void NotifyGasInitialUpdateSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
         }
 
-        [EffectMethod(typeof(ElectricityMeterInitialAddAction))]
-        public async Task NotifyElectricityInitialAddSuccess(IDispatcher dispatcher)
+        [EffectMethod(typeof(GasMeterDeleteAction))]
+        public void DispatchGasDeleteReadingsActions(IDispatcher dispatcher)
         {
+            dispatcher.Dispatch(new GasInitiateDeleteReadingsAction());
+        }
+
+        [EffectMethod(typeof(ElectricityMeterInitialAddAction))]
+        public void NotifyElectricityInitialAddSuccess(IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new ElectricityInitiateSetDefaultTariffsAction());
+
             dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
         }
 
         [EffectMethod(typeof(ElectricityMeterInitialUpdateAction))]
-        public async Task NotifyElectricityInitialUpdateSuccess(IDispatcher dispatcher)
+        public void NotifyElectricityInitialUpdateSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
+        }
+
+        [EffectMethod(typeof(ElectricityMeterDeleteAction))]
+        public void DispatchElectricityDeleteReadingsActions(IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new ElectricityInitiateDeleteReadingsAction());
         }
     }
 

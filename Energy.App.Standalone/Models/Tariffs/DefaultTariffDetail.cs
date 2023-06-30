@@ -4,7 +4,8 @@ namespace Energy.App.Standalone.Models.Tariffs
 {
     public record DefaultTariffDetail
     {
-        public string Name { get; init; }
+        public ExampleTariffType ExampleTariffType { get; set; }
+
         public DateTime DateAppliesFrom { get; init; }
         public MeterType MeterType { get; init; }
         public double PencePerKWh { get; init; }

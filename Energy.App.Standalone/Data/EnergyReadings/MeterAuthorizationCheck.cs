@@ -15,7 +15,7 @@ namespace Energy.App.Standalone.Data.EnergyReadings
 
         public async Task<TestAccessResponse> TestAccess(MeterType meterType, string mac, CancellationToken ctx = default)
         {
-            using var response = await _consumptionDataRetriever.TestAccess(meterType, mac, ctx);
+            using HttpResponseMessage response = await _consumptionDataRetriever.TestAccess(meterType, mac, ctx);
             if (response.IsSuccessStatusCode)
             {
                 return new TestAccessResponse()

@@ -33,7 +33,7 @@ public class ConsumptionDataRetriever : IConsumptionDataRetriever
         DateTime endDate,
         CancellationToken ctx = default)
     {
-        var httpClient = GetHttpClient(meterType);
+        HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
 
         string path = $"1?start={startDate:yyyyMMdd}&end={endDate:yyyyMMdd}";

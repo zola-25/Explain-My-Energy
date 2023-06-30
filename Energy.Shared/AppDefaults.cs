@@ -6,7 +6,7 @@ public static class AppDefaults
 {
     public static TimeZoneInfo GetUkTimezone()
     {
-        var ukTimezone = GetTimeZoneById("GMT Standard Time");
+        TimeZoneInfo ukTimezone = GetTimeZoneById("GMT Standard Time");
         return ukTimezone;
     }
 

@@ -1,0 +1,26 @@
+﻿@page "/Tariffs/{MeterTypeText}"
+@inherits FluxorComponent
+@inject IState<GasTariffsState> GasTariffState
+@inject IState<ElectricityTariffsState> ElectricityTariffState
+
+<PageTitle>@MeterTypeText Tariffs</PageTitle>
+
+<MudStack Class="mt-2"> 
+    
+    <MudPaper Elevation="2" Class="p-2">
+        <MeterTariffsTable MeterType="_meterType"></MeterTariffsTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string MeterTypeText { get; set; }
+
+    
+    protected override void OnParametersSet()
+    {
+        _meterType = MeterTypeText.eStringToEnum<MeterType>();
+    }
+
+    private MeterType _meterType;
+}

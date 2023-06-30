@@ -1,11 +1,11 @@
-﻿using System.Globalization;
-using System.Runtime.CompilerServices;
-using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.n3rgyApi.Interfaces;
 using Energy.n3rgyApi.Models;
 using Energy.Shared;
 using Fluxor;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Energy.App.Standalone.Data.EnergyReadings
 {
@@ -13,7 +13,7 @@ namespace Energy.App.Standalone.Data.EnergyReadings
     {
 
         private readonly BatchCreator _batchCreator;
-        public readonly IState<HouseholdState> _householdState;
+        private readonly IState<HouseholdState> _householdState;
         private readonly IConsumptionDataRetriever _consumptionDataRetriever;
 
         public EnergyReadingImporter(IState<HouseholdState> householdState,
@@ -27,19 +27,19 @@ namespace Energy.App.Standalone.Data.EnergyReadings
 
         public async Task<List<BasicReading>> ImportFromMoveIn(MeterType meterType, CancellationToken ctx = default)
         {
-            var startDate = _householdState.Value.MoveInDate.Value;
-            var macId = _householdState.Value.IhdMacId;
+            DateTime startDate = _householdState.Value.MoveInDate.Value;
+            string macId = _householdState.Value.IhdMacId;
 
-            var meterReadings = await GetMeterReadings(startDate, DateTime.Today, macId, meterType, ctx)
+            List<BasicReading> meterReadings = await GetMeterReadings(startDate, DateTime.Today, macId, meterType, ctx)
                 .ToListAsync(ctx);
             return meterReadings;
         }
 
         public async Task<List<BasicReading>> ImportFromDate(MeterType meterType, DateTime fromDate, CancellationToken ctx = default)
         {
-            var macId = _householdState.Value.IhdMacId;
+            string macId = _householdState.Value.IhdMacId;
 
-            var meterReadings = await GetMeterReadings(fromDate, DateTime.Today, macId, meterType, ctx)
+            List<BasicReading> meterReadings = await GetMeterReadings(fromDate, DateTime.Today, macId, meterType, ctx)
                 .ToListAsync(ctx);
             return meterReadings;
         }
@@ -50,18 +50,18 @@ namespace Energy.App.Standalone.Data.EnergyReadings
             MeterType meterType,
             [EnumeratorCancellation] CancellationToken ctx = default)
         {
-            var batches = _batchCreator.GetBatches(startDate, endDate);
+            IEnumerable<Batch> batches = _batchCreator.GetBatches(startDate, endDate);
 
-            foreach (var batch in batches)
+            foreach (Batch batch in batches)
             {
-                var response = await _consumptionDataRetriever.GetConsumptionResponse(
+                N3RgyConsumptionResponse response = await _consumptionDataRetriever.GetConsumptionResponse(
                     macId,
                     meterType,
                     batch.StartDate,
                     batch.EndDate, ctx);
 
-                var basicReadings = ConvertToBasicReadings(meterType, response);
-                foreach (var energyReading in basicReadings)
+                IEnumerable<BasicReading> basicReadings = ConvertToBasicReadings(meterType, response);
+                foreach (BasicReading energyReading in basicReadings)
                 {
                     yield return energyReading;
                 }
@@ -71,9 +71,9 @@ namespace Energy.App.Standalone.Data.EnergyReadings
         private IEnumerable<BasicReading> ConvertToBasicReadings(MeterType meterType,
             N3RgyConsumptionResponse apiResponse)
         {
-            var ukTimezone = AppDefaults.GetUkTimezone();
+            TimeZoneInfo ukTimezone = AppDefaults.GetUkTimezone();
 
-            foreach (var energyReading in apiResponse.Values)
+            foreach (ConsumptionReading energyReading in apiResponse.Values)
             {
                 double consumptionKWh;
                 if (meterType == MeterType.Gas)
@@ -85,12 +85,12 @@ namespace Energy.App.Standalone.Data.EnergyReadings
                     consumptionKWh = energyReading.Value;
                 }
 
-                var utcTime = DateTimeOffset.ParseExact(energyReading.Timestamp,
+                DateTimeOffset utcTime = DateTimeOffset.ParseExact(energyReading.Timestamp,
                     "yyyy-MM-dd HH:mm",
                     DateTimeFormatInfo.InvariantInfo,
                     DateTimeStyles.AssumeUniversal);
 
-                var localDateTimeOffset = TimeZoneInfo.ConvertTime(utcTime, ukTimezone);
+                DateTimeOffset localDateTimeOffset = TimeZoneInfo.ConvertTime(utcTime, ukTimezone);
 
                 yield return new BasicReading()
                 {

@@ -25,10 +25,22 @@
                         <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
                     </div>
                     <iframe src="https://data.n3rgy.com/consumer/sign-up" width="100%" style="height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
-                    <div id="authorizationSuccess" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
-                        
-                            <p class="text-success">Authorization Succeeded</p>
-                            <p>Your meter data is now being analysed</p>
+                    <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
+
+                        <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
+                        <MudText>Your meter data is now being loaded</MudText>
+
+                        <MudTooltip ShowOnHover="true" Text="Return to Setup">
+                            <MudLink Underline="Underline.None"
+                                     Href="@($"/HouseholdSetup")">
+                                <MudButton Color="Color.Primary"
+                                           ButtonType="ButtonType.Button"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+                            </MudLink>
+                        </MudTooltip>
+
                             @*<LoadingDataDisplay GlobalId="_meter.GlobalId"></LoadingDataDisplay>*@
                     </div>
                     <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
@@ -38,7 +50,7 @@
                     </div>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton @onclick="CheckAuthorization" Variant="Variant.Outlined" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
+                    <MudButton @onclick="CheckAuthorization" Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudPaper>
@@ -80,9 +92,12 @@
             {
                 case MeterType.Gas:
                     Dispatcher.Dispatch(new GasMeterSuccessfulAuthorizationAction());
+                    Dispatcher.Dispatch(new GasReloadReadingsAction());
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new ElectricityMeterSuccessfulAuthorizationAction());
+                    Dispatcher.Dispatch(new ElectricityReloadReadingsAction());
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

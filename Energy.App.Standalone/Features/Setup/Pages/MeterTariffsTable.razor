@@ -1,0 +1,216 @@
+﻿@inherits FluxorComponent
+@inject IState<GasTariffsState> GasTariffState
+@inject IState<ElectricityTariffsState> ElectricityTariffState
+
+@using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+@using Energy.App.Standalone.Models
+@using LabelPosition = MudBlazor.LabelPosition
+
+
+<MudTable Items="@_tariffDetailRows" Elevation="0">
+    <ToolBarContent>
+        <MudStack Spacing="1">
+            <MudText Typo="Typo.h6">Tariff History</MudText>
+            <MudText Typo="Typo.body1">@($"{MeterType} Meter")</MudText>
+            </MudStack>
+            <MudSpacer />
+            <MudIconButton OnClick="OnAddNewTariffClick"
+                       ButtonType="ButtonType.Button"
+                       Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       Class="rounded-circle"
+                       Icon="@Icons.Material.Filled.Add"
+                       Title="Add Updated Tariff"></MudIconButton>
+        </ToolBarContent>
+    <HeaderContent>
+        <MudTh></MudTh>
+
+        <MudTh>Tariff Type</MudTh>
+        <MudTh>Applies From</MudTh>
+        <MudTh>Unit Rate (p/kWh)</MudTh>
+        <MudTh>Daily Standing Charge (p/Day)</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            @if (!context.IsHourOfDayFixed)
+            {
+                <MudButton Variant="Variant.Outlined"
+                           Size="Size.Small"
+                           OnClick="@(() => context.ShowHourOfDayRows = !context.ShowHourOfDayRows)">
+                    @((context.ShowHourOfDayRows) ? "Hide" : "Show") Hourly Rates
+                </MudButton>
+            }
+        </MudTd>
+        <MudTd DataLabel="Tariff Type">
+            @(context.IsHourOfDayFixed ? "Fixed Daily Rate" : "Variable Day Rate")
+        </MudTd>
+
+        <MudTd DataLabel="Applies From">@context.DateAppliesFrom.eToLongDateString()</MudTd>
+        <MudTd DataLabel="Unit Rate (p/kWh)">
+            @if (context.IsHourOfDayFixed)
+            {
+                @context.PencePerKWh.ePenceRateDisplay()
+            }
+            else
+            {
+                @("N/A")
+            }
+        </MudTd>
+        <MudTd DataLabel="Daily Standing Charge (p/Day)">@context.DailyStandingChargePence.ePenceRateDisplay()</MudTd>
+        <MudTd DataLabel="Edit">
+            <MudButton Variant="Variant.Outlined"
+                       Size="Size.Small"
+                       OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
+        </MudTd>
+
+    </RowTemplate>
+    <ChildRowContent>
+        @if (context.ShowHourOfDayRows)
+        {
+            <MudTr>
+                <td colspan="5">
+                    <MudCard Elevation="0">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.body1">Variable Rates applying from <strong>@context.DateAppliesFrom.eToLongDateString()</strong></MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent Class="pa-0">
+                            <MudTable Items="@context.HourOfDayPrices"
+                                  Context="hourOfDayContext">
+                                
+                                <HeaderContent>
+                                    <MudTh>Hour of Day (24hr)</MudTh>
+                                    <MudTh>Unit Rate (p/kWh)</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Hour of Day (24hr)">@hourOfDayContext.HourOfDay.eTimeSpanToString()</MudTd>
+                                    <MudTd DataLabel="Unit Rate (p/kWh)">@hourOfDayContext.PencePerKWh.ePenceRateDisplay()</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+</MudTable>
+
+
+
+<MudDialog @bind-IsVisible="_showEditDialogue" Options="new DialogOptions() {CloseButton = true, CloseOnEscapeKey = true, FullWidth = true }">
+    <TitleContent>
+        @(_adding ? "Add" : "Edit") Tariff Period
+    </TitleContent>
+    <DialogContent>
+        <EditTariffForm Adding="_adding" TariffDetail="_addEditTariffDetail" MeterType="MeterType" OnSubmitCallback="TariffSubmitted"></EditTariffForm>
+    </DialogContent>
+
+</MudDialog>
+
+@code
+{
+    [Parameter] public MeterType MeterType { get; set; }
+
+    [Inject] IDialogService DialogService { get; set; }
+
+
+
+    List<TariffDetailRow> _tariffDetailRows;
+
+    bool _showEditDialogue;
+    bool _adding;
+
+
+    TariffDetail _addEditTariffDetail;
+
+    private record TariffDetailRow
+    {
+        public DateTime? DateAppliesFrom { get; set; }
+
+        public double PencePerKWh { get; set; }
+        public bool IsHourOfDayFixed { get; set; }
+
+        public double DailyStandingChargePence { get; set; }
+
+        public List<HourOfDayPrice> HourOfDayPrices { get; set; }
+        public bool ShowHourOfDayRows { get; set; }
+        public Guid GlobalId { get; set; }
+    }
+
+    protected override void OnParametersSet()
+    {
+        switch (MeterType)
+        {
+            case MeterType.Gas:
+                _tariffDetailState = GasTariffState.Value.TariffDetails;
+                break;
+            case MeterType.Electricity:
+                _tariffDetailState = ElectricityTariffState.Value.TariffDetails;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        SetTariffDetailRows();
+    }
+
+    private void OnAddNewTariffClick()
+    {
+        var exampleTariff = DefaultTariffData.GetCurrentExampleTariff(MeterType, ExampleTariffType.StandardFixedDaily);
+        _addEditTariffDetail = new TariffDetail()
+            {
+                IsHourOfDayFixed = exampleTariff.IsHourOfDayFixed,
+                PencePerKWh = exampleTariff.PencePerKWh,
+                DailyStandingChargePence = exampleTariff.DailyStandingChargePence,
+                DateAppliesFrom = DateTime.Today,
+                HourOfDayPrices = exampleTariff.DefaultHourOfDayPrices.Select(c => new HourOfDayPrice()
+                {
+                    PencePerKWh = c.PencePerKWh,
+                    HourOfDay = c.HourOfDay
+                }).ToList(),
+            };
+
+        _adding = true;
+        _showEditDialogue = true;
+    }
+
+    List<TariffDetailState> _tariffDetailState;
+
+
+    private void SetTariffDetailRows()
+    {
+        _tariffDetailRows = _tariffDetailState.Select((c, i) => new TariffDetailRow()
+            {
+                GlobalId = c.GlobalId,
+                IsHourOfDayFixed = c.IsHourOfDayFixed,
+                HourOfDayPrices = c.HourOfDayPrices.eMapToHourOfDayPrice(),
+                PencePerKWh = c.PencePerKWh,
+                DailyStandingChargePence = c.DailyStandingChargePence,
+                DateAppliesFrom = c.DateAppliesFrom,
+                ShowHourOfDayRows = false
+            }).OrderBy(c => c.DateAppliesFrom).ToList();
+    }
+
+    private Task OnEditTariffClick(TariffDetailRow context)
+    {
+        _addEditTariffDetail = _tariffDetailState.Single(c => c.GlobalId == context.GlobalId).eMapToTariffDto();
+        _adding = false;
+        _showEditDialogue = true;
+
+        return Task.CompletedTask;
+    }
+
+    private async Task TariffSubmitted(TariffDetail tariffDetail)
+    {
+        // Dispatch 
+        await MeterState.SetMeter(meter);
+        _meter = meter;
+        SetTariffDetailRows();
+        _addEditTariffDetail = null;
+        _showEditDialogue = false;
+    }
+
+}
+

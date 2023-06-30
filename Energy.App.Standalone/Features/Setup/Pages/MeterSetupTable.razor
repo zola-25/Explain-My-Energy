@@ -2,7 +2,6 @@
 @inject IState<MeterSetupState> MeterSetupState
 @inject IDispatcher Dispatcher
 
-
 <MudPaper Class="p-3" Elevation="0">
     <MudText Typo="Typo.h5">Meter Setup</MudText>
 </MudPaper>
@@ -13,7 +12,8 @@
         <MudTh>Add / Remove </MudTh>
         <MudTh>MPAN / MPRN</MudTh>
         <MudTh>Authorized</MudTh>
-        <MudTh>Reload Data</MudTh>
+        <MudTh>Energy Readings</MudTh>
+        <MudTh>Manual Update Readings</MudTh>
         <MudTh>Current Tariff</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
@@ -23,7 +23,7 @@
 
             @if (context.Added)
             {
-                <MudButton Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.GlobalId, context.MeterType))">Remove</MudButton>
+                <MudButton Class="m-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.GlobalId, context.MeterType))">Remove</MudButton>
             }
             else
             {
@@ -42,25 +42,47 @@
             }
             else
             {
-            <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
+                <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
 
-                <MudLink Disabled="@(!context.Added)" Underline="Underline.None" Href="@($"/MeterAuthorization/{context.MeterType}")" >
-                    <MudButton Color="Color.Default" Disabled="@(!context.Added)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
-                </MudLink>
-             </MudTooltip>
+                    <MudLink Disabled="@(!context.Added)" Underline="Underline.None" Href="@($"/MeterAuthorization/{context.MeterType}")">
+                        <MudButton Color="Color.Default" Disabled="@(!context.Added)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                    </MudLink>
+                </MudTooltip>
             }
         </MudTd>
-        <MudTd DataLabel="Reload Data">
+        <MudTd DataLabel="Energy Readings">
             @if (context.Authorized)
             {
-                @if (!context.Loading)
+                if (context.ReadingsLoading)
                 {
-                    <MudButton Color="Color.Secondary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small" @onclick="@(async () => await ImportData(context.GlobalId))">Reload</MudButton>
+                    <MudText>Updating...</MudText>
+                }
+                else if (context.LatestReadingsDate != null)
+                {
+                    @if (context.LatestReadingsDate.eUpToDate())
+                    {
+                        <MudText>Up to Date</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Most Recent: @context.LatestReadingsDate.Value.eDateToMinimal()</MudText>
+                    }
                 }
                 else
                 {
-                    <MudProgressCircular Indeterminate="true"></MudProgressCircular>
+                    <MudText>No Energy Readings Loaded</MudText>
                 }
+            }
+        </MudTd>
+        <MudTd DataLabel="Manual Update Readings">
+            @if (context.Authorized && !context.ReadingsLoading)
+            {
+                @if (context.LatestReadingsDate != null)
+                {
+                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate()" Class="m-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                               Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
+                }
+                <MudButton Class="m-1"  Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
             }
 
         </MudTd>
@@ -80,7 +102,7 @@
         </MudTd>
         <MudTd DataLabel="Set Tariffs">
             @*<MudTooltip Text="Tooltip">*@
-            <MudTooltip ShowOnHover="true" Text="@(context.Added ? "Set Tariffs for this Meter" : "Authorize this Meter to configure Tariffs")">
+            <MudTooltip ShowOnHover="true" Text="Set Tariffs for this Meter">
                 <MudLink Disabled="@(!context.Added)" Underline="Underline.None"
                          Href="@($"/Tariffs/{context.MeterType}")">
                     <MudButton Color="Color.Primary"
