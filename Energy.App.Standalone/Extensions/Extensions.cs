@@ -27,9 +27,18 @@ public static class Extensions
         return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
     }
 
-    public static List<HourOfDayPrice> eMapToHourOfDayPrice(this IEnumerable<HourOfDayPriceState> hourOfDayPriceStates)
+    public static List<HourOfDayPrice> eMapToHourOfDayPriceDto(this IEnumerable<HourOfDayPriceState> hourOfDayPriceStates)
     {
         return hourOfDayPriceStates.Select(c => new HourOfDayPrice
+        {
+            HourOfDay = c.HourOfDay,
+            PencePerKWh = c.PencePerKWh
+        }).ToList();
+    }
+
+    public static List<HourOfDayPriceState> eMapToHourOfDayPriceState(this IEnumerable<HourOfDayPrice> hourOfDayPriceDtos)
+    {
+        return hourOfDayPriceDtos.Select(c => new HourOfDayPriceState
         {
             HourOfDay = c.HourOfDay,
             PencePerKWh = c.PencePerKWh
@@ -43,9 +52,22 @@ public static class Extensions
             DailyStandingChargePence = tariffDetailState.DailyStandingChargePence,
             DateAppliesFrom = tariffDetailState.DateAppliesFrom,
             GlobalId = tariffDetailState.GlobalId,
-            HourOfDayPrices = tariffDetailState.HourOfDayPrices.eMapToHourOfDayPrice(),
+            HourOfDayPrices = tariffDetailState.HourOfDayPrices.eMapToHourOfDayPriceDto(),
             IsHourOfDayFixed = tariffDetailState.IsHourOfDayFixed,
             PencePerKWh = tariffDetailState.PencePerKWh
+        };
+    }
+
+    public static TariffDetailState eMapToTariffState(this TariffDetail tariffDetailDto, bool addGuidForNewTariff)
+    {
+        return new TariffDetailState
+        {
+            DailyStandingChargePence = tariffDetailDto.DailyStandingChargePence,
+            DateAppliesFrom = tariffDetailDto.DateAppliesFrom,
+            GlobalId = addGuidForNewTariff ? Guid.NewGuid() : tariffDetailDto.GlobalId,
+            HourOfDayPrices = tariffDetailDto.HourOfDayPrices.eMapToHourOfDayPriceState(),
+            IsHourOfDayFixed = tariffDetailDto.IsHourOfDayFixed,
+            PencePerKWh = tariffDetailDto.PencePerKWh
         };
     }
 

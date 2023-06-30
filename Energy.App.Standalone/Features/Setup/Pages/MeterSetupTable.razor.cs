@@ -160,10 +160,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    tariffDetailState = GasTariffsState.Value.TariffDetails;
+                    tariffDetailState = GasTariffsState.Value.TariffDetails.ToList();
                     break;
                 case MeterType.Electricity:
-                    tariffDetailState = ElectricityTariffsState.Value.TariffDetails;
+                    tariffDetailState = ElectricityTariffsState.Value.TariffDetails.ToList();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

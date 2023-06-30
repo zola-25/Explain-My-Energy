@@ -1,6 +1,6 @@
 ﻿using Energy.Shared;
 
-namespace Energy.App.Standalone.Features.Setup.Store;
+namespace Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 
 public record MeterState
 {

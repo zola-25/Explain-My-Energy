@@ -1,5 +1,6 @@
 ﻿using Energy.App.Standalone.Data;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models;
@@ -7,6 +8,7 @@ using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Setup.Store
 {
@@ -14,7 +16,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
 
     public record GasTariffsState
     {
-        public List<TariffDetailState> TariffDetails { get; init; }
+        public ImmutableList<TariffDetailState> TariffDetails { get; init; }
 
     }
 
@@ -29,7 +31,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         {
             return new GasTariffsState
             {
-                TariffDetails = new List<TariffDetailState>()
+                TariffDetails = ImmutableList<TariffDetailState>.Empty
             };
         }
     }
@@ -46,7 +48,47 @@ namespace Energy.App.Standalone.Features.Setup.Store
         }
     }
 
+    public class GasAddTariffAction {
 
+        public TariffDetail TariffDetail { get;  }
+
+        public GasAddTariffAction(TariffDetail tariffDetail)
+        {
+            TariffDetail = tariffDetail;
+        }
+    }
+
+    public class GasStoreNewTariffAction {
+
+        public TariffDetailState TariffDetailState { get;  }
+
+        public GasStoreNewTariffAction(TariffDetailState tariffDetailState)
+        {
+            TariffDetailState = tariffDetailState;
+        }
+    }
+
+    public class GasUpdateTariffAction {
+
+        public TariffDetail TariffDetail { get;  }
+
+        public GasUpdateTariffAction(TariffDetail tariffDetail)
+        {
+            TariffDetail = tariffDetail;
+        }
+    }
+
+    public class GasStoreUpdatedTariffAction {
+
+        public TariffDetailState TariffDetailState { get;  }
+
+        public GasStoreUpdatedTariffAction(TariffDetailState tariffDetailState)
+        {
+            TariffDetailState = tariffDetailState;
+        }
+    }
+
+    public class NotifyGasTariffsUpdated { }
 
     public static class GasTariffsReducers
     {
@@ -55,7 +97,26 @@ namespace Energy.App.Standalone.Features.Setup.Store
         {
             return state with
             {
-                TariffDetails = action.DefaultGasTariffs,
+                TariffDetails = state.TariffDetails.AddRange(action.DefaultGasTariffs),
+            };
+        }
+
+        [ReducerMethod]
+        public static GasTariffsState OnStoreNewTarrifAction(GasTariffsState state, GasStoreNewTariffAction action)
+        {
+            return state with
+            {
+                TariffDetails = state.TariffDetails.Add(action.TariffDetailState)
+            };
+        }
+
+        [ReducerMethod]
+        public static GasTariffsState OnStoreUpdatedTarrifAction(GasTariffsState state, GasStoreUpdatedTariffAction action)
+        {
+            var index = state.TariffDetails.FindIndex(c => c.GlobalId == action.TariffDetailState.GlobalId);
+            return state with
+            {
+                TariffDetails = state.TariffDetails.SetItem(index, action.TariffDetailState)
             };
         }
     }
@@ -85,6 +146,28 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 }).ToList();
 
             dispatcher.Dispatch(new GasExecuteSetDefaultTariffsAction(defaultTariffs));
+
+        }
+
+        [EffectMethod]
+        public void AddGasTariff(GasAddTariffAction addTariffAction, IDispatcher dispatcher)
+        {
+            var tariffState = addTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
+            
+
+            dispatcher.Dispatch(new GasStoreNewTariffAction(tariffState));
+            dispatcher.Dispatch(new NotifyGasTariffsUpdated());
+
+
+        }
+
+        [EffectMethod]
+        public void UpdateGasTariff(GasUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
+        {
+            var tariffState = updateTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
+            
+            dispatcher.Dispatch(new GasStoreUpdatedTariffAction(tariffState));
+            dispatcher.Dispatch(new NotifyGasTariffsUpdated());
 
         }
 
