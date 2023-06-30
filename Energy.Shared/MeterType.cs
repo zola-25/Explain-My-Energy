@@ -1,4 +1,4 @@
-﻿namespace Energy.App.Standalone.Models
+﻿namespace Energy.Shared
 {
 
     public enum MeterType

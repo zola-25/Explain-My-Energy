@@ -1,4 +1,5 @@
-﻿using MudBlazor;
+﻿using Energy.Shared;
+using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
 namespace Energy.App.Standalone.Models;

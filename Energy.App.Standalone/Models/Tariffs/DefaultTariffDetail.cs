@@ -1,4 +1,6 @@
-﻿namespace Energy.App.Standalone.Models.Tariffs
+﻿using Energy.Shared;
+
+namespace Energy.App.Standalone.Models.Tariffs
 {
     public record DefaultTariffDetail
     {

@@ -67,7 +67,7 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Elevation="2" Class="p-2">
-                @*<MeterSetupTable></MeterSetupTable>*@
+                <MeterSetupTable></MeterSetupTable>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -142,7 +142,9 @@ else
     private async Task HandleValidSubmit()
     {
         Dispatcher.Dispatch(new HouseholdSubmitSuccessAction(
-            _householdDetails.MoveInDate, _householdDetails.IhdMacId, _householdDetails.OutCode.OutCodeCharacters, _householdDetails.PrimaryHeatSource));
+            _householdDetails.MoveInDate, 
+            _householdDetails.IhdMacId, 
+            _householdDetails.OutCode.OutCodeCharacters, _householdDetails.PrimaryHeatSource));
 
     }
 

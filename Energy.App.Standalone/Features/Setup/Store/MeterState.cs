@@ -1,4 +1,6 @@
-﻿namespace Energy.App.Standalone.Models;
+﻿using Energy.Shared;
+
+namespace Energy.App.Standalone.Features.Setup.Store;
 
 public record MeterState
 {
@@ -7,8 +9,11 @@ public record MeterState
 
     public string Mpxn { get; init; }
 
+    public bool InitialSetupValid { get; init; }
+
     public bool Authorized { get; init; }
 
+
     public bool SetupValid { get; init; }
-    
+
 }

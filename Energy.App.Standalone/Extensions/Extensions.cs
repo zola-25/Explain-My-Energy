@@ -1,5 +1,7 @@
-﻿using Energy.App.Standalone.Models;
+﻿using Energy.App.Standalone.Features.Setup.Store;
+using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
+using Energy.Shared;
 using System.Text;
 using TimeZoneConverter;
 
@@ -8,17 +10,6 @@ namespace Energy.App.Standalone.Extensions;
 public static class Extensions
 {
 
-
-    public static TimeZoneInfo GetUkTimezone()
-    {
-        TimeZoneInfo ukTimezone = GetTimeZoneById("GMT Standard Time");
-        return ukTimezone;
-    }
-
-    public static TimeZoneInfo GetTimeZoneById(string timeZoneId)
-    {
-        return TZConvert.GetTimeZoneInfo(timeZoneId);
-    }
 
     public static string eTimeSpanToString(this TimeSpan timeSpan)
     {
@@ -33,7 +24,7 @@ public static class Extensions
 
     public static long eToUnixTime(this DateTime dateTime)
     {
-        TimeZoneInfo timeZone = GetUkTimezone();
+        TimeZoneInfo timeZone = AppDefaults.GetUkTimezone();
         return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
     }
 
@@ -96,8 +87,8 @@ public static class Extensions
             return $"Unit Rate: {tariffDetail.PencePerKWh:N0}p/kWh";
         }
 
-        var maxCost = tariffDetail.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
-        var minCost = tariffDetail.HourOfDayPrices.MinBy(c => c.PencePerKWh);
+        HourOfDayPrice maxCost = tariffDetail.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
+        HourOfDayPrice minCost = tariffDetail.HourOfDayPrices.MinBy(c => c.PencePerKWh);
         return $"Variable Unit Rate: {minCost.PencePerKWh:N0}p/kWh - {maxCost.PencePerKWh:N0}p/kWh";
     }
 
@@ -177,6 +168,17 @@ public static class Extensions
     public static MeterState eMapToMeterState(this Meter meter)
     {
         return new MeterState
+        {
+            Authorized = meter.Authorized,
+            GlobalId = meter.GlobalId,
+            MeterType = meter.MeterType,
+            Mpxn = meter.Mpxn,
+        };
+    }
+
+    public static Meter eMapToMeterDto(this MeterState meter)
+    {
+        return new Meter
         {
             Authorized = meter.Authorized,
             GlobalId = meter.GlobalId,
@@ -397,4 +399,10 @@ public static class Extensions
         string formattedName = sb.ToString();
         return formattedName;
     }
+
+    public static IEnumerable<T> eToIEnumerable<T>(this T[] items)
+    {
+        return items;
+    }
+
 }

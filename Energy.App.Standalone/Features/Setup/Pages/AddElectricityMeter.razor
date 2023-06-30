@@ -1,0 +1,91 @@
+﻿@*@page "/AddElectricityMeter"
+
+<PageTitle>Add Electricity Meter</PageTitle>
+
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2 mt-2">
+            <EditForm Model="@Meter" OnValidSubmit="@HandleValidSubmit"
+                      OnInvalidSubmit="@HandleInvalidSubmit">
+                <MudCard Elevation="0">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Add your Electricity Meter</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+
+
+                        <DataAnnotationsValidator />
+
+                        <MudTextField For="@(() => Meter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@Meter.Mpxn" Placeholder="MPAN"></MudTextField>
+                        <ValidationMessage For="@(() => Meter.Mpxn)" />
+
+                        <div class="mx-auto">
+                            <p>Don't know your Electricity Meter's MPAN number?</p>
+                            <p>Quickly find it via the <button type="button" @onclick="ToggleNationalGrid">National Grid</button></p>
+                            <iframe id="iframeNationalGrid" hidden="@HideNationalGrid"
+                                    src="https://supplier.nationalgrid.co.uk/"
+                                    width="100%" height="800px"></iframe>
+                        </div>
+
+
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add Meter</MudButton>
+
+                    </MudCardActions>
+                </MudCard>
+            </EditForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code
+{
+    [Inject]
+    public IMeterApi MeterApi { get; set; }
+
+    [Inject]
+    MeterState MeterState { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    private Meter Meter { get; set; } = new Meter
+        {
+            MeterType = MeterType.Electricity
+        };
+
+    private bool HideNationalGrid { get; set; } = true;
+
+    protected string Message = string.Empty;
+    protected string StatusClass = string.Empty;
+    protected bool Saved;
+
+    private void ToggleNationalGrid()
+    {
+        HideNationalGrid = !HideNationalGrid;
+    }
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    protected async Task HandleInvalidSubmit()
+    {
+        StatusClass = "alert-danger";
+        Message = "There are some validation errors. Please try again.";
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var newMeter = await MeterApi.AddMeterAsync(Meter);
+        await MeterState.SetMeter(newMeter);
+        NavigationManager.NavigateTo($"/MeterAuthorization/{MeterType.Electricity}");
+    }
+
+}
+*@

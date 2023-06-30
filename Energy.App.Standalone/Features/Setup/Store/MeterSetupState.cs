@@ -1,12 +1,35 @@
-﻿using Energy.App.Standalone.Models;
+﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Models;
+using Energy.Shared;
 using Fluxor;
+using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Store
 {
+    [PersistState, PriorityLoad]
+
     public record MeterSetupState
     {
         public MeterState GasMeter { get; init; }
         public MeterState ElectricityMeter { get; init; }
+
+        public IEnumerable<MeterState> MeterStates => new MeterState[] { GasMeter, ElectricityMeter }.eToIEnumerable();
+
+        public MeterState this[MeterType meterType]
+        {
+            get
+            {
+                switch (meterType)
+                {
+                    case MeterType.Gas:
+                        return GasMeter;
+                    case MeterType.Electricity:
+                        return ElectricityMeter;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null);
+                }
+            }
+        }
 
     }
 
@@ -21,122 +44,261 @@ namespace Energy.App.Standalone.Features.Setup.Store
         {
             return new MeterSetupState
             {
-                GasMeter = new MeterState
-                {
-                    GlobalId = Guid.Empty,
-                    Authorized = false,
-                    MeterType = MeterType.Gas,
-                    Mpxn = null,
-                    SetupValid = false
-                },
-                ElectricityMeter = new MeterState
-                {
-                    GlobalId = Guid.Empty,
-                    Authorized = false,
-                    MeterType = MeterType.Electricity,
-                    Mpxn = null,
-                    SetupValid = false
-                },
+                GasMeter = Utilities.GetMeterInitialState(MeterType.Gas),
+                ElectricityMeter = Utilities.GetMeterInitialState(MeterType.Electricity),
             };
+        }
+    }
+
+    public static class Utilities
+    {
+        public static MeterState GetMeterInitialState(MeterType meterType)
+        {
+
+            return new MeterState
+            {
+                GlobalId = Guid.Empty,
+                Authorized = false,
+                MeterType = meterType,
+                Mpxn = null,
+                SetupValid = false
+            };
+        }
+
+        public static MeterSetupState UpdateForMeter(MeterSetupState meterSetupState, MeterState meterState)
+        {
+            switch (meterState.MeterType)
+            {
+                case MeterType.Electricity:
+                    return meterSetupState with
+                    {
+                        ElectricityMeter = meterState
+                    };
+                case MeterType.Gas:
+                    return meterSetupState with
+                    {
+                        GasMeter = meterState
+                    };
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(meterState.MeterType));
+
+            }
+        }
+    }
+
+
+
+    public class GasMeterInitialAddAction
+    {
+        public Meter Meter { get; }
+
+        public GasMeterInitialAddAction(Meter meter)
+        {
+            Meter = meter;
+        }
+    }
+
+    public class GasMeterInitialUpdateAction
+    {
+        public Meter Meter { get; }
+
+        public GasMeterInitialUpdateAction(Meter meter)
+        {
+            Meter = meter;
+        }
+    }
+
+    public class ElectricityMeterInitialAddAction
+    {
+        public Meter Meter { get; }
+
+        public ElectricityMeterInitialAddAction(Meter meter)
+        {
+            Meter = meter;
+        }
+    }
+
+    public class ElectricityMeterInitialUpdateAction
+    {
+        public Meter Meter { get; }
+
+
+        public ElectricityMeterInitialUpdateAction(Meter meter)
+        {
+            Meter = meter;
         }
     }
 
     
 
-    public class MeterAddSuccessAction
+    public class ElectricityMeterSuccessfulAuthorizationAction
     {
-        public Meter Meter { get; }
 
-        public MeterType MeterType => Meter.MeterType;
-
-
-        public MeterAddSuccessAction(Meter meter)
-        {
-            Meter = meter;
-        }
     }
 
-    public class MeterUpdateSuccessAction
+    public class GasMeterSuccessfulAuthorizationAction
     {
-        public Meter Meter { get; }
 
-        public MeterType MeterType => Meter.MeterType;
-
-
-        public MeterUpdateSuccessAction(Meter meter)
-        {
-            Meter = meter;
-        }
     }
 
-    public class MeterAddFailureAction
+    public class MeterDeleteAction
     {
         public MeterType MeterType { get; }
+        public Guid MeterId { get; }
 
-        public MeterAddFailureAction(MeterType meterType)
+
+        public MeterDeleteAction(MeterType meterType, Guid meterId)
         {
             MeterType = meterType;
+            MeterId = meterId;
         }
-
     }
 
 
-    public class NotifyMeterReadyAction
+
+    public class NotifyGasMeterInitialSetupValidAction
     {
-        public Meter Meter { get; }
 
-        public MeterType MeterType => Meter.MeterType;
+    }
 
+    public class NotifyElectricityMeterInitialSetupValidAction
+    {
 
-        public NotifyMeterReadyAction(Meter meter)
-        {
-            Meter = meter;
-        }
     }
 
 
     public static class MeterReducers
     {
         [ReducerMethod]
-        public static MeterSetupState OnMeterAddSuccessReducer(MeterSetupState state, MeterAddSuccessAction action)
+        public static MeterSetupState OnElectricityMeterInitialAddReducer(MeterSetupState meterSetupState, ElectricityMeterInitialAddAction addSuccessAction)
         {
-            if (action.MeterType == MeterType.Electricity)
+            var meterState = meterSetupState.ElectricityMeter;
+            return meterSetupState with
             {
-                return state with
+                ElectricityMeter = meterState with
                 {
-                    ElectricityMeter = action.Meter
-                };
-            }
-            else
-            {
-                return state with
-                {
-                    GasMeter = action.Meter
-                };
-            }
+                    GlobalId = Guid.NewGuid(),
+                    InitialSetupValid = true,
+                    Authorized = false,
+                    MeterType = MeterType.Electricity,
+                    Mpxn = addSuccessAction.Meter.Mpxn
+                }
+            };
 
         }
 
-        [ReducerMethod(typeof(HouseholdSubmitFailureAction))]
-
-        public static MeterSetupState OnSubmitFailureReducer(MeterSetupState state)
+        [ReducerMethod]
+        public static MeterSetupState OnElectricityMeterInitialUpdateReducer(MeterSetupState meterSetupState, ElectricityMeterInitialUpdateAction updateSuccessAction)
         {
-            return state with
+            var meterState = meterSetupState.ElectricityMeter;
+            return meterSetupState with
             {
-                Validating = false,
-                Invalid = true,
+                ElectricityMeter = meterState with
+                {
+                    InitialSetupValid = true,
+                    Authorized = false,
+                    MeterType = MeterType.Electricity,
+                    Mpxn = updateSuccessAction.Meter.Mpxn
+                }
+            };
+
+        }
+
+        [ReducerMethod]
+        public static MeterSetupState OnGasMeterInitialAddReducer(MeterSetupState meterSetupState, GasMeterInitialAddAction addSuccessAction)
+        {
+            var meterState = meterSetupState.GasMeter;
+            return meterSetupState with
+            {
+                GasMeter = meterState with
+                {
+                    GlobalId = Guid.NewGuid(),
+                    InitialSetupValid = true,
+                    Authorized = false,
+                    Mpxn = addSuccessAction.Meter.Mpxn
+                }
+            };
+
+        }
+
+        [ReducerMethod]
+        public static MeterSetupState OnGasMeterInitialUpdateReducer(MeterSetupState meterSetupState, GasMeterInitialUpdateAction updateSuccessAction)
+        {
+            var meterState = meterSetupState.GasMeter;
+            return meterSetupState with
+            {
+                GasMeter = meterState with
+                {
+                    InitialSetupValid = true,
+                    Authorized = false,
+                    Mpxn = updateSuccessAction.Meter.Mpxn
+                }
             };
         }
-    }
 
-    public class HouseholdEffects
+        [ReducerMethod]
+        public static MeterSetupState OnElectricityMeterAuthorizationReducer(MeterSetupState meterSetupState, ElectricityMeterSuccessfulAuthorizationAction authorizationAction)
+        {
+            var meterState = meterSetupState.ElectricityMeter;
+            return meterSetupState with
+            {
+                ElectricityMeter = meterState with
+                {
+                    Authorized = true,
+                }
+            };
+        }
+
+        [ReducerMethod]
+        public static MeterSetupState OnGasMeterAuthorizationReducer(MeterSetupState meterSetupState, GasMeterSuccessfulAuthorizationAction authorizationAction)
+        {
+            var meterState = meterSetupState.GasMeter;
+            return meterSetupState with
+            {
+                GasMeter = meterState with
+                {
+                    Authorized = true,
+                }
+            };
+        }
+
+        [ReducerMethod]
+        public static MeterSetupState OnMeterDeleteReducer(MeterSetupState meterSetupState, MeterDeleteAction deleteAction)
+        {
+            MeterState resettedMeterState = Utilities.GetMeterInitialState(deleteAction.MeterType);
+            return Utilities.UpdateForMeter(meterSetupState, resettedMeterState);
+        }
+
+
+
+    }
+    public class MeterSetupEffects
     {
 
-        [EffectMethod(typeof(HouseholdSubmitSuccessAction))]
-        public async Task NotifyHouseholdReady(IDispatcher dispatcher)
+        [EffectMethod(typeof(GasMeterInitialAddAction))]
+        public async Task NotifyGasInitialAddSuccess(IDispatcher dispatcher)
         {
-            dispatcher.Dispatch(new NotifyHouseholdReadyAction());
+            dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
+        }
+
+        [EffectMethod(typeof(GasMeterInitialUpdateAction))]
+        public async Task NotifyGasInitialUpdateSuccess(IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
+        }
+
+        [EffectMethod(typeof(ElectricityMeterInitialAddAction))]
+        public async Task NotifyElectricityInitialAddSuccess(IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
+        }
+
+        [EffectMethod(typeof(ElectricityMeterInitialUpdateAction))]
+        public async Task NotifyElectricityInitialUpdateSuccess(IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
         }
     }
+
 
 }

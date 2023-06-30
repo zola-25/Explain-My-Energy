@@ -9,8 +9,8 @@ public static class ValidationExtensions
         if (meterIdentifier == null || meterIdentifier.Length != MPAN_LENGTH)
             return false;
 
-        var primeNumbers = new List<int>() { 3, 5, 7, 13, 17, 19, 23, 29, 31, 37, 41, 43 };
-        var digitCheckSumResults = new List<int>();
+        List<int> primeNumbers = new List<int>() { 3, 5, 7, 13, 17, 19, 23, 29, 31, 37, 41, 43 };
+        List<int> digitCheckSumResults = new List<int>();
 
         int primeNumberIdx = 0;
         meterIdentifier
@@ -21,7 +21,7 @@ public static class ValidationExtensions
             .ToList()
             .ForEach(x => digitCheckSumResults.Add(x * primeNumbers[primeNumberIdx++]));
 
-        var checkDigit = Convert.ToUInt16(meterIdentifier.Substring(MPAN_LENGTH - 1, 1));
+        ushort checkDigit = Convert.ToUInt16(meterIdentifier.Substring(MPAN_LENGTH - 1, 1));
 
         return checkDigit == digitCheckSumResults.Sum() % 11 % 10;
     }
@@ -33,17 +33,17 @@ public static class ValidationExtensions
 
     public static bool eIsValidMprn(this string meterIdentifier)
     {
-        var characters = meterIdentifier.ToCharArray();
+        char[] characters = meterIdentifier.ToCharArray();
 
-        var checkChars = characters[^2..^0];
-        var toCheck = characters[..^2];
+        char[] checkChars = characters[^2..^0];
+        char[] toCheck = characters[..^2];
         int length = toCheck.Length;
 
         int sumToCheck = 0;
 
-        for (var index = 0; index < toCheck.Length; index++)
+        for (int index = 0; index < toCheck.Length; index++)
         {
-            var charToCheck = toCheck[index];
+            char charToCheck = toCheck[index];
             int digit = int.Parse(charToCheck.ToString());
             int digitCheckResult = digit * (length - index);
             sumToCheck += digitCheckResult;

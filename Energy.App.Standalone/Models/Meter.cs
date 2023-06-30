@@ -1,6 +1,6 @@
-﻿using Energy.App.Standalone.Models.Tariffs;
-using Energy.App.Standalone.Extensions;
-
+﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Models.Tariffs;
+using Energy.Shared;
 using System.ComponentModel.DataAnnotations;
 
 namespace Energy.App.Standalone.Models;

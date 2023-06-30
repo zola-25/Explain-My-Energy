@@ -1,8 +1,10 @@
-﻿using Energy.App.Standalone.Models;
+﻿using Energy.Shared;
 using Fluxor;
+using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Store
 {
+    [PersistState, PriorityLoad]
     public record HouseholdState
     {
         public bool Saved { get; init; }
@@ -90,7 +92,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
             return state with
             {
                 Validating = false,
-                Invalid = true,
+                Invalid = false,
                 Saved = true,
                 OutCodeCharacters = action.OutCodeCharacters,
                 IhdMacId = action.IhdMacId,

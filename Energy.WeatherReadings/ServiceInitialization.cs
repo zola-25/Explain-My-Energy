@@ -26,10 +26,14 @@ namespace Energy.WeatherReadings
             WeatherDataOptions options = new WeatherDataOptions();
             config(options);
 
-            if (String.IsNullOrWhiteSpace(options.HistoricalApi)) throw new ArgumentException(nameof(options.HistoricalApi));
-            if (String.IsNullOrWhiteSpace(options.ForecastApi)) throw new ArgumentException(nameof(options.ForecastApi));
-            if (String.IsNullOrWhiteSpace(options.ClimateApi)) throw new ArgumentException(nameof(options.ClimateApi));
-            if (String.IsNullOrWhiteSpace(options.PostcodeLocationApi)) throw new ArgumentException(nameof(options.PostcodeLocationApi));
+            if (String.IsNullOrWhiteSpace(options.HistoricalApi))
+                throw new ArgumentException(nameof(options.HistoricalApi));
+            if (String.IsNullOrWhiteSpace(options.ForecastApi))
+                throw new ArgumentException(nameof(options.ForecastApi));
+            if (String.IsNullOrWhiteSpace(options.ClimateApi))
+                throw new ArgumentException(nameof(options.ClimateApi));
+            if (String.IsNullOrWhiteSpace(options.PostcodeLocationApi))
+                throw new ArgumentException(nameof(options.PostcodeLocationApi));
 
 
             services.Configure(config);
