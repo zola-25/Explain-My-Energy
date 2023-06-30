@@ -284,43 +284,58 @@ namespace Energy.App.Standalone.Features.Setup.Store
     {
 
         [EffectMethod(typeof(GasMeterInitialAddAction))]
-        public void NotifyGasInitialAddSuccess(IDispatcher dispatcher)
+        public Task NotifyGasInitialAddSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new GasInitiateSetDefaultTariffsAction());
 
             dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
+            return Task.CompletedTask;
         }
 
         [EffectMethod(typeof(GasMeterInitialUpdateAction))]
-        public void NotifyGasInitialUpdateSuccess(IDispatcher dispatcher)
+        public Task NotifyGasInitialUpdateSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new NotifyGasMeterInitialSetupValidAction());
+            return Task.CompletedTask;
+
         }
 
         [EffectMethod(typeof(GasMeterDeleteAction))]
-        public void DispatchGasDeleteReadingsActions(IDispatcher dispatcher)
+        public Task DispatchGasDeleteAllAssociatedDataActions(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new GasInitiateDeleteReadingsAction());
+            dispatcher.Dispatch(new DeleteAllGasTariffsAction());
+
+            return Task.CompletedTask;
+
         }
 
         [EffectMethod(typeof(ElectricityMeterInitialAddAction))]
-        public void NotifyElectricityInitialAddSuccess(IDispatcher dispatcher)
+        public Task NotifyElectricityInitialAddSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new ElectricityInitiateSetDefaultTariffsAction());
 
             dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
+            return Task.CompletedTask;
+
         }
 
         [EffectMethod(typeof(ElectricityMeterInitialUpdateAction))]
-        public void NotifyElectricityInitialUpdateSuccess(IDispatcher dispatcher)
+        public Task NotifyElectricityInitialUpdateSuccess(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new NotifyElectricityMeterInitialSetupValidAction());
+            return Task.CompletedTask;
+
         }
 
         [EffectMethod(typeof(ElectricityMeterDeleteAction))]
-        public void DispatchElectricityDeleteReadingsActions(IDispatcher dispatcher)
+        public Task DispatchElectricityDeleteAllAssociatedData(IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new ElectricityInitiateDeleteReadingsAction());
+            dispatcher.Dispatch(new DeleteAllElectricityTariffsAction());
+
+            return Task.CompletedTask;
+
         }
     }
 

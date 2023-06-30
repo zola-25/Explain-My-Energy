@@ -1,4 +1,7 @@
-﻿@*@page "/AddElectricityMeter"
+﻿@page "/AddElectricityMeter"
+@inherits FluxorComponent
+@inject IState<MeterSetupState> MeterSetupState
+@inject IDispatcher Dispatcher
 
 <PageTitle>Add Electricity Meter</PageTitle>
 
@@ -6,8 +9,7 @@
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
-            <EditForm Model="@Meter" OnValidSubmit="@HandleValidSubmit"
-                      OnInvalidSubmit="@HandleInvalidSubmit">
+            <EditForm Model="@ElectricityMeter" OnValidSubmit="@HandleValidSubmit">
                 <MudCard Elevation="0">
                     <MudCardHeader>
                         <MudText Typo="Typo.h6">Add your Electricity Meter</MudText>
@@ -17,10 +19,9 @@
 
                         <DataAnnotationsValidator />
 
-                        <MudTextField For="@(() => Meter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@Meter.Mpxn" Placeholder="MPAN"></MudTextField>
-                        <ValidationMessage For="@(() => Meter.Mpxn)" />
+                        <MudTextField For="@(() => ElectricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@ElectricityMeter.Mpxn" Placeholder="MPAN" Required></MudTextField>
 
-                        <div class="mx-auto">
+                        <div class="mt-5">
                             <p>Don't know your Electricity Meter's MPAN number?</p>
                             <p>Quickly find it via the <button type="button" @onclick="ToggleNationalGrid">National Grid</button></p>
                             <iframe id="iframeNationalGrid" hidden="@HideNationalGrid"
@@ -30,62 +31,97 @@
 
 
                     </MudCardContent>
-                    <MudCardActions>
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add Meter</MudButton>
+                    <MudCardActions Class="d-block">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
-                    </MudCardActions>
-                </MudCard>
-            </EditForm>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+                            <MudGrid Spacing="2" Class="mt-2" hidden=" @(!_submitSuccessful)">
+                                <MudItem>
 
-@code
-{
-    [Inject]
-    public IMeterApi MeterApi { get; set; }
+                                    <MudText Color="Color.Success">
+                                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
 
-    [Inject]
-    MeterState MeterState { get; set; }
+                                        Electricity Meter Valid - proceed to authorize?
+                                    </MudText>
+                                </MudItem>
+                                <MudItem>
+                                    <MudTooltip Text="Proceed to Authorize Meter for data access?">
+                                        <MudLink Underline="Underline.None" Href="@($"/MeterAuthorization/{MeterType.Electricity}")">
+                                            <MudButton Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                                        </MudLink>
+                                    </MudTooltip>
+                                </MudItem>
+                            </MudGrid>
+
+                        </MudCardActions>
+                    </MudCard>
+                </EditForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @code
+    {
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
-    private Meter Meter { get; set; } = new Meter
-        {
-            MeterType = MeterType.Electricity
-        };
+    private Meter ElectricityMeter { get; set; }
 
     private bool HideNationalGrid { get; set; } = true;
 
-    protected string Message = string.Empty;
-    protected string StatusClass = string.Empty;
-    protected bool Saved;
+    protected bool _submitSuccessful;
+
+    protected bool _addingNotUpdating;
+
+    protected override void OnParametersSet()
+    {
+        SubscribeToAction<NotifyElectricityMeterInitialSetupValidAction>(SetupValidAction);
+        MapElectricityMeter();
+
+    }
+
+    private void MapElectricityMeter()
+    {
+        var meterState = MeterSetupState.Value.GasMeter;
+        if (meterState.InitialSetupValid)
+        {
+            _addingNotUpdating = false;
+        }
+        else
+        {
+            _addingNotUpdating = true;
+        }
+        ElectricityMeter = meterState.eMapToMeterDto();
+
+    }
 
     private void ToggleNationalGrid()
     {
         HideNationalGrid = !HideNationalGrid;
     }
 
-
-
-
-    protected override async Task OnInitializedAsync()
+    private void SetupValidAction(NotifyElectricityMeterInitialSetupValidAction action)
     {
+        MapElectricityMeter();
+        ShowSuccessMessage();
     }
 
-    protected async Task HandleInvalidSubmit()
-    {
-        StatusClass = "alert-danger";
-        Message = "There are some validation errors. Please try again.";
-    }
 
     private async Task HandleValidSubmit()
     {
-        var newMeter = await MeterApi.AddMeterAsync(Meter);
-        await MeterState.SetMeter(newMeter);
-        NavigationManager.NavigateTo($"/MeterAuthorization/{MeterType.Electricity}");
+        if (_addingNotUpdating)
+        {
+            Dispatcher.Dispatch(new ElectricityMeterInitialAddAction(ElectricityMeter));
+        }
+        else
+        {
+            Dispatcher.Dispatch(new ElectricityMeterInitialUpdateAction(ElectricityMeter));
+        }
+    }
+
+    private void ShowSuccessMessage()
+    {
+        _submitSuccessful = true;
     }
 
 }
-*@

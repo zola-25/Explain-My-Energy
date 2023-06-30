@@ -7,6 +7,17 @@
 @using LabelPosition = MudBlazor.LabelPosition
 
 
+<MudTooltip ShowOnHover="true" Text="Return to Setup">
+    <MudLink  Underline="Underline.None"
+             Href="@($"/HouseholdSetup")">
+        <MudButton Class="m-1"  Color="Color.Primary"
+                   ButtonType="ButtonType.Button"
+                   Variant="Variant.Filled"
+                   Size="Size.Small"
+                   StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+    </MudLink>
+</MudTooltip>
+
 <MudTable Items="@_tariffDetailRows" Elevation="0">
     <ToolBarContent>
         <MudStack Spacing="1">

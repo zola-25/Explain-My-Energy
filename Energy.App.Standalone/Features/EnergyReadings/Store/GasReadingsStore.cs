@@ -172,10 +172,12 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         }
 
         [EffectMethod]
-        public void DeleteGasReadings(GasInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
+        public Task DeleteGasReadings(GasInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new GasExecuteDeleteReadingsAction());
             dispatcher.Dispatch(new NotifyGasReadingsDeletedAction());
+            return Task.CompletedTask;
+
         }
     }
 

@@ -168,10 +168,12 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         }
 
         [EffectMethod]
-        public void DeleteElectricityReadings(ElectricityInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
+        public Task DeleteElectricityReadings(ElectricityInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new ElectricityExecuteDeleteReadingsAction());
             dispatcher.Dispatch(new NotifyElectricityReadingsDeletedAction());
+            return Task.CompletedTask;
+
         }
     }
 

@@ -94,6 +94,9 @@ namespace Energy.App.Standalone.Features.Setup.Store
 
     public class NotifyElectricityTariffsUpdated {}
 
+    public class DeleteAllElectricityTariffsAction { }
+
+
     public static class ElectricityTariffsReducers
     {
         [ReducerMethod]
@@ -124,6 +127,15 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 TariffDetails = state.TariffDetails.SetItem(index, action.TariffDetailState)
             };
         }
+
+        [ReducerMethod]
+        public static ElectricityTariffsState OnDeleteAllTariffs(ElectricityTariffsState state, DeleteAllElectricityTariffsAction action)
+        {
+            return state with
+            {
+                TariffDetails = state.TariffDetails.Clear()
+            };
+        }
     }
 
     // Delete readings with subscribe
@@ -133,7 +145,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
     public class ElectricityTariffsEffects
     {
         [EffectMethod]
-        public void ExecuteSetDefaultElectricityTariffs(ElectricityInitiateSetDefaultTariffsAction initiateSetDefaultTariffsAction, IDispatcher dispatcher)
+        public Task ExecuteSetDefaultElectricityTariffs(ElectricityInitiateSetDefaultTariffsAction initiateSetDefaultTariffsAction, IDispatcher dispatcher)
         {
             var defaultTariffs = DefaultTariffData.DefaultTariffs.Where(c => c.ExampleTariffType == ExampleTariffType.StandardFixedDaily
                 && c.MeterType == MeterType.Electricity).Select(c => new TariffDetailState
@@ -151,28 +163,32 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 }).ToList();
 
             dispatcher.Dispatch(new ElectricityExecuteSetDefaultTariffsAction(defaultTariffs));
+            return Task.CompletedTask;
 
         }
 
          [EffectMethod]
-        public void AddElectricityTariff(ElectricityAddTariffAction addTariffAction, IDispatcher dispatcher)
+        public Task AddElectricityTariff(ElectricityAddTariffAction addTariffAction, IDispatcher dispatcher)
         {
             var tariffState = addTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
             
 
             dispatcher.Dispatch(new ElectricityStoreNewTariffAction(tariffState));
             dispatcher.Dispatch(new NotifyElectricityTariffsUpdated());
+            return Task.CompletedTask;
 
         }
 
         [EffectMethod]
-        public void UpdateElectricityTariff(ElectricityUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
+        public Task UpdateElectricityTariff(ElectricityUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
         {
             var tariffState = updateTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
             
             dispatcher.Dispatch(new ElectricityStoreUpdatedTariffAction(tariffState));
 
             dispatcher.Dispatch(new NotifyElectricityTariffsUpdated());
+            return Task.CompletedTask;
+
         }
 
     }

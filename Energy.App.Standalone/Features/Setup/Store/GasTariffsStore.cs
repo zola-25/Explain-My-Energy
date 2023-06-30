@@ -88,6 +88,8 @@ namespace Energy.App.Standalone.Features.Setup.Store
         }
     }
 
+    public class DeleteAllGasTariffsAction { }
+
     public class NotifyGasTariffsUpdated { }
 
     public static class GasTariffsReducers
@@ -119,6 +121,15 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 TariffDetails = state.TariffDetails.SetItem(index, action.TariffDetailState)
             };
         }
+
+        [ReducerMethod]
+        public static GasTariffsState OnDeleteAllTariffs(GasTariffsState state, DeleteAllGasTariffsAction action)
+        {
+            return state with
+            {
+                TariffDetails = state.TariffDetails.Clear()
+            };
+        }
     }
 
     // Delete readings with subscribe
@@ -128,7 +139,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
     public class GasTariffsEffects
     {
         [EffectMethod]
-        public void ExecuteSetDefaultGasTariffs(GasInitiateSetDefaultTariffsAction initiateSetDefaultTariffsAction, IDispatcher dispatcher)
+        public Task ExecuteSetDefaultGasTariffs(GasInitiateSetDefaultTariffsAction initiateSetDefaultTariffsAction, IDispatcher dispatcher)
         {
             var defaultTariffs = DefaultTariffData.DefaultTariffs.Where(c => c.ExampleTariffType == ExampleTariffType.StandardFixedDaily
                 && c.MeterType == MeterType.Gas).Select(c => new TariffDetailState
@@ -146,28 +157,30 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 }).ToList();
 
             dispatcher.Dispatch(new GasExecuteSetDefaultTariffsAction(defaultTariffs));
+            return Task.CompletedTask;
 
         }
 
         [EffectMethod]
-        public void AddGasTariff(GasAddTariffAction addTariffAction, IDispatcher dispatcher)
+        public Task AddGasTariff(GasAddTariffAction addTariffAction, IDispatcher dispatcher)
         {
             var tariffState = addTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
             
 
             dispatcher.Dispatch(new GasStoreNewTariffAction(tariffState));
             dispatcher.Dispatch(new NotifyGasTariffsUpdated());
-
+            return Task.CompletedTask;
 
         }
 
         [EffectMethod]
-        public void UpdateGasTariff(GasUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
+        public Task UpdateGasTariff(GasUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
         {
             var tariffState = updateTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
             
             dispatcher.Dispatch(new GasStoreUpdatedTariffAction(tariffState));
             dispatcher.Dispatch(new NotifyGasTariffsUpdated());
+            return Task.CompletedTask;
 
         }
 
