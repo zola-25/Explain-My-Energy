@@ -2,13 +2,10 @@ using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
-using Energy.App.Standalone.Models;
-using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using System.Diagnostics.Metrics;
 
 namespace Energy.App.Standalone.Features.Setup.Pages
 {
@@ -116,7 +113,7 @@ namespace Energy.App.Standalone.Features.Setup.Pages
 
         private MeterStatus MeterStateToStatus(MeterState meterState)
         {
-            var tariffInfo = GetTariffInfo(meterState.MeterType);
+            TariffInfo tariffInfo = GetTariffInfo(meterState.MeterType);
 
             return new MeterStatus()
             {
@@ -246,6 +243,6 @@ namespace Energy.App.Standalone.Features.Setup.Pages
 
     public record TariffInfo(bool HasActiveTariff, string TariffUnitRateText, string TariffStandingChargeText)
     {
-        
+
     }
 }

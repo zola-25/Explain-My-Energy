@@ -1,0 +1,79 @@
+﻿@inherits FluxorComponent
+@inject IState<WeatherState> WeatherState
+@inject IState<HouseholdState> HouseholdState
+@inject IDispatcher Dispatcher
+
+<MudSimpleTable Style="overflow-x: auto;">
+    <thead>
+        <tr>
+            <th>Historical Data</th>
+            <th>Latest Reading</th>
+            <th>Forecast Range</th>
+            <th>Climate Forecast Range</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @if(!HouseholdState.Value.Saved)
+            {
+                <td colspan="4">Complete Household setup to import local weather data</td>
+            }
+            @if (WeatherState.Value.Loading)
+            {
+                <td colspan="4">Loading Weather Data...</td>
+            }
+            else
+            {
+                <td>From @WeatherState.Value.WeatherReadings.First().ReadDate.eDateToMinimal()</td>
+                <td>
+                    @{
+                        var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.ReadDate).Last().ReadDate;
+                    }
+
+                    @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
+                    {
+                        <MudTooltip Text="Up to date">
+                            @latestReading.eDateToMinimal()
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon>
+                        </MudTooltip>
+                    }
+                    else
+                    {
+                        <MudTooltip Text="Missing Latest Weather Data">
+                            @latestReading.eDateToMinimal()
+                            <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Default"></MudIcon>
+                        </MudTooltip>
+                    }
+                </td>
+                <td>
+                    @{
+                        var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).OrderBy(c => c.ReadDate).ToList();
+                    }
+                    @forecastReadings.First().ReadDate.eDateToMinimal() - @forecastReadings.Last().ReadDate.eDateToMinimal()
+                </td>
+                <td>
+                    @{
+                        var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).OrderBy(c => c.ReadDate).ToList();
+                    }
+                    @climateReadings.First().ReadDate.eDateToMinimal() - @climateReadings.Last().ReadDate.eDateToMinimal()
+
+                </td>
+            }
+        </tr>
+    </tbody>
+</MudSimpleTable>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        SubscribeToAction<NotifyHouseholdReadyAction>((action) => { LoadWeatherData(); });
+    }
+
+    void LoadWeatherData()
+    {
+        Dispatcher.Dispatch(new WeatherLoadReadingsAction(HouseholdState.Value.OutCodeCharacters));
+    }
+}

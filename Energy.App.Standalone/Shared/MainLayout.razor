@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using Energy.App.Standalone.Features;
+@using Fluxor.Blazor.Web.Components;
+@using Fluxor.Persist.Middleware;
+@inherits FluxorLayout
+@inject IDispatcher Dispatcher
+
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -23,6 +28,18 @@
 
 @code {
 
+    [Inject] IAppInitialization AppInitialization { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
+        {
+            Console.WriteLine($"**** State rehydrated**");
+            AppInitialization.Initialize();
+            this.StateHasChanged();// we now have state, we can re-render to reflect binding changes
+        });
+    }
 
     bool _drawerOpen = true;
 

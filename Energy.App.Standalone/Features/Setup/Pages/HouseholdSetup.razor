@@ -1,4 +1,5 @@
 ﻿@page "/HouseholdSetup"
+@using Energy.App.Standalone.Features.Weather.Pages
 
 @inherits FluxorComponent
 @inject IState<HouseholdState> HouseholdState
@@ -57,7 +58,7 @@
                         <MudCardActions>
                             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
 
-                            <MudText Color="Color.Success" hidden="@(!_submitSuccessful)">
+                            <MudText Class="m-1" Color="Color.Success" hidden="@(!_submitSuccessful)">
                                 @_saveResponseMessage
                             </MudText>
                         </MudCardActions>
@@ -65,6 +66,12 @@
                 </EditForm>
             </MudPaper>
         </MudItem>
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="p-2">
+                <WeatherDataInfo></WeatherDataInfo>
+            </MudPaper>
+        </MudItem>
+
         <MudItem xs="12">
             <MudPaper Elevation="2" Class="p-2">
                 <MeterSetupTable></MeterSetupTable>

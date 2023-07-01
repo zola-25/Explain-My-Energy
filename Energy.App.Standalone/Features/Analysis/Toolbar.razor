@@ -1,0 +1,137 @@
+﻿@using LabelPosition = MudBlazor.LabelPosition
+@inherits FluxorComponent
+@inject IState<AnalysisOptionsState> AnalysisOptionsState
+@inject IDispatcher Dispatcher
+
+<MudToolBar>
+    <MudPaper Elevation="0">
+
+        <MudSwitch Checked="_toggled"
+                   T="bool"
+                   CheckedChanged="OnToggledChanged"
+                   Color="Color.Surface"
+                   ThumbIcon="@(_toggled ? Icons.Material.Filled.CurrencyPound : Icons.Material.Filled.ShowChart)"
+                   UnCheckedColor="Color.Primary"
+                   Label="@_labelText"
+                   LabelPosition="LabelPosition.Start" />
+    </MudPaper>
+
+    <MudSpacer />
+
+    <MudPaper Elevation="0" MinWidth="200px;">
+
+        <MudSelect 
+                    Class="w-100"
+                   Value="_calendarTerm"
+                   ValueChanged="TermChanged"
+                   Label="Change Term"
+                   Variant="Variant.Text"
+                   T="CalendarTerm"
+                   Dense="true"
+                   OpenIcon="@Icons.Material.Filled.AccessTime"
+                   AdornmentColor="Color.Dark">
+            @foreach (CalendarTerm term in Enum.GetValues(typeof(CalendarTerm)))
+            {
+                <MudSelectItem Value="@term">@term.TermAdjective()</MudSelectItem>
+            }
+        </MudSelect>
+    </MudPaper>
+
+    <MudSpacer />
+
+    <MudPaper Elevation="0">
+        @if (IsPrimaryHeatingSource)
+        {
+            <MudNumericField @bind-Value="@_degreesDifference"
+                             TextChanged="DegreeDifferenceChange"
+                             Immediate="true"
+                             Max="50"
+                             Min="-50"
+                             Class="right-align-input"
+                             Style="width: 150px;"
+                             T="double"
+                             Label="Adjust Forecast" Variant="Variant.Text"
+                             Step="1"
+                             Adornment="Adornment.End"
+                             AdornmentText="°C"/>
+        }
+    </MudPaper>
+    @*<MudText Style="font-size: xx-large" Inline="true">@ForecastAnalysis.TemperatureRange.Symbol</MudText>*@
+</MudToolBar>
+
+<style>
+    .right-align-input input {
+        text-align: right;
+    }
+</style>
+@code {
+
+    [Parameter, EditorRequired] public bool IsPrimaryHeatingSource { get; set; }
+
+    [Parameter, EditorRequired] public MeterType MeterType { get; set; }
+
+    AnalysisOptionsActionFactory AnalysisOptionsActionFactory { get; set; } 
+
+
+    [Inject]
+    ForecastState ForecastState { get; set; }
+
+    CalendarTerm _calendarTerm;
+
+    bool _toggled;
+    string _labelText => _toggled ? "Chart Cost" : "Chart kWh";
+
+    protected override void OnParametersSet()
+    {
+        AnalysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
+        _firstSet = true;
+
+
+        _toggled = AnalysisOptionsState.Value[MeterType].ShowCost;
+        _calendarTerm = AnalysisOptionsState.Value[MeterType].CalendarTerm;
+        _degreesDifference = ForecastState.GetDegreeDifference(MeterType);
+    }
+
+    private async Task OnToggledChanged(bool on)
+    {
+        var action = AnalysisOptionsActionFactory.Create(AnalysisAction.ShowCost, on);
+
+        Dispatcher.Dispatch(action);
+
+        _toggled = on;
+    }
+
+    private async Task TermChanged(CalendarTerm newTerm)
+    {
+        var action = AnalysisOptionsActionFactory.Create(AnalysisAction.SetCalenderTerm, newTerm);
+
+        Dispatcher.Dispatch(action);
+        _calendarTerm = newTerm;
+    }
+
+    bool _firstSet = true;
+    private double _degreesDifference;
+
+    private async Task DegreeDifferenceChange(string degreesFromForecastString)
+    {
+        if (_firstSet)
+        {
+            _firstSet = false;
+            return;
+        }
+        if (String.IsNullOrWhiteSpace(degreesFromForecastString))
+        {
+            degreesFromForecastString = "0";
+        }
+
+        var degreeDifference = Convert.ToDouble(degreesFromForecastString);
+
+        if (Math.Abs(degreeDifference - ForecastState.GetDegreeDifference(MeterType)) < 0.01)
+        {
+            return;
+        }
+        _degreesDifference = degreeDifference;
+        await ForecastState.UpdateDegreeDifference(MeterType, degreeDifference);
+    }
+
+}

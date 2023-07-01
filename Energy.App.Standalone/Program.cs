@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Features;
 using Energy.App.Standalone.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
@@ -28,7 +29,10 @@ System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
     Fluxor.DependencyInjection.FluxorOptions fluxorOptions = options.ScanAssemblies(currentAssembly);
-    fluxorOptions.UseReduxDevTools();
+    fluxorOptions.UseReduxDevTools(options =>
+    {
+        options.EnableStackTrace();
+    });
     fluxorOptions.UsePersist(options =>
     {
         options.UseInclusionApproach();
@@ -41,6 +45,7 @@ builder.Services.AddN3rgyServices();
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
 builder.Services.AddTransient<IEnergyReadingImporter, EnergyReadingImporter>();
 
+builder.Services.AddScoped<IAppInitialization, AppInitialization>();
 
 builder.Services.AddMudServices(config =>
 {

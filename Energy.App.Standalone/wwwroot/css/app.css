@@ -104,3 +104,32 @@ a, .btn-link {
     pointer-events: none;
 }
 
+@media screen and (min-width: 300px) {
+    #national-grid-iframe-container.toggled {
+        height: 1000px;
+    }
+}
+
+@media screen and (min-width: 400px) {
+    #national-grid-iframe-container.toggled {
+        height: 900px;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    #national-grid-iframe-container.toggled {
+        height: 800px;
+    }
+    
+}
+
+@media only screen and (min-width: 1088px) {
+    #national-grid-iframe-container.toggled {
+        height: 600px;
+    }
+}
+
+#national-grid-iframe-container iframe {
+    width: 100%;
+    height: 90%;
+}

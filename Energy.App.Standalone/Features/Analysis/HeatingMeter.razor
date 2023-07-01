@@ -1,0 +1,26 @@
+﻿@page "/" 
+@page "/HeatingMeter/{MeterTypeName}"
+
+
+    <MeterAnalysisTemplate MeterType="_meterType"  PrimaryHeatSource="true">
+        <EnergyChart>
+            <EnergyTemperatureChart MeterGlobalId="_meterGlobalId" MeterType="_meterType"></EnergyTemperatureChart>
+        </EnergyChart>
+        <Summary>
+            <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
+        </Summary>
+
+    </MeterAnalysisTemplate>
+
+@code {
+
+    [Parameter] public string MeterTypeName { get; set; }
+
+    MeterType _meterType;
+
+    protected override void OnParametersSet()
+    {
+        _meterType = MeterTypeName.eStringToEnum<MeterType>();
+    }
+}
+

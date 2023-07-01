@@ -1,0 +1,88 @@
+﻿
+<MudCard Elevation="2">
+    <MudCardContent>
+        <MudPaper Class="d-flex flex-column flex-grow-1 m-1" Elevation="0">
+            <MudText Typo="Typo.h5">@_headerText</MudText>
+            <MudText Typo="Typo.caption">@TotalsSoFar.DateRangeText</MudText>
+        </MudPaper>
+        <MudText Class="ml-1" Typo="Typo.caption"><strong>To Date</strong></MudText>
+        <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
+            <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsSoFar.PeriodCost.eToMoneyFormat()</MudChip>
+            <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon" >@TotalsSoFar.PeriodConsumptionKWh kWh</MudChip>
+            <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" >@TotalsSoFar.PeriodCo2 kgCO<sub>2</sub></MudChip>
+        </MudPaper>
+        <MudText Class="ml-1" Typo="Typo.caption"><strong>@Term.TermAdjective() Forecast</strong></MudText>
+
+        <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
+
+            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsForecast.ForecastCostPence.eToMoneyFormat()</MudChip>
+            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon" >@TotalsForecast.ForecastConsumption kWh</MudChip>
+            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" >@TotalsForecast.ForecastCo2 kgCO<sub>2</sub></MudChip>
+        </MudPaper>
+
+        @if (PrimaryHeatSource)
+        {
+            <MudDivider DividerType="DividerType.Middle"></MudDivider>
+            <MudPaper Class="my-2 d-flex justify-center" Elevation="0">
+
+                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@TotalsForecast.TemperatureRange.TemperatureColourStyle">@TotalsForecast.TemperatureRange.TemperatureText</MudChip>
+
+            </MudPaper>
+        }
+        <MudDivider DividerType="DividerType.Middle"></MudDivider>
+        <MudCardActions Class="d-flex justify-center">
+
+            <MudToggleIconButton Toggled="_highlightToggled"
+                                 ToggledChanged="ToggleHighlight"
+                                 Variant="Variant.Filled"
+                                 Icon="@Icons.Material.Filled.ZoomIn" Color="@Color.Secondary" 
+                                 Title="Highlight"
+                                 ToggledIcon="@Icons.Material.Filled.ZoomOut"
+                                 ToggledColor="@Color.Tertiary" ToggledTitle="Highligted"/>
+        </MudCardActions>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired] public bool PrimaryHeatSource { get; set; }
+    [Parameter, EditorRequired] public MeterType MeterType { get; set; }
+    [Parameter, EditorRequired] public CalendarTerm Term { get; set; }
+
+    [Parameter, EditorRequired] public HistoricalAnalysis TotalsSoFar { get; set; }
+    [Parameter, EditorRequired] public ForecastAnalysis TotalsForecast { get; set; }
+
+    [Inject] AnalysisOptions AnalysisOptions { get; set; }
+
+    string _consumptionIcon = Icons.Material.Filled.ElectricBolt;
+    string _headerText;
+
+    private bool _highlightToggled;
+
+    protected override void OnParametersSet()
+    {
+        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Current, TotalsSoFar.Start);
+        _consumptionIcon = MeterType == MeterType.Electricity ? Icons.Material.Filled.ElectricBolt : Icons.Material.Filled.LocalFireDepartment;
+    }
+
+    private async Task ToggleHighlight(bool toggled)
+    {
+        if (toggled)
+        {
+            await AnalysisOptions[MeterType].SetHighlightRange(TotalsSoFar.Start, TotalsForecast.End);
+            AnalysisOptions[MeterType].NotifySetHighlightRange += HighlightRangeChanged;
+        }
+        else
+        {
+            await AnalysisOptions[MeterType].RemoveHighlightRange();
+            AnalysisOptions[MeterType].NotifySetHighlightRange -= HighlightRangeChanged;
+        }
+        _highlightToggled = toggled;
+    }
+
+    private Task HighlightRangeChanged(DateTime startDate, DateTime endDate)
+    {
+        _highlightToggled = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

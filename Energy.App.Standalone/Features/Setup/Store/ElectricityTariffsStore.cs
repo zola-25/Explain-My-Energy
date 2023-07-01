@@ -1,9 +1,6 @@
 ﻿using Energy.App.Standalone.Data;
-using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
-using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using Fluxor;
@@ -92,7 +89,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         }
     }
 
-    public class NotifyElectricityTariffsUpdated {}
+    public class NotifyElectricityTariffsUpdated { }
 
     public class DeleteAllElectricityTariffsAction { }
 
@@ -108,7 +105,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
             };
         }
 
-        
+
         [ReducerMethod]
         public static ElectricityTariffsState OnStoreNewTarrifAction(ElectricityTariffsState state, ElectricityStoreNewTariffAction action)
         {
@@ -121,7 +118,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [ReducerMethod]
         public static ElectricityTariffsState OnStoreUpdatedTarrifAction(ElectricityTariffsState state, ElectricityStoreUpdatedTariffAction action)
         {
-            var index = state.TariffDetails.FindIndex(c => c.GlobalId == action.TariffDetailState.GlobalId);
+            int index = state.TariffDetails.FindIndex(c => c.GlobalId == action.TariffDetailState.GlobalId);
             return state with
             {
                 TariffDetails = state.TariffDetails.SetItem(index, action.TariffDetailState)
@@ -147,7 +144,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [EffectMethod]
         public Task ExecuteSetDefaultElectricityTariffs(ElectricityInitiateSetDefaultTariffsAction initiateSetDefaultTariffsAction, IDispatcher dispatcher)
         {
-            var defaultTariffs = DefaultTariffData.DefaultTariffs.Where(c => c.ExampleTariffType == ExampleTariffType.StandardFixedDaily
+            List<TariffDetailState> defaultTariffs = DefaultTariffData.DefaultTariffs.Where(c => c.ExampleTariffType == ExampleTariffType.StandardFixedDaily
                 && c.MeterType == MeterType.Electricity).Select(c => new TariffDetailState
                 {
                     GlobalId = Guid.NewGuid(),
@@ -167,11 +164,11 @@ namespace Energy.App.Standalone.Features.Setup.Store
 
         }
 
-         [EffectMethod]
+        [EffectMethod]
         public Task AddElectricityTariff(ElectricityAddTariffAction addTariffAction, IDispatcher dispatcher)
         {
-            var tariffState = addTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
-            
+            TariffDetailState tariffState = addTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
+
 
             dispatcher.Dispatch(new ElectricityStoreNewTariffAction(tariffState));
             dispatcher.Dispatch(new NotifyElectricityTariffsUpdated());
@@ -182,8 +179,8 @@ namespace Energy.App.Standalone.Features.Setup.Store
         [EffectMethod]
         public Task UpdateElectricityTariff(ElectricityUpdateTariffAction updateTariffAction, IDispatcher dispatcher)
         {
-            var tariffState = updateTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
-            
+            TariffDetailState tariffState = updateTariffAction.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
+
             dispatcher.Dispatch(new ElectricityStoreUpdatedTariffAction(tariffState));
 
             dispatcher.Dispatch(new NotifyElectricityTariffsUpdated());

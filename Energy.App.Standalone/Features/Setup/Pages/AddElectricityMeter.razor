@@ -9,6 +9,16 @@
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
+            <MudTooltip ShowOnHover="true" Text="Return to Setup">
+                <MudLink Underline="Underline.None"
+                         Href="@($"/HouseholdSetup")">
+                    <MudButton Class="m-1" Color="Color.Primary"
+                               ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+                </MudLink>
+            </MudTooltip>
             <EditForm Model="@ElectricityMeter" OnValidSubmit="@HandleValidSubmit">
                 <MudCard Elevation="0">
                     <MudCardHeader>
@@ -19,14 +29,14 @@
 
                         <DataAnnotationsValidator />
 
-                        <MudTextField For="@(() => ElectricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@ElectricityMeter.Mpxn" Placeholder="MPAN" Required></MudTextField>
+                        <MudInput  For="@(() => ElectricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@ElectricityMeter.Mpxn" Placeholder="MPAN" Required></MudInput>
 
-                        <div class="mt-5">
+                        <div id="national-grid-iframe-container" class="mt-5 @(!HideNationalGrid ? "toggled" : "")">
                             <p>Don't know your Electricity Meter's MPAN number?</p>
-                            <p>Quickly find it via the <button type="button" @onclick="ToggleNationalGrid">National Grid</button></p>
+                            <p>Quickly find it via the <MudButton Size="Size.Small" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Bolt" Variant="Variant.Outlined" Color="Color.Default" @onclick="ToggleNationalGrid">National Grid</MudButton></p>
                             <iframe id="iframeNationalGrid" hidden="@HideNationalGrid"
                                     src="https://supplier.nationalgrid.co.uk/"
-                                    width="100%" height="800px"></iframe>
+                                    ></iframe>
                         </div>
 
 
@@ -59,6 +69,7 @@
         </MudItem>
     </MudGrid>
 
+
     @code
     {
 
@@ -82,7 +93,7 @@
 
     private void MapElectricityMeter()
     {
-        var meterState = MeterSetupState.Value.GasMeter;
+        var meterState = MeterSetupState.Value.ElectricityMeter;
         if (meterState.InitialSetupValid)
         {
             _addingNotUpdating = false;

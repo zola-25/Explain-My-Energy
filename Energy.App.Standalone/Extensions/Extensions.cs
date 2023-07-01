@@ -128,7 +128,7 @@ public static class Extensions
         return $"{meter.GlobalId}-basicReadings";
     }
 
-    
+
     public static string eTariffUnitRateText(this TariffDetailState tariffDetailState)
     {
 

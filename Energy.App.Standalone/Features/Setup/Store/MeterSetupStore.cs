@@ -69,26 +69,8 @@ namespace Energy.App.Standalone.Features.Setup.Store
             };
         }
 
-        public static MeterSetupState UpdateForMeter(MeterSetupState meterSetupState, MeterState meterState)
-        {
-            switch (meterState.MeterType)
-            {
-                case MeterType.Electricity:
-                    return meterSetupState with
-                    {
-                        ElectricityMeter = meterState
-                    };
-                case MeterType.Gas:
-                    return meterSetupState with
-                    {
-                        GasMeter = meterState
-                    };
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(meterState.MeterType));
-
-            }
-        }
     }
+
 
 
 

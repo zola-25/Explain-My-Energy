@@ -1,9 +1,11 @@
 ﻿using Energy.Shared;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
+using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Weather.Store
 {
+    [PersistState, PriorityLoad]
     public record WeatherState
     {
         public bool Loading { get; init; }
