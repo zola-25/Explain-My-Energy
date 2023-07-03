@@ -25,6 +25,11 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         {
             var firstMeterTariffDate = meterTariffDetails.Any() ? meterTariffDetails.MinBy(c => c.DateAppliesFrom.Value)?.DateAppliesFrom : null;
 
+            // TODO: Get accurate for historical
+            //TODO: Check vs old engeniq
+            //TODO: Store costed readings for better performance
+            //TODO: Catch failed downloads so not stuck in updating state
+            // TODO check redux stack trace not slowing down
 
             List<Tariff> applicableTariffs =
                 meterTariffDetails.Select(c => new Tariff()
