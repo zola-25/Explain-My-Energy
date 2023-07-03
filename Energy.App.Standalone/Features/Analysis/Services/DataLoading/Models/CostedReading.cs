@@ -1,16 +1,16 @@
 ﻿namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
 {
-    public class CostedReading
+    public record CostedReading
     {
-        public DateTime LocalTime { get; set; }
-        public double PencePerKWh { get; set; }
-        public double CostPence => KWh * PencePerKWh + HalfHourlyStandingCharge;
-        public double DailyStandingChargePence { get; set; }
-        public double KWh { get; set; }
-        public double HalfHourlyStandingCharge { get; set; }
-        public DateTime TariffAppliesFrom { get; set; }
-        public TariffType TariffType { get; set; }
-        public bool Forecast { get; set; }
+        public DateTime LocalTime { get; init; }
+        public decimal PencePerKWh { get; init; }
+        public decimal CostPence { get; init; } 
+        public decimal DailyStandingChargePence { get; init; }
+        public decimal KWh { get; init; }
+        public decimal HalfHourlyStandingChargePence { get; init; }
+        public DateTime TariffAppliesFrom { get; init; }
+        public TariffType TariffType { get; init; }
+        public bool Forecast { get; init; }
     }
 
     public class ChartReading

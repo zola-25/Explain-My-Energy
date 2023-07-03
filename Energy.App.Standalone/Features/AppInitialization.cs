@@ -43,7 +43,7 @@ namespace Energy.App.Standalone.Features
             }
             else
             {
-                DateTime latestReading = _weatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.ReadDate).First().ReadDate;
+                DateTime latestReading = _weatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.UtcReadDate).First().UtcReadDate;
                 if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
                 {
                     _dispatcher.Dispatch(new WeatherLoadReadingsAction(_householdState.Value.OutCodeCharacters));
@@ -54,7 +54,7 @@ namespace Energy.App.Standalone.Features
             {
                 if (_electricityReadingsState.Value.BasicReadings.Any())
                 {
-                    DateTime lastReading = _electricityReadingsState.Value.BasicReadings.Last().LocalTime;
+                    DateTime lastReading = _electricityReadingsState.Value.BasicReadings.Last().UtcTime;
                     if (lastReading < DateTime.Today.AddDays(-1))
                     {
                         _dispatcher.Dispatch(new ElectricityUpdateReadingsAction(lastReading.Date));
@@ -70,7 +70,7 @@ namespace Energy.App.Standalone.Features
             {
                 if (_gasReadingsState.Value.BasicReadings.Any())
                 {
-                    DateTime lastReading = _gasReadingsState.Value.BasicReadings.Last().LocalTime;
+                    DateTime lastReading = _gasReadingsState.Value.BasicReadings.Last().UtcTime;
                     if (lastReading < DateTime.Today.AddDays(-1))
                     {
                         _dispatcher.Dispatch(new GasUpdateReadingsAction(lastReading.Date));

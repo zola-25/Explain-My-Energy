@@ -1,9 +1,9 @@
 ﻿namespace Energy.Shared
 {
-    public class BasicReading
+    public record BasicReading
     {
-        public double KWh { get; set; }
-        public DateTime LocalTime { get; set; }
-        public bool Forecast { get; set; }
+        public decimal KWh { get; init; }
+        public DateTime UtcTime { get; init; }
+        public bool Forecast { get; init; }
     }
 }

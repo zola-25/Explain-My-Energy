@@ -2,6 +2,7 @@
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Store
 {
@@ -11,7 +12,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         public bool Reloading { get; init; }
         public bool Updating { get; init; }
 
-        public List<BasicReading> BasicReadings { get; init; }
+        public ImmutableList<BasicReading> BasicReadings { get; init; }
     }
 
     public class ElectricityReadingsFeature : Feature<ElectricityReadingsState>
@@ -27,7 +28,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             {
                 Reloading = false,
                 Updating = false,
-                BasicReadings = new List<BasicReading>()
+                BasicReadings = ImmutableList<BasicReading>.Empty
             };
         }
     }
@@ -84,7 +85,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return state with
             {
-                BasicReadings = action.BasicReadings,
+                BasicReadings = action.BasicReadings.ToImmutableList(),
                 Reloading = false
             };
         }
@@ -111,11 +112,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         [ReducerMethod]
         public static ElectricityReadingsState OnStoreUpdatedReadingsReducer(ElectricityReadingsState state, ElectricityStoreUpdatedReadingsAction action)
         {
-            List<BasicReading> readingsToUpdate = state.BasicReadings.ToList();
-            readingsToUpdate.AddRange(action.NewReadings);
             return state with
             {
-                BasicReadings = readingsToUpdate,
+                BasicReadings = state.BasicReadings.AddRange(action.NewReadings),
                 Updating = false
             };
         }
@@ -134,7 +133,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return state with
             {
-                BasicReadings = new List<BasicReading>(),
+                BasicReadings = ImmutableList<BasicReading>.Empty,
                 Updating = false
             };
         }

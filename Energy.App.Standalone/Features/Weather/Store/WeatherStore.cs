@@ -2,6 +2,7 @@
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
 using Fluxor.Persist.Storage;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Weather.Store
 {
@@ -9,7 +10,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
     public record WeatherState
     {
         public bool Loading { get; init; }
-        public List<DailyWeatherReading> WeatherReadings { get; init; }
+        public ImmutableList<DailyWeatherReading> WeatherReadings { get; init; }
     }
 
     public class WeatherFeature : Feature<WeatherState>
@@ -24,7 +25,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
             return new WeatherState
             {
                 Loading = false,
-                WeatherReadings = new List<DailyWeatherReading>()
+                WeatherReadings = ImmutableList<DailyWeatherReading>.Empty
             };
         }
     }
@@ -58,7 +59,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
         {
             return state with
             {
-                WeatherReadings = action.WeatherReadings,
+                WeatherReadings = action.WeatherReadings.ToImmutableList(),
                 Loading = false
             };
         }

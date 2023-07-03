@@ -1,7 +1,12 @@
-﻿@using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+﻿@using Energy.App.Blazor.Client.StateContainers;
+@using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+@using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
+@using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+@using Energy.App.Standalone.Features.EnergyReadings.Store;
+@using System.Collections.Immutable;
+@using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 @implements IDisposable
 @inherits FluxorComponent
-@inject IState<AnalysisOptionsState> AnalysisOptionsState
 @inject IDispatcher Dispatcher
 
 @if (_ready)
@@ -41,6 +46,19 @@
     [Parameter, EditorRequired]
     public MeterType MeterType { get; set; }
 
+    [Inject] IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
+    [Inject] IState<GasReadingsState> GasReadingsState { get; set; }
+    [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+    
+    [Inject] IState<GasTariffsState> GasTariffsState { get; set; }
+    [Inject] IState<ElectricityTariffsState> ElectricityTariffsState { get; set; }
+    
+    [Inject] IState<WeatherState> WeatherState { get; set; }
+    [Inject] IState<LinearCoefficientsState> LinearCoefficientsState { get; set; }
+
+
+
+
     [Inject]
     ITempForecastAnalyzer TempForecastAnalyzer { get; set; }
 
@@ -48,55 +66,34 @@
     IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
 
     [Inject]
-    AnalysisOptions AnalysisOptions { get; set; }
-
-    [Inject]
-    ForecastState ForecastState { get; set; }
+    ICostCalculator CostCalculator { get; set; }
 
 
     CalendarTerm _calendarTerm => AnalysisOptionsState.Value[MeterType].CalendarTerm;
-
     
-    bool _ready;
-
-    protected override void OnParametersSet()
-    {
-
-        ForecastState.NotifyDegreeDifferenceChange += OnDegreeDifferenceChanged;
-
-        SetData();
-        _ready = true;
-    }
+    decimal _degreeDifference => AnalysisOptionsState.Value[MeterType].DegreeDifference;
+    LinearCoefficientsState _linearCoefficientsState => LinearCoefficientsState.Value;
+    ImmutableList<DailyWeatherReading> _dailyWeatherReadings => WeatherState.Value.WeatherReadings;
 
 
+    ImmutableList<BasicReading> _basicReadings => MeterType == MeterType.Gas
+        ? GasReadingsState.Value.BasicReadings : ElectricityReadingsState.Value.BasicReadings;
 
-    HistoricalAnalysis _thisDurationAnalysis => HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm);
-    HistoricalAnalysis _previousDurationAnalysis => HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm);
-
-    ForecastAnalysis _currentTermForecastAnalysis => TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm);
-    ForecastAnalysis _nextTermForecastAnalysis => TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm);
-
+    ImmutableList<TariffDetailState> _tariffDefails => MeterType == MeterType.Gas
+    ? GasTariffsState.Value.TariffDetails : ElectricityTariffsState.Value.TariffDetails;
 
 
-    private Task OnDegreeDifferenceChanged(MeterType meterType, double degreeDifference)
-    {
-        if (meterType != MeterType)
-        {
-            return Task.CompletedTask;
-        }
-        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm);
-        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm);
-
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
+    ImmutableList<CostedReading> _historicalCostedReadings => CostCalculator.GetCostReadings(_basicReadings, _tariffDefails).ToImmutableList();
 
 
-    public void Dispose()
-    {
-        AnalysisOptions[MeterType].NotifyTermChanged -= OnTermChanged;
-        ForecastState.NotifyDegreeDifferenceChange -= OnDegreeDifferenceChanged;
+    bool _ready = true;
 
-    }
+
+    HistoricalAnalysis _thisDurationAnalysis => HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, WeatherState.Value.WeatherReadings);
+    HistoricalAnalysis _previousDurationAnalysis => HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, WeatherState.Value.WeatherReadings);
+
+    ForecastAnalysis _currentTermForecastAnalysis => TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);
+    ForecastAnalysis _nextTermForecastAnalysis => TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);
+
 
 }

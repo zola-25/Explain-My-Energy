@@ -71,31 +71,29 @@ namespace Energy.App.Standalone.Data.EnergyReadings
         private IEnumerable<BasicReading> ConvertToBasicReadings(MeterType meterType,
             N3RgyConsumptionResponse apiResponse)
         {
-            TimeZoneInfo ukTimezone = AppDefaults.GetUkTimezone();
 
             foreach (ConsumptionReading energyReading in apiResponse.Values)
             {
-                double consumptionKWh;
+                decimal consumptionKWh;
                 if (meterType == MeterType.Gas)
                 {
-                    consumptionKWh = energyReading.Value * 38 * 1.02264 / 3.6;
+                    consumptionKWh = energyReading.Value * 38m * 1.02264m / 3.6m;
                 }
                 else
                 {
                     consumptionKWh = energyReading.Value;
                 }
 
-                DateTimeOffset utcTime = DateTimeOffset.ParseExact(energyReading.Timestamp,
+                var utcTime = DateTime.ParseExact(energyReading.Timestamp,
                     "yyyy-MM-dd HH:mm",
                     DateTimeFormatInfo.InvariantInfo,
                     DateTimeStyles.AssumeUniversal);
 
-                DateTimeOffset localDateTimeOffset = TimeZoneInfo.ConvertTime(utcTime, ukTimezone);
 
                 yield return new BasicReading()
                 {
                     KWh = consumptionKWh,
-                    LocalTime = localDateTimeOffset.LocalDateTime,
+                    UtcTime = utcTime,
                 };
             }
 

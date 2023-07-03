@@ -1,7 +1,13 @@
 ﻿using Energy.App.Blazor.Client.StateContainers;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Store;
+using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+using Energy.Shared;
+using System.Collections.Immutable;
+using MathNet.Numerics;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -9,45 +15,56 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
-    private readonly WeatherDataState _weatherDataState;
-    private readonly ForecastState _forecastState;
+    private readonly IForecastGenerator _forecastGenerator;
+    private readonly ICostCalculator _costCalculator;
 
-    public TempForecastAnalyzer(ITermDateRanges periodDateRanges,
-                                WeatherDataState weatherDataState,
-                                ForecastState forecastState)
+    public TempForecastAnalyzer(Co2ConversionFactors co2Conversion,
+                                ITermDateRanges periodDateRanges,
+                                IForecastGenerator forecastGenerator,
+                                ICostCalculator costCalculator)
     {
+        _co2Conversion = co2Conversion;
         _periodDateRanges = periodDateRanges;
-        _weatherDataState = weatherDataState;
-        _co2Conversion = new Co2ConversionFactors();
-        _forecastState = forecastState;
+        _forecastGenerator = forecastGenerator;
+        _costCalculator = costCalculator;
     }
 
-
-
-    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
-        CalendarTerm duration)
+    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, 
+        CalendarTerm duration,
+        decimal degreeDifference,
+        LinearCoefficientsState linearCoefficientsState,
+        ImmutableList<TariffDetailState> tariffDetailStates,
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(duration);
-        var forecastCosts = _forecastState.GetTempDiffForecast(meterType);
 
-        var weatherReadings = _weatherDataState.WeatherReadings.Where(c => c.ReadDate >= start && c.ReadDate < end).ToList();
-        var costReadings = forecastCosts.Where(c => c.LocalTime >= start && c.LocalTime < end).ToList();
-
-        ForecastAnalysis results = ForecastAnalysis(meterType, costReadings, weatherReadings);
+        ForecastAnalysis results = ForecastAnalysis(meterType,
+                                                    degreeDifference,
+                                                    start,
+                                                    end,
+                                                    linearCoefficientsState,
+                                                    tariffDetailStates,
+                                                    dailyWeatherReadings);
 
         return results;
     }
 
-    public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
-        CalendarTerm duration)
+    public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType, 
+        CalendarTerm duration,
+        decimal degreeDifference,
+        LinearCoefficientsState linearCoefficientsState,
+        ImmutableList<TariffDetailState> tariffDetailStates,
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
-        var forecastCosts = _forecastState.GetTempDiffForecast(meterType);
 
-        var weatherReadings = _weatherDataState.WeatherReadings.Where(c => c.ReadDate >= start && c.ReadDate < end).ToList();
-        var costReadings = forecastCosts.Where(c => c.LocalTime >= start && c.LocalTime < end).ToList();
-
-        ForecastAnalysis results = ForecastAnalysis(meterType, costReadings, weatherReadings);
+        ForecastAnalysis results = ForecastAnalysis(meterType,
+                                                    degreeDifference,
+                                                    start,
+                                                    end,
+                                                    linearCoefficientsState,
+                                                    tariffDetailStates,
+                                                    dailyWeatherReadings);
 
         return results;
     }
@@ -56,24 +73,31 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
 
     private ForecastAnalysis ForecastAnalysis(
         MeterType meterType,
-        ICollection<CostedReading> costedReadings,
-        ICollection<DailyWeatherReading> dailyWeatherReadings)
+        decimal degreeDifference,
+        DateTime start,
+        DateTime end,
+        LinearCoefficientsState linearCoeffiecientsState,
+        ImmutableList<TariffDetailState> tariffDetailStates,
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
-        double forecastConsumption = costedReadings.Sum(c => c.KWh);
+        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast(start, end, degreeDifference, linearCoeffiecientsState, dailyWeatherReadings);
+        var forecastCostedReadings = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
+
+        decimal forecastConsumption = forecastCostedReadings.Sum(c => c.KWh);
 
         ForecastAnalysis results = new ForecastAnalysis()
         {
             NumberOfDays = dailyWeatherReadings.Count,
-            Start = dailyWeatherReadings.First().ReadDate,
-            End = dailyWeatherReadings.Last().ReadDate,
+            Start = start,
+            End = end,
             ForecastConsumption = forecastConsumption.Round(0),
-            ForecastCostPence = costedReadings.Sum(c => c.CostPence).Round(2),
+            ForecastCostPence = forecastCostedReadings.Sum(c => c.CostPence).Round(2),
             ForecastCo2 = (forecastConsumption * _co2Conversion.GetCo2ConversionFactor(meterType)).Round(1),
             TemperatureRange = new TemperatureRange()
             {
-                LowDailyTemp = Convert.ToInt32(dailyWeatherReadings.Min(c => c.TemperatureMeanHourly)),
-                HighDailyTemp = Convert.ToInt32(dailyWeatherReadings.Max(c => c.TemperatureMeanHourly)),
-                AverageTemp = Convert.ToInt32(dailyWeatherReadings.Average(c => c.TemperatureMeanHourly))
+                LowDailyTemp = Convert.ToInt32(dailyWeatherReadings.Min(c => c.TemperatureAverage)),
+                HighDailyTemp = Convert.ToInt32(dailyWeatherReadings.Max(c => c.TemperatureAverage)),
+                AverageTemp = Convert.ToInt32(dailyWeatherReadings.Average(c => c.TemperatureAverage))
             }
         };
         return results;

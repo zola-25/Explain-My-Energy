@@ -65,33 +65,33 @@ namespace Energy.WeatherReadings
                 long[] time = dailyJson.GetProperty("time").EnumerateArray().Select(x => x.GetInt64()).ToArray();
                 int?[] weathercode = dailyJson.GetProperty("weathercode").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (int?)null : x.GetInt32()).ToArray();
-                double?[] temperature_2m_mean = dailyJson.GetProperty("temperature_2m_mean").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] apparent_temperature_min = dailyJson.GetProperty("apparent_temperature_min").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] apparent_temperature_max = dailyJson.GetProperty("apparent_temperature_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
+                decimal?[] temperature_2m_mean = dailyJson.GetProperty("temperature_2m_mean").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] apparent_temperature_min = dailyJson.GetProperty("apparent_temperature_min").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] apparent_temperature_max = dailyJson.GetProperty("apparent_temperature_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
                 long?[] sunrise = dailyJson.GetProperty("sunrise").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (long?)null : x.GetInt64()).ToArray();
                 long?[] sunset = dailyJson.GetProperty("sunset").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (long?)null : x.GetInt64()).ToArray();
-                double?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
+                decimal?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
 
 
                 for (int i = 0; i < time.Length; i++)
                 {
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        ReadDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
+                        UtcReadDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         ApparentTemperatureMin = apparent_temperature_min[i],
@@ -157,35 +157,35 @@ namespace Energy.WeatherReadings
                 long[] time = dailyJson.GetProperty("time").EnumerateArray().Select(x => x.GetInt64()).ToArray();
                 int?[] weathercode = dailyJson.GetProperty("weathercode").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (int?)null : x.GetInt32()).ToArray();
-                double?[] apparent_temperature_min = dailyJson.GetProperty("apparent_temperature_min").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] apparent_temperature_max = dailyJson.GetProperty("apparent_temperature_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
+                decimal?[] apparent_temperature_min = dailyJson.GetProperty("apparent_temperature_min").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] apparent_temperature_max = dailyJson.GetProperty("apparent_temperature_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
                 long?[] sunrise = dailyJson.GetProperty("sunrise").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (long?)null : x.GetInt64()).ToArray();
                 long?[] sunset = dailyJson.GetProperty("sunset").EnumerateArray()
                     .Select(x => x.ValueKind == JsonValueKind.Null ? (long?)null : x.GetInt64()).ToArray();
-                double?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray()
-                    .Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
+                decimal?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray()
+                    .Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
 
                 for (int i = 0; i < time.Length; i++)
                 {
                     DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        ReadDate = readDate,
+                        UtcReadDate = readDate,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
                         ApparentTemperatureMin = apparent_temperature_min[i],
                         ApparentTemperatureMax = apparent_temperature_max[i],
-                        TemperatureAverage = Math.Round(((temperature_2m_max[i] ?? 0) + (temperature_2m_min[i] ?? 0)) / 2d, 2),
+                        TemperatureAverage = Math.Round(((temperature_2m_max[i] ?? 0) + (temperature_2m_min[i] ?? 0)) / 2m, 2),
                         TemperatureMin = temperature_2m_min[i],
                         TemperatureMax = temperature_2m_max[i],
                         Sunrise = sunrise[i].HasValue
@@ -247,19 +247,19 @@ namespace Energy.WeatherReadings
                 JsonElement dailyJson = root.GetProperty("daily");
 
                 long[] time = dailyJson.GetProperty("time").EnumerateArray().Select(x => x.GetInt64()).ToArray();
-                double?[] temperature_2m_mean = dailyJson.GetProperty("temperature_2m_mean").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
-                double?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (double?)null : x.GetDouble()).ToArray();
+                decimal?[] temperature_2m_mean = dailyJson.GetProperty("temperature_2m_mean").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_min = dailyJson.GetProperty("temperature_2m_min").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] temperature_2m_max = dailyJson.GetProperty("temperature_2m_max").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] windspeed_10m_max = dailyJson.GetProperty("windspeed_10m_max").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] rain_sum = dailyJson.GetProperty("rain_sum").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
+                decimal?[] snowfall_sum = dailyJson.GetProperty("snowfall_sum").EnumerateArray().Select(x => x.ValueKind == JsonValueKind.Null ? (decimal?)null : x.GetDecimal()).ToArray();
 
                 for (int i = 0; i < time.Length; i++)
                 {
                     DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        ReadDate = readDate,
+                        UtcReadDate = readDate,
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         TemperatureMin = temperature_2m_min[i],
                         TemperatureMax = temperature_2m_max[i],

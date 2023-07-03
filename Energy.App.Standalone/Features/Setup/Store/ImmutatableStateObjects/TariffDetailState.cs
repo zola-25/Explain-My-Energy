@@ -6,11 +6,11 @@
 
         public DateTime? DateAppliesFrom { get; init; }
 
-        public double PencePerKWh { get; init; }
+        public decimal PencePerKWh { get; init; }
 
         public bool IsHourOfDayFixed { get; init; }
 
-        public double DailyStandingChargePence { get; init; }
+        public decimal DailyStandingChargePence { get; init; }
 
         public List<HourOfDayPriceState> HourOfDayPrices { get; init; }
     }

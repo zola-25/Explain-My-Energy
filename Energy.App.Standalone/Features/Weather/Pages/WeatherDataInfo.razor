@@ -25,10 +25,10 @@
             }
             else
             {
-                <td>From @WeatherState.Value.WeatherReadings.First().ReadDate.eDateToMinimal()</td>
+                <td>From @WeatherState.Value.WeatherReadings.First().UtcReadDate.eDateToMinimal()</td>
                 <td>
                     @{
-                        var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.ReadDate).Last().ReadDate;
+                        var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.UtcReadDate).Last().UtcReadDate;
                     }
 
                     @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
@@ -48,15 +48,15 @@
                 </td>
                 <td>
                     @{
-                        var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).OrderBy(c => c.ReadDate).ToList();
+                        var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).OrderBy(c => c.UtcReadDate).ToList();
                     }
-                    @forecastReadings.First().ReadDate.eDateToMinimal() - @forecastReadings.Last().ReadDate.eDateToMinimal()
+                    @forecastReadings.First().UtcReadDate.eDateToMinimal() - @forecastReadings.Last().UtcReadDate.eDateToMinimal()
                 </td>
                 <td>
                     @{
-                        var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).OrderBy(c => c.ReadDate).ToList();
+                        var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).OrderBy(c => c.UtcReadDate).ToList();
                     }
-                    @climateReadings.First().ReadDate.eDateToMinimal() - @climateReadings.Last().ReadDate.eDateToMinimal()
+                    @climateReadings.First().UtcReadDate.eDateToMinimal() - @climateReadings.Last().UtcReadDate.eDateToMinimal()
 
                 </td>
             }

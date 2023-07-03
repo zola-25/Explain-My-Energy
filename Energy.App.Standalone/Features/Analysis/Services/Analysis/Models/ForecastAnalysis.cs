@@ -1,13 +1,15 @@
-﻿namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Extensions;
 
-public class ForecastAnalysis
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+
+public record ForecastAnalysis
 {
     public string DateText => $"{Start.eDateToMinimal()} - {End.eDateToMinimal()}";
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
-    public double ForecastCostPence { get; set; }
-    public double ForecastConsumption { get; set; }
-    public int NumberOfDays { get; set; }
-    public double ForecastCo2 { get; set; }
-    public TemperatureRange TemperatureRange { get; set; }
+    public DateTime Start { get; init; }
+    public DateTime End { get; init; }
+    public decimal ForecastCostPence { get; init; }
+    public decimal ForecastConsumption { get; init; }
+    public int NumberOfDays { get; init; }
+    public decimal ForecastCo2 { get; init; }
+    public TemperatureRange TemperatureRange { get; init; }
 }

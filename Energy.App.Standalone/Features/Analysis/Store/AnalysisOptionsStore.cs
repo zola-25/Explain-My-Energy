@@ -38,6 +38,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         public bool ShowCost { get; init; }
         public bool ShowKWh => !ShowCost;
 
+        public decimal DegreeDifference { get; init; }
 
         public bool ChartRendered { get; init; }
 
@@ -59,6 +60,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 Gas = new MeterAnalysisOptions
                 {
                     CalendarTerm = CalendarTerm.Week,
+                    DegreeDifference = 0,
                     ChartRendered = false,
                     HighlightSet = false,
                     HighlightStart = null,
@@ -68,6 +70,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 Electricity = new MeterAnalysisOptions
                 {
                     CalendarTerm = CalendarTerm.Week,
+                    DegreeDifference = 0,
                     ChartRendered = false,
                     HighlightSet = false,
                     HighlightStart = null,
@@ -85,6 +88,26 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         public GasAnalysisOptionsShowCostAction(bool showCost)
         {
             ShowCost = showCost;
+        }
+    }
+
+    public class GasAnalysisOptionsSetDegreeDifferenceAction : IAnalysisOptionsAction
+    {
+        public decimal DegreeDifference { get; }
+
+        public GasAnalysisOptionsSetDegreeDifferenceAction(decimal degreeDifference)
+        {
+            DegreeDifference = degreeDifference;
+        }
+    }
+
+    public class ElectricityAnalysisOptionsSetDegreeDifferenceAction : IAnalysisOptionsAction
+    {
+        public decimal DegreeDifference { get; }
+
+        public ElectricityAnalysisOptionsSetDegreeDifferenceAction(decimal degreeDifference)
+        {
+            DegreeDifference = degreeDifference;
         }
     }
 
@@ -322,6 +345,34 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 }
             };
         }
+
+        [ReducerMethod]
+        // Generate degree difference reducer
+        public static AnalysisOptionsState OnElectricityDegreeDifferenceUpdateReducer(AnalysisOptionsState analysisOptionsState, ElectricityAnalysisOptionsSetDegreeDifferenceAction action )
+        {
+            var meterState = analysisOptionsState.Electricity;
+            return analysisOptionsState with
+            {
+                Electricity = meterState with
+                {
+                    DegreeDifference = action.DegreeDifference
+                }
+            };
+        }
+
+        [ReducerMethod]
+        // Generate gas degree difference reducer
+        public static AnalysisOptionsState OnGasGenerateDegreeDifferenceReducer(AnalysisOptionsState analysisOptionsState, GasAnalysisOptionsSetDegreeDifferenceAction action)
+        {
+            var meterState = analysisOptionsState.Gas;
+            return analysisOptionsState with
+            {
+                Gas = meterState with
+                {
+                    DegreeDifference = action.DegreeDifference
+                }
+            };
+        }
     }
 
     public interface IAnalysisOptionsAction { }
@@ -333,6 +384,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         RemoveHighlightRange,
         SetChartRendered,
         SetCalenderTerm,
+        SetDegreeDifference
     }
 
     public class AnalysisOptionsActionFactory

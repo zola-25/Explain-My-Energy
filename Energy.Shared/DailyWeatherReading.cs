@@ -4,28 +4,28 @@
     {
         public string OutCode { get; set; }
 
-        public DateTime ReadDate { get; set; }
+        public DateTime UtcReadDate { get; set; }
         public string Summary { get; set; }
         public string Icon { get; set; }
 
-        public double TemperatureAverage { get; set; }
+        public decimal TemperatureAverage { get; set; }
 
-        public double? ApparentTemperatureMin { get; set; }
-        public double? ApparentTemperatureMax { get; set; }
-        public double? TemperatureMin { get; set; }
-        public double? TemperatureMax { get; set; }
+        public decimal? ApparentTemperatureMin { get; set; }
+        public decimal? ApparentTemperatureMax { get; set; }
+        public decimal? TemperatureMin { get; set; }
+        public decimal? TemperatureMax { get; set; }
         public DateTime? Sunrise { get; set; }
         public DateTime? Sunset { get; set; }
-        public double? WindSpeed { get; set; }
+        public decimal? WindSpeed { get; set; }
 
-        public double? TotalRain { get; set; }
-        public double? TotalSnowfall { get; set; }
+        public decimal? TotalRain { get; set; }
+        public decimal? TotalSnowfall { get; set; }
 
 
-        public double TemperatureFahrenheit
+        public decimal TemperatureFahrenheit
         {
-            set => TemperatureAverage = (value - 32d) * 5d / 9d;
-            get => (TemperatureAverage * (9d / 5d)) + 32d;
+            set => TemperatureAverage = (value - 32m) * 5m / 9m;
+            get => (TemperatureAverage * (9m / 5m)) + 32m;
         }
 
         public bool IsClimateForecast { get; set; }

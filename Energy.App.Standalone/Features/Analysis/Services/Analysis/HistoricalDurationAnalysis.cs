@@ -3,6 +3,8 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
+using System.Collections.Immutable;
+using MathNet.Numerics;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -22,32 +24,39 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
         _co2Conversion = new Co2ConversionFactors();
     }
 
-    public HistoricalAnalysis GetCurrentDurationAnalysis(List<BasicReading> readings, List<DailyWeatherReading> dailyWeatherReadings, CalendarTerm duration)
+    public HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType, 
+        CalendarTerm duration,
+        ImmutableList<CostedReading> costedReadings, 
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
 
-        return GetHistoricalAnalysis(readings, dailyWeatherReadings, start, end);
+        return GetHistoricalAnalysis(meterType, start, end, costedReadings, dailyWeatherReadings);
     }
 
-    public HistoricalAnalysis GetPreviousDurationAnalysis(List<BasicReading> readings, List<DailyWeatherReading> dailyWeatherReadings, CalendarTerm duration)
+    public HistoricalAnalysis GetPreviousDurationAnalysis(MeterType meterType, 
+        CalendarTerm duration,
+        ImmutableList<CostedReading> costedReadings, 
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetPreviousPeriodDates(duration);
 
-        return GetHistoricalAnalysis(readings, dailyWeatherReadings, start, end);
+        return GetHistoricalAnalysis(meterType, start, end, costedReadings, dailyWeatherReadings);
     }
 
-    private HistoricalAnalysis GetHistoricalAnalysis(List<BasicReading> readings, List<DailyWeatherReading> dailyWeatherReadings, DateTime start, DateTime end)
+    private HistoricalAnalysis GetHistoricalAnalysis(MeterType meterType, 
+        DateTime start, DateTime end,
+        ImmutableList<CostedReading> costedReadings, 
+        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
     {
-        var costedReadings = _meterDataState.GetCostedReadings(meterType);
-        var weatherReadings = dailyWeatherReadings.Where(c => c.ReadDate >= start && c.ReadDate < end)
+        var weatherReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate < end)
             .ToList();
 
-        var durationData = costedReadings
-            .Where(c => c.LocalTime >= start && c.LocalTime < end).ToList();
+        var durationData = costedReadings.FindAll(c => c.LocalTime >= start && c.LocalTime < end);
 
-        double co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
+        decimal co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
 
-        bool hasData = durationData.Any();
+        bool hasData = durationData.Count > 0;
 
         if (hasData)
         {
@@ -62,9 +71,9 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
                 PeriodCost = durationData.Sum(c => c.CostPence).Round(2),
                 TemperatureRange = weatherReadings.Any() ? new TemperatureRange()
                 {
-                    LowDailyTemp = Convert.ToInt32(weatherReadings.Min(c => c.TemperatureMeanHourly)),
-                    HighDailyTemp = Convert.ToInt32(weatherReadings.Max(c => c.TemperatureMeanHourly)),
-                    AverageTemp = Convert.ToInt32(weatherReadings.Average(c => c.TemperatureMeanHourly))
+                    LowDailyTemp = Convert.ToInt32(weatherReadings.Min(c => c.TemperatureAverage)),
+                    HighDailyTemp = Convert.ToInt32(weatherReadings.Max(c => c.TemperatureAverage)),
+                    AverageTemp = Convert.ToInt32(weatherReadings.Average(c => c.TemperatureAverage))
                 } : new TemperatureRange()
             };
         }

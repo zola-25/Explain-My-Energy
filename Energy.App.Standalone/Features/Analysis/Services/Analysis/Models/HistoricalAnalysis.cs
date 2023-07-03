@@ -1,27 +1,29 @@
-﻿namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Extensions;
 
-public class HistoricalAnalysis
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+
+public record HistoricalAnalysis
 {
     public string DateRangeText => $"{Start.eDateToMinimal()} - {End.eDateToMinimal()}";
 
-    public DateTime Start { get; set; }
-    public DateTime End { get; set; }
-    public DateTime? LatestReading { get; set; }
+    public DateTime Start { get; init; }
+    public DateTime End { get; init; }
+    public DateTime? LatestReading { get; init; }
 
-    public double PeriodCo2 { get; set; }
+    public decimal PeriodCo2 { get; init; }
 
-    public double PeriodConsumptionKWh { get; set; }
-    public double PeriodCost { get; set; }
+    public decimal PeriodConsumptionKWh { get; init; }
+    public decimal PeriodCost { get; init; }
 
-    public TemperatureRange TemperatureRange { get; set; }
-    public bool HasData { get; set; }
+    public TemperatureRange TemperatureRange { get; init; }
+    public bool HasData { get; init; }
 }
 
-public class TemperatureRange
+public record TemperatureRange
 {
-    public int AverageTemp { get; set; }
-    public int LowDailyTemp { get; set; }
-    public int HighDailyTemp { get; set; }
+    public int AverageTemp { get; init; }
+    public int LowDailyTemp { get; init; }
+    public int HighDailyTemp { get; init; }
 
     public string Symbol => "°C";
     public string TemperatureText => $"{LowDailyTemp} - {HighDailyTemp}{Symbol}";

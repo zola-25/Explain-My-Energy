@@ -11,7 +11,7 @@
                 PencePerKWh = costedReading.PencePerKWh,
                 DailyStandingCharge = costedReading.DailyStandingChargePence,
                 DateTicks = costedReading.LocalTime.eToUnixTime(),
-                HalfHourlyStandingCharge = costedReading.HalfHourlyStandingCharge,
+                HalfHourlyStandingCharge = costedReading.HalfHourlyStandingChargePence,
                 TariffType = costedReading.TariffType.ToString(),
                 TariffAppliesFrom = costedReading.TariffAppliesFrom,
                 IsForecast = costedReading.Forecast

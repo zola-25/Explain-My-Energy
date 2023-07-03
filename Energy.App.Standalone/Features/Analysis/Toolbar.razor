@@ -1,6 +1,6 @@
-﻿@using LabelPosition = MudBlazor.LabelPosition
+﻿@using Energy.App.Standalone.Features.Analysis.Services.Analysis;
+@using LabelPosition = MudBlazor.LabelPosition
 @inherits FluxorComponent
-@inject IState<AnalysisOptionsState> AnalysisOptionsState
 @inject IDispatcher Dispatcher
 
 <MudToolBar>
@@ -42,14 +42,14 @@
     <MudPaper Elevation="0">
         @if (IsPrimaryHeatingSource)
         {
-            <MudNumericField @bind-Value="@_degreesDifference"
+            <MudNumericField Value="@_degreesDifference"
                              TextChanged="DegreeDifferenceChange"
                              Immediate="true"
                              Max="50"
                              Min="-50"
                              Class="right-align-input"
                              Style="width: 150px;"
-                             T="double"
+                             T="decimal"
                              Label="Adjust Forecast" Variant="Variant.Text"
                              Step="1"
                              Adornment="Adornment.End"
@@ -72,9 +72,10 @@
 
     AnalysisOptionsActionFactory AnalysisOptionsActionFactory { get; set; } 
 
+    [Inject] IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
-    [Inject]
-    ForecastState ForecastState { get; set; }
+    MeterAnalysisOptions MeterAnalysisOptions => AnalysisOptionsState.Value[MeterType];
+
 
     CalendarTerm _calendarTerm;
 
@@ -89,10 +90,9 @@
 
         _toggled = AnalysisOptionsState.Value[MeterType].ShowCost;
         _calendarTerm = AnalysisOptionsState.Value[MeterType].CalendarTerm;
-        _degreesDifference = ForecastState.GetDegreeDifference(MeterType);
     }
 
-    private async Task OnToggledChanged(bool on)
+    private void OnToggledChanged(bool on)
     {
         var action = AnalysisOptionsActionFactory.Create(AnalysisAction.ShowCost, on);
 
@@ -101,7 +101,7 @@
         _toggled = on;
     }
 
-    private async Task TermChanged(CalendarTerm newTerm)
+    private void TermChanged(CalendarTerm newTerm)
     {
         var action = AnalysisOptionsActionFactory.Create(AnalysisAction.SetCalenderTerm, newTerm);
 
@@ -110,9 +110,10 @@
     }
 
     bool _firstSet = true;
-    private double _degreesDifference;
+    decimal _degreesDifference => MeterAnalysisOptions.DegreeDifference;
 
-    private async Task DegreeDifferenceChange(string degreesFromForecastString)
+
+    private void DegreeDifferenceChange(string degreesFromForecastString)
     {
         if (_firstSet)
         {
@@ -124,14 +125,16 @@
             degreesFromForecastString = "0";
         }
 
-        var degreeDifference = Convert.ToDouble(degreesFromForecastString);
+        var degreeDifference = Convert.ToDecimal(degreesFromForecastString);
 
-        if (Math.Abs(degreeDifference - ForecastState.GetDegreeDifference(MeterType)) < 0.01)
+        if (Math.Abs(degreeDifference - _degreesDifference) < 0.01m)
         {
             return;
         }
-        _degreesDifference = degreeDifference;
-        await ForecastState.UpdateDegreeDifference(MeterType, degreeDifference);
+
+        var action = AnalysisOptionsActionFactory.Create(AnalysisAction.SetDegreeDifference, degreeDifference);
+
+        Dispatcher.Dispatch(action);
     }
 
 }
