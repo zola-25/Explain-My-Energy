@@ -3,7 +3,9 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Weather.Store;
+using Energy.Shared;
 using Fluxor;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Analysis.Store
 {
@@ -60,6 +62,9 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     public class InitiateUpdateLinearCoeffiecientsAction
     { }
 
+    public class NotifyLinearCoeffiecientsReadyAction
+    { }
+
     public class UpdateLinearCoeffiecientsAction
     {
         public decimal Gradient { get; }
@@ -110,11 +115,37 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         
         public async Task HandleInitiateUpdateLinearCoeffiecientsAction(InitiateUpdateLinearCoeffiecientsAction action, IDispatcher dispatcher)
         {
+            ImmutableList<BasicReading> heatingMeterReadings;
+            switch (_householdState.Value.PrimaryHeatSource)
+            {
+                case MeterType.Gas:
+                    heatingMeterReadings = _gasReadingsState.Value.BasicReadings;
+                    break;
+                default:
+                    heatingMeterReadings = _electricityReadingsState.Value.BasicReadings;
+                    break;
+            }
+
             var linearCoefficients = _forecastCoefficientsCreator
-                .GetForecastCoefficients(_gasReadingsState.Value.BasicReadings, _weatherState.Value.WeatherReadings);
+                .GetForecastCoefficients(heatingMeterReadings, _weatherState.Value.WeatherReadings);
+            
             dispatcher.Dispatch(new UpdateLinearCoeffiecientsAction(linearCoefficients.Gradient, linearCoefficients.C));
+            dispatcher.Dispatch(new NotifyLinearCoeffiecientsReadyAction());
         }
 
+        [EffectMethod]
+        public async Task HandleNotifyElectricityStoreReadyAction(NotifyElectricityStoreReady action, IDispatcher dispatcher)
+        {
+            if(_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
+                dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
+        }
+
+        [EffectMethod]
+        public async Task HandleNotifyGasStoreReadyAction(NotifyGasStoreReady action, IDispatcher dispatcher)
+        {
+            if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
+                dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
+        }
 
     }
     

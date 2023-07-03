@@ -1,16 +1,15 @@
-﻿@page "/" 
-@page "/HeatingMeter/{MeterTypeName}"
+﻿@page "/HeatingMeter/{MeterTypeName}"
 
 
-    <MeterAnalysisTemplate MeterType="_meterType"  PrimaryHeatSource="true">
-        <EnergyChart>
-            <EnergyTemperatureChart MeterGlobalId="_meterGlobalId" MeterType="_meterType"></EnergyTemperatureChart>
-        </EnergyChart>
-        <Summary>
-            <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
-        </Summary>
+<MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="true">
+    <EnergyChart>
+        @*<EnergyTemperatureChart MeterGlobalId="_meterGlobalId" MeterType="_meterType"></EnergyTemperatureChart>*@
+    </EnergyChart>
+    <Summary>
+        <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
+    </Summary>
 
-    </MeterAnalysisTemplate>
+</MeterAnalysisTemplate>
 
 @code {
 

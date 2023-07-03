@@ -19,20 +19,20 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 40.8,
+                    PencePerKWh = 40.8m,
                     DateAppliesFrom = new DateTime(2023, 04, 01),
-                    DailyStandingChargePence = 55.2,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(40.8).ToList(),
+                    DailyStandingChargePence = 55.2m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(40.8m).ToList(),
                 },
                 new()
                 {
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Gas,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 12.36,
+                    PencePerKWh = 12.36m,
                     DateAppliesFrom = new DateTime(2023, 04, 01),
-                    DailyStandingChargePence = 33.6,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(12.36).ToList(),
+                    DailyStandingChargePence = 33.6m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(12.36m).ToList(),
 
                 },
                 // Oct -Apr
@@ -41,10 +41,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 34,
+                    PencePerKWh = 34m,
                     DateAppliesFrom = new DateTime(2022, 10, 01),
-                    DailyStandingChargePence = 46,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(34).ToList(),
+                    DailyStandingChargePence = 46m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(34m).ToList(),
                 },
 
                 new()
@@ -52,10 +52,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Gas,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 10.3,
+                    PencePerKWh = 10.3m,
                     DateAppliesFrom = new DateTime(2022, 10, 01),
-                    DailyStandingChargePence = 28,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(10.3).ToList(),
+                    DailyStandingChargePence = 28m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(10.3m).ToList(),
                 },
                 // Apr - Oct 22
                 new()
@@ -63,10 +63,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 28.3,
+                    PencePerKWh = 28.3m,
                     DateAppliesFrom = new DateTime(2022, 04, 01),
-                    DailyStandingChargePence = 45,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(28.3).ToList(),
+                    DailyStandingChargePence = 45m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(28.3m).ToList(),
 
                 },
                 new()
@@ -74,10 +74,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Gas,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 7.37,
+                    PencePerKWh = 7.37m,
                     DateAppliesFrom = new DateTime(2022, 04, 01),
-                    DailyStandingChargePence = 23,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(7.37).ToList(),
+                    DailyStandingChargePence = 23m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(7.37m).ToList(),
 
                 },
                 //Oct 21 - Apr 22
@@ -86,10 +86,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
-                    PencePerKWh = 20.8,
+                    PencePerKWh = 20.8m,
                     DateAppliesFrom = new DateTime(2021, 10, 01),
-                    DailyStandingChargePence = 23,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(20.8).ToList(),
+                    DailyStandingChargePence = 23m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(20.8m).ToList(),
 
                 },
                 new()
@@ -97,10 +97,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
                     MeterType = MeterType.Gas,
-                    PencePerKWh = 4.1,
+                    PencePerKWh = 4.1m,
                     DateAppliesFrom = new DateTime(2021, 10, 01),
-                    DailyStandingChargePence = 24,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(4.1).ToList(),
+                    DailyStandingChargePence = 24m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(4.1m).ToList(),
 
                 },
                 // Apr 21 - Oct 21
@@ -109,10 +109,10 @@ namespace Energy.App.Standalone.Data
                     IsHourOfDayFixed = true,
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
                     MeterType = MeterType.Electricity,
-                    PencePerKWh = 19,
+                    PencePerKWh = 19m,
                     DateAppliesFrom = new DateTime(2021, 04, 01),
-                    DailyStandingChargePence = 23,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(19).ToList(),
+                    DailyStandingChargePence = 23m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(19m).ToList(),
 
                 },
                 new()
@@ -120,10 +120,10 @@ namespace Energy.App.Standalone.Data
                     ExampleTariffType = ExampleTariffType.StandardFixedDaily,
                     IsHourOfDayFixed = true,
                     MeterType = MeterType.Gas,
-                    PencePerKWh = 3.3,
+                    PencePerKWh = 3.3m,
                     DateAppliesFrom = new DateTime(2021, 04, 01),
-                    DailyStandingChargePence = 25,
-                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(3.3).ToList(),
+                    DailyStandingChargePence = 25m,
+                    DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(3.3m).ToList(),
 
                 },
                 new()
@@ -132,8 +132,8 @@ namespace Energy.App.Standalone.Data
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.Economy7Variable,
                     DateAppliesFrom = new DateTime(2022, 01, 01),
-                    DailyStandingChargePence = 38,
-                    DefaultHourOfDayPrices = CreateExampleEconomy7Prices(34, 19).ToList(),
+                    DailyStandingChargePence = 38m,
+                    DefaultHourOfDayPrices = CreateExampleEconomy7Prices(34m, 19m).ToList(),
                 },
                 new()
                 {
@@ -141,13 +141,13 @@ namespace Energy.App.Standalone.Data
                     MeterType = MeterType.Electricity,
                     ExampleTariffType = ExampleTariffType.Economy7Variable,
                     DateAppliesFrom = new DateTime(2021, 01, 01),
-                    DailyStandingChargePence = 24,
-                    DefaultHourOfDayPrices = CreateExampleEconomy7Prices(22, 11).ToList(),
+                    DailyStandingChargePence = 24m,
+                    DefaultHourOfDayPrices = CreateExampleEconomy7Prices(22m, 11m).ToList(),
                 },
             };
 
 
-        private static IEnumerable<DefaultHourOfDayPrice> CreateExampleEconomy7Prices(double dayRate, double nightRate)
+        private static IEnumerable<DefaultHourOfDayPrice> CreateExampleEconomy7Prices(decimal dayRate, decimal nightRate)
         {
             return Enumerable.Range(0, 24).Select(i => new DefaultHourOfDayPrice()
             {
@@ -156,7 +156,7 @@ namespace Energy.App.Standalone.Data
             });
         }
 
-        private static IEnumerable<DefaultHourOfDayPrice> CreateUniform24HourOfDayPrices(double fixedPencePerKWh)
+        private static IEnumerable<DefaultHourOfDayPrice> CreateUniform24HourOfDayPrices(decimal fixedPencePerKWh)
         {
             return Enumerable.Range(0, 24).Select(i => new DefaultHourOfDayPrice()
             {

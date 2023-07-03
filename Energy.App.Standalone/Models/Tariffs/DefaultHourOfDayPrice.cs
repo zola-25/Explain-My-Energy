@@ -4,6 +4,6 @@ public record DefaultHourOfDayPrice
 {
 
     public TimeSpan HourOfDay { get; init; }
-    public double PencePerKWh { get; init; }
+    public decimal PencePerKWh { get; init; }
 
 }

@@ -32,11 +32,7 @@ class ForecastCoefficientsCreator : IForecastCoefficientsCreator
         double[] yConsumption = winterData.Select(c => c.ConsumptionKWh).ToArray();
 
         var consumptionFit = Fit.Line(x, yConsumption);
-        var consumptionCoefficients = new LinearCoefficients()
-        {
-            C = consumptionFit.A,
-            Gradient = consumptionFit.B
-        };
+
         return (C: (decimal)consumptionFit.A, Gradient: (decimal)consumptionFit.B);
     }
 

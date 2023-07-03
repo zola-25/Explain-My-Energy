@@ -180,12 +180,12 @@ public static class Extensions
 
     }
 
-    public static string ePenceRateDisplay(this double amount)
+    public static string ePenceRateDisplay(this decimal amount)
     {
         return $"{amount:F2}p";
     }
 
-    public static string eToMoneyFormat(this double amount)
+    public static string eToMoneyFormat(this decimal amount)
     {
         return $"{amount:F2}";
     }

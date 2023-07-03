@@ -3,6 +3,11 @@ using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Store;
 using Energy.App.Standalone.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
@@ -46,6 +51,18 @@ builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>
 builder.Services.AddTransient<IEnergyReadingImporter, EnergyReadingImporter>();
 
 builder.Services.AddScoped<IAppInitialization, AppInitialization>();
+
+builder.Services.AddTransient<IForecastGenerator, ForecastGenerator>();
+builder.Services.AddTransient<IForecastCoefficientsCreator, ForecastCoefficientsCreator>();
+builder.Services.AddTransient<Co2ConversionFactors>();
+
+
+builder.Services.AddTransient<IHistoricalDurationAnalyzer, HistoricalDurationAnalyzer>();
+builder.Services.AddTransient<ITempForecastAnalyzer, TempForecastAnalyzer>();
+builder.Services.AddTransient<ITermDateRanges, TermDateRanges>();
+builder.Services.AddTransient<ICostCalculator, CostCalculator>();
+
+
 
 builder.Services.AddMudServices(config =>
 {

@@ -68,35 +68,39 @@
     [Parameter, EditorRequired] public HistoricalAnalysis DurationAnalysis { get; set; }
 
     [Inject] IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
-    [Inject] AnalysisOptionsActionFactory AnalysisOptionsActionFactory { get; set; }
+    AnalysisOptionsActionFactory _analysisOptionsActionFactory;
 
 
     string _consumptionIcon = Icons.Material.Filled.ElectricBolt;
     string _headerText;
-    bool _highlightToggled => AnalysisOptionsState.Value[MeterType].HighlightSet;
+    bool _highlightToggled;
 
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
 
+        _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
+
         _headerText = Term.AnalysisPeriodHeader(Period, DurationAnalysis.Start);
         _consumptionIcon = MeterType == MeterType.Electricity ? Icons.Material.Filled.ElectricBolt : Icons.Material.Filled.LocalFireDepartment;
+        _highlightToggled = AnalysisOptionsState.Value[MeterType].ToggleSource == ToggleSource.Historical;
+
     }
 
     private void ToggleHighlight(bool toggled)
     {
         if (toggled)
         {
-            var setHighlightAction = AnalysisOptionsActionFactory.Create(AnalysisAction.SetHighlightRange, DurationAnalysis.Start, DurationAnalysis.End);
+            var setHighlightAction = _analysisOptionsActionFactory.Create(AnalysisAction.SetHighlightRange, DurationAnalysis.Start, DurationAnalysis.End);
             Dispatcher.Dispatch(setHighlightAction);
         }
         else
         {
-            var clearHighlightAction = AnalysisOptionsActionFactory.Create(AnalysisAction.RemoveHighlightRange);
+            var clearHighlightAction = _analysisOptionsActionFactory.Create(AnalysisAction.RemoveHighlightRange);
             Dispatcher.Dispatch(clearHighlightAction);
         }
-
+        _highlightToggled = toggled;
     }
 
 

@@ -16,9 +16,9 @@
 
         @if (_tariffDetail.IsHourOfDayFixed)
         {
-            <MudNumericField Label="Unit Rate (p)" For="@(() => _tariffDetail.PencePerKWh)" T="double" @bind-Value="_tariffDetail.PencePerKWh" Step="0.1" Min="0" Max="1000000" Format="#.###" Adornment="Adornment.End" AdornmentText="p per kWh" Required></MudNumericField>
+            <MudNumericField Label="Unit Rate (p)" For="@(() => _tariffDetail.PencePerKWh)" T="decimal" @bind-Value="_tariffDetail.PencePerKWh" Step="0.1m" Min="0" Max="1000000" Format="#.###" Adornment="Adornment.End" AdornmentText="p per kWh" Required></MudNumericField>
         }
-        <MudNumericField Label="Daily Standing Charge (p)" T="double" For="@(() => _tariffDetail.DailyStandingChargePence)" @bind-Value="_tariffDetail.DailyStandingChargePence" Min="0" Max="1000000" Format="#.###" Step="0.1" Adornment="Adornment.End" AdornmentText="p" Required></MudNumericField>
+        <MudNumericField Label="Daily Standing Charge (p)" T="decimal" For="@(() => _tariffDetail.DailyStandingChargePence)" @bind-Value="_tariffDetail.DailyStandingChargePence" Min="0" Max="1000000" Format="#.###" Step="0.1m" Adornment="Adornment.End" AdornmentText="p" Required></MudNumericField>
     </MudPaper>
     <MudPaper Elevation="0" Class="p-0">
         @if (!_tariffDetail.IsHourOfDayFixed)
@@ -38,7 +38,7 @@
                         <MudTr>
                             <MudTd DataLabel="Hour">@hourOfDayPrice.HourOfDay.eTimeSpanToString()</MudTd>
                             <MudTd DataLabel="Pence per kWh">
-                                <MudNumericField T="double" @bind-Value="hourOfDayPrice.PencePerKWh" Variant="Variant.Outlined" Class="" DisableUnderLine="true" Step="0.1" Min="0" Max="1000000" Format="#.###" Adornment="Adornment.End" AdornmentText="p per kWh" Required></MudNumericField>
+                                <MudNumericField T="decimal" @bind-Value="hourOfDayPrice.PencePerKWh" Variant="Variant.Outlined" Class="" DisableUnderLine="true" Step="0.1m" Min="0" Max="1000000" Format="#.###" Adornment="Adornment.End" AdornmentText="p per kWh" Required></MudNumericField>
                             </MudTd>
                         </MudTr>
                     }

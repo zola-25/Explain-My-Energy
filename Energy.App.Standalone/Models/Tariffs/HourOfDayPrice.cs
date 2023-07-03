@@ -10,6 +10,6 @@ namespace Energy.App.Standalone.Models.Tariffs
 
         [Required]
         [Range(0, 10E6)]
-        public double PencePerKWh { get; set; }
+        public decimal PencePerKWh { get; set; }
     }
 }

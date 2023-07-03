@@ -1,132 +1,131 @@
-﻿using System.Collections.ObjectModel;
-using Energy.App.Blazor.Client.Services.Analysis.Data;
-using Energy.App.Blazor.Client.Services.Analysis.Interfaces;
-using Energy.App.Blazor.Shared;
-using Energy.App.Blazor.Shared.Analysis;
-using Energy.Shared;
-using Fluxor.Persist.Storage;
-using MathNet.Numerics.LinearAlgebra.Factorization;
-using Microsoft.AspNetCore.Components;
+﻿//using System.Collections.ObjectModel;
+//using Energy.App.Blazor.Client.Services.Analysis.Data;
+//using Energy.App.Blazor.Client.Services.Analysis.Interfaces;
+//using Energy.App.Blazor.Shared;
+//using Energy.App.Blazor.Shared.Analysis;
+//using Energy.Shared;
+//using Fluxor.Persist.Storage;
+//using MathNet.Numerics.LinearAlgebra.Factorization;
+//using Microsoft.AspNetCore.Components;
 
-namespace Energy.App.Blazor.Client.StateContainers
-{
-    [PersistState, PriorityLoad]
+//namespace Energy.App.Blazor.Client.StateContainers
+//{
 
-    public class AnalysisOptions
-    {
+//    public class AnalysisOptions
+//    {
 
-        public AnalysisOptions()
-        {
-            Electricity = new MeterAnalysisOptions();
-            Gas = new MeterAnalysisOptions();
-        }
+//        public AnalysisOptions()
+//        {
+//            Electricity = new MeterAnalysisOptions();
+//            Gas = new MeterAnalysisOptions();
+//        }
 
-        public MeterAnalysisOptions this[MeterType meterType]
-        {
-            get
-            {
-                switch (meterType)
-                {
-                    case MeterType.Gas:
-                        return Gas;
-                    case MeterType.Electricity:
-                        return Electricity;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null);
-                }
-            }
-        }
+//        public MeterAnalysisOptions this[MeterType meterType]
+//        {
+//            get
+//            {
+//                switch (meterType)
+//                {
+//                    case MeterType.Gas:
+//                        return Gas;
+//                    case MeterType.Electricity:
+//                        return Electricity;
+//                    default:
+//                        throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null);
+//                }
+//            }
+//        }
 
-        public MeterAnalysisOptions Electricity { get; }
+//        public MeterAnalysisOptions Electricity { get; }
 
-        public MeterAnalysisOptions Gas { get; }
+//        public MeterAnalysisOptions Gas { get; }
 
-    }
+//    }
 
-    public class MeterAnalysisOptions
-    {
-        public DateTime? HighlightStart { get; private set; }
-        public DateTime? HighlightEnd { get; private set; }
+//    public class MeterAnalysisOptions
+//    {
+//        public DateTime? HighlightStart { get; private set; }
+//        public DateTime? HighlightEnd { get; private set; }
 
-        public bool HighlightSet { get; private set; }
+//        public bool HighlightSet { get; private set; }
 
-        public bool ShowCost { get; private set; }
-        public bool ShowKWh => !ShowCost;
+//        public bool ShowCost { get; private set; }
+//        public bool ShowKWh => !ShowCost;
 
-        public async Task ToggleShowCost()
-        {
-            ShowCost = !ShowCost;
+//        public async Task ToggleShowCost()
+//        {
+//            ShowCost = !ShowCost;
 
-            if (NotifyToggleCostChange != null)
-            {
-                await NotifyToggleCostChange(ShowCost);
-            }
-        }
+//            if (NotifyToggleCostChange != null)
+//            {
+//                await NotifyToggleCostChange(ShowCost);
+//            }
+//        }
 
-        public event Func<bool, Task> NotifyToggleCostChange;
-
-
-        public async Task SetHighlightRange(DateTime start, DateTime end)
-        {
-            HighlightStart = start;
-            HighlightEnd = end;
-            HighlightSet = true;
-
-            if (NotifySetHighlightRange != null)
-            {
-                await NotifySetHighlightRange(start, end);
-            }
-        }
-
-        public async Task RemoveHighlightRange()
-        {
-            HighlightStart = null;
-            HighlightEnd = null;
-            HighlightSet = false;
-
-            if (NotifyRemoveHighlightRange != null)
-            {
-                await NotifyRemoveHighlightRange();
-            }
-        }
-
-        public event Func<Task> NotifyRemoveHighlightRange;
-
-        public event Func<DateTime, DateTime, Task> NotifySetHighlightRange;
+//        public event Func<bool, Task> NotifyToggleCostChange;
 
 
+//        public async Task SetHighlightRange(DateTime start, DateTime end)
+//        {
+//            HighlightStart = start;
+//            HighlightEnd = end;
+//            HighlightSet = true;
 
-        public bool ChartRendered { get; private set; }
-        public async Task SetChartRendered(bool isRendered)
-        {
-            ChartRendered = isRendered;
-            if (NotifyChartRendered != null)
-            {
-                await NotifyChartRendered(isRendered);
-            }
-        }
+//            if (NotifySetHighlightRange != null)
+//            {
+//                await NotifySetHighlightRange(start, end);
+//            }
+//        }
 
-        public event Func<bool, Task> NotifyChartRendered;
+//        public async Task RemoveHighlightRange()
+//        {
+//            HighlightStart = null;
+//            HighlightEnd = null;
+//            HighlightSet = false;
 
-        public CalendarTerm CalendarTerm { get; private set; }
+//            if (NotifyRemoveHighlightRange != null)
+//            {
+//                await NotifyRemoveHighlightRange();
+//            }
+//        }
+
+//        public event Func<Task> NotifyRemoveHighlightRange;
+
+//        public event Func<DateTime, DateTime, Task> NotifySetHighlightRange;
 
 
-        public async Task SetTerm(CalendarTerm term)
-        {
-            if (term == CalendarTerm)
-            {
-                return;
-            }
 
-            CalendarTerm = term;
+//        public bool ChartRendered { get; private set; }
+//        public async Task SetChartRendered(bool isRendered)
+//        {
+//            ChartRendered = isRendered;
+//            if (NotifyChartRendered != null)
+//            {
+//                await NotifyChartRendered(isRendered);
+//            }
+//        }
 
-            if (NotifyTermChanged != null)
-            {
-                await NotifyTermChanged(term);
-            }
-        }
+//        public event Func<bool, Task> NotifyChartRendered;
 
-        public event Func<CalendarTerm, Task> NotifyTermChanged;
+//        public CalendarTerm CalendarTerm { get; private set; }
 
-    }
-}
+
+//        public async Task SetTerm(CalendarTerm term)
+//        {
+//            if (term == CalendarTerm)
+//            {
+//                return;
+//            }
+
+//            CalendarTerm = term;
+
+//            if (NotifyTermChanged != null)
+//            {
+//                await NotifyTermChanged(term);
+//            }
+//        }
+
+//        public event Func<CalendarTerm, Task> NotifyTermChanged;
+
+//    }
+//}

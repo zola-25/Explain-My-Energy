@@ -1,5 +1,4 @@
-﻿using Energy.App.Blazor.Client.StateContainers;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
@@ -12,15 +11,12 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     readonly ITermDateRanges _periodDateRanges;
-    private readonly MeterDataState _meterDataState;
-    private readonly WeatherDataState _weatherDataState;
 
 
-    public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges, MeterDataState meterDataState, WeatherDataState weatherDataState)
+
+    public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges)
     {
         _periodDateRanges = periodDateRanges;
-        _meterDataState = meterDataState;
-        _weatherDataState = weatherDataState;
         _co2Conversion = new Co2ConversionFactors();
     }
 

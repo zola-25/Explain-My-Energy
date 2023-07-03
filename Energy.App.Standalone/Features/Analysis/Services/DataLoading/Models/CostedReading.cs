@@ -16,11 +16,11 @@
     public class ChartReading
     {
         public long DateTicks { get; set; }
-        public double PencePerKWh { get; set; }
-        public double Cost { get; set; }
-        public double DailyStandingCharge { get; set; }
-        public double KWh { get; set; }
-        public double HalfHourlyStandingCharge { get; set; }
+        public decimal PencePerKWh { get; set; }
+        public decimal Cost { get; set; }
+        public decimal DailyStandingCharge { get; set; }
+        public decimal KWh { get; set; }
+        public decimal HalfHourlyStandingCharge { get; set; }
         public DateTime TariffAppliesFrom { get; set; }
         public string TariffType { get; set; }
         public bool IsForecast { get; set; }

@@ -11,14 +11,14 @@ public class TariffDetail : IValidatableObject
 
     [Required]
     [Range(0, 10E6)]
-    public double PencePerKWh { get; set; }
+    public decimal PencePerKWh { get; set; }
 
     [Required]
     public bool IsHourOfDayFixed { get; set; }
 
     [Required]
     [Range(0, 10E6)]
-    public double DailyStandingChargePence { get; set; }
+    public decimal DailyStandingChargePence { get; set; }
 
     public List<HourOfDayPrice> HourOfDayPrices { get; set; } = new List<HourOfDayPrice>();
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

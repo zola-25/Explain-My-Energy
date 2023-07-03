@@ -17,10 +17,10 @@
         
         <MudDivider></MudDivider>
         
-        <MudNavLink Disabled="_electricityDisabled" Class="menu-nav-item" Href="@_electricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
+        <MudNavLink Disabled="_electricityDisabled" Class="menu-nav-item" Href="/HeatingMeter/Electricity" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
             <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Electricity)">Electricity</MeterNavLinkContent>
         </MudNavLink>
-        <MudNavLink Disabled="_gasDisabled" Class="menu-nav-item" Href="@_gasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
+        <MudNavLink Disabled="_gasDisabled" Class="menu-nav-item" Href="/HeatingMeter/Gas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
             <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Gas)">Gas</MeterNavLinkContent>
         </MudNavLink>
 

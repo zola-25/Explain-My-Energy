@@ -2,9 +2,11 @@
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;
+using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Analysis.Store
 {
+    [PersistState]
     public record AnalysisOptionsState
     {
         public MeterAnalysisOptions this[MeterType meterType]
@@ -43,6 +45,16 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         public bool ChartRendered { get; init; }
 
         public CalendarTerm CalendarTerm { get; init; }
+
+        public ToggleSource ToggleSource { get; init; }
+    }
+
+    public enum ToggleSource
+    {
+        None,
+        Historical,
+        Current,
+        Forecast
     }
 
 
@@ -65,7 +77,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                     HighlightSet = false,
                     HighlightStart = null,
                     HighlightEnd = null,
-                    ShowCost = false
+                    ShowCost = false,
+                    ToggleSource = ToggleSource.None
                 },
                 Electricity = new MeterAnalysisOptions
                 {
@@ -75,7 +88,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                     HighlightSet = false,
                     HighlightStart = null,
                     HighlightEnd = null,
-                    ShowCost = false
+                    ShowCost = false,
+                    ToggleSource = ToggleSource.None
                 },
             };
         }
@@ -114,12 +128,14 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     public class GasAnalysisOptionsSetHighlightRangeAction : IAnalysisOptionsAction
     {
 
-        public GasAnalysisOptionsSetHighlightRangeAction(DateTime start, DateTime end)
+        public GasAnalysisOptionsSetHighlightRangeAction(ToggleSource toggleSource, DateTime start, DateTime end)
         {
+            ToggleSource = toggleSource;
             Start = start;
             End = end;
         }
 
+        public ToggleSource ToggleSource { get; }
         public DateTime Start { get; }
         public DateTime End { get; }
     }
@@ -163,12 +179,13 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     public class ElectricityAnalysisOptionsSetHighlightRangeAction : IAnalysisOptionsAction
     {
 
-        public ElectricityAnalysisOptionsSetHighlightRangeAction(DateTime start, DateTime end)
+        public ElectricityAnalysisOptionsSetHighlightRangeAction(ToggleSource toggleSource, DateTime start, DateTime end)
         {
             Start = start;
             End = end;
         }
 
+        public ToggleSource ToggleSource { get; }
         public DateTime Start { get; }
         public DateTime End { get; }
     }
@@ -226,7 +243,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 {
                     HighlightStart = setHighlightRange.Start,
                     HighlightEnd = setHighlightRange.End,
-                    HighlightSet = true
+                    HighlightSet = true,
+                    ToggleSource = setHighlightRange.ToggleSource
                 }
             };
 
@@ -242,7 +260,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 {
                     HighlightStart = null,
                     HighlightEnd = null,
-                    HighlightSet = true
+                    HighlightSet = false,
+                    ToggleSource = ToggleSource.None
                 }
             };
 
@@ -298,7 +317,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 {
                     HighlightStart = setHighlightRange.Start,
                     HighlightEnd = setHighlightRange.End,
-                    HighlightSet = true
+                    HighlightSet = true,
+                    ToggleSource = setHighlightRange.ToggleSource
                 }
             };
 
@@ -314,7 +334,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 {
                     HighlightStart = null,
                     HighlightEnd = null,
-                    HighlightSet = true
+                    HighlightSet = false,
+                    ToggleSource = ToggleSource.None
                 }
             };
 

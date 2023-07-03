@@ -1,4 +1,6 @@
-﻿namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
+﻿using Energy.App.Standalone.Extensions;
+
+namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
 {
     public static class Mapping
     {
