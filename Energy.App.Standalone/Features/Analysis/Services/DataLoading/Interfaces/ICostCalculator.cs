@@ -8,5 +8,5 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interface
 public interface ICostCalculator
 {
     //Task<List<CostedReading>> GetCostedReadings(Meter meter, IEnumerable<BasicReading> basicReadings, CancellationToken ctx = default);
-    IEnumerable<CostedReading> GetCostReadings(ImmutableList<BasicReading> basicReadings, ImmutableList<TariffDetailState> meterTariffDetails);
+    ImmutableList<CostedReading> GetCostReadings(ImmutableList<BasicReading> basicReadings, ImmutableList<TariffDetailState> meterTariffDetails);
 }

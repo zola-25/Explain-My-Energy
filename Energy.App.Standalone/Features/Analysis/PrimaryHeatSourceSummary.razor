@@ -82,14 +82,14 @@
     ? GasTariffsState.Value.TariffDetails : ElectricityTariffsState.Value.TariffDetails;
 
 
-    ImmutableList<CostedReading> _historicalCostedReadings => CostCalculator.GetCostReadings(_basicReadings, _tariffDefails).ToImmutableList();
+    ImmutableList<CostedReading> _historicalCostedReadings => CostCalculator.GetCostReadings(_basicReadings, _tariffDefails);
 
 
     bool _ready = true;
 
 
-    HistoricalAnalysis _thisDurationAnalysis => HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, WeatherState.Value.WeatherReadings);
-    HistoricalAnalysis _previousDurationAnalysis => HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, WeatherState.Value.WeatherReadings);
+    HistoricalAnalysis _thisDurationAnalysis => HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, _dailyWeatherReadings);
+    HistoricalAnalysis _previousDurationAnalysis => HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, _dailyWeatherReadings);
 
     ForecastAnalysis _currentTermForecastAnalysis => TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);
     ForecastAnalysis _nextTermForecastAnalysis => TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);

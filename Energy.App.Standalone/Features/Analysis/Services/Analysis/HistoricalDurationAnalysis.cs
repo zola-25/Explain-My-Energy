@@ -64,7 +64,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
                 LatestReading = durationData.Last().LocalTime.Date,
                 PeriodCo2 = (durationData.Sum(c => c.KWh) * co2ConversionFactor).Round(1),
                 PeriodConsumptionKWh = durationData.Sum(c => c.KWh).Round(0),
-                PeriodCost = durationData.Sum(c => c.CostPence).Round(2),
+                PeriodCostPounds = (durationData.Sum(c => c.CostPence) / 100m).Round(2),
                 TemperatureRange = weatherReadings.Any() ? new TemperatureRange()
                 {
                     LowDailyTemp = Convert.ToInt32(weatherReadings.Min(c => c.TemperatureAverage)),

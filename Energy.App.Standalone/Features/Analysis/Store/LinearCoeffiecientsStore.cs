@@ -77,7 +77,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         }
     }
     
-    public class LinearCoeffiecientsReducer
+    public static class LinearCoeffiecientsReducer
     {
         [ReducerMethod]
         public static LinearCoefficientsState Reduce(LinearCoefficientsState state, UpdateLinearCoeffiecientsAction action)

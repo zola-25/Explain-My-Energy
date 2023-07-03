@@ -10,7 +10,7 @@
         </MudPaper>
         <MudText Class="ml-1" Typo="Typo.caption"><strong>To Date</strong></MudText>
         <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
-            <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsSoFar.PeriodCost.eToMoneyFormat()</MudChip>
+            <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsSoFar.PeriodCostPounds.eToMoneyFormat()</MudChip>
             <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon" >@TotalsSoFar.PeriodConsumptionKWh kWh</MudChip>
             <MudChip  Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" >@TotalsSoFar.PeriodCo2 kgCO<sub>2</sub></MudChip>
         </MudPaper>
@@ -18,7 +18,7 @@
 
         <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
 
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsForecast.ForecastCostPence.eToMoneyFormat()</MudChip>
+            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound" >@TotalsForecast.ForecastCostPounds.eToMoneyFormat()</MudChip>
             <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon" >@TotalsForecast.ForecastConsumption kWh</MudChip>
             <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" >@TotalsForecast.ForecastCo2 kgCO<sub>2</sub></MudChip>
         </MudPaper>

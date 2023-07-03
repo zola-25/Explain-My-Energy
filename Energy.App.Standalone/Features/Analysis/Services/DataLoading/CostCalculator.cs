@@ -10,7 +10,16 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
     public class CostCalculator : ICostCalculator
     {
 
-        public IEnumerable<CostedReading> GetCostReadings(
+        public ImmutableList<CostedReading> GetCostReadings(
+            ImmutableList<BasicReading> basicReadings,
+            ImmutableList<TariffDetailState> meterTariffDetails)
+        {
+            var costedReadings = GetCostReadingsEnum(basicReadings, meterTariffDetails).ToImmutableList();
+            return costedReadings;
+        }
+
+
+        public IEnumerable<CostedReading> GetCostReadingsEnum(
             ImmutableList<BasicReading> basicReadings,
             ImmutableList<TariffDetailState> meterTariffDetails)
         {

@@ -1,6 +1,8 @@
-﻿using Energy.App.Standalone.Features.EnergyReadings.Store;
+﻿using Energy.App.Standalone.Features.Analysis.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Weather.Store;
+using Energy.Shared;
 using Fluxor;
 
 namespace Energy.App.Standalone.Features
@@ -64,6 +66,10 @@ namespace Energy.App.Standalone.Features
                 {
                     _dispatcher.Dispatch(new ElectricityReloadReadingsAction());
                 }
+                if(_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
+                {
+                    _dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
+                }
             }
 
             if (_meterSetupState.Value.GasMeter.SetupValid)
@@ -79,6 +85,11 @@ namespace Energy.App.Standalone.Features
                 else
                 {
                     _dispatcher.Dispatch(new GasReloadReadingsAction());
+                }
+
+                if(_householdState.Value.PrimaryHeatSource == MeterType.Gas)
+                {
+                    _dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
                 }
             }
         }

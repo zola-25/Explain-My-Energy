@@ -13,7 +13,7 @@ public record HistoricalAnalysis
     public decimal PeriodCo2 { get; init; }
 
     public decimal PeriodConsumptionKWh { get; init; }
-    public decimal PeriodCost { get; init; }
+    public decimal PeriodCostPounds { get; init; }
 
     public TemperatureRange TemperatureRange { get; init; }
     public bool HasData { get; init; }

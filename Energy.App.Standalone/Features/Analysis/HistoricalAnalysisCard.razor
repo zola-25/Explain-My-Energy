@@ -7,17 +7,12 @@
     <MudCardContent>
         <MudPaper Class="d-flex flex-column flex-grow-1 m-1" Elevation="0">
             <MudText Typo="Typo.h5">@_headerText</MudText>
-            <MudText Typo="Typo.h5">@_headerText</MudText>
-            <MudText Typo="Typo.h5">@_headerText</MudText>
-            <MudText Typo="Typo.h5">@_headerText</MudText>
-            <MudText Typo="Typo.h5">@_headerText</MudText>
-
 
             <MudText Typo="Typo.caption">@DurationAnalysis.DateRangeText</MudText>
         </MudPaper>
         <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
 
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound">@DurationAnalysis.PeriodCost.eToMoneyFormat()</MudChip>
+            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound">@DurationAnalysis.PeriodCostPounds.eToMoneyFormat()</MudChip>
             <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon">@DurationAnalysis.PeriodConsumptionKWh kWh</MudChip>
             <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" Label="true">@DurationAnalysis.PeriodCo2 kgCO<sub>2</sub></MudChip>
 
@@ -40,10 +35,6 @@
 
         <MudCardActions Class="d-flex justify-center">
                 <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@DurationAnalysis.TemperatureRange.TemperatureText</MudChip>
-                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@DurationAnalysis.TemperatureRange.TemperatureText</MudChip>
-                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@DurationAnalysis.TemperatureRange.TemperatureText</MudChip>
-                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@DurationAnalysis.TemperatureRange.TemperatureText</MudChip>
-                
             
             <MudToggleIconButton Toggled="_highlightToggled"
                                  ToggledChanged="ToggleHighlight"

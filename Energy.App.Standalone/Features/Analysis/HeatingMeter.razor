@@ -1,5 +1,6 @@
 ﻿@page "/HeatingMeter/{MeterTypeName}"
-
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
 
 <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="true">
     <EnergyChart>
@@ -20,6 +21,7 @@
     protected override void OnParametersSet()
     {
         _meterType = MeterTypeName.eStringToEnum<MeterType>();
+        Dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
     }
 }
 
