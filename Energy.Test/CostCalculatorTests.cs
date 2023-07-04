@@ -11,65 +11,100 @@ namespace Energy.Test
 {
     public class CostCalculatorTests
     {
-        public class CostCalculatorTestData : TheoryData<decimal, DateTime, DateTime>
+        public class SingleFixedTariffCostCalculatorTestData : TheoryData<decimal, decimal, decimal, decimal, DateTime, DateTime>
         {
-            public CostCalculatorTestData()
+            public SingleFixedTariffCostCalculatorTestData()
             {
-                Add(283, new DateTime(2023, 4, 30), new DateTime(2023, 5, 31));
+                // 30th April 2023 to 31st May 2023
+                decimal t1TotalKWhForPeriod = 283m;
+                decimal t1PeriodStandingChargePence = 1569m;
+                decimal t1PeriodPencePerKWh = 31.697m;
+                decimal t1TotalCostForPeriodPence = 10539.251m;
+
+                Add(t1TotalKWhForPeriod,
+                    t1PeriodStandingChargePence,
+                    t1PeriodPencePerKWh,
+                    t1TotalCostForPeriodPence,
+                    new DateTime(2023, 4, 30),
+                    new DateTime(2023, 5, 31));
+
+                // 31st March 2023 to 30th April 2023
+                decimal t2TotalKWhForPeriod = 283m;
+                decimal t2PeriodStandingChargePence = 1569m;
+                decimal t2PeriodPencePerKWh = 31.697m;
+                decimal t2TotalCostForPeriodPence = 10539.251m;
+
+
+                Add(t2TotalKWhForPeriod,
+                    t2PeriodStandingChargePence,
+                    t2PeriodPencePerKWh,
+                    t2TotalCostForPeriodPence,
+                    new DateTime(2023, 3, 31),
+                    new DateTime(2023, 4, 30));
+
             }
         }
 
         // a test to check that the cost calculator is working correctly
 
         [Theory]
-        [ClassData(typeof(CostCalculatorTestData))]
-        public void CostedValuesCorrectForTimePeriod(decimal totalKWhForPeriod, DateTime start, DateTime end)
+        [ClassData(typeof(SingleFixedTariffCostCalculatorTestData))]
+        public void CostedValuesForSingleApplicableFixedTariff(decimal totalKWhForPeriod,
+                                                               decimal periodStandingChargePence,
+                                                               decimal periodPencePerKWh,
+                                                               decimal totalCostForPeriodPence,
+                                                               DateTime start,
+                                                               DateTime end)
         {
-            int periodDays = start.eGetDateCount(end);;
-            decimal periodStandingChargePence = 1569m;
-            decimal periodPencePerKWh = 31.697m;
-            decimal totalCostForPeriodPence = 10539.251m;
+            int periodDays = start.eGetDateCount(end);
 
             var myRecentTariff = new TariffDetailState
             {
                 DailyStandingChargePence = periodStandingChargePence / periodDays,
-                DateAppliesFrom = new DateTime(2023, 4, 30),
+                DateAppliesFrom = start,
                 PencePerKWh = periodPencePerKWh,
                 IsHourOfDayFixed = true,
                 GlobalId = Guid.NewGuid(),
                 HourOfDayPrices = new()
             };
 
-            var tarriffDetails = DefaultTariffData.DefaultTariffs.Select(c => new TariffDetailState
-            {
-                DailyStandingChargePence = c.DailyStandingChargePence,
-                PencePerKWh = c.PencePerKWh,
-                DateAppliesFrom = c.DateAppliesFrom,
-                IsHourOfDayFixed = c.IsHourOfDayFixed,
-                HourOfDayPrices = c.DefaultHourOfDayPrices.eMapToHourOfDayPriceState(),
-                GlobalId = Guid.NewGuid(),
-            }).Append(myRecentTariff).ToImmutableList();
+            var tariffState = myRecentTariff.eItemToImmutableList();
 
             var basicReadings = CreateBasicReadingsFromTotalKWh(start, end, totalKWhForPeriod).ToImmutableList();
-            
+
             var costCalculator = new CostCalculator();
-            var costedReadings = costCalculator.GetCostReadings(basicReadings, tarriffDetails);
-            
-            var calculatedTotalKWh = costedReadings.Sum(c => c.KWh);
-            var calculatedTotalCostPence = costedReadings.Sum(c => c.ReadingTotalCostPence);
+            var costedReadings = costCalculator.GetCostReadings(basicReadings, tariffState);
+            AssertAccurateForSingleTariff(myRecentTariff,
+                                          totalKWhForPeriod,
+                                          periodDays,
+                                          periodStandingChargePence,
+                                          totalCostForPeriodPence,
+                                          basicReadings.Count,
+                                          costedReadings);
+        }
 
-            var calculatedTotalStandingChargePence = costedReadings.Sum(c => c.TariffHalfHourlyStandingChargePence);
+        private static void AssertAccurateForSingleTariff(TariffDetailState applicableTariff,
+                                                          decimal totalKWhForPeriod,
+                                                          int periodDays,
+                                                          decimal periodStandingChargePence,
+                                                          decimal totalCostForPeriodPence,
+                                                          int numExpectedReadings,
+                                                          ImmutableList<CostedReading> calculatedCostedReadings)
+        {
+            var calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
+            var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.ReadingTotalCostPence);
+
+            var calculatedTotalStandingChargePence = calculatedCostedReadings.Sum(c => c.TariffHalfHourlyStandingChargePence);
 
 
-            var applicableTariff = tarriffDetails.Where(c => c.DateAppliesFrom <= start).OrderByDescending(c => c.DateAppliesFrom).First();
 
-            Assert.Equal(basicReadings.Count, costedReadings.Count);
+            Assert.Equal(numExpectedReadings, calculatedCostedReadings.Count);
 
-            Assert.All<CostedReading>(costedReadings, (costReading) =>
+            Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
             {
                 Assert.Equal(applicableTariff.DateAppliesFrom, costReading.TariffAppliesFrom);
                 Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingChargePence);
-                Assert.True(applicableTariff.HourOfDayPrices.All(c => c.PencePerKWh  / 2m == costReading.TariffHalfHourlyPencePerKWh));
+                Assert.True(applicableTariff.HourOfDayPrices.All(c => c.PencePerKWh / 2m == costReading.TariffHalfHourlyPencePerKWh));
 
                 Assert.Equal(totalKWhForPeriod / (periodDays * 48), costReading.KWh);
 
@@ -88,10 +123,11 @@ namespace Energy.Test
 
             var totalHalfHours = periodDays * 48;
             decimal kWhPerHalfHour = totalKWh / totalHalfHours;
-            return Enumerable.Range(0, totalHalfHours).Select(halfHourIndex => {
-                
+            return Enumerable.Range(0, totalHalfHours).Select(halfHourIndex =>
+            {
+
                 var utcTime = start.AddMinutes(halfHourIndex * 30);
-                
+
                 return new BasicReading()
                 {
                     UtcTime = utcTime,

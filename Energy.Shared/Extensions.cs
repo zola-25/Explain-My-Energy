@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 
 namespace Energy.Shared
 {
@@ -23,6 +24,16 @@ namespace Energy.Shared
 
             return queryStringBuilder.ToString();
         }
+        public static List<T> eItemToList<T>(this T item)
+        {
+            return new List<T> { item };
+        }
 
+        public static ImmutableList<T> eItemToImmutableList<T>(this T item)
+        {
+            return new List<T> { item }.ToImmutableList();
+        }
     }
+
+
 }
