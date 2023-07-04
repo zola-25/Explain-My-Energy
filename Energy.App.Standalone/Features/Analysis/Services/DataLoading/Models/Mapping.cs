@@ -8,13 +8,12 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
         {
             return new ChartReading()
             {
-                Cost = costedReading.CostPence,
+                Cost = costedReading.ReadingTotalCostPence,
                 KWh = costedReading.KWh,
-                PencePerKWh = costedReading.PencePerKWh,
-                DailyStandingCharge = costedReading.DailyStandingChargePence,
-                DateTicks = costedReading.LocalTime.eToUnixTime(),
-                HalfHourlyStandingCharge = costedReading.HalfHourlyStandingChargePence,
-                TariffType = costedReading.TariffType.ToString(),
+                PencePerKWh = costedReading.TariffHalfHourlyPencePerKWh,
+                DailyStandingCharge = costedReading.TariffDailyStandingChargePence,
+                DateTicks = costedReading.UtcTime.eToUnixTime(),
+                HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingChargePence,
                 TariffAppliesFrom = costedReading.TariffAppliesFrom,
                 IsForecast = costedReading.Forecast
             };

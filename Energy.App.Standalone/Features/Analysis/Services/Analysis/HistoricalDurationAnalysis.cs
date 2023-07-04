@@ -48,7 +48,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
         var weatherReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate < end)
             .ToList();
 
-        var durationData = costedReadings.FindAll(c => c.LocalTime >= start && c.LocalTime < end);
+        var durationData = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime < end);
 
         decimal co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
 
@@ -61,10 +61,10 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
                 HasData = true,
                 Start = start,
                 End = end.AddDays(-1),
-                LatestReading = durationData.Last().LocalTime.Date,
+                LatestReading = durationData.Last().UtcTime.Date,
                 PeriodCo2 = (durationData.Sum(c => c.KWh) * co2ConversionFactor).Round(1),
                 PeriodConsumptionKWh = durationData.Sum(c => c.KWh).Round(0),
-                PeriodCostPounds = (durationData.Sum(c => c.CostPence) / 100m).Round(2),
+                PeriodCostPounds = (durationData.Sum(c => c.ReadingTotalCostPence) / 100m).Round(2),
                 TemperatureRange = weatherReadings.Any() ? new TemperatureRange()
                 {
                     LowDailyTemp = Convert.ToInt32(weatherReadings.Min(c => c.TemperatureAverage)),

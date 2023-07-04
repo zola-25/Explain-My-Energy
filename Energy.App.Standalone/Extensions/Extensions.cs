@@ -27,6 +27,16 @@ public static class Extensions
         return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
     }
 
+
+    public static List<HourOfDayPriceState> eMapToHourOfDayPriceState(this IEnumerable<DefaultHourOfDayPrice> hourOfDayPriceStates)
+    {
+        return hourOfDayPriceStates.Select(c => new HourOfDayPriceState
+        {
+            HourOfDay = c.HourOfDay,
+            PencePerKWh = c.PencePerKWh
+        }).ToList();
+    }
+
     public static List<HourOfDayPrice> eMapToHourOfDayPriceDto(this IEnumerable<HourOfDayPriceState> hourOfDayPriceStates)
     {
         return hourOfDayPriceStates.Select(c => new HourOfDayPrice

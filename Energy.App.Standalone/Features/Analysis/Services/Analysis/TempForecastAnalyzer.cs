@@ -89,7 +89,7 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
             Start = start,
             End = end,
             ForecastConsumption = forecastConsumption.Round(0),
-            ForecastCostPounds = (forecastCostedReadings.Sum(c => c.CostPence) / 100m).Round(2),
+            ForecastCostPounds = (forecastCostedReadings.Sum(c => c.ReadingTotalCostPence) / 100m).Round(2),
             ForecastCo2 = (forecastConsumption * _co2Conversion.GetCo2ConversionFactor(meterType)).Round(1),
             TemperatureRange = new TemperatureRange()
             {
