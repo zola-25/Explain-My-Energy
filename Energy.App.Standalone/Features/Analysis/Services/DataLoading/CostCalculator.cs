@@ -11,37 +11,27 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
     public class CostCalculator : ICostCalculator
     {
-
         public ImmutableList<CostedReading> GetCostReadings(
             ImmutableList<BasicReading> basicReadings,
-            ImmutableList<TariffDetailState> meterTariffDetails)
+            ImmutableList<TariffDetailState> meterTariffState)
         {
-            var costedReadings = GetCostReadingsEnum(basicReadings, meterTariffDetails).ToImmutableList();
-            return costedReadings;
-        }
-
-
-        public IEnumerable<CostedReading> GetCostReadingsEnum(
-            ImmutableList<BasicReading> basicReadings,
-            ImmutableList<TariffDetailState> allTariffDetails)
-        {
-            var allTariffDetailsOrdered = allTariffDetails.OrderBy(c => c.DateAppliesFrom).ToArray();
+            var allTariffsOrderedArray = meterTariffState.OrderBy(c => c.DateAppliesFrom).ToArray();
 
             var firstReadingTime = basicReadings.First().UtcTime;
-            if (firstReadingTime < allTariffDetailsOrdered[0].DateAppliesFrom)
+            if (firstReadingTime < allTariffsOrderedArray[0].DateAppliesFrom)
             {
                 string message = $"All tariffs apply after first reading date {firstReadingTime:D}";
                 throw new ArgumentException(message);
             }
 
             //List<(TariffDetailState TariffDetailState, ImmutableList<BasicReading> BasicReadings)> tariffsForReadings = new();
-
-            for (int i = 0; i < allTariffDetailsOrdered.Length; i++)
+            List<CostedReading> costedReadings = new();
+            for (int i = 0; i < allTariffsOrderedArray.Length; i++)
             {
-                var currentTariff = allTariffDetailsOrdered[i];
+                var currentTariff = allTariffsOrderedArray[i];
                 ImmutableList<BasicReading> tariffReadings;
 
-                if (i == allTariffDetailsOrdered.Length - 1)
+                if (i == allTariffsOrderedArray.Length - 1)
                 {
 
                     tariffReadings = basicReadings.FindAll(
@@ -50,10 +40,15 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 }
                 else
                 {
-                    var nextTariff = allTariffDetailsOrdered[i + 1];
+                    var nextTariff = allTariffsOrderedArray[i + 1];
                     tariffReadings = basicReadings.FindAll(
                        c => c.UtcTime >= currentTariff.DateAppliesFrom && c.UtcTime < nextTariff.DateAppliesFrom);
 
+                }
+
+                if (tariffReadings.Count == 0)
+                {
+                    continue;
                 }
 
                 List<HalfHourOfDayPrice> halfHourOfDayPrices = new();
@@ -72,24 +67,50 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                                                                     equals halfHourlyPrice.HourOfDayMinutes
                                                                 select new CostedReading()
                                                                 {
-                                                                    KWh = basicReading.KWh,
-                                                                    UtcTime = basicReading.UtcTime,
-                                                                    TariffHalfHourlyPencePerKWh = halfHourlyPrice.PencePerKWh,
-                                                                    TariffDailyStandingChargePence = currentTariff.DailyStandingChargePence,
-                                                                    ReadingTotalCostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
-                                                                    TariffHalfHourlyStandingChargePence = halfHourlyStandingChargePence,
                                                                     TariffAppliesFrom = currentTariff.DateAppliesFrom.Value,
+                                                                    TariffDailyStandingChargePence = currentTariff.DailyStandingChargePence,
+                                                                    TariffHalfHourlyStandingChargePence = halfHourlyStandingChargePence,
+                                                                    TariffHalfHourlyPencePerKWh = halfHourlyPrice.PencePerKWh,
+
+                                                                    UtcTime = basicReading.UtcTime,
+                                                                    KWh = basicReading.KWh,
+                                                                    ReadingTotalCostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
                                                                     Forecast = basicReading.Forecast
                                                                 };
-
-                foreach (CostedReading calculatedReading in calculatedReadings)
-                    yield return calculatedReading;
-
+                costedReadings.AddRange(calculatedReadings);
             }
+
+            return costedReadings.ToImmutableList();
 
         }
 
+        private IEnumerable<HalfHourOfDayPrice> CreateUniformHalfHourOfDayPrices(decimal fixedPencePerKWh)
+        {
+            return Enumerable.Range(0, 48).Select(i => new HalfHourOfDayPrice()
+            {
+                PencePerKWh = fixedPencePerKWh ,
+                HourOfDayMinutes = i * 30,
+            });
+        }
 
+        private static IEnumerable<HalfHourOfDayPrice> ToHalfHourly(HourOfDayPriceState price)
+        {
+            yield return new HalfHourOfDayPrice()
+            {
+                HourOfDayMinutes = price.HourOfDay.Value.Minutes,
+                PencePerKWh = price.PencePerKWh ,
+            };
+            yield return new HalfHourOfDayPrice()
+            {
+                HourOfDayMinutes = price.HourOfDay.Value.Minutes + 30,
+                PencePerKWh = price.PencePerKWh ,
+            };
+        }
+        private record HalfHourOfDayPrice
+        {
+            public int HourOfDayMinutes { get; init; }
+            public decimal PencePerKWh { get; init; }
+        }
 
         //foreach (var basicReading in basicReadings)
         //{
@@ -177,33 +198,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         //    else
         //        throw new ArgumentException("No tariff found");
 
-        private IEnumerable<HalfHourOfDayPrice> CreateUniformHalfHourOfDayPrices(decimal fixedPencePerKWh)
-        {
-            return Enumerable.Range(0, 48).Select(i => new HalfHourOfDayPrice()
-            {
-                PencePerKWh = fixedPencePerKWh / 48m,
-                HourOfDayMinutes = i * 30,
-            });
-        }
-
-        private static IEnumerable<HalfHourOfDayPrice> ToHalfHourly(HourOfDayPriceState price)
-        {
-            yield return new HalfHourOfDayPrice()
-            {
-                HourOfDayMinutes = price.HourOfDay.Value.Minutes,
-                PencePerKWh = price.PencePerKWh,
-            };
-            yield return new HalfHourOfDayPrice()
-            {
-                HourOfDayMinutes = price.HourOfDay.Value.Minutes + 30,
-                PencePerKWh = price.PencePerKWh,
-            };
-        }
-        private record HalfHourOfDayPrice
-        {
-            public int HourOfDayMinutes { get; init; }
-            public decimal PencePerKWh { get; init; }
-        }
+        
     }
 
 
@@ -220,16 +215,5 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 //    public ImmutableList<HalfHourOfDayPrice> HalfHourOfDayPrices { get; init; }
 //    public TariffType TariffType { get; init; }
 //}
-
-
-
-
-
-
-
-
-
-
-}
 
 

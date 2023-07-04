@@ -25,6 +25,21 @@ namespace Energy.Test
         [ClassData(typeof(CostCalculatorTestData))]
         public void CostedValuesCorrectForTimePeriod(decimal totalKWhForPeriod, DateTime start, DateTime end)
         {
+            int periodDays = start.eGetDateCount(end);;
+            decimal periodStandingChargePence = 1569m;
+            decimal periodPencePerKWh = 31.697m;
+            decimal totalCostForPeriodPence = 10539.251m;
+
+            var myRecentTariff = new TariffDetailState
+            {
+                DailyStandingChargePence = periodStandingChargePence / periodDays,
+                DateAppliesFrom = new DateTime(2023, 4, 30),
+                PencePerKWh = periodPencePerKWh,
+                IsHourOfDayFixed = true,
+                GlobalId = Guid.NewGuid(),
+                HourOfDayPrices = new()
+            };
+
             var tarriffDetails = DefaultTariffData.DefaultTariffs.Select(c => new TariffDetailState
             {
                 DailyStandingChargePence = c.DailyStandingChargePence,
@@ -33,44 +48,46 @@ namespace Energy.Test
                 IsHourOfDayFixed = c.IsHourOfDayFixed,
                 HourOfDayPrices = c.DefaultHourOfDayPrices.eMapToHourOfDayPriceState(),
                 GlobalId = Guid.NewGuid(),
+            }).Append(myRecentTariff).ToImmutableList();
 
-            }).ToImmutableList();
-
-            var costCalculator = new CostCalculator();
             var basicReadings = CreateBasicReadingsFromTotalKWh(start, end, totalKWhForPeriod).ToImmutableList();
             
-            var costReadings = costCalculator.GetCostReadings(basicReadings, tarriffDetails);
-            var totalKWh = costReadings.Sum(c => c.KWh);
-            var totalCost = costReadings.Sum(c => c.ReadingTotalCostPence);
+            var costCalculator = new CostCalculator();
+            var costedReadings = costCalculator.GetCostReadings(basicReadings, tarriffDetails);
+            
+            var calculatedTotalKWh = costedReadings.Sum(c => c.KWh);
+            var calculatedTotalCostPence = costedReadings.Sum(c => c.ReadingTotalCostPence);
 
-            var totalStandingCharge = costReadings.Sum(c => c.TariffHalfHourlyStandingChargePence);
+            var calculatedTotalStandingChargePence = costedReadings.Sum(c => c.TariffHalfHourlyStandingChargePence);
 
 
             var applicableTariff = tarriffDetails.Where(c => c.DateAppliesFrom <= start).OrderByDescending(c => c.DateAppliesFrom).First();
 
-            Assert.All<CostedReading>(costReadings, (costReading) =>
+            Assert.Equal(basicReadings.Count, costedReadings.Count);
+
+            Assert.All<CostedReading>(costedReadings, (costReading) =>
             {
                 Assert.Equal(applicableTariff.DateAppliesFrom, costReading.TariffAppliesFrom);
                 Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingChargePence);
                 Assert.True(applicableTariff.HourOfDayPrices.All(c => c.PencePerKWh  / 2m == costReading.TariffHalfHourlyPencePerKWh));
-                
-                Assert.Equal(totalKWh / (end - start).Days, costReading.KWh);
+
+                Assert.Equal(totalKWhForPeriod / (periodDays * 48), costReading.KWh);
 
                 Assert.False(costReading.Forecast);
 
             });
 
-            Assert.Equal(283, totalKWh);
-            Assert.Equal(1569, totalStandingCharge);
-            Assert.Equal(10539, totalCost);
+            Assert.Equal(totalKWhForPeriod, calculatedTotalKWh, 6);
+            Assert.Equal(periodStandingChargePence, calculatedTotalStandingChargePence, 6);
+            Assert.Equal(totalCostForPeriodPence, calculatedTotalCostPence, 6);
         }
 
         private IEnumerable<BasicReading> CreateBasicReadingsFromTotalKWh(DateTime start, DateTime end, decimal totalKWh)
         {
-            // create a list of basic readings from a total kWh divided int 24 hourly readings
-            var totalDays = (end - start).Days;
-            var totalHalfHours = totalDays * 48;
-            decimal kWhPerHalfHour = totalKWh / (decimal)totalHalfHours;
+            var periodDays = start.eGetDateCount(end);
+
+            var totalHalfHours = periodDays * 48;
+            decimal kWhPerHalfHour = totalKWh / totalHalfHours;
             return Enumerable.Range(0, totalHalfHours).Select(halfHourIndex => {
                 
                 var utcTime = start.AddMinutes(halfHourIndex * 30);

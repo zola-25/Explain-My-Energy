@@ -190,6 +190,12 @@ public static class Extensions
 
     }
 
+    public static int eGetDateCount(this DateTime startDate, DateTime endDate)
+    {
+        var dates = startDate.Date.eGenerateAllDatesBetween(endDate).ToList();
+        return dates.Count;
+    }
+
     public static string ePenceRateDisplay(this decimal amount)
     {
         return $"{amount:F2}p";
