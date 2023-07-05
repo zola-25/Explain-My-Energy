@@ -61,7 +61,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 {
                     halfHourOfDayPrices = currentTariff.HourOfDayPrices.SelectMany(ToHalfHourly).ToList();
                 }
-                decimal halfHourlyStandingChargePence = (currentTariff.DailyStandingChargePence / 48m);
+                decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
                 IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
                                                                 join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.Minute 
@@ -75,7 +75,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    ReadingTotalCostPence = ((basicReading.KWh * halfHourlyPrice.PencePerKWh).Round(3) + halfHourlyStandingChargePence.Round(2)),
+                                                                    ReadingTotalCostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
                                                                     Forecast = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);
@@ -89,7 +89,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         {
             return Enumerable.Range(0, 48).Select(i => new HalfHourOfDayPrice()
             {
-                PencePerKWh = fixedPencePerKWh ,
+                PencePerKWh = fixedPencePerKWh,
                 HourOfDayMinutes = i * 30,
             });
         }

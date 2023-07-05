@@ -32,7 +32,7 @@ namespace Energy.Test
             return tariffDetailState;
         }
         
-        public static List<TariffDetailState> TestElectricityTariffs => ElectricityPeriodValuesList.Select(c =>
+        public static List<TariffDetailState> TestElectricityTariffs => ElectricityBillValuesList.Select(c =>
         {
             int periodDays = c.Start.eGetDateCountExcludeEnd(c.End);
 
@@ -40,7 +40,7 @@ namespace Energy.Test
             {
                 DateAppliesFrom = c.Start,
                 PencePerKWh = c.PeriodPencePerKWh,
-                DailyStandingChargePence = (c.PeriodStandingChargePence / periodDays).Round(3),
+                DailyStandingChargePence = (c.PeriodStandingChargePence / periodDays),
                 IsHourOfDayFixed = true,
                 HourOfDayPrices = new List<HourOfDayPriceState>()
             };
@@ -54,16 +54,16 @@ namespace Energy.Test
             {
                 DateAppliesFrom = c.Start,
                 PencePerKWh = c.PeriodPencePerKWh,
-                DailyStandingChargePence = (c.PeriodStandingChargePence / periodDays).Round(3),
+                DailyStandingChargePence = (c.PeriodStandingChargePence / periodDays),
                 IsHourOfDayFixed = true,
                 HourOfDayPrices = new List<HourOfDayPriceState>()
             };
         }).ToList();
 
-        public static ImmutableList<PeriodValues> GasPeriodValuesList = new List<PeriodValues>()
+        public static ImmutableList<EnergyBillValues> GasPeriodValuesList = new List<EnergyBillValues>()
         {
             // May
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.May,
                 TotalCostForPeriodPence = 2128m,
@@ -76,10 +76,10 @@ namespace Energy.Test
 
         }.ToImmutableList();
 
-        public static ImmutableList<PeriodValues> ElectricityPeriodValuesList = new List<PeriodValues>()
+        public static ImmutableList<EnergyBillValues> ElectricityBillValuesList = new List<EnergyBillValues>()
         {
             // February
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.February,
                 TotalCostForPeriodPence = 9232m,
@@ -90,7 +90,7 @@ namespace Energy.Test
                 End = new DateTime(2023, 1, 31)
             }, 
             // March
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.March,
                 TotalCostForPeriodPence = 8644m,
@@ -101,7 +101,7 @@ namespace Energy.Test
                 End = new DateTime(2023, 2, 28)
             }, 
             // April
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.April,
                 TotalCostForPeriodPence = 6224m,
@@ -113,7 +113,7 @@ namespace Energy.Test
             }, 
 
             // May
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.May,
                 TotalCostForPeriodPence = 8016m,
@@ -125,7 +125,7 @@ namespace Energy.Test
             },
 
             // June
-            new PeriodValues
+            new EnergyBillValues
             {
                 BillDate = BillDate.June,
                 TotalCostForPeriodPence = 10539m,
@@ -140,7 +140,7 @@ namespace Energy.Test
     }
 
 
-    public record PeriodValues
+    public record EnergyBillValues
     {
         public decimal TotalKWhForPeriod { get; init; }
         public decimal PeriodStandingChargePence { get; init; }
