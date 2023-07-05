@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Weather.Store
 {
-    [PersistState, PriorityLoad]
+    [PersistState]
     public record WeatherState
     {
         public bool Loading { get; init; }
@@ -59,8 +59,8 @@ namespace Energy.App.Standalone.Features.Weather.Store
         {
             return state with
             {
+                Loading = false,
                 WeatherReadings = action.WeatherReadings.ToImmutableList(),
-                Loading = false
             };
         }
 

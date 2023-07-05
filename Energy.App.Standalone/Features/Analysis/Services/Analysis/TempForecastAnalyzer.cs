@@ -83,6 +83,9 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
 
         decimal forecastConsumption = forecastCostedReadings.Sum(c => c.KWh);
 
+        var periodWeatherReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate < end).ToImmutableList();
+        decimal forecastBasicConsumption = forecastBasicReadings.Sum(c => c.KWh);
+
         ForecastAnalysis results = new ForecastAnalysis()
         {
             NumberOfDays = dailyWeatherReadings.Count,
@@ -93,9 +96,9 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
             ForecastCo2 = (forecastConsumption * _co2Conversion.GetCo2ConversionFactor(meterType)).Round(1),
             TemperatureRange = new TemperatureRange()
             {
-                LowDailyTemp = Convert.ToInt32(dailyWeatherReadings.Min(c => c.TemperatureAverage)),
-                HighDailyTemp = Convert.ToInt32(dailyWeatherReadings.Max(c => c.TemperatureAverage)),
-                AverageTemp = Convert.ToInt32(dailyWeatherReadings.Average(c => c.TemperatureAverage))
+                LowDailyTemp = Convert.ToInt32(periodWeatherReadings.Min(c => c.TemperatureAverage)),
+                HighDailyTemp = Convert.ToInt32(periodWeatherReadings.Max(c => c.TemperatureAverage)),
+                AverageTemp = Convert.ToInt32(periodWeatherReadings.Average(c => c.TemperatureAverage))
             }
         };
         return results;

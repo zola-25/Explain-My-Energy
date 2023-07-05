@@ -12,15 +12,18 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                                                                    LinearCoefficientsState linearCoefficientsState,
                                                                    ImmutableList<DailyWeatherReading> dailyWeatherReadings)
         {
-            var adjustedKWh = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
-                .Select(c => new BasicReading
-                {
-                    Forecast = true,
-                    UtcTime = c.UtcReadDate,
-                    KWh = linearCoefficientsState.PredictConsumptionY(c.TemperatureAverage + degreeDifference)
-                }).ToImmutableList();
+            var adjustedReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
+                .SelectMany(c => {
+                    decimal adjustedKWh = linearCoefficientsState.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
+                    return Enumerable.Range(0, 48).Select(i => new BasicReading
+                        {
+                            Forecast = true,
+                            UtcTime = c.UtcReadDate.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
+                            KWh = adjustedKWh / 48
+                        });
+                    }).ToImmutableList();
 
-            return adjustedKWh;
+            return adjustedReadings;
 
         }
     }

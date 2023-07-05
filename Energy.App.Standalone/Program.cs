@@ -36,7 +36,7 @@ builder.Services.AddFluxor(options =>
     Fluxor.DependencyInjection.FluxorOptions fluxorOptions = options.ScanAssemblies(currentAssembly);
     fluxorOptions.UseReduxDevTools(options =>
     {
-        options.EnableStackTrace();
+        //options.EnableStackTrace();
     });
     fluxorOptions.UsePersist(options =>
     {

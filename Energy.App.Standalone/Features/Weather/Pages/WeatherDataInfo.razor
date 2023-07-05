@@ -23,7 +23,7 @@
             {
                 <td colspan="4">Loading Weather Data...</td>
             }
-            else
+            else if (WeatherState.Value.WeatherReadings.Any())
             {
                 <td>From @WeatherState.Value.WeatherReadings.First().UtcReadDate.eDateToMinimal()</td>
                 <td>
