@@ -1,6 +1,8 @@
 ﻿@using Energy.App.Standalone.Features;
+@using Energy.App.Standalone.Features.EnergyReadings.Store;
 @using Fluxor.Blazor.Web.Components;
 @using Fluxor.Persist.Middleware;
+@using System.Collections.Immutable;
 @inherits FluxorLayout
 @inject IDispatcher Dispatcher
 
@@ -20,7 +22,22 @@
     </MudDrawer>
     <MudMainContent>
         <MudContainer>
-            @Body
+            @if (!Ready)
+            {
+                <MudGrid Justify="Justify.Center">
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2">
+                            <MudText Typo="Typo.h5">Loading...</MudText>
+                            <MudProgressCircular StrokeWidth="8" Size="@Size.Large" Value="_progress" Color="Color.Primary">
+                            </MudProgressCircular>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            }
+            else
+            {
+                @Body
+            }
         </MudContainer>
     </MudMainContent>
 </MudLayout>
@@ -29,17 +46,40 @@
 @code {
 
     [Inject] IAppInitialization AppInitialization { get; set; }
+    [Inject]
+    public IStateSelection<WeatherState, ImmutableList<DailyWeatherReading>> WeatherStateSelection { get; set; }
+
+    [Inject]
+    public IState<AppInitializationState> AppInitializationState { get; set; }
+
+
+    public bool Ready => (!AppInitializationState.Value.WaitingForWeatherData
+                            && !AppInitializationState.Value.WaitingForElectricityReadingsData
+                            && !AppInitializationState.Value.WaitingForGasReadingsData
+                            && !AppInitializationState.Value.WaitingForLinearCoefficients);
+    double _progress = 10;
 
     protected override void OnInitialized()
     {
-        base.OnInitialized();
+        _progress += 20;
         this.SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
+
             Console.WriteLine($"**** State rehydrated**");
+            _progress += 20;
+
+
             AppInitialization.Initialize();
+
             this.StateHasChanged();// we now have state, we can re-render to reflect binding changes
+
+            _progress += 20;
+
         });
+
     }
+
+
 
     bool _drawerOpen = true;
 

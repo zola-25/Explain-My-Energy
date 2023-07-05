@@ -144,7 +144,7 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         {
             return meterType switch
             {
-                MeterType.Electricity => ElectricityReadingsState.Value.Reloading || ElectricityReadingsState.Value.Updating,
+                MeterType.Electricity => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings,
                 MeterType.Gas => GasReadingsState.Value.Reloading || GasReadingsState.Value.Updating,
                 _ => throw new ArgumentOutOfRangeException(),
             };

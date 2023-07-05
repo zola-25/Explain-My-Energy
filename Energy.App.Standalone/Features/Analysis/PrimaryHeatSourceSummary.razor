@@ -4,35 +4,38 @@
 @using Energy.App.Standalone.Features.EnergyReadings.Store;
 @using System.Collections.Immutable;
 @using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
-@implements IDisposable
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-@if (_ready)
+@if (!Ready)
 {
-
-    // Co2?y
-    // Tooltips/badges?
-    // Button to switch chart to cost/kwh
+    <MudItem xs="12" sm="6" md="4">
+        <MudText Typo="Typo.h5">@Status</MudText>
+        <MudProgressCircular Stroke="7" Size="@Size.Large" Value="Progress" Color="Color.Primary">
+        </MudProgressCircular>
+    </MudItem>
+}
+else
+{
     <MudItem xs="12" sm="6" md="4">
         <HistoricalAnalysisCard PrimaryHeatSource="true"
-                            Term="_calendarTerm"
-                            MeterType="MeterType"
-                            Period="RelativePeriod.Previous"
-                            DurationAnalysis="_previousDurationAnalysis">
+                                Term="_meterAnalysisOptions.CalendarTerm"
+                                MeterType="MeterType"
+                                Period="RelativePeriod.Previous"
+                                DurationAnalysis="_previousDurationAnalysis">
         </HistoricalAnalysisCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <CurrentPeriodAnalysisCard PrimaryHeatSource="true"
-                               Term="_calendarTerm"
-                               MeterType="MeterType"
-                               TotalsForecast="_currentTermForecastAnalysis"
-                               TotalsSoFar="_thisDurationAnalysis">
+                                   Term="_meterAnalysisOptions.CalendarTerm"
+                                   MeterType="MeterType"
+                                   TotalsForecast="_currentTermForecastAnalysis"
+                                   TotalsSoFar="_thisDurationAnalysis">
         </CurrentPeriodAnalysisCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <ForecastCard PrimaryHeatSource="true"
-            Term="_calendarTerm"
+                      Term="_meterAnalysisOptions.CalendarTerm"
                       ForecastAnalysis="_nextTermForecastAnalysis"
                       MeterType="MeterType">
         </ForecastCard>
@@ -45,18 +48,7 @@
     [Parameter, EditorRequired]
     public MeterType MeterType { get; set; }
 
-    [Inject] IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
-    [Inject] IState<GasReadingsState> GasReadingsState { get; set; }
-    [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
-    
-    [Inject] IState<GasTariffsState> GasTariffsState { get; set; }
-    [Inject] IState<ElectricityTariffsState> ElectricityTariffsState { get; set; }
-    
-    [Inject] IState<WeatherState> WeatherState { get; set; }
-    [Inject] IState<LinearCoefficientsState> LinearCoefficientsState { get; set; }
-
-
-
+    [Inject] public IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
     [Inject]
     ITempForecastAnalyzer TempForecastAnalyzer { get; set; }
@@ -64,35 +56,65 @@
     [Inject]
     IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
 
-    [Inject]
-    ICostCalculator CostCalculator { get; set; }
+
+    MeterAnalysisOptions _meterAnalysisOptions => AnalysisOptionsState.Value[MeterType];
 
 
-    CalendarTerm _calendarTerm => AnalysisOptionsState.Value[MeterType].CalendarTerm;
-    
-    decimal _degreeDifference => AnalysisOptionsState.Value[MeterType].DegreeDifference;
-    LinearCoefficientsState _linearCoefficientsState => LinearCoefficientsState.Value;
-    ImmutableList<DailyWeatherReading> _dailyWeatherReadings => WeatherState.Value.WeatherReadings;
+    public string Status { get; set; }
+    public bool Ready { get; set; }
+    public double Progress { get; set; }
 
+    HistoricalAnalysis _thisDurationAnalysis;
+    HistoricalAnalysis _previousDurationAnalysis;
 
-    ImmutableList<BasicReading> _basicReadings => MeterType == MeterType.Gas
-        ? GasReadingsState.Value.BasicReadings : ElectricityReadingsState.Value.BasicReadings;
+    ForecastAnalysis _currentTermForecastAnalysis;
+    ForecastAnalysis _nextTermForecastAnalysis;
 
-    ImmutableList<TariffDetailState> _tariffDefails => MeterType == MeterType.Gas
-    ? GasTariffsState.Value.TariffDetails : ElectricityTariffsState.Value.TariffDetails;
+    AnalysisOptionsActionFactory _analysisOptionsActionFactory;
 
+    protected override async Task OnParametersSetAsync()
+    {
+        Ready = false;
 
-    ImmutableList<CostedReading> _historicalCostedReadings => CostCalculator.GetCostReadings(_basicReadings, _tariffDefails);
+        Progress = 30;
+        Status = "Analysing Historical";
+        _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
 
+        await Task.Run(() =>
+        {
+            _thisDurationAnalysis = HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _meterAnalysisOptions.CalendarTerm);
+            _previousDurationAnalysis = HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _meterAnalysisOptions.CalendarTerm);
+        });
+        Progress = 60;
 
-    bool _ready = true;
+        Status = "Analysing Forecast";
 
+        await Task.Run(() =>
+        {
+            SetForecastAnalyses(_meterAnalysisOptions.DegreeDifference);
+        });
 
-    HistoricalAnalysis _thisDurationAnalysis => HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, _dailyWeatherReadings);
-    HistoricalAnalysis _previousDurationAnalysis => HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm, _historicalCostedReadings, _dailyWeatherReadings);
+        Progress = 80;
 
-    ForecastAnalysis _currentTermForecastAnalysis => TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);
-    ForecastAnalysis _nextTermForecastAnalysis => TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm, _degreeDifference, _linearCoefficientsState, _tariffDefails, _dailyWeatherReadings);
+        switch (MeterType)
+        {
+            case MeterType.Electricity:
+                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(c => SetForecastAnalyses(c.DegreeDifference));
+                break;
+            case MeterType.Gas:
+                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>(c => SetForecastAnalyses(c.DegreeDifference));
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
 
+        }
 
+        Ready = true;
+    }
+
+    void SetForecastAnalyses(decimal degreeDifference)
+    {
+        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _meterAnalysisOptions.CalendarTerm, degreeDifference);
+        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _meterAnalysisOptions.CalendarTerm, degreeDifference);
+    }
 }

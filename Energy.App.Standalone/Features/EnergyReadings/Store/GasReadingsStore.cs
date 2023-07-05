@@ -1,4 +1,7 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
@@ -12,8 +15,12 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         public bool Reloading { get; init; }
         public bool Updating { get; init; }
 
+        public bool CalculatingCosts { get; init; }
+
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
+        public ImmutableList<CostedReading> CostedReadings { get; init; }
+        public bool CalculationError { get; init; }
     }
 
     public class GasReadingsFeature : Feature<GasReadingsState>
@@ -29,9 +36,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             {
                 Reloading = false,
                 Updating = false,
-                BasicReadings = ImmutableList<BasicReading>.Empty
+                CalculatingCosts = false,
+                CalculationError = false,
+                BasicReadings = ImmutableList<BasicReading>.Empty,
+                CostedReadings = ImmutableList<CostedReading>.Empty
             };
         }
+    }
+
+    public class GasInitiateCostCalculationsAction
+    {
     }
 
     public class GasInitiateDeleteReadingsAction
@@ -134,51 +148,148 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             return state with
             {
                 BasicReadings = ImmutableList<BasicReading>.Empty,
+                CalculatingCosts = false,
+                CostedReadings = ImmutableList<CostedReading>.Empty,
+                Reloading = false,
                 Updating = false
             };
         }
 
+        [ReducerMethod]
+        public static GasReadingsState OnStoreInitiateCostCalculationsReducer(GasReadingsState state, GasInitiateCostCalculationsAction action)
+        {
+            return state with
+            {
+                CalculatingCosts = true
+            };
+        }
+        //GasStoreCostedReadingsAction
+        [ReducerMethod]
+
+        public static GasReadingsState OnStoreGasStoreCostedReadingsActionReducer(GasReadingsState state, GasStoreCostedReadingsAction action)
+        {
+            return state with
+            {
+                CostedReadings = action.CostedReadings,
+                CalculatingCosts = false,
+                CalculationError = false
+            };
+        }
+
+        [ReducerMethod]
+
+        public static GasReadingsState OnCostCalculationsFailedNotification(GasReadingsState state, NotifyGasCostsCalculationFailedAction action)
+        {
+            return state with
+            {
+                CalculatingCosts = false,
+                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CalculationError = true
+            };
+        }
+
+        public class GasStoreCostCalculationsCompleteAction
+        {
+        }
+
+        // Delete readings with subscribe
+        // Tariffs
+        // Weather Data status
+
+        public class GasReadingsEffects
+        {
+            private readonly IEnergyReadingImporter _energyReadingImporter;
+            private readonly ICostCalculator _energyCostCalculator;
+
+            IState<GasReadingsState> _gasReadingsState;
+            IState<GasTariffsState> _gasTariffsState;
+
+            public GasReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<GasReadingsState> gasReadingsState, IState<GasTariffsState> gasTariffsState, ICostCalculator energyCostCalculator)
+            {
+                _energyReadingImporter = energyReadingImporter;
+                _gasReadingsState = gasReadingsState;
+                _gasTariffsState = gasTariffsState;
+                _energyCostCalculator = energyCostCalculator;
+            }
+
+            [EffectMethod]
+            public async Task ReloadGasReadings(GasReloadReadingsAction loadReadingsAction, IDispatcher dispatcher)
+            {
+                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveIn(MeterType.Gas);
+                dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings));
+                dispatcher.Dispatch(new NotifyGasStoreReady());
+
+            }
+
+            [EffectMethod]
+            public async Task UpdateGasReadings(GasUpdateReadingsAction updateReadingsAction, IDispatcher dispatcher)
+            {
+                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
+                dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings));
+                dispatcher.Dispatch(new NotifyGasStoreReady());
+
+            }
+
+            [EffectMethod]
+            public Task DeleteGasReadings(GasInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
+            {
+                dispatcher.Dispatch(new GasExecuteDeleteReadingsAction());
+                dispatcher.Dispatch(new NotifyGasReadingsDeletedAction());
+                return Task.CompletedTask;
+
+            }
+
+            [EffectMethod]
+            public Task CalculateCosts(GasInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
+            {
+                ImmutableList<CostedReading> costedReadings;
+                try
+                {
+                    costedReadings = _energyCostCalculator.GetCostReadings(_gasReadingsState.Value.BasicReadings, _gasTariffsState.Value.TariffDetails);
+                    dispatcher.Dispatch(new GasStoreCostedReadingsAction(costedReadings));
+                    dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error calculating reading costs:");
+                    Console.WriteLine(e);
+
+                    dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
+                    dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction(true));
+                }
+
+                return Task.CompletedTask;
+            }
+        }
+
+        public class NotifyGasCostsCalculationFailedAction
+        {
+            public NotifyGasCostsCalculationFailedAction()
+            {
+            }
+        }
+
+        public class NotifyGasCostsCalculationCompletedAction
+        {
+            public bool CalculationError { get; }
+
+            public NotifyGasCostsCalculationCompletedAction(bool calculationError = false)
+            {
+                CalculationError = calculationError;
+            }
+
+        }
+
+        public class GasStoreCostedReadingsAction
+        {
+            public ImmutableList<CostedReading> CostedReadings { get; }
+
+            public GasStoreCostedReadingsAction(ImmutableList<CostedReading> costedReadings)
+            {
+                CostedReadings = costedReadings;
+
+            }
+        }
     }
-
-    // Delete readings with subscribe
-    // Tariffs
-    // Weather Data status
-
-    public class GasReadingsEffects
-    {
-        private readonly IEnergyReadingImporter _energyReadingImporter;
-
-        public GasReadingsEffects(IEnergyReadingImporter energyReadingImporter)
-        {
-            _energyReadingImporter = energyReadingImporter;
-        }
-
-        [EffectMethod]
-        public async Task ReloadGasReadings(GasReloadReadingsAction loadReadingsAction, IDispatcher dispatcher)
-        {
-            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveIn(MeterType.Gas);
-            dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings));
-            dispatcher.Dispatch(new NotifyGasStoreReady());
-
-        }
-
-        [EffectMethod]
-        public async Task UpdateGasReadings(GasUpdateReadingsAction updateReadingsAction, IDispatcher dispatcher)
-        {
-            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
-            dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings));
-            dispatcher.Dispatch(new NotifyGasStoreReady());
-
-        }
-
-        [EffectMethod]
-        public Task DeleteGasReadings(GasInitiateDeleteReadingsAction initiateDeleteAction, IDispatcher dispatcher)
-        {
-            dispatcher.Dispatch(new GasExecuteDeleteReadingsAction());
-            dispatcher.Dispatch(new NotifyGasReadingsDeletedAction());
-            return Task.CompletedTask;
-
-        }
-    }
-
 }

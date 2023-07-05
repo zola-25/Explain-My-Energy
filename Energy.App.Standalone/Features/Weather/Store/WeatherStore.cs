@@ -92,6 +92,18 @@ namespace Energy.App.Standalone.Features.Weather.Store
             List<DailyWeatherReading> forecasts = await _weatherDataService.GetForOutCode(loadReadingsAction.OutCode);
             dispatcher.Dispatch(new WeatherStoreReadingsAction(forecasts));
         }
+
+        [EffectMethod]
+        public Task NotifyReady(WeatherStoreReadingsAction storeReadingsAction, IDispatcher dispatcher)
+        {
+            dispatcher.Dispatch(new NotifyWeatherReadingsLoadedAction());
+            return Task.CompletedTask;
+        }
+    }
+
+    public class NotifyWeatherReadingsLoadedAction
+    {
+        
     }
 
 }

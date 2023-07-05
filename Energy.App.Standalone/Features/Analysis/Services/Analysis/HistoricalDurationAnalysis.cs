@@ -4,6 +4,9 @@ using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
 using System.Collections.Immutable;
 using MathNet.Numerics;
+using Fluxor;
+using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.Weather.Store;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -11,44 +14,44 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     readonly ITermDateRanges _periodDateRanges;
+    IState<ElectricityReadingsState> _electricityReadingsState;
+    IState<GasReadingsState> _gasReadingsState;
+    IState<WeatherState> _weatherState;
 
 
-
-    public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges)
+    public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges, IState<GasReadingsState> gasReadingsState, IState<ElectricityReadingsState> electricityReadingsState, IState<WeatherState> weatherState)
     {
         _periodDateRanges = periodDateRanges;
         _co2Conversion = new Co2ConversionFactors();
+        _gasReadingsState = gasReadingsState;
+        _electricityReadingsState = electricityReadingsState;
+        _weatherState = weatherState;
     }
 
     public HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType, 
-        CalendarTerm duration,
-        ImmutableList<CostedReading> costedReadings, 
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        CalendarTerm duration)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
 
-        return GetHistoricalAnalysis(meterType, start, end, costedReadings, dailyWeatherReadings);
+        return GetHistoricalAnalysis(meterType, start, end);
     }
 
     public HistoricalAnalysis GetPreviousDurationAnalysis(MeterType meterType, 
-        CalendarTerm duration,
-        ImmutableList<CostedReading> costedReadings, 
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        CalendarTerm duration)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetPreviousPeriodDates(duration);
 
-        return GetHistoricalAnalysis(meterType, start, end, costedReadings, dailyWeatherReadings);
+        return GetHistoricalAnalysis(meterType, start, end);
     }
 
     private HistoricalAnalysis GetHistoricalAnalysis(MeterType meterType, 
-        DateTime start, DateTime end,
-        ImmutableList<CostedReading> costedReadings, 
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        DateTime start, DateTime end)
     {
-        var weatherReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate < end)
+        var costedReadings = meterType == MeterType.Electricity ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings;
+        var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
             .ToList();
 
-        var durationData = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime < end);
+        var durationData = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime <= end);
 
         decimal co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
 

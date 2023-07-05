@@ -115,6 +115,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         }
     }
 
+
+
     public class ElectricityAnalysisOptionsSetDegreeDifferenceAction : IAnalysisOptionsAction
     {
         public decimal DegreeDifference { get; }
@@ -395,6 +397,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             };
         }
     }
+
 
     public interface IAnalysisOptionsAction { }
 

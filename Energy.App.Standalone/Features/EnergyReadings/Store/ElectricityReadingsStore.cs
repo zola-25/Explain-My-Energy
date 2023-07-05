@@ -1,18 +1,27 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Setup.Store;
+using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
+using static Energy.App.Standalone.Features.EnergyReadings.Store.GasReadingsReducers;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Store
 {
     [PersistState]
     public record ElectricityReadingsState
     {
-        public bool Reloading { get; init; }
-        public bool Updating { get; init; }
+        public bool ReloadingReadings { get; init; }
+        public bool UpdatingReadings { get; init; }
+        public bool CalculatingCosts { get; init; }
+
 
         public ImmutableList<BasicReading> BasicReadings { get; init; }
+        public ImmutableList<CostedReading> CostedReadings { get; init; }
+        public bool CalculationError { get; init; }
     }
 
     public class ElectricityReadingsFeature : Feature<ElectricityReadingsState>
@@ -26,12 +35,20 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return new ElectricityReadingsState
             {
-                Reloading = false,
-                Updating = false,
-                BasicReadings = ImmutableList<BasicReading>.Empty
+                ReloadingReadings = false,
+                UpdatingReadings = false,
+                CalculatingCosts = false,
+                CalculationError = false,
+                BasicReadings = ImmutableList<BasicReading>.Empty,
+                CostedReadings = ImmutableList<CostedReading>.Empty
             };
         }
     }
+
+    public class ElectricityInitiateCostCalculationsAction
+    {
+    }
+
 
     public class ElectricityInitiateDeleteReadingsAction
     { }
@@ -80,13 +97,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
 
     public static class ElectricityReadingsReducers
     {
+        
+
+
         [ReducerMethod]
         public static ElectricityReadingsState OnStoreReloadedReadingsReducer(ElectricityReadingsState state, ElectricityStoreReloadedReadingsAction action)
         {
             return state with
             {
                 BasicReadings = action.BasicReadings.ToImmutableList(),
-                Reloading = false
+                ReloadingReadings = false
             };
         }
 
@@ -96,7 +116,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return state with
             {
-                Reloading = true
+                ReloadingReadings = true
             };
         }
 
@@ -105,7 +125,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return state with
             {
-                Updating = true
+                UpdatingReadings = true
             };
         }
 
@@ -115,7 +135,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             return state with
             {
                 BasicReadings = state.BasicReadings.AddRange(action.NewReadings),
-                Updating = false
+                UpdatingReadings = false
             };
         }
 
@@ -124,7 +144,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             return state with
             {
-                Updating = true
+                UpdatingReadings = true
             };
         }
 
@@ -134,7 +154,41 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             return state with
             {
                 BasicReadings = ImmutableList<BasicReading>.Empty,
-                Updating = false
+                CostedReadings = ImmutableList<CostedReading>.Empty,
+                UpdatingReadings = false
+            };
+        }
+
+
+        [ReducerMethod]
+        public static ElectricityReadingsState OnInitiateCostCalculationsReducer(ElectricityReadingsState state, ElectricityInitiateCostCalculationsAction action)
+        {
+            return state with
+            {
+                CalculatingCosts = true
+            };
+        }
+
+        [ReducerMethod]
+        public static ElectricityReadingsState OnStoreExecuteCostCalculationsReducer(ElectricityReadingsState state, ElectricityStoreCostedReadingsAction action)
+        {
+            return state with
+            {
+                CostedReadings = action.CostedReadings,
+                CalculatingCosts = false,
+                CalculationError = false
+            };
+        }
+
+        [ReducerMethod]
+
+        public static ElectricityReadingsState OnCostCalculationsFailedNotification(ElectricityReadingsState state, NotifyElectricityCostsCalculationFailedAction action)
+        {
+            return state with
+            {
+                CalculatingCosts = false,
+                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CalculationError = true
             };
         }
 
@@ -143,10 +197,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
     public class ElectricityReadingsEffects
     {
         private readonly IEnergyReadingImporter _energyReadingImporter;
+        private readonly ICostCalculator _energyCostCalculator;
+        IState<ElectricityTariffsState> _electricityTariffsState;
+        IState<ElectricityReadingsState> _electricityReadingsState;
 
-        public ElectricityReadingsEffects(IEnergyReadingImporter energyReadingImporter)
+        public ElectricityReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<ElectricityTariffsState> electricityTariffsState, ICostCalculator energyCostCalculator, IState<ElectricityReadingsState> electricityReadingsState)
         {
             _energyReadingImporter = energyReadingImporter;
+            _electricityTariffsState = electricityTariffsState;
+            _energyCostCalculator = energyCostCalculator;
+            _electricityReadingsState = electricityReadingsState;
         }
 
         [EffectMethod]
@@ -174,6 +234,61 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             return Task.CompletedTask;
 
         }
+
+
+
+        [EffectMethod]
+        public Task InitiateCostCalculations(ElectricityInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
+        {
+            ImmutableList<CostedReading> costedReadings;
+            try
+            {
+                costedReadings = _energyCostCalculator
+                                .GetCostReadings(_electricityReadingsState.Value.BasicReadings,
+                                                _electricityTariffsState.Value.TariffDetails);
+
+                dispatcher.Dispatch(new ElectricityStoreCostedReadingsAction(costedReadings));
+                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction());
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error calculating Electricity reading costs:");
+                Console.WriteLine(e);
+
+                dispatcher.Dispatch(new NotifyElectricityCostsCalculationFailedAction());
+                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction(failed: true));
+            }
+
+            return Task.CompletedTask;
+        }
+
     }
 
+    public class NotifyElectricityCostsCalculationFailedAction
+    {
+        public NotifyElectricityCostsCalculationFailedAction()
+        {
+        }
+    }
+
+    public class NotifyElectricityCostsCalculationCompletedAction
+    {
+        public bool Failed { get; }
+
+        public NotifyElectricityCostsCalculationCompletedAction(bool failed = false)
+        {
+            Failed = failed;
+        }
+    }
+
+    public class ElectricityStoreCostedReadingsAction
+    {
+        public ImmutableList<CostedReading> CostedReadings { get; }
+
+        public ElectricityStoreCostedReadingsAction(ImmutableList<CostedReading> costedReadings)
+        {
+            CostedReadings = costedReadings;
+        }
+    }
 }

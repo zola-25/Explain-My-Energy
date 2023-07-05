@@ -1,5 +1,8 @@
-﻿@inherits FluxorComponent
+﻿@using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+@inherits FluxorComponent
 @inject IState<HouseholdState> HouseholdState
+@inject IState<MeterSetupState> MeterSetupState
+
 
 <MudPaper class="py-3" Elevation="0">
     <MudNavMenu Color="Color.Info" Bordered="true">
@@ -43,8 +46,8 @@
     MeterType _heaterMeterType;
 
 
-    bool _gasDisabled;
-    bool _electricityDisabled;
+    bool _gasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid;
+    bool _electricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid;
 
     string _gasHref;
     string _electricityHref;

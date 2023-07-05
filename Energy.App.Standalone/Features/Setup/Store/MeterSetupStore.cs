@@ -224,6 +224,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 ElectricityMeter = meterState with
                 {
                     Authorized = true,
+                    SetupValid = true
                 }
             };
         }
@@ -237,6 +238,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
                 GasMeter = meterState with
                 {
                     Authorized = true,
+                    SetupValid = true
                 }
             };
         }

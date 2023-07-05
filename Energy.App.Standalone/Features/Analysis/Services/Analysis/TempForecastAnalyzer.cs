@@ -6,6 +6,10 @@ using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
 using MathNet.Numerics;
+using Fluxor;
+using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.Weather.Store;
+using Energy.App.Standalone.Features.Setup.Store;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -15,54 +19,63 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     private readonly ITermDateRanges _periodDateRanges;
     private readonly IForecastGenerator _forecastGenerator;
     private readonly ICostCalculator _costCalculator;
+    IState<GasReadingsState> _gasReadingsState;
+    IState<ElectricityReadingsState> _electricityReadingsState;
+    IState<WeatherState> _weatherState;
+    IState<LinearCoefficientsState> _linearCoefficientsState;
+    
+    IState<ElectricityTariffsState> _electricityTariffsState;
+
+    IState<GasTariffsState> _gasTariffsState;
+
 
     public TempForecastAnalyzer(Co2ConversionFactors co2Conversion,
                                 ITermDateRanges periodDateRanges,
                                 IForecastGenerator forecastGenerator,
-                                ICostCalculator costCalculator)
+                                ICostCalculator costCalculator,
+                                IState<GasReadingsState> gasReadingsState,
+                                IState<ElectricityReadingsState> electricityReadingsState,
+                                IState<WeatherState> weatherState,
+                                IState<LinearCoefficientsState> linearCoefficientsState,
+                                IState<GasTariffsState> gasTariffsState,
+                                IState<ElectricityTariffsState> electricityTariffsState)
     {
         _co2Conversion = co2Conversion;
         _periodDateRanges = periodDateRanges;
         _forecastGenerator = forecastGenerator;
         _costCalculator = costCalculator;
+        _gasReadingsState = gasReadingsState;
+        _electricityReadingsState = electricityReadingsState;
+        _weatherState = weatherState;
+        _linearCoefficientsState = linearCoefficientsState;
+        _gasTariffsState = gasTariffsState;
+        _electricityTariffsState = electricityTariffsState;
     }
 
     public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, 
         CalendarTerm duration,
-        decimal degreeDifference,
-        LinearCoefficientsState linearCoefficientsState,
-        ImmutableList<TariffDetailState> tariffDetailStates,
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        decimal degreeDifference)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(duration);
 
         ForecastAnalysis results = ForecastAnalysis(meterType,
                                                     degreeDifference,
                                                     start,
-                                                    end,
-                                                    linearCoefficientsState,
-                                                    tariffDetailStates,
-                                                    dailyWeatherReadings);
+                                                    end);
 
         return results;
     }
 
     public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType, 
         CalendarTerm duration,
-        decimal degreeDifference,
-        LinearCoefficientsState linearCoefficientsState,
-        ImmutableList<TariffDetailState> tariffDetailStates,
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        decimal degreeDifference)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
 
         ForecastAnalysis results = ForecastAnalysis(meterType,
                                                     degreeDifference,
                                                     start,
-                                                    end,
-                                                    linearCoefficientsState,
-                                                    tariffDetailStates,
-                                                    dailyWeatherReadings);
+                                                    end);
 
         return results;
     }
@@ -73,22 +86,33 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         MeterType meterType,
         decimal degreeDifference,
         DateTime start,
-        DateTime end,
-        LinearCoefficientsState linearCoeffiecientsState,
-        ImmutableList<TariffDetailState> tariffDetailStates,
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        DateTime end)
     {
-        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast(start, end, degreeDifference, linearCoeffiecientsState, dailyWeatherReadings);
+        var periodWeatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).ToImmutableList();
+
+        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast(start, end, degreeDifference, _linearCoefficientsState.Value, periodWeatherReadings);
+        
+        ImmutableList<TariffDetailState> tariffDetailStates;
+        switch (meterType)
+        {
+            case MeterType.Electricity:
+                tariffDetailStates = _electricityTariffsState.Value.TariffDetails;
+                break;
+            case MeterType.Gas:
+                tariffDetailStates = _gasTariffsState.Value.TariffDetails;
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+        
         var forecastCostedReadings = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
 
         decimal forecastConsumption = forecastCostedReadings.Sum(c => c.KWh);
 
-        var periodWeatherReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate < end).ToImmutableList();
-        decimal forecastBasicConsumption = forecastBasicReadings.Sum(c => c.KWh);
 
         ForecastAnalysis results = new ForecastAnalysis()
         {
-            NumberOfDays = dailyWeatherReadings.Count,
+            NumberOfDays = periodWeatherReadings.Count,
             Start = start,
             End = end,
             ForecastConsumption = forecastConsumption.Round(0),
