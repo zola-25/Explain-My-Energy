@@ -223,8 +223,8 @@ namespace Energy.Test
             new EnergyBillValues
             {
                 BillDate = BillDate.July,
-                TotalCostForPeriodPence = 8644m,
-                TotalKWhForPeriod = 228m,
+                TotalCostForPeriodPence = 1000m,
+                TotalKWhForPeriod = 150m,
                 PeriodPencePerKWh = 32.348m,
                 PeriodStandingChargePence = 1269m,
                 Start = new DateTime(2023, 3, 31),
