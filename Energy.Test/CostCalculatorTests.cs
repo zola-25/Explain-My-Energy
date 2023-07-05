@@ -128,7 +128,7 @@ namespace Energy.Test
 
             decimal calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
             decimal calculatedTotalCost = calculatedCostedReadings.Sum(c => c.ReadingTotalCostPence);
-            decimal calculatedTotalStandingCharge = calculatedCostedReadings.Sum(c => c.TariffDailyStandingChargePence);
+            decimal calculatedTotalStandingCharge = calculatedCostedReadings.Sum(c => c.TariffHalfHourlyStandingChargePence);
 
             Assert.Equal(expectedTotalKWh, calculatedTotalKWh, 0);
             Assert.Equal(expectedTotalStandingCharge, calculatedTotalStandingCharge, 0);
@@ -143,13 +143,13 @@ namespace Energy.Test
             yield return
                 new HourOfDayPriceState
                 {
-                    HourOfDay = hourOfDayPrice.HourOfDay,
+                    HourOfDay = new TimeSpan (hourOfDayPrice.HourOfDay.Value.Hours,0,0),
                     PencePerKWh = hourOfDayPrice.PencePerKWh,
                 };
 
             yield return new HourOfDayPriceState
             {
-                HourOfDay = hourOfDayPrice.HourOfDay.Value.Add(TimeSpan.FromMinutes(30)),
+                HourOfDay = new TimeSpan (hourOfDayPrice.HourOfDay.Value.Hours,30,0),
                 PencePerKWh = hourOfDayPrice.PencePerKWh,
             };
         }

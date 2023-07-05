@@ -2,6 +2,7 @@
 using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace Energy.App.Standalone.Extensions;
@@ -75,7 +76,7 @@ public static class Extensions
             DailyStandingChargePence = tariffDetailDto.DailyStandingChargePence,
             DateAppliesFrom = tariffDetailDto.DateAppliesFrom,
             GlobalId = addGuidForNewTariff ? Guid.NewGuid() : tariffDetailDto.GlobalId,
-            HourOfDayPrices = tariffDetailDto.HourOfDayPrices.eMapToHourOfDayPriceState(),
+            HourOfDayPrices = tariffDetailDto.HourOfDayPrices.eMapToHourOfDayPriceState().ToImmutableList(),
             IsHourOfDayFixed = tariffDetailDto.IsHourOfDayFixed,
             PencePerKWh = tariffDetailDto.PencePerKWh
         };

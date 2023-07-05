@@ -47,13 +47,14 @@ namespace Energy.Test
 
             for (int i = 0; i < halfHours; i++)
             {
+                var readTime = start.AddTicks(TimeSpan.TicksPerMinute * 30 * i);
                 var basicReading = new BasicReading
                 {
-                    UtcTime = start.AddMinutes(i * 30),
+                    UtcTime = readTime,
                     KWh =
-                    i % 6 == 0 ? 0.08m :
-                    i % 2 == 0 ? 0.02m :
-                    i % 3 == 0 ? 0.04m :
+                    readTime.Hour % 6 == 0 ? 0.08m :
+                    readTime.Hour % 2 == 0 ? 0.02m :
+                    readTime.Hour % 3 == 0 ? 0.04m :
                     0.07m
                 };
                 basicReadings.Add(basicReading);
@@ -65,14 +66,14 @@ namespace Energy.Test
 
         public static IEnumerable<BasicReading> CreateBasicReadingsFromTotalKWh(DateTime start, DateTime end, decimal totalKWh)
         {
-            var periodDays = start.eGetDateCountExcludeEnd(end);
+            int periodDays = start.eGetDateCountExcludeEnd(end);
 
-            var totalHalfHours = periodDays * 48;
+            int totalHalfHours = periodDays * 48;
             decimal kWhPerHalfHour = totalKWh / totalHalfHours;
             return Enumerable.Range(0, totalHalfHours).Select(halfHourIndex =>
             {
 
-                var utcTime = start.AddMinutes(halfHourIndex * 30);
+                var utcTime = start.AddTicks(TimeSpan.TicksPerMinute * 30 * halfHourIndex);
 
                 return new BasicReading()
                 {
@@ -89,14 +90,6 @@ namespace Energy.Test
 
         }
 
-        public static IEnumerable<HourOfDayPriceState> CreateFixedHourOfDayPrices(decimal v)
-        {
-            return Enumerable.Range(0, 24).Select(c => new HourOfDayPriceState()
-            {
-                HourOfDay = TimeSpan.FromHours(c),
-                PencePerKWh = v / 24m
-            });
-        }
 
 
         public static List<TariffDetailState> TestElectricityTariffs => ElectricityBillValuesList.Select(c =>
@@ -206,27 +199,32 @@ namespace Energy.Test
 
 
         public static ImmutableList<TariffDetailState> EnergyTariffsManuallyCreated =>
-            EnergyBillValuesManuallyCreated.Select(c => new TariffDetailState
+            EnergyBillValuesManuallyCreated.Select(c =>
             {
-                DateAppliesFrom = c.Start,
-                PencePerKWh = c.PeriodPencePerKWh,
-                DailyStandingChargePence = c.PeriodStandingChargePence,
-                IsHourOfDayFixed = c.IsFixedPencePerKWh,
-                HourOfDayPrices = c.IsFixedPencePerKWh ?
+
+                int periodDays = c.Start.eGetDateCountExcludeEnd(c.End);
+                return new TariffDetailState
+                {
+                    DateAppliesFrom = c.Start,
+                    PencePerKWh = c.PeriodPencePerKWh,
+                    DailyStandingChargePence = c.PeriodStandingChargePence / periodDays,
+                    IsHourOfDayFixed = c.IsFixedPencePerKWh,
+                    HourOfDayPrices = c.IsFixedPencePerKWh ?
                     ImmutableList<HourOfDayPriceState>.Empty :
                     c.HourOfDayPrices,
-                GlobalId = Guid.NewGuid(),
+                    GlobalId = Guid.NewGuid(),
 
 
+                };
             }).ToImmutableList();
 
         public static ImmutableList<EnergyBillValues> EnergyBillValuesManuallyCreated = ImmutableList.Create(
             new EnergyBillValues
             {
-                TotalKWhForPeriod = 1110.72m,
+                TotalKWhForPeriod = 213.6m,
                 PeriodPencePerKWh = 30,
                 PeriodStandingChargePence = 1500,
-                TotalCostForPeriodPence = 34821.6m,
+                TotalCostForPeriodPence = 7908m,
                 BillDate = BillDate.April,
                 Start = new DateTime(2023, 01, 01),
                 End = new DateTime(2023, 03, 31),
@@ -235,10 +233,10 @@ namespace Energy.Test
             new EnergyBillValues
             {
                 BillDate = BillDate.July,
-                TotalKWhForPeriod = 1135.68m,
+                TotalKWhForPeriod = 218.4m,
                 PeriodPencePerKWh = 25,
                 PeriodStandingChargePence = 1000,
-                TotalCostForPeriodPence = 29392m,
+                TotalCostForPeriodPence = 6460m,
                 Start = new DateTime(2023, 03, 31),
                 End = new DateTime(2023, 06, 30),
                 IsFixedPencePerKWh = true
@@ -246,10 +244,10 @@ namespace Energy.Test
             new EnergyBillValues
             {
                 BillDate = BillDate.October,
-                TotalKWhForPeriod = 1148.16m,
+                TotalKWhForPeriod = 220.8m,
                 PeriodPencePerKWh = 0,
                 PeriodStandingChargePence = 1000,
-                TotalCostForPeriodPence = 19547.2m,
+                TotalCostForPeriodPence = 4477.6m,
                 Start = new DateTime(2023, 06, 30),
                 End = new DateTime(2023, 09, 30),
                 IsFixedPencePerKWh = false,
@@ -257,39 +255,39 @@ namespace Energy.Test
                                 .Select(hour =>
                                 {
                                     var pencePerKWh = hour >= 7 && hour < 21 ? 20 : 10;
-                                    var timeSpan = TimeSpan.FromHours(hour);
+                                    var timeSpan = new TimeSpan(0, hour, 0, 0);
                                     return new HourOfDayPriceState { HourOfDay = timeSpan, PencePerKWh = pencePerKWh };
                                 })
                                 .ToImmutableList()
             });
 
-
-        public record EnergyBillValues
-        {
-            public decimal TotalKWhForPeriod { get; init; }
-            public decimal PeriodStandingChargePence { get; init; }
-            public decimal PeriodPencePerKWh { get; init; }
-            public decimal TotalCostForPeriodPence { get; init; }
-            public bool IsFixedPencePerKWh { get; init; }
-
-            public ImmutableList<HourOfDayPriceState> HourOfDayPrices { get; init; }
+    }
 
 
-            public DateTime Start { get; init; }
-            public DateTime End { get; init; }
-            public BillDate BillDate { get; init; }
-        }
+    public record EnergyBillValues
+    {
+        public decimal TotalKWhForPeriod { get; init; }
+        public decimal PeriodStandingChargePence { get; init; }
+        public decimal PeriodPencePerKWh { get; init; }
+        public decimal TotalCostForPeriodPence { get; init; }
+        public bool IsFixedPencePerKWh { get; init; }
 
-        public enum BillDate
-        {
-            February,
-            March,
-            April,
-            May,
-            June,
-            July,
-            October,
-        }
+        public ImmutableList<HourOfDayPriceState> HourOfDayPrices { get; init; }
 
+
+        public DateTime Start { get; init; }
+        public DateTime End { get; init; }
+        public BillDate BillDate { get; init; }
+    }
+
+    public enum BillDate
+    {
+        February,
+        March,
+        April,
+        May,
+        June,
+        July,
+        October,
     }
 }

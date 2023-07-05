@@ -156,7 +156,7 @@ namespace Energy.App.Standalone.Features.Setup.Store
                     {
                         HourOfDay = h.HourOfDay,
                         PencePerKWh = h.PencePerKWh
-                    }).ToList(),
+                    }).ToImmutableList(),
                 }).ToList();
 
             dispatcher.Dispatch(new ElectricityExecuteSetDefaultTariffsAction(defaultTariffs));

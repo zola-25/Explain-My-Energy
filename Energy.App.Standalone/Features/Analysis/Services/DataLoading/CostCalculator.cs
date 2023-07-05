@@ -64,8 +64,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
                 IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
-                                                                join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.Minute 
-                                                                    equals halfHourlyPrice.HourOfDayMinutes
+                                                                join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.TimeOfDay
+                                                                    equals halfHourlyPrice.HourOfDay
                                                                 select new CostedReading()
                                                                 {
                                                                     TariffAppliesFrom = currentTariff.DateAppliesFrom.Value,
@@ -90,7 +90,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
             return Enumerable.Range(0, 48).Select(i => new HalfHourOfDayPrice()
             {
                 PencePerKWh = fixedPencePerKWh,
-                HourOfDayMinutes = i * 30,
+                HourOfDay = new TimeSpan(0, i * 30, 0),
+
             });
         }
 
@@ -98,19 +99,19 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         {
             yield return new HalfHourOfDayPrice()
             {
-                HourOfDayMinutes = price.HourOfDay.Value.Minutes,
-                PencePerKWh = price.PencePerKWh ,
+                HourOfDay = price.HourOfDay.Value,
+                PencePerKWh = price.PencePerKWh
             };
             yield return new HalfHourOfDayPrice()
             {
-                HourOfDayMinutes = price.HourOfDay.Value.Minutes + 30,
-                PencePerKWh = price.PencePerKWh ,
+                HourOfDay = new TimeSpan(price.HourOfDay.Value.Hours, 30, 0),
+                PencePerKWh = price.PencePerKWh 
             };
         }
         private record HalfHourOfDayPrice
         {
-            public int HourOfDayMinutes { get; init; }
             public decimal PencePerKWh { get; init; }
+            public TimeSpan HourOfDay { get; init; }
         }
 
         //foreach (var basicReading in basicReadings)
