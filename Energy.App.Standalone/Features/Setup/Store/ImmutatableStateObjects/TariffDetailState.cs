@@ -1,4 +1,6 @@
-﻿namespace Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects
+﻿using System.Collections.Immutable;
+
+namespace Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects
 {
     public record TariffDetailState
     {
@@ -12,6 +14,6 @@
 
         public decimal DailyStandingChargePence { get; init; }
 
-        public List<HourOfDayPriceState> HourOfDayPrices { get; init; }
+        public ImmutableList<HourOfDayPriceState> HourOfDayPrices { get; init; }
     }
 }

@@ -73,45 +73,22 @@ namespace Energy.Test
         [Fact]
         public void CostedValuesForRandomTariffsThatDontOverlapWithBasicReadings()
         {
-            // Generate a list of random TariffDetailStates about 3 months apart with random values 
+            
+            var tariffs = Data.EnergyTariffsManuallyCreated;
+            var energyData = Data.EnergyBillValuesManuallyCreated;
 
-            var startDate = new DateTime(2023, 1, 1);
+            var start = energyData.First().Start;
+            var end = energyData.Last().End;
+            var basicReadings = Data.GetBasicReadingsManuallyCreated(start, end);
 
-            var tariffs = new List<TariffDetailState>()
-            {
-                new TariffDetailState
-                {
-                    DateAppliesFrom = startDate,
-                    DailyStandingChargePence = 10,
-                    PencePerKWh = 10,
-                    GlobalId = Guid.NewGuid(),
-                    IsHourOfDayFixed = true
-                },
-                new TariffDetailState
-                {
-                    DateAppliesFrom = startDate.AddMonths(3),
-                    DailyStandingChargePence = 20,
-                    PencePerKWh = 20,
-                    GlobalId = Guid.NewGuid(),
-                    IsHourOfDayFixed = false,
-                    HourOfDayPrices = Data.GetRandomHourOfDayPrices()
-                },
-                new TariffDetailState
-                {
-                    DailyStandingChargePence = 30,
-                    PencePerKWh = 30,
-                    DateAppliesFrom = startDate.AddMonths(6),
-                    GlobalId = Guid.NewGuid(),
-                    IsHourOfDayFixed = true
-                },
-
-            }.ToImmutableList();
-            var basicReadings = Data.GetRandomBasicReadings(startDate, startDate.AddMonths(8)).ToImmutableList();
+            decimal expectedTotalKWh = energyData.Sum(c => c.TotalKWhForPeriod);
+            decimal expectedTotalCost = energyData.Sum(c => c.TotalCostForPeriodPence);
+            decimal expectedTotalStandingCharge = energyData.Sum(c => c.PeriodStandingChargePence);
 
             var costCalculator = new CostCalculator();
             var calculatedCostedReadings = costCalculator.GetCostReadings(basicReadings, tariffs);
 
-            decimal expectedTotalKWh = basicReadings.Sum(c => c.KWh);
+            Assert.Equal(basicReadings.Count, calculatedCostedReadings.Count);
 
             basicReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.UtcTime })
             .Should()
@@ -120,8 +97,7 @@ namespace Energy.Test
                 e => e.ComparingRecordsByMembers().WithStrictOrdering());
 
 
-            var hourlyPriceTariffLookup = tariffs.Single(c => !c.IsHourOfDayFixed).HourOfDayPrices.SelectMany(ToHalfHourly).ToDictionary(c => c.HourOfDay.Value);
-
+            var halfHourlyPriceTariffLookup = tariffs.Single(c => !c.IsHourOfDayFixed).HourOfDayPrices.SelectMany(ToHalfHourly).ToDictionary(c => c.HourOfDay.Value);
 
             Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
             {
@@ -130,8 +106,6 @@ namespace Energy.Test
 
                 if (applicableTariff.IsHourOfDayFixed)
                 {
-
-
                     Assert.Equal(applicableTariff.PencePerKWh, costReading.TariffHalfHourlyPencePerKWh);
 
                     decimal expectedCost = (costReading.KWh * applicableTariff.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
@@ -140,7 +114,7 @@ namespace Energy.Test
                 }
                 else
                 {
-                    var halfHourlyPrice = hourlyPriceTariffLookup[costReading.UtcTime.TimeOfDay];
+                    var halfHourlyPrice = halfHourlyPriceTariffLookup[costReading.UtcTime.TimeOfDay];
 
                     Assert.Equal(halfHourlyPrice.PencePerKWh, costReading.TariffHalfHourlyPencePerKWh);
 
@@ -152,17 +126,15 @@ namespace Energy.Test
 
             });
 
+            decimal calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
+            decimal calculatedTotalCost = calculatedCostedReadings.Sum(c => c.ReadingTotalCostPence);
+            decimal calculatedTotalStandingCharge = calculatedCostedReadings.Sum(c => c.TariffDailyStandingChargePence);
 
             Assert.Equal(expectedTotalKWh, calculatedTotalKWh, 0);
-            Assert.Equal(expectedTotalStandingChargePence, calculatedTotalStandingChargePence, 0);
+            Assert.Equal(expectedTotalStandingCharge, calculatedTotalStandingCharge, 0);
 
-            // each bill total cost is provided rounded rather than exact, hence sum of all totals is out by 1p
-            expectedTotalCostPence.Should().BeApproximately(calculatedTotalCostPence, 1m);
-
-
-
-
-
+            Assert.Equal(expectedTotalCost, calculatedTotalCost, 0);
+            
         }
 
         private static IEnumerable<HourOfDayPriceState> ToHalfHourly(HourOfDayPriceState hourOfDayPrice)
