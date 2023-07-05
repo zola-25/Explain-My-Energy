@@ -179,10 +179,11 @@ public static class Extensions
         return latestReading.HasValue && latestReading >= DateTime.Today.AddDays(-1).Date;
     }
 
-    public static IEnumerable<DateTime> eGenerateAllDatesBetween(this DateTime startDate, DateTime endDate)
+    public static IEnumerable<DateTime> eGenerateAllDatesBetween(this DateTime startDate, DateTime endDate, bool endDateInclusive = true)
     {
         DateTime currentDate = startDate.Date;
-        while (currentDate <= endDate.Date)
+        var lastDateToInclude = endDateInclusive ? endDate.Date : endDate.AddDays(-1).Date;
+        while (currentDate <= lastDateToInclude)
         {
             yield return currentDate;
             currentDate = currentDate.AddDays(1);
@@ -190,9 +191,15 @@ public static class Extensions
 
     }
 
-    public static int eGetDateCount(this DateTime startDate, DateTime endDate)
+    public static int eGetDateCountInclusive(this DateTime startDate, DateTime endDate)
     {
-        var dates = startDate.Date.eGenerateAllDatesBetween(endDate).ToList();
+        var dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: true).ToList();
+        return dates.Count;
+    }
+
+    public static int eGetDateCountExcludeEnd(this DateTime startDate, DateTime endDate)
+    {
+        var dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: false).ToList();
         return dates.Count;
     }
 

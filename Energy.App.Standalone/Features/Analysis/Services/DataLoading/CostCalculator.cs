@@ -4,6 +4,7 @@ using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
+using MathNet.Numerics;
 using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
@@ -60,7 +61,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 {
                     halfHourOfDayPrices = currentTariff.HourOfDayPrices.SelectMany(ToHalfHourly).ToList();
                 }
-                decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
+                decimal halfHourlyStandingChargePence = (currentTariff.DailyStandingChargePence / 48m);
 
                 IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
                                                                 join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.Minute 
@@ -74,7 +75,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    ReadingTotalCostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
+                                                                    ReadingTotalCostPence = ((basicReading.KWh * halfHourlyPrice.PencePerKWh).Round(3) + halfHourlyStandingChargePence.Round(2)),
                                                                     Forecast = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);
