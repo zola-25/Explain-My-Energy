@@ -56,7 +56,7 @@ namespace Energy.Test
             int periodDays = start.eGetDateCountExcludeEnd(end);
             var tariffState = Data.GetTariffDetailState(start, meterType);
 
-            var basicReadings = CreateBasicReadingsFromTotalKWh(start, end, totalKWhForPeriod).ToImmutableList();
+            var basicReadings = Data.CreateBasicReadingsFromTotalKWh(start, end, totalKWhForPeriod).ToImmutableList();
 
             var costCalculator = new CostCalculator();
             var costedReadings = costCalculator.GetCostReadings(basicReadings, tariffState.eItemToImmutableList());
@@ -75,11 +75,13 @@ namespace Energy.Test
         {
             // Generate a list of random TariffDetailStates about 3 months apart with random values 
 
+            var startDate = new DateTime(2023, 1, 1);
+
             var tariffs = new List<TariffDetailState>()
             {
                 new TariffDetailState
                 {
-                    DateAppliesFrom = new DateTime(2023, 1, 1),
+                    DateAppliesFrom = startDate,
                     DailyStandingChargePence = 10,
                     PencePerKWh = 10,
                     GlobalId = Guid.NewGuid(),
@@ -87,36 +89,97 @@ namespace Energy.Test
                 },
                 new TariffDetailState
                 {
-                    DateAppliesFrom = new DateTime(2023, 4, 1),
+                    DateAppliesFrom = startDate.AddMonths(3),
                     DailyStandingChargePence = 20,
                     PencePerKWh = 20,
                     GlobalId = Guid.NewGuid(),
                     IsHourOfDayFixed = false,
-                    HourOfDayPrices = GetRandomHourOfDayPrices()
+                    HourOfDayPrices = Data.GetRandomHourOfDayPrices()
                 },
                 new TariffDetailState
                 {
                     DailyStandingChargePence = 30,
                     PencePerKWh = 30,
-                    DateAppliesFrom = new DateTime(2023, 7, 1),
+                    DateAppliesFrom = startDate.AddMonths(6),
                     GlobalId = Guid.NewGuid(),
                     IsHourOfDayFixed = true
                 },
-                           
-            }
+
+            }.ToImmutableList();
+            var basicReadings = Data.GetRandomBasicReadings(startDate, startDate.AddMonths(8)).ToImmutableList();
+
+            var costCalculator = new CostCalculator();
+            var calculatedCostedReadings = costCalculator.GetCostReadings(basicReadings, tariffs);
+
+            decimal expectedTotalKWh = basicReadings.Sum(c => c.KWh);
+
+            basicReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.UtcTime })
+            .Should()
+            .BeEquivalentTo(
+                calculatedCostedReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.UtcTime }),
+                e => e.ComparingRecordsByMembers().WithStrictOrdering());
+
+
+            var hourlyPriceTariffLookup = tariffs.Single(c => !c.IsHourOfDayFixed).HourOfDayPrices.SelectMany(ToHalfHourly).ToDictionary(c => c.HourOfDay.Value);
+
+
+            Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
+            {
+                var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TariffAppliesFrom);
+                Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingChargePence);
+
+                if (applicableTariff.IsHourOfDayFixed)
+                {
+
+
+                    Assert.Equal(applicableTariff.PencePerKWh, costReading.TariffHalfHourlyPencePerKWh);
+
+                    decimal expectedCost = (costReading.KWh * applicableTariff.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
+                    Assert.Equal(expectedCost, costReading.ReadingTotalCostPence);
+
+                }
+                else
+                {
+                    var halfHourlyPrice = hourlyPriceTariffLookup[costReading.UtcTime.TimeOfDay];
+
+                    Assert.Equal(halfHourlyPrice.PencePerKWh, costReading.TariffHalfHourlyPencePerKWh);
+
+                    decimal expectedCost = (costReading.KWh * halfHourlyPrice.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
+                    Assert.Equal(expectedCost, costReading.ReadingTotalCostPence);
+                }
+
+                Assert.False(costReading.Forecast);
+
+            });
+
+
+            Assert.Equal(expectedTotalKWh, calculatedTotalKWh, 0);
+            Assert.Equal(expectedTotalStandingChargePence, calculatedTotalStandingChargePence, 0);
+
+            // each bill total cost is provided rounded rather than exact, hence sum of all totals is out by 1p
+            expectedTotalCostPence.Should().BeApproximately(calculatedTotalCostPence, 1m);
+
+
 
 
 
         }
 
-        // create a method to get a list of HourOfDayPriceStates for each hour of the day with random prices
-        public List<HourOfDayPriceState> GetRandomHourOfDayPrices()
+        private static IEnumerable<HourOfDayPriceState> ToHalfHourly(HourOfDayPriceState hourOfDayPrice)
         {
-            return Enumerable.Range(0,24).Select(c => new HourOfDayPriceState
+
+            yield return
+                new HourOfDayPriceState
+                {
+                    HourOfDay = hourOfDayPrice.HourOfDay,
+                    PencePerKWh = hourOfDayPrice.PencePerKWh,
+                };
+
+            yield return new HourOfDayPriceState
             {
-                HourOfDay = TimeSpan.FromHours(c),
-                PencePerKWh = (c * 10) + 1
-            }).ToList();
+                HourOfDay = hourOfDayPrice.HourOfDay.Value.Add(TimeSpan.FromMinutes(30)),
+                PencePerKWh = hourOfDayPrice.PencePerKWh,
+            };
         }
 
 
@@ -136,7 +199,7 @@ namespace Energy.Test
             decimal expectedTotalCostPence = energyBillValues.Sum(c => c.TotalCostForPeriodPence);
 
 
-            var basicReadings = CreateBasicReadingsBillValues(energyBillValues).ToImmutableList();
+            var basicReadings = Data.CreateBasicReadingsBillValues(energyBillValues).ToImmutableList();
 
             var costCalculator = new CostCalculator();
             var calculatedCostedReadings = costCalculator.GetCostReadings(basicReadings, tariffs);
@@ -198,41 +261,6 @@ namespace Energy.Test
             public decimal KWh { get; init; }
         }
 
-        //[Theory]
-        //[ClassData(typeof(SingleFixedTariffCostCalculatorTestData))]
-        //public void CostedValuesForMultipleApplicableFixedTariff(decimal totalKWhForPeriod,
-        //                                                       decimal periodStandingChargePence,
-        //                                                       decimal periodPencePerKWh,
-        //                                                       decimal totalCostForPeriodPence,
-        //                                                       DateTime start,
-        //                                                       DateTime end)
-        //{
-        //    int periodDays = start.eGetDateCountExcludeEnd(end);
-
-        //    var myRecentTariff = new TariffDetailState
-        //    {
-        //        DailyStandingChargePence = periodStandingChargePence / periodDays,
-        //        DateAppliesFrom = start,
-        //        PencePerKWh = periodPencePerKWh,
-        //        IsHourOfDayFixed = true,
-        //        GlobalId = Guid.NewGuid(),
-        //        HourOfDayPrices = new()
-        //    };
-
-        //    var tariffState = myRecentTariff.eItemToImmutableList();
-
-        //    var basicReadings = CreateBasicReadingsFromTotalKWh(start, end, totalKWhForPeriod).ToImmutableList();
-
-        //    var costCalculator = new CostCalculator();
-        //    var costedReadings = costCalculator.GetCostReadings(basicReadings, tariffState);
-        //    AssertAccurateForSingleTariff(myRecentTariff,
-        //                                  totalKWhForPeriod,
-        //                                  periodDays,
-        //                                  periodStandingChargePence,
-        //                                  totalCostForPeriodPence,
-        //                                  basicReadings.Count,
-        //                                  costedReadings);
-        //}
 
         private static void AssertAccurateForSingleTariff(TariffDetailState applicableTariff,
                                                           decimal totalKWhForPeriod,
@@ -269,42 +297,5 @@ namespace Energy.Test
             Assert.Equal(periodStandingChargePence, calculatedTotalStandingChargePence, 0);
             Assert.Equal(totalCostForPeriodPence, calculatedTotalCostPence, 0);
         }
-
-
-        private IEnumerable<BasicReading> CreateBasicReadingsBillValues(ImmutableList<EnergyBillValues> periodValues)
-        {
-            return periodValues.Select(c => CreateBasicReadingsFromTotalKWh(c.Start, c.End, c.TotalKWhForPeriod)).SelectMany(c => c).ToList();
-
-        }
-
-
-        private IEnumerable<BasicReading> CreateBasicReadingsFromTotalKWh(DateTime start, DateTime end, decimal totalKWh)
-        {
-            var periodDays = start.eGetDateCountExcludeEnd(end);
-
-            var totalHalfHours = periodDays * 48;
-            decimal kWhPerHalfHour = totalKWh / totalHalfHours;
-            return Enumerable.Range(0, totalHalfHours).Select(halfHourIndex =>
-            {
-
-                var utcTime = start.AddMinutes(halfHourIndex * 30);
-
-                return new BasicReading()
-                {
-                    UtcTime = utcTime,
-                    KWh = kWhPerHalfHour
-                };
-            });
-        }
-
-        private IEnumerable<HourOfDayPriceState> CreateFixedHourOfDayPrices(decimal v)
-        {
-            return Enumerable.Range(0, 24).Select(c => new HourOfDayPriceState()
-            {
-                HourOfDay = TimeSpan.FromHours(c),
-                PencePerKWh = v / 24m
-            });
-        }
-
     }
 }
