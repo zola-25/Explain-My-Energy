@@ -25,9 +25,10 @@ namespace Energy.App.Standalone.Data.EnergyReadings
             _batchCreator = new BatchCreator();
         }
 
-        public async Task<List<BasicReading>> ImportFromMoveIn(MeterType meterType, CancellationToken ctx = default)
+        public async Task<List<BasicReading>> ImportFromMoveInOrPreviousYear(MeterType meterType, CancellationToken ctx = default)
         {
-            DateTime startDate = _householdState.Value.MoveInDate.Value;
+            var startDate = _householdState.Value.MoveInDate.Value < DateTime.UtcNow.AddYears(-1) ? DateTime.UtcNow.AddYears(-1) : _householdState.Value.MoveInDate.Value;
+
             string macId = _householdState.Value.IhdMacId;
 
             List<BasicReading> meterReadings = await GetMeterReadings(startDate, DateTime.Today, macId, meterType, ctx)

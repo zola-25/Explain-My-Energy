@@ -7,6 +7,7 @@ using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using static Energy.App.Standalone.Features.EnergyReadings.Store.GasReadingsReducers;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Store
@@ -14,13 +15,22 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
     [PersistState]
     public record ElectricityReadingsState
     {
+        [property: JsonIgnore]
         public bool ReloadingReadings { get; init; }
+        
+        [property: JsonIgnore]
         public bool UpdatingReadings { get; init; }
+        
+        [property: JsonIgnore]
         public bool CalculatingCosts { get; init; }
 
 
         public ImmutableList<BasicReading> BasicReadings { get; init; }
+
+        [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
+
+        [property: JsonIgnore]
         public bool CalculationError { get; init; }
     }
 
@@ -212,7 +222,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         [EffectMethod]
         public async Task ReloadElectricityReadings(ElectricityReloadReadingsAction loadReadingsAction, IDispatcher dispatcher)
         {
-            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveIn(MeterType.Electricity);
+            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Electricity);
             dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAction(basicReadings));
             dispatcher.Dispatch(new NotifyElectricityStoreReady());
         }

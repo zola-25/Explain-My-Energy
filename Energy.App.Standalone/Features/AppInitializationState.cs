@@ -63,16 +63,28 @@ namespace Energy.App.Standalone.Features
             return state with { WaitingForLinearCoefficients = false };
         }
 
+
         [ReducerMethod]
-        public static AppInitializationState ReduceAppInitializationUpdateLoadableDataAction(AppInitializationState state, AppInitializationUpdateLoadableDataAction action)
+        public static AppInitializationState ReduceWeatherUpdateLoadableAction(AppInitializationState state, AppInitializationUpdateWeatherDataLoadableAction action)
         {
-            return state with
-            {
-                WaitingForWeatherData = action.CanUpdateWeatherData,
-                WaitingForGasReadingsData = action.CanUpdateGasReadingsData,
-                WaitingForElectricityReadingsData = action.CanUpdateElectricityReadingsData,
-                WaitingForLinearCoefficients = action.CanUpdateLinearCoefficients
-            };
+            return state with { WaitingForWeatherData = action.CanUpdateWeatherData };
+        }
+
+        [ReducerMethod]
+        public static AppInitializationState ReduceGasReadingsUpdateLoadableAction(AppInitializationState state, AppInitializationUpdateGasReadingsDataLoadableAction action)
+        {
+            return state with { WaitingForGasReadingsData = action.CanUpdateGasReadingsData };
+        }
+        [ReducerMethod]
+        public static AppInitializationState ReduceElectricityReadingsUpdateLoadableAction(AppInitializationState state, AppInitializationUpdateElectricityReadingsDataLoadableAction action)
+        {
+            return state with { WaitingForElectricityReadingsData = action.CanUpdateElectricityReadingsData };
+        }
+
+        [ReducerMethod]
+        public static AppInitializationState ReduceLinearCoefficientsUpdateLoadableAction(AppInitializationState state, AppInitializationUpdateLinearCoefficientsLoadableAction action)
+        {
+            return state with { WaitingForLinearCoefficients = action.CanUpdateLinearCoefficients };
         }
     }
 }

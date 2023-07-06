@@ -74,6 +74,6 @@
 
     void LoadWeatherData()
     {
-        Dispatcher.Dispatch(new WeatherLoadReadingsAction(HouseholdState.Value.OutCodeCharacters));
+        Dispatcher.Dispatch(new WeatherReloadReadingsAction(HouseholdState.Value.OutCodeCharacters));
     }
 }

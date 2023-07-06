@@ -39,10 +39,10 @@ namespace Energy.App.Standalone.Features
             bool canUpdateGasData = _meterSetupState.Value.ElectricityMeter.SetupValid;
             bool canUpdateLinearCoefficients =  _meterSetupState.Value[_householdState.Value.PrimaryHeatSource].SetupValid;
 
-            _dispatcher.Dispatch(new AppInitializationUpdateLoadableDataAction(canUpdateWeatherData,
-                                                           canUpdateElectricityData,
-                                                           canUpdateGasData,
-                                                           canUpdateLinearCoefficients));
+            _dispatcher.Dispatch(new AppInitializationUpdateWeatherDataLoadableAction(canUpdateWeatherData));
+            _dispatcher.Dispatch(new AppInitializationUpdateElectricityReadingsDataLoadableAction(canUpdateElectricityData));
+            _dispatcher.Dispatch(new AppInitializationUpdateGasReadingsDataLoadableAction(canUpdateGasData));
+            _dispatcher.Dispatch(new AppInitializationUpdateLinearCoefficientsLoadableAction(canUpdateLinearCoefficients));
 
             if (!_householdState.Value.Saved)
             {
@@ -104,14 +104,18 @@ namespace Energy.App.Standalone.Features
             {
                 if (!_weatherState.Value.WeatherReadings.Any())
                 {
-                    _dispatcher.Dispatch(new WeatherLoadReadingsAction(_householdState.Value.OutCodeCharacters));
+                    _dispatcher.Dispatch(new WeatherReloadReadingsAction(_householdState.Value.OutCodeCharacters));
                 }
                 else
                 {
-                    DateTime latestReading = _weatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).OrderBy(c => c.UtcReadDate).First().UtcReadDate;
+                    var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.UtcReadDate;
+                    var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.UtcReadDate;
+
                     if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
                     {
-                        _dispatcher.Dispatch(new WeatherLoadReadingsAction(_householdState.Value.OutCodeCharacters));
+                        _dispatcher.Dispatch(new WeatherUpdateReadingsAction(_householdState.Value.OutCodeCharacters,
+                                                                             latestReading,
+                                                                             latestHistoricalReading));
                     } 
                     else
                     {
@@ -122,12 +126,6 @@ namespace Energy.App.Standalone.Features
             }
         }
 
-        private void WeatherState_StateChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        public EventHandler OnInitialized { get; set; }
         
     }
 }

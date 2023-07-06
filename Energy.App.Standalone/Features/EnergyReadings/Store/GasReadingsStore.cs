@@ -6,20 +6,32 @@ using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Store
 {
     [PersistState]
     public record GasReadingsState
     {
+        [property: JsonIgnore]
         public bool Reloading { get; init; }
+        
+
+        [property: JsonIgnore]
         public bool Updating { get; init; }
 
+        [property: JsonIgnore]
         public bool CalculatingCosts { get; init; }
+
 
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
+
+
+        [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
+        
+        [property: JsonIgnore]
         public bool CalculationError { get; init; }
     }
 
@@ -215,7 +227,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             [EffectMethod]
             public async Task ReloadGasReadings(GasReloadReadingsAction loadReadingsAction, IDispatcher dispatcher)
             {
-                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveIn(MeterType.Gas);
+                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Gas);
                 dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings));
                 dispatcher.Dispatch(new NotifyGasStoreReady());
 
@@ -252,7 +264,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error calculating reading costs:");
+                    Console.WriteLine("Error calculating Gas reading costs:");
                     Console.WriteLine(e);
 
                     dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
