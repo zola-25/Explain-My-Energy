@@ -1,16 +1,122 @@
 ﻿@using Energy.App.Standalone.Features;
+@using Energy.App.Standalone.Features.EnergyReadings.Store;
+@using Fluxor.Persist.Middleware;
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
 
 <Fluxor.Blazor.Web.StoreInitializer />
-<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+@if (!Ready)
+{
 
+    <MudContainer>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="m-3 mx-auto">
+                    <MudText Typo="Typo.h5">@_status</MudText>
+                    <MudProgressCircular StrokeWidth="8" Size="@Size.Large" Value="_progress" Color="Color.Primary">
+                    </MudProgressCircular>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+
+}
+else
+{
+
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+}
+@code {
+
+    [Inject] public IAppInitialization AppInitialization { get; set; }
+
+    [Inject]
+    public IState<AppInitializationState> AppInitializationState { get; set; }
+
+
+    public bool Ready => (!AppInitializationState.Value.WaitingForWeatherData
+                        && !AppInitializationState.Value.WaitingForElectricityReadingsData
+                        && !AppInitializationState.Value.WaitingForGasReadingsData
+                        && !AppInitializationState.Value.WaitingForLinearCoefficients);
+
+    double _progress = 10;
+    string _status = "App initializing";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        this.SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
+        {
+
+            Console.WriteLine($"**** State rehydrated ****");
+            _progress += 20;
+
+
+            this.StateHasChanged();// we now have state, we can re-render to reflect binding changes
+
+
+        });
+
+
+
+        SubscribeToAction<InitializeAppAction>(result =>
+        {
+            Console.WriteLine($"**** Initializing App ****");
+
+            _status = "App initializing";
+
+            AppInitialization.Initialize();
+            _progress += 10;
+
+        });
+
+        SubscribeToAction<NotifyWeatherReadingsLoadedAction>(result =>
+        {
+            Console.WriteLine("NotifyWeatherReadingsLoadedAction");
+
+            _status = "Weather data loaded";
+            _progress += 10;
+
+        });
+
+        SubscribeToAction<NotifyElectricityCostsCalculationCompletedAction>(result =>
+        {
+            Console.WriteLine("NotifyElectricityCostsCalculationCompletedAction");
+
+            _status = "Electricity data loaded" + (result.Failed ? "" : " with costs");
+            _progress += 10;
+
+        });
+
+        SubscribeToAction<NotifyGasCostsCalculationCompletedAction>(result =>
+        {
+            Console.WriteLine("NotifyGasCostsCalculationCompletedAction");
+
+            _status = "Gas data loaded" + (result.CalculationError ? "" : " with costs");
+            _progress += 10;
+
+        });
+
+        SubscribeToAction<NotifyLinearCoeffiecientsReadyAction>(result =>
+        {
+            Console.WriteLine("NotifyLinearCoeffiecientsReadyAction");
+            _status = "Initial forecast analysis completed";
+            _progress += 10;
+
+        });
+
+
+    }
+
+}
