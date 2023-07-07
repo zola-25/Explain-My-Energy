@@ -5,11 +5,15 @@ using Energy.App.Standalone.Features.Analysis.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
+using System.Text.Json;
 using MathNet.Numerics;
 using Fluxor;
 using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.App.Standalone.Features.Setup.Store;
+using Newtonsoft.Json;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -23,22 +27,22 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     IState<ElectricityReadingsState> _electricityReadingsState;
     IState<WeatherState> _weatherState;
     IState<LinearCoefficientsState> _linearCoefficientsState;
-    
+
     IState<ElectricityTariffsState> _electricityTariffsState;
 
     IState<GasTariffsState> _gasTariffsState;
 
 
     public TempForecastAnalyzer(Co2ConversionFactors co2Conversion,
-                                ITermDateRanges periodDateRanges,
-                                IForecastGenerator forecastGenerator,
-                                ICostCalculator costCalculator,
-                                IState<GasReadingsState> gasReadingsState,
-                                IState<ElectricityReadingsState> electricityReadingsState,
-                                IState<WeatherState> weatherState,
-                                IState<LinearCoefficientsState> linearCoefficientsState,
-                                IState<GasTariffsState> gasTariffsState,
-                                IState<ElectricityTariffsState> electricityTariffsState)
+        ITermDateRanges periodDateRanges,
+        IForecastGenerator forecastGenerator,
+        ICostCalculator costCalculator,
+        IState<GasReadingsState> gasReadingsState,
+        IState<ElectricityReadingsState> electricityReadingsState,
+        IState<WeatherState> weatherState,
+        IState<LinearCoefficientsState> linearCoefficientsState,
+        IState<GasTariffsState> gasTariffsState,
+        IState<ElectricityTariffsState> electricityTariffsState)
     {
         _co2Conversion = co2Conversion;
         _periodDateRanges = periodDateRanges;
@@ -52,34 +56,39 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         _electricityTariffsState = electricityTariffsState;
     }
 
-    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, 
+    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
         CalendarTerm duration,
         decimal degreeDifference)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(duration);
 
-        ForecastAnalysis results = ForecastAnalysis(meterType,
-                                                    degreeDifference,
-                                                    start,
-                                                    end);
+        ForecastAnalysis results = ForecastAnalysis
+        (
+            meterType,
+            degreeDifference,
+            start,
+            end
+        );
 
         return results;
     }
 
-    public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType, 
+    public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
         CalendarTerm duration,
         decimal degreeDifference)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
 
-        ForecastAnalysis results = ForecastAnalysis(meterType,
-                                                    degreeDifference,
-                                                    start,
-                                                    end);
+        ForecastAnalysis results = ForecastAnalysis
+        (
+            meterType,
+            degreeDifference,
+            start,
+            end
+        );
 
         return results;
     }
-
 
 
     private ForecastAnalysis ForecastAnalysis(
@@ -88,9 +97,18 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         DateTime start,
         DateTime end)
     {
-        var periodWeatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).ToImmutableList();
+        var periodWeatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).
+            ToImmutableList();
 
-        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast(start, end, degreeDifference, _linearCoefficientsState.Value, periodWeatherReadings);
+        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast
+        (
+            start,
+            end,
+            degreeDifference,
+            _linearCoefficientsState.Value,
+            periodWeatherReadings
+        );
+        
         
         ImmutableList<TariffDetailState> tariffDetailStates;
         switch (meterType)
@@ -104,7 +122,7 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
             default:
                 throw new NotImplementedException();
         }
-        
+
         var forecastCostedReadings = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
 
         decimal forecastConsumption = forecastCostedReadings.Sum(c => c.KWh);

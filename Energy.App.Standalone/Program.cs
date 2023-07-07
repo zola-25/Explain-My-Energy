@@ -8,6 +8,7 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Store;
+using Energy.App.Standalone.Features.AppInit.Store.OldAppInit;
 using Energy.App.Standalone.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
@@ -66,18 +67,20 @@ builder.Services.AddBlazoredLocalStorage(config =>
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
 builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 
+builder.Services.AddScoped<AppInit>();
+
 
 System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
     options = options.ScanAssemblies(currentAssembly);
     
-    // options.UseReduxDevTools(devToolsOptions =>
-    // {
-    //     devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
-    //     devToolsOptions.UseSystemTextJson();
-    //     //options.EnableStackTrace();
-    // });
+    options.UseReduxDevTools(devToolsOptions =>
+    {
+        devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
+        devToolsOptions.UseSystemTextJson();
+        //devToolsOptions.EnableStackTrace();
+    });
     options.UsePersist(persistMiddlewareOptions =>
     {
         persistMiddlewareOptions.UseInclusionApproach();

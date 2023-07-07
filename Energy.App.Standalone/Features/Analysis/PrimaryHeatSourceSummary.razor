@@ -3,6 +3,7 @@
 @using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 @using Energy.App.Standalone.Features.EnergyReadings.Store;
 @using System.Collections.Immutable;
+@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit
 @using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
@@ -40,7 +41,6 @@ else
                       MeterType="MeterType">
         </ForecastCard>
     </MudItem>
-
 }
 
 @code {
@@ -48,7 +48,8 @@ else
     [Parameter, EditorRequired]
     public MeterType MeterType { get; set; }
 
-    [Inject] public IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
+    [Inject]
+    public IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
     [Inject]
     ITempForecastAnalyzer TempForecastAnalyzer { get; set; }
@@ -61,7 +62,7 @@ else
 
     CalendarTerm _calenderTerm;
     decimal _degreeDifference;
-    
+
     public string Status { get; set; }
     public bool Ready { get; set; }
     public double Progress { get; set; }
@@ -74,6 +75,43 @@ else
 
     AnalysisOptionsActionFactory _analysisOptionsActionFactory;
 
+    [Inject]
+    AppInit AppInit { get; set; }
+
+    [Inject]
+    IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+
+    [Inject]
+    IState<GasReadingsState> GasReadingsState { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        switch (MeterType)
+        {
+            case MeterType.Electricity:
+            {
+                if (ElectricityReadingsState.Value.CostedReadings.Count
+                    == 0)
+                {
+                    AppInit.InitializeElectricity();
+                }
+                break;
+            }
+            case MeterType.Gas:
+            {
+                if (GasReadingsState.Value.CostedReadings.Count
+                    == 0)
+                {
+                    AppInit.InitializeGas();
+                }
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         Ready = false;
@@ -81,7 +119,7 @@ else
         await Task.Delay(1);
         Progress = 30;
         Status = "Analysing Historical";
-        
+
         _calenderTerm = InitialMeterAnalysisOptions.CalendarTerm;
         _degreeDifference = InitialMeterAnalysisOptions.DegreeDifference;
         await Task.Delay(1);
@@ -106,8 +144,11 @@ else
                     SetForecastAnalyses();
                 });
                 SubscribeToAction<ElectricityAnalysisOptionsSetCalenderTermAction>(
-                    action => _calenderTerm = action.CalendarTerm);
-                    SetForecastAnalyses();
+                    action =>
+                    {
+                        _calenderTerm = action.CalendarTerm;
+                        SetForecastAnalyses();
+                    });
                 break;
             case MeterType.Gas:
                 SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>(action =>
@@ -116,30 +157,33 @@ else
                     SetForecastAnalyses();
                 });
                 SubscribeToAction<GasAnalysisOptionsSetCalenderTermAction>(
-                    action => _calenderTerm = action.CalendarTerm);
-                    SetForecastAnalyses();
+                    action =>
+                    {
+                        _calenderTerm = action.CalendarTerm;
+                        SetForecastAnalyses();
+                    });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
-
         }
-        
+
         await Task.Delay(1);
 
         SetForecastAnalyses();
 
         Ready = true;
     }
-    
+
     void SetHistoricalAnalyses()
     {
         _thisDurationAnalysis = HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calenderTerm);
         _previousDurationAnalysis = HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calenderTerm);
     }
-    
+
     void SetForecastAnalyses()
     {
         _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
         _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
     }
+
 }

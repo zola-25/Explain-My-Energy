@@ -15,6 +15,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
             var adjustedReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
                 .SelectMany(c => {
                     decimal adjustedKWh = linearCoefficientsState.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
+                    adjustedKWh = adjustedKWh < 0 ? 0 : adjustedKWh;
                     return Enumerable.Range(0, 48).Select(i => new BasicReading
                         {
                             Forecast = true,
