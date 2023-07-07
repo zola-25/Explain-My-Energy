@@ -248,14 +248,14 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
 
 
         [EffectMethod]
-        public Task InitiateCostCalculations(ElectricityInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
+        public async Task InitiateCostCalculations(ElectricityInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
         {
             ImmutableList<CostedReading> costedReadings;
             try
             {
-                costedReadings = _energyCostCalculator
+                costedReadings = await Task.Run(() => _energyCostCalculator
                                 .GetCostReadings(_electricityReadingsState.Value.BasicReadings,
-                                                _electricityTariffsState.Value.TariffDetails);
+                                                _electricityTariffsState.Value.TariffDetails));
 
                 dispatcher.Dispatch(new ElectricityStoreCostedReadingsAction(costedReadings));
                 dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction());
@@ -270,7 +270,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
                 dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction(failed: true));
             }
 
-            return Task.CompletedTask;
         }
 
     }

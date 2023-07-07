@@ -13,26 +13,20 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
     [PersistState]
     public record GasReadingsState
     {
-        [property: JsonIgnore]
-        public bool Reloading { get; init; }
+        [property: JsonIgnore] public bool Reloading { get; init; }
 
 
-        [property: JsonIgnore]
-        public bool Updating { get; init; }
+        [property: JsonIgnore] public bool Updating { get; init; }
 
-        [property: JsonIgnore]
-        public bool CalculatingCosts { get; init; }
+        [property: JsonIgnore] public bool CalculatingCosts { get; init; }
 
 
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
 
+        [property: JsonIgnore] public ImmutableList<CostedReading> CostedReadings { get; init; }
 
-        [property: JsonIgnore]
-        public ImmutableList<CostedReading> CostedReadings { get; init; }
-
-        [property: JsonIgnore]
-        public bool CalculationError { get; init; }
+        [property: JsonIgnore] public bool CalculationError { get; init; }
     }
 
     public class GasReadingsFeature : Feature<GasReadingsState>
@@ -61,16 +55,20 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
     }
 
     public class GasInitiateDeleteReadingsAction
-    { }
+    {
+    }
 
     public class GasExecuteDeleteReadingsAction
-    { }
+    {
+    }
 
     public class NotifyGasReadingsDeletedAction
-    { }
+    {
+    }
 
     public class GasReloadReadingsAction
-    { }
+    {
+    }
 
     public class GasUpdateReadingsAction
     {
@@ -102,7 +100,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         }
     }
 
-    public class NotifyGasStoreReady { }
+    public class NotifyGasStoreReady
+    {
+    }
 
     public static class GasReadingsReducers
     {
@@ -175,9 +175,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
                 CalculatingCosts = true
             };
         }
+
         //GasStoreCostedReadingsAction
         [ReducerMethod]
-
         public static GasReadingsState OnStoreGasStoreCostedReadingsActionReducer(GasReadingsState state, GasStoreCostedReadingsAction action)
         {
             return state with
@@ -189,7 +189,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         }
 
         [ReducerMethod]
-
         public static GasReadingsState OnCostCalculationsFailedNotification(GasReadingsState state, NotifyGasCostsCalculationFailedAction action)
         {
             return state with
@@ -217,7 +216,10 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         IState<GasReadingsState> _gasReadingsState;
         IState<GasTariffsState> _gasTariffsState;
 
-        public GasReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<GasReadingsState> gasReadingsState, IState<GasTariffsState> gasTariffsState, ICostCalculator energyCostCalculator)
+        public GasReadingsEffects(IEnergyReadingImporter energyReadingImporter,
+            IState<GasReadingsState> gasReadingsState,
+            IState<GasTariffsState> gasTariffsState,
+            ICostCalculator energyCostCalculator)
         {
             _energyReadingImporter = energyReadingImporter;
             _gasReadingsState = gasReadingsState;
@@ -231,7 +233,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Gas);
             dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings));
             dispatcher.Dispatch(new NotifyGasStoreReady());
-
         }
 
         [EffectMethod]
@@ -240,7 +241,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
             dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings));
             dispatcher.Dispatch(new NotifyGasStoreReady());
-
         }
 
         [EffectMethod]
@@ -249,19 +249,22 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
             dispatcher.Dispatch(new GasExecuteDeleteReadingsAction());
             dispatcher.Dispatch(new NotifyGasReadingsDeletedAction());
             return Task.CompletedTask;
-
         }
 
         [EffectMethod]
-        public Task CalculateCosts(GasInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
+        public async Task CalculateCosts(GasInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
         {
             ImmutableList<CostedReading> costedReadings;
             try
             {
-                costedReadings = _energyCostCalculator.GetCostReadings(_gasReadingsState.Value.BasicReadings, _gasTariffsState.Value.TariffDetails);
+                costedReadings =
+                    await Task.Run
+                    (
+                        () => _energyCostCalculator.GetCostReadings(_gasReadingsState.Value.BasicReadings, _gasTariffsState.Value.TariffDetails)
+                    );
+
                 dispatcher.Dispatch(new GasStoreCostedReadingsAction(costedReadings));
                 dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
-
             }
             catch (Exception e)
             {
@@ -271,8 +274,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
                 dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
                 dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction(true));
             }
-
-            return Task.CompletedTask;
         }
     }
 
@@ -291,7 +292,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         {
             CalculationError = calculationError;
         }
-
     }
 
     public class GasStoreCostedReadingsAction
@@ -301,9 +301,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         public GasStoreCostedReadingsAction(ImmutableList<CostedReading> costedReadings)
         {
             CostedReadings = costedReadings;
-
         }
     }
-
 }
-

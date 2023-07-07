@@ -23,6 +23,7 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         [Inject] IState<ElectricityTariffsState> ElectricityTariffsState { get; set; }
         [Inject] IState<GasTariffsState> GasTariffsState { get; set; }
 
+        [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
 
 
 
@@ -54,55 +55,65 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             {
                 Snackbar.Add("Electricity Readings Updated");
 
-                SetMeterStatusList();
             });
             SubscribeToAction<NotifyGasStoreReady>((a) =>
             {
                 Snackbar.Add("Gas Readings Updated");
-                SetMeterStatusList();
             });
 
             SubscribeToAction<NotifyGasReadingsDeletedAction>((a) =>
             {
                 Snackbar.Add("Gas Readings Deleted");
 
-                SetMeterStatusList();
             });
 
             SubscribeToAction<NotifyElectricityReadingsDeletedAction>((a) =>
             {
                 Snackbar.Add("Electricity Readings Deleted");
 
-                SetMeterStatusList();
             });
-
-            SubscribeToAction<NotifyGasStoreReady>((a) =>
+            
+            HouseholdState.StateChanged += async (sender, state) =>
             {
-                Snackbar.Add("Gas Readings Updated");
                 SetMeterStatusList();
-            });
-
-            SubscribeToAction<GasReloadReadingsAction>((a) => SetMeterStatusList());
-            SubscribeToAction<ElectricityReloadReadingsAction>((a) => SetMeterStatusList());
-
-            SubscribeToAction<GasUpdateReadingsAction>((a) => SetMeterStatusList());
-            SubscribeToAction<ElectricityUpdateReadingsAction>((a) => SetMeterStatusList());
-
+                await InvokeAsync(StateHasChanged);
+            };
+            
+            MeterSetupState.StateChanged += async (sender, state) =>
+            {
+                SetMeterStatusList();
+                await InvokeAsync(StateHasChanged);
+            };
+            
+            GasReadingsState.StateChanged += async (sender, state) =>
+            {
+                SetMeterStatusList();
+                await InvokeAsync(StateHasChanged);
+            };
+            
+            ElectricityReadingsState.StateChanged += async (sender, state) =>
+            {
+                SetMeterStatusList();
+                await InvokeAsync(StateHasChanged);
+            };
+            
+            GasTariffsState.StateChanged += async (sender, state) =>
+            {
+                SetMeterStatusList();
+                await InvokeAsync(StateHasChanged);
+            };
+            
+            ElectricityTariffsState.StateChanged += async (sender, state) =>
+            {
+                SetMeterStatusList();
+                await InvokeAsync(StateHasChanged);
+            };
+            
             SetMeterStatusList();
 
         }
 
 
-        protected override void OnParametersSet()
-        {
-            //SubscribeToAction<ElectricityReloadReadingsAction>(ShowMeterAddedToast);
-            //SubscribeToAction<ElectricityUpdateReadingsAction>(ShowMeterUpdatedToast);
-            //SubscribeToAction<GasReloadReadingsAction>(ShowMeterUpdatedToast);
-            //SubscribeToAction<GasUpdateReadingsAction>(ShowMeterUpdatedToast);
-            //SubscribeToAction<GasReloadReadingsAction>(ShowMeterUpdatedToast);
-
-            //SubscribeToAction<MeterDeleteAction>(ShowMeterDeletedToast);
-        }
 
 
 

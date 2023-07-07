@@ -1,32 +1,35 @@
 ﻿@using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 @inherits FluxorComponent
-@inject IState<HouseholdState> HouseholdState
-@inject IState<MeterSetupState> MeterSetupState
-
 
 <MudPaper class="py-3" Elevation="0">
-    <MudNavMenu Color="Color.Info" Bordered="true">
-        <MudNavLink Href="/HouseholdSetup"  Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
-            Household Setup @if (HouseholdState.Value.Invalid || !HouseholdState.Value.Saved)
-            {
-                <MudIcon Color="Color.Warning" Icon="@Icons.Material.Filled.Settings"></MudIcon>
-                <MudTooltip>Setup Required</MudTooltip>
-            } else if (HouseholdState.Value.Saved)
-            {
-                <MudIcon Color="Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
-            }
+    <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
 
-        </MudNavLink>
-        
+        <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right">
+            <MudNavLink Href="/HouseholdSetup" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
+                Household Setup
+                @if (HouseholdSetupValid)
+                {
+                    <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
+                }
+                else
+                {
+                    <MudIcon Color="@Color.Warning" Icon="@Icons.Material.Filled.Settings"></MudIcon>
+                }
+
+            </MudNavLink>
+        </MudTooltip>
         <MudDivider></MudDivider>
-        
-        <MudNavLink Disabled="_electricityDisabled" Class="menu-nav-item" Href="/HeatingMeter/Electricity" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
-            <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Electricity)">Electricity</MeterNavLinkContent>
-        </MudNavLink>
-        <MudNavLink Disabled="_gasDisabled" Class="menu-nav-item" Href="/HeatingMeter/Gas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
-            <MeterNavLinkContent IsHeating="@(_heaterMeterType == MeterType.Gas)">Gas</MeterNavLinkContent>
-        </MudNavLink>
 
+        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right">
+            <MudNavLink Disabled="ElectricityDisabled" Class="menu-nav-item" Href="/HeatingMeter/Electricity" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
+                <MeterNavLinkContent IsHeating="HeatingMeterIsElectricity">Electricity</MeterNavLinkContent>
+            </MudNavLink>
+        </MudTooltip>
+        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right">
+            <MudNavLink Disabled="GasDisabled" Class="menu-nav-item" Href="/HeatingMeter/Gas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
+                <MeterNavLinkContent IsHeating="HeatingMeterIsGas">Gas</MeterNavLinkContent>
+            </MudNavLink>
+        </MudTooltip>
     </MudNavMenu>
 </MudPaper>
 
@@ -43,14 +46,34 @@
 
 @code {
 
-    MeterType _heaterMeterType;
+    [Inject]
+    IState<HouseholdState> HouseholdState { get; set; }
 
+    [Inject]
+    IState<MeterSetupState> MeterSetupState { get; set; }
 
-    bool _gasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid;
-    bool _electricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid;
+    MeterType HeaterMeterType => HouseholdState.Value.PrimaryHeatSource;
+
+    bool GasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid;
+    bool ElectricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid;
 
     string _gasHref;
     string _electricityHref;
 
+
+    private bool HeatingMeterIsElectricity => HouseholdState.Value.Saved && HouseholdState.Value.PrimaryHeatSource == MeterType.Electricity;
+    private bool HeatingMeterIsGas => HouseholdState.Value.Saved && HouseholdState.Value.PrimaryHeatSource == MeterType.Gas;
+
+    public string GasTooltipText()
+    {
+        return GasDisabled ? "Configure in Household Setup" : "Show analysis";
+    }
+
+    public string ElectricityTooltipText()
+    {
+        return ElectricityDisabled ? "Configure in Household Setup" : "Show analysis";
+    }
+
+    private bool HouseholdSetupValid => !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
 
 }

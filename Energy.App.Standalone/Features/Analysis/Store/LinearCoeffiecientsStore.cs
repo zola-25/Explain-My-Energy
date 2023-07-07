@@ -59,18 +59,18 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         }
     }
 
-    public class InitiateUpdateLinearCoeffiecientsAction
+    public class InitiateUpdateLinearCoefficientsAction
     { }
 
-    public class NotifyLinearCoeffiecientsReadyAction
+    public class NotifyLinearCoefficientsReadyAction
     { }
 
-    public class UpdateLinearCoeffiecientsAction
+    public class UpdateLinearCoefficientsAction
     {
         public decimal Gradient { get; }
         public decimal C { get; }
 
-        public UpdateLinearCoeffiecientsAction(decimal gradient, decimal c)
+        public UpdateLinearCoefficientsAction(decimal gradient, decimal c)
         {
             Gradient = gradient;
             C = c;
@@ -80,7 +80,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     public static class LinearCoeffiecientsReducer
     {
         [ReducerMethod]
-        public static LinearCoefficientsState Reduce(LinearCoefficientsState state, UpdateLinearCoeffiecientsAction action)
+        public static LinearCoefficientsState Reduce(LinearCoefficientsState state, UpdateLinearCoefficientsAction action)
         {
             return state with
             {
@@ -113,7 +113,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         [EffectMethod]
         
-        public async Task HandleInitiateUpdateLinearCoeffiecientsAction(InitiateUpdateLinearCoeffiecientsAction action, IDispatcher dispatcher)
+        public async Task HandleInitiateUpdateLinearCoeffiecientsAction(InitiateUpdateLinearCoefficientsAction action, IDispatcher dispatcher)
         {
             ImmutableList<BasicReading> heatingMeterReadings;
             switch (_householdState.Value.PrimaryHeatSource)
@@ -129,22 +129,22 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             var linearCoefficients = _forecastCoefficientsCreator
                 .GetForecastCoefficients(heatingMeterReadings, _weatherState.Value.WeatherReadings);
             
-            dispatcher.Dispatch(new UpdateLinearCoeffiecientsAction(linearCoefficients.Gradient, linearCoefficients.C));
-            dispatcher.Dispatch(new NotifyLinearCoeffiecientsReadyAction());
+            dispatcher.Dispatch(new UpdateLinearCoefficientsAction(linearCoefficients.Gradient, linearCoefficients.C));
+            dispatcher.Dispatch(new NotifyLinearCoefficientsReadyAction());
         }
 
         [EffectMethod]
         public async Task HandleNotifyElectricityStoreReadyAction(NotifyElectricityStoreReady action, IDispatcher dispatcher)
         {
             if(_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
-                dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
+                dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
         }
 
         [EffectMethod]
         public async Task HandleNotifyGasStoreReadyAction(NotifyGasStoreReady action, IDispatcher dispatcher)
         {
             if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
-                dispatcher.Dispatch(new InitiateUpdateLinearCoeffiecientsAction());
+                dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
         }
 
     }

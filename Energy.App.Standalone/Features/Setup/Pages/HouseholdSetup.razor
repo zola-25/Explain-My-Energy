@@ -111,10 +111,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        
+        HouseholdState.StateChanged += async (sender, state) =>
+        {
+            await SetHouseholdInputs();
+            await InvokeAsync(StateHasChanged);
+        };
+        
         await SetHouseholdInputs();
-        return;
+        SubscribeToAction<NotifyHouseholdReadyAction>(ShowSuccessMessage);
+        SubscribeToAction<HouseholdSubmitFailureAction>(HandleSubmitFailure);
     }
-
+    
     private Task SetHouseholdInputs()
     {
         _householdDetails = new HouseholdDetails()
@@ -124,9 +133,6 @@ else
             OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
             PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
         };
-
-        SubscribeToAction<NotifyHouseholdReadyAction>(ShowSuccessMessage);
-        SubscribeToAction<HouseholdSubmitFailureAction>(HandleSubmitFailure);
 
 
         _readyToInteract = true;

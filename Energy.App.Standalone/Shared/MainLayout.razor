@@ -1,16 +1,9 @@
-﻿@using Energy.App.Standalone.Features;
-@using Energy.App.Standalone.Features.EnergyReadings.Store;
-@using Fluxor.Blazor.Web.Components;
-@using Fluxor.Persist.Middleware;
-@using System.Collections.Immutable;
-@using static Energy.App.Standalone.Features.EnergyReadings.Store.GasReadingsReducers;
-@inherits FluxorLayout
+﻿@inherits LayoutComponentBase
 @inject IDispatcher Dispatcher
 
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
 
 <MudLayout>
     <MudAppBar Elevation="1">
@@ -24,8 +17,6 @@
     <MudMainContent>
         <MudContainer>
             @Body
-
-            
         </MudContainer>
     </MudMainContent>
 </MudLayout>

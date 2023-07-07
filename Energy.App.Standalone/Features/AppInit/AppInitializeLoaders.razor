@@ -1,0 +1,167 @@
+﻿@using Energy.App.Standalone.Features.AppInit.Store
+@using Energy.App.Standalone.Features.EnergyReadings.Store
+@using Microsoft.Extensions.FileSystemGlobbing.Abstractions
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+
+<MudPaper Elevation="2" Class="d-flex flex-column mx-auto justify-content-evenly mt-3">
+    <MudCard>
+        <MudCardHeader Class="justify-center">
+            <MudText Typo="Typo.h4">Setup Status</MudText>
+        </MudCardHeader>
+        <MudCardContent Class="d-flex flex-column gap-3">
+
+            @if (!AppInitState.Value.AppStarted)
+            {
+                <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">App starting...</MudAlert>
+                <MudProgressLinear Size="Size.Large" Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+
+            @if (AppInitState.Value.AppStarted)
+            {
+                @if (AppInitState.Value.CanUpdateWeatherData)
+                {
+                    @if (AppInitState.Value.WeatherDataInitializing)
+                    {
+                        <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudAlert>
+                        <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@Severity.Success" Elevation="2" Dense="@true">Weather data loaded</MudAlert>
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Household for local Weather Data</MudAlert>
+                }
+
+                @if (AppInitState.Value.CanUpdateElectricityData)
+                {
+                    @if (AppInitState.Value.ElectricityDataInitializing)
+                    {
+                        <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading electricity data...</MudAlert>
+                        <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@Severity.Success" Elevation="2" Dense="@true">Electricity data loaded</MudAlert>
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Electricity Meter for consumption analysis</MudAlert>
+                }
+
+                @if (AppInitState.Value.CanUpdateGasData)
+                {
+                    @if (AppInitState.Value.GasDataInitializing)
+                    {
+                        <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading gas data...</MudAlert>
+                        <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@Severity.Success" Elevation="2" Dense="@true">Gas data loaded</MudAlert>
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Gas Meter for consumption analysis</MudAlert>
+                }
+
+                @if (AppInitState.Value.CanUpdateLinearCoefficients)
+                {
+                    @if (AppInitState.Value.LinearCoefficientsInitializing)
+                    {
+                        <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Calculating weather/consumption relationship...</MudAlert>
+                        <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@Severity.Success" Elevation="2" Dense="@true">Weather/consumption relationship calculated</MudAlert>
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Heating Meter to see how weather changes affect your energy costs</MudAlert>
+                }
+            }
+
+        </MudCardContent>
+    </MudCard>
+
+
+</MudPaper>
+
+
+@code {
+
+    int _loadingProgress = 0;
+
+    [Inject]
+    private IState<AppInitState> AppInitState { get; set; }
+
+    [Inject]
+    IState<HouseholdState> HouseholdState { get; set; }
+
+    [Inject]
+    IState<WeatherState> WeatherState { get; set; }
+
+    [Inject]
+    IState<MeterSetupState> MeterSetupState { get; set; }
+
+    [Inject]
+    IState<GasReadingsState> GasReadingsState { get; set; }
+
+    [Inject]
+    IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+    // AppInitState.StateChanged += ((sender, args) => WorkItem());
+
+        AppInitState.StateChanged += async (sender, args) => { await InvokeAsync(WorkItem); };
+
+        SubscribeToAction<NotifyWeatherReadingsReadyAction>(action =>
+        {
+            Dispatcher.Dispatch(new InititateAppInitUpdateElectricityReadingsAction(MeterSetupState.Value[MeterType.Electricity].SetupValid)); 
+        });
+        
+        SubscribeToAction<NotifyElectricityStoreReady>  (action =>
+        {
+            Dispatcher.Dispatch(new InitiateAppInitUpdateGasReadingsAction(MeterSetupState.Value[MeterType.Gas].SetupValid));
+        });
+        
+        SubscribeToAction<NotifyGasStoreReady>  (action =>
+        {
+            Dispatcher.Dispatch(new InitiateAppInitUpdateLinearCoefficientsAction(MeterSetupState.Value[HouseholdState.Value.PrimaryHeatSource].SetupValid);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            Console.WriteLine(nameof(OnAfterRender));
+
+            Dispatcher.Dispatch(new InitializeAppAction());
+        }
+    }
+
+    private async Task WorkItem()
+    {
+        Console.WriteLine(DateTime.Now);
+        Console.WriteLine(AppInitState.Value);
+        await Task.Yield();
+        await Task.Delay(1);
+        StateHasChanged();
+        await Task.Delay(1);
+    }
+
+
+}

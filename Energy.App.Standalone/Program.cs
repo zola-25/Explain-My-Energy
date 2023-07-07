@@ -33,8 +33,6 @@ builder.Services.AddN3rgyServices();
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
 builder.Services.AddTransient<IEnergyReadingImporter, EnergyReadingImporter>();
 
-builder.Services.AddScoped<IAppInitialization, AppInitialization>();
-
 builder.Services.AddTransient<IForecastGenerator, ForecastGenerator>();
 builder.Services.AddTransient<IForecastCoefficientsCreator, ForecastCoefficientsCreator>();
 builder.Services.AddTransient<Co2ConversionFactors>();
@@ -60,7 +58,11 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
-builder.Services.AddBlazoredLocalStorage(config => config.JsonSerializerOptions.WriteIndented = false);
+builder.Services.AddBlazoredLocalStorage(config =>
+    {
+        config.JsonSerializerOptions.WriteIndented = false;
+    }
+);
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
 builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 
@@ -68,15 +70,17 @@ builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
-
-    Fluxor.DependencyInjection.FluxorOptions fluxorOptions = options.ScanAssemblies(currentAssembly);
-    fluxorOptions.UseReduxDevTools(options =>
+    options = options.ScanAssemblies(currentAssembly);
+    
+    // options.UseReduxDevTools(devToolsOptions =>
+    // {
+    //     devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
+    //     devToolsOptions.UseSystemTextJson();
+    //     //options.EnableStackTrace();
+    // });
+    options.UsePersist(persistMiddlewareOptions =>
     {
-        //options.EnableStackTrace();
-    });
-    fluxorOptions.UsePersist(options =>
-    {
-        options.UseInclusionApproach();
+        persistMiddlewareOptions.UseInclusionApproach();
     });
 });
 
