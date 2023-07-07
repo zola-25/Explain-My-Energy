@@ -28,22 +28,22 @@ namespace Energy.App.Standalone.Features.AppInit.Store
             _electricityReadingsState = electricityReadingsState;
         }
 
-        [EffectMethod]
-        public async Task HandleInitializeAppAction(InitializeAppAction action, IDispatcher dispatcher)
-        {
-            bool canUpdateWeatherData = _householdState.Value.Saved;
-            bool canUpdateElectricityData = _meterSetupState.Value.ElectricityMeter.SetupValid;
-            bool canUpdateGasData = _meterSetupState.Value.GasMeter.SetupValid;
-            bool canUpdateLinearCoefficients = _meterSetupState.Value[_householdState.Value.PrimaryHeatSource].
-                SetupValid;
-
-            dispatcher.Dispatch(new NotifyAppStartedAction());
-
-            dispatcher.Dispatch(new InitiateAppInitUpdateWeatherDataAction(canUpdateWeatherData));
-            dispatcher.Dispatch(new InititateAppInitUpdateElectricityReadingsAction(canUpdateElectricityData));
-            dispatcher.Dispatch(new InitiateAppInitUpdateGasReadingsAction(canUpdateGasData));
-            dispatcher.Dispatch(new InitiateAppInitUpdateLinearCoefficientsAction(canUpdateLinearCoefficients));
-        }
+        // [EffectMethod]
+        // public async Task HandleInitializeAppAction(InitializeAppAction action, IDispatcher dispatcher)
+        // {
+        //     bool canUpdateWeatherData = _householdState.Value.Saved;
+        //     bool canUpdateElectricityData = _meterSetupState.Value.ElectricityMeter.SetupValid;
+        //     bool canUpdateGasData = _meterSetupState.Value.GasMeter.SetupValid;
+        //     bool canUpdateLinearCoefficients = _meterSetupState.Value[_householdState.Value.PrimaryHeatSource].
+        //         SetupValid;
+        //
+        //     dispatcher.Dispatch(new NotifyAppStartedAction());
+        //
+        //     dispatcher.Dispatch(new InitiateAppInitUpdateWeatherDataAction(canUpdateWeatherData));
+        //     dispatcher.Dispatch(new InititateAppInitUpdateElectricityReadingsAction(canUpdateElectricityData));
+        //     dispatcher.Dispatch(new InitiateAppInitUpdateGasReadingsAction(canUpdateGasData));
+        //     dispatcher.Dispatch(new InitiateAppInitUpdateLinearCoefficientsAction(canUpdateLinearCoefficients));
+        // }
 
         [EffectMethod]
         public async Task HandleAppInitWeatherAction(InitiateAppInitUpdateWeatherDataAction action, IDispatcher dispatcher)

@@ -16,7 +16,7 @@
         {
             <MudTd colspan="4">Complete Household setup to import local weather data</MudTd>
         }
-        else if (WeatherState.Value.Loading)
+        else if (WeatherState.Value.Loading || WeatherState.Value.Updating)
         {
             <MudTd colspan="4">Loading Weather Data...</MudTd>
         }

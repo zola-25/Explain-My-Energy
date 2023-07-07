@@ -19,9 +19,9 @@
 
             @if (AppInitState.Value.AppStarted)
             {
-                @if (AppInitState.Value.CanUpdateWeatherData)
+                @if (CanUpdateWeatherData)
                 {
-                    @if (AppInitState.Value.WeatherDataInitializing)
+                    @if (WeatherDataLoading)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -36,9 +36,9 @@
                     <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Household for local Weather Data</MudAlert>
                 }
 
-                @if (AppInitState.Value.CanUpdateElectricityData)
+                @if (CanUpdateElectricityData)
                 {
-                    @if (AppInitState.Value.ElectricityDataInitializing)
+                    @if (ElectricityDataLoading)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading electricity data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -53,9 +53,9 @@
                     <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Electricity Meter for consumption analysis</MudAlert>
                 }
 
-                @if (AppInitState.Value.CanUpdateGasData)
+                @if (CanUpdateGasData)
                 {
-                    @if (AppInitState.Value.GasDataInitializing)
+                    @if (GasDataLoading)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading gas data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -70,9 +70,9 @@
                     <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Gas Meter for consumption analysis</MudAlert>
                 }
 
-                @if (AppInitState.Value.CanUpdateLinearCoefficients)
+                @if (CanUpdateLinearCoefficients)
                 {
-                    @if (AppInitState.Value.LinearCoefficientsInitializing)
+                    @if (LinearCoefficientsLoading)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Calculating weather/consumption relationship...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -117,29 +117,26 @@
     [Inject]
     IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 
+    [Inject]
+    IState<LinearCoefficientsState> LinearCoefficientsState { get; set; }
+
+    bool CanUpdateWeatherData => HouseholdState.Value.Saved;
+    bool CanUpdateElectricityData => MeterSetupState.Value.ElectricityMeter.SetupValid;
+    bool CanUpdateGasData => MeterSetupState.Value.GasMeter.SetupValid;
+
+    bool CanUpdateLinearCoefficients => MeterSetupState.Value[HouseholdState.Value.PrimaryHeatSource].
+        SetupValid;
+
+    bool WeatherDataLoading => WeatherState.Value.Loading || WeatherState.Value.Updating;
+    bool ElectricityDataLoading => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings || ElectricityReadingsState.Value.CalculatingCosts;
+    bool GasDataLoading => GasReadingsState.Value.Reloading || GasReadingsState.Value.Updating || GasReadingsState.Value.CalculatingCosts;
+
+    bool LinearCoefficientsLoading => !LinearCoefficientsState.Value.Saved;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-
-    // AppInitState.StateChanged += ((sender, args) => WorkItem());
-
-        AppInitState.StateChanged += async (sender, args) => { await InvokeAsync(WorkItem); };
-
-        SubscribeToAction<NotifyWeatherReadingsReadyAction>(action =>
-        {
-            Dispatcher.Dispatch(new InititateAppInitUpdateElectricityReadingsAction(MeterSetupState.Value[MeterType.Electricity].SetupValid)); 
-        });
-        
-        SubscribeToAction<NotifyElectricityStoreReady>  (action =>
-        {
-            Dispatcher.Dispatch(new InitiateAppInitUpdateGasReadingsAction(MeterSetupState.Value[MeterType.Gas].SetupValid));
-        });
-        
-        SubscribeToAction<NotifyGasStoreReady>  (action =>
-        {
-            Dispatcher.Dispatch(new InitiateAppInitUpdateLinearCoefficientsAction(MeterSetupState.Value[HouseholdState.Value.PrimaryHeatSource].SetupValid);
-        });
+        SubscribeToAction<InitializeAppAction>(_ => LoadAll());
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -153,6 +150,28 @@
         }
     }
 
+    private void LoadAll()
+    {
+        if (CanUpdateWeatherData)
+        {
+            InitializeWeather();
+        }
+
+        if (CanUpdateElectricityData)
+        {
+            InitializeElectricity();
+        }
+
+        if (CanUpdateGasData)
+        {
+            InitializeGas();
+        }
+        if (CanUpdateLinearCoefficients)
+        {
+            InitializeLinearCoefficients();
+        }
+    }
+
     private async Task WorkItem()
     {
         Console.WriteLine(DateTime.Now);
@@ -163,5 +182,69 @@
         await Task.Delay(1);
     }
 
+    private void InitializeWeather()
+    {
+        if (!WeatherState.Value.WeatherReadings.Any())
+        {
+            Dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(HouseholdState.Value.OutCodeCharacters));
+            return;
+        }
+
+        var latestReading = WeatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
+            UtcReadDate;
+        var latestHistoricalReading = WeatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
+            UtcReadDate;
+
+        if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
+        {
+            Dispatcher.Dispatch(new InitiateWeatherUpdateReadingsAction(HouseholdState.Value.OutCodeCharacters,
+                latestReading,
+                latestHistoricalReading));
+            return;
+        }
+    }
+
+    private void InitializeGas()
+    {
+        if (GasReadingsState.Value.BasicReadings.Any())
+        {
+            DateTime lastReading = GasReadingsState.Value.BasicReadings.Last().
+                UtcTime;
+            if (lastReading < DateTime.Today.AddDays(-1))
+            {
+                Dispatcher.Dispatch(new GasUpdateReadingsAction(lastReading.Date));
+            }
+        }
+        else
+        {
+            Dispatcher.Dispatch(new GasReloadReadingsAction());
+        }
+
+        Dispatcher.Dispatch(new GasInitiateCostCalculationsAction());
+    }
+
+    private void InitializeElectricity()
+    {
+        if (ElectricityReadingsState.Value.BasicReadings.Any())
+        {
+            DateTime lastReading = ElectricityReadingsState.Value.BasicReadings.Last().
+                UtcTime;
+            if (lastReading < DateTime.Today.AddDays(-1))
+            {
+                Dispatcher.Dispatch(new ElectricityUpdateReadingsAction(lastReading.Date));
+            }
+        }
+        else
+        {
+            Dispatcher.Dispatch(new ElectricityReloadReadingsAction());
+        }
+
+        Dispatcher.Dispatch(new ElectricityInitiateCostCalculationsAction());
+    }
+
+    private void InitializeLinearCoefficients()
+    {
+        Dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
+    }
 
 }

@@ -19,7 +19,7 @@ else
 {
     <MudItem xs="12" sm="6" md="4">
         <HistoricalAnalysisCard PrimaryHeatSource="true"
-                                Term="_meterAnalysisOptions.CalendarTerm"
+                                Term="_calenderTerm"
                                 MeterType="MeterType"
                                 Period="RelativePeriod.Previous"
                                 DurationAnalysis="_previousDurationAnalysis">
@@ -27,7 +27,7 @@ else
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <CurrentPeriodAnalysisCard PrimaryHeatSource="true"
-                                   Term="_meterAnalysisOptions.CalendarTerm"
+                                   Term="_calenderTerm"
                                    MeterType="MeterType"
                                    TotalsForecast="_currentTermForecastAnalysis"
                                    TotalsSoFar="_thisDurationAnalysis">
@@ -35,7 +35,7 @@ else
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <ForecastCard PrimaryHeatSource="true"
-                      Term="_meterAnalysisOptions.CalendarTerm"
+                      Term="_calenderTerm"
                       ForecastAnalysis="_nextTermForecastAnalysis"
                       MeterType="MeterType">
         </ForecastCard>
@@ -57,9 +57,11 @@ else
     IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
 
 
-    MeterAnalysisOptions _meterAnalysisOptions => AnalysisOptionsState.Value[MeterType];
+    MeterAnalysisOptions InitialMeterAnalysisOptions => AnalysisOptionsState.Value[MeterType];
 
-
+    CalendarTerm _calenderTerm;
+    decimal _degreeDifference;
+    
     public string Status { get; set; }
     public bool Ready { get; set; }
     public double Progress { get; set; }
@@ -76,45 +78,68 @@ else
     {
         Ready = false;
 
+        await Task.Delay(1);
         Progress = 30;
         Status = "Analysing Historical";
-        _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
+        
+        _calenderTerm = InitialMeterAnalysisOptions.CalendarTerm;
+        _degreeDifference = InitialMeterAnalysisOptions.DegreeDifference;
+        await Task.Delay(1);
 
-        await Task.Run(() =>
-        {
-            _thisDurationAnalysis = HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _meterAnalysisOptions.CalendarTerm);
-            _previousDurationAnalysis = HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _meterAnalysisOptions.CalendarTerm);
-        });
+        SetHistoricalAnalyses();
+
         Progress = 60;
 
         Status = "Analysing Forecast";
 
-        await Task.Run(() =>
-        {
-            SetForecastAnalyses(_meterAnalysisOptions.DegreeDifference);
-        });
+        await Task.Delay(1);
+
 
         Progress = 80;
 
         switch (MeterType)
         {
             case MeterType.Electricity:
-                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(c => SetForecastAnalyses(c.DegreeDifference));
+                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(action =>
+                {
+                    _degreeDifference = action.DegreeDifference;
+                    SetForecastAnalyses();
+                });
+                SubscribeToAction<ElectricityAnalysisOptionsSetCalenderTermAction>(
+                    action => _calenderTerm = action.CalendarTerm);
+                    SetForecastAnalyses();
                 break;
             case MeterType.Gas:
-                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>(c => SetForecastAnalyses(c.DegreeDifference));
+                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>(action =>
+                {
+                    _degreeDifference = action.DegreeDifference;
+                    SetForecastAnalyses();
+                });
+                SubscribeToAction<GasAnalysisOptionsSetCalenderTermAction>(
+                    action => _calenderTerm = action.CalendarTerm);
+                    SetForecastAnalyses();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
 
         }
+        
+        await Task.Delay(1);
+
+        SetForecastAnalyses();
 
         Ready = true;
     }
-
-    void SetForecastAnalyses(decimal degreeDifference)
+    
+    void SetHistoricalAnalyses()
     {
-        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _meterAnalysisOptions.CalendarTerm, degreeDifference);
-        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _meterAnalysisOptions.CalendarTerm, degreeDifference);
+        _thisDurationAnalysis = HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calenderTerm);
+        _previousDurationAnalysis = HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calenderTerm);
+    }
+    
+    void SetForecastAnalyses()
+    {
+        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
+        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
     }
 }
