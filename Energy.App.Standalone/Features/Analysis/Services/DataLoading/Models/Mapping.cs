@@ -15,6 +15,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
                 DateTicks = costedReading.UtcTime.eToUnixTime(),
                 HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingChargePence,
                 TariffAppliesFrom = costedReading.TariffAppliesFrom,
+                TariffType = String.Empty,
                 IsForecast = costedReading.Forecast
             };
         }

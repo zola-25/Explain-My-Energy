@@ -222,11 +222,8 @@ export namespace Charts {
         public setChart(divId: string, meterChartProfile: MeterChartProfile, temperatureIconPoints: TemperatureIconPoint[]): void {
 
             console.log("setChart called");
-            debugger;
-        }
-        
-        public setChart2(divId: string, meterChartProfile: MeterChartProfile, temperatureIconPoints: TemperatureIconPoint[]): void {
-            // Create root element
+
+             // Create root element
             let root = am5.Root.new(divId);
             // Set themes
             root.setThemes([
@@ -505,7 +502,7 @@ export namespace Charts {
 
             costSeries.data.setAll(meterChartProfile.chartReadings);
             consumptionSeries.data.setAll(meterChartProfile.chartReadings);
-            iconSeries.data.setAll(temperatureIconPoints);
+            //iconSeries.data.setAll(temperatureIconPoints);
 
             costSeries.hideTooltip();
 

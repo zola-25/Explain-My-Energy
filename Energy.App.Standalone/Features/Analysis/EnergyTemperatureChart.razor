@@ -21,17 +21,17 @@
 
     [Inject]
     IState<MeterSetupState> MeterSetupState { get; set; }
-    
+
     [Inject]
     IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
-    
+
     [Inject]
     IState<GasReadingsState> GasReadingsState { get; set; }
 
-    
+
     [Inject]
     IState<WeatherState> WeatherState { get; set; }
-    
+
     [Inject]
     IState<HeatingForecastState> HeatingForecastState { get; set; }
 
@@ -75,7 +75,7 @@
                 MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings.Select(Mapping.MapToChartReading).
                     ToList(),
                 _ => throw new ArgumentOutOfRangeException()
-                };
+            };
 
             var latestReading = chartReadings.Last().DateTicks;
 
@@ -86,13 +86,12 @@
                     DateTicks = c.UtcTime.Ticks,
                     TemperatureCelsius = c.TemperatureAverage,
                     TemperatureCelsiusUnmodified = c.TemperatureAverage,
-                    Summary = c.Summary ?? string.Empty
-                        
+                    Summary = c.Summary ?? string.Empty,
+
                 }).ToList();
-            
-            var meterChartData = new MeterChartData()
-            {
-                MeterChartProfile = new MeterChartProfile()
+
+
+            var meterChartProfile = new MeterChartProfile()
                 {
                     GlobalId = MeterGlobalId,
                     LatestReading = latestReading,
@@ -100,12 +99,10 @@
                     ProfileStart = chartReadings.First().DateTicks,
                     ProfileEnd = latestReading,
                     ChartReadings = chartReadings,
-                },
-                TemperatureIconPoints = temperatureIconPoints
-            };
+                };
             
 
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterChartData, temperatureIconPoints);
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterChartProfile, temperatureIconPoints);
             _chartRendered = true;
         }
     }

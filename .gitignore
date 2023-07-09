@@ -412,3 +412,4 @@ FodyWeavers.xsd
 *.sln.iml
 /.editorconfig
 /.vscode
+/Energy.App.Standalone/JS/package-lock.json
