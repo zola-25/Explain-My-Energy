@@ -5,17 +5,30 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 {
     public class TermDateRanges : ITermDateRanges
     {
+        public TermDateRanges(DateTime today)
+        {
+            Today = DateTime.SpecifyKind(today, DateTimeKind.Utc);
+        }
+
+        public TermDateRanges()
+        {
+            Today = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
+        }
+
+        public DateTime Today { get; set; }
+
         public (DateTime start, DateTime end) GetPreviousPeriodDates(CalendarTerm duration)
         {
-            DateTime end = GetCurrentPeriodStartingDate(duration);
+            DateTime end = GetCurrentPeriodStartingDate(duration).AddDays(-1);
             DateTime start = duration switch
             {
-                CalendarTerm.Week => end.AddDays(-7),
-                CalendarTerm.Day => end.AddDays(-1),
-                CalendarTerm.Month => end.AddMonths(-1),
+                CalendarTerm.Week => end.AddDays(-6),
+                CalendarTerm.Day => end,
+                CalendarTerm.Month => new DateTime(end.Year, end.Month, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
-
+            
+            end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
             return (start, end);
         }
 
@@ -24,9 +37,9 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
             DateTime start = GetCurrentPeriodStartingDate(duration);
             DateTime end = duration switch
             {
-                CalendarTerm.Week => start.AddDays(7),
-                CalendarTerm.Month => start.AddMonths(1),
-                CalendarTerm.Day => start.AddDays(1),
+                CalendarTerm.Week => start.AddDays(6),
+                CalendarTerm.Month => start.AddMonths(1).AddDays(-1),
+                CalendarTerm.Day => start,
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
             return (start, end);
@@ -44,17 +57,17 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
             DateTime start = duration switch
             {
                 CalendarTerm.Week => GetThisWeeksStartingDate(),
-                CalendarTerm.Month => new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1),
-                CalendarTerm.Day => DateTime.Today,
+                CalendarTerm.Day => Today,
+                CalendarTerm.Month => new DateTime(Today.Year, Today.Month, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
-
-            return start;
+            
+            return DateTime.SpecifyKind(start, DateTimeKind.Utc);
         }
 
         private DateTime GetThisWeeksStartingDate(DayOfWeek startOfWeek = DayOfWeek.Monday)
         {
-            DateTime start = DateTime.Today;
+            DateTime start = Today;
             while (start.DayOfWeek != startOfWeek)
             {
                 start = start.AddDays(-1).Date;
@@ -64,31 +77,33 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 
         private DateTime GetNextPeriodStartingDate(CalendarTerm duration)
         {
-            DateTime today = DateTime.Today;
+            DateTime today = Today;
             DateTime start = duration switch
             {
                 CalendarTerm.Week => GetNextWeekStartingDate(),
-                CalendarTerm.Day => DateTime.Today.AddDays(1),
+                CalendarTerm.Day => today.AddDays(1),
                 CalendarTerm.Month => new DateTime(today.Year, today.Month + 1, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
 
-            return start;
+            return DateTime.SpecifyKind(start, DateTimeKind.Utc);
         }
 
         private DateTime GetNextPeriodEndDate(CalendarTerm duration, DateTime start)
         {
-            return duration switch
+            var end = duration switch
             {
-                CalendarTerm.Week => start.AddDays(7).Date,
-                CalendarTerm.Day => start.AddDays(1).Date,
-                CalendarTerm.Month => start.AddMonths(1),
+                CalendarTerm.Week => start.AddDays(6),
+                CalendarTerm.Day => start,
+                CalendarTerm.Month => start.AddMonths(1).AddDays(-1),
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
+            
+            return DateTime.SpecifyKind(end, DateTimeKind.Utc);
         }
         private DateTime GetNextWeekStartingDate(DayOfWeek startOfWeek = DayOfWeek.Monday)
         {
-            DateTime start = DateTime.Today.AddDays(1).Date;
+            DateTime start = Today.AddDays(1).Date;
             while (start.DayOfWeek != startOfWeek)
             {
                 start = start.AddDays(1).Date;

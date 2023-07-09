@@ -6,13 +6,11 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 {
     public class ForecastGenerator : IForecastGenerator
     {
-        public ImmutableList<BasicReading> GetBasicReadingsForecast(DateTime start,
-                                                                   DateTime end,
-                                                                   decimal degreeDifference,
-                                                                   LinearCoefficientsState linearCoefficientsState,
-                                                                   ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        public List<BasicReading> GetBasicReadingsForecast(decimal degreeDifference,
+            LinearCoefficientsState linearCoefficientsState,
+            List<DailyWeatherReading> forecastWeatherReadings)
         {
-            var adjustedReadings = dailyWeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
+            var adjustedReadings = forecastWeatherReadings
                 .SelectMany(c => {
                     decimal adjustedKWh = linearCoefficientsState.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
                     adjustedKWh = adjustedKWh < 0 ? 0 : adjustedKWh;
@@ -22,7 +20,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                             UtcTime = c.UtcReadDate.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
                             KWh = adjustedKWh / 48
                         });
-                    }).ToImmutableList();
+                    }).ToList();
 
             return adjustedReadings;
 

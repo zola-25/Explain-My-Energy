@@ -29,50 +29,59 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
     }
 
     public HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType, 
-        CalendarTerm duration)
+        CalendarTerm term)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
+        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
 
-        return GetHistoricalAnalysis(meterType, start, end);
+        return GetHistoricalAnalysis(meterType, start, end, term);
     }
 
     public HistoricalAnalysis GetPreviousDurationAnalysis(MeterType meterType, 
-        CalendarTerm duration)
+        CalendarTerm term)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetPreviousPeriodDates(duration);
+        (DateTime start, DateTime end) = _periodDateRanges.GetPreviousPeriodDates(term);
 
-        return GetHistoricalAnalysis(meterType, start, end);
+        return GetHistoricalAnalysis(meterType, start, end, term);
     }
 
     private HistoricalAnalysis GetHistoricalAnalysis(MeterType meterType, 
-        DateTime start, DateTime end)
+        DateTime start, DateTime end, CalendarTerm term)
     {
-        var costedReadings = meterType == MeterType.Electricity ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings;
+        var costedReadings = (meterType == MeterType.Electricity 
+            ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings).ToList();
         var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
             .ToList();
 
-        var durationData = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime <= end);
+        var historicalCosts = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime < end.AddDays(1));
 
         decimal co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
 
-        bool hasData = durationData.Count > 0;
-
+        bool hasData = historicalCosts.Count > 0;
+        
+        var totalKWh = historicalCosts.Sum(c => c.KWh);
+        var totalCost = historicalCosts.Sum(c => c.ReadingTotalCostPence) / 100m;
+        var totalCo2 = totalKWh * co2ConversionFactor;
+        
+        var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
+        var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
+        var totalCo2Rounded = totalCo2.Round(2);
+    
         if (hasData)
         {
             return new HistoricalAnalysis()
             {
                 HasData = true,
                 Start = start,
-                End = end.AddDays(-1),
-                LatestReading = durationData.Last().UtcTime.Date,
-                PeriodCo2 = (durationData.Sum(c => c.KWh) * co2ConversionFactor).Round(1),
-                PeriodConsumptionKWh = durationData.Sum(c => c.KWh).Round(0),
-                PeriodCostPounds = (durationData.Sum(c => c.ReadingTotalCostPence) / 100m).Round(2),
+                End = end,
+                LatestReading = historicalCosts.Last().UtcTime.Date,
+                PeriodCo2 = totalCo2Rounded,
+                PeriodConsumptionKWh = totalKWhRounded,
+                PeriodCostPounds = totalCostRounded,
                 TemperatureRange = weatherReadings.Any() ? new TemperatureRange()
                 {
-                    LowDailyTemp = Convert.ToInt32(weatherReadings.Min(c => c.TemperatureAverage)),
-                    HighDailyTemp = Convert.ToInt32(weatherReadings.Max(c => c.TemperatureAverage)),
-                    AverageTemp = Convert.ToInt32(weatherReadings.Average(c => c.TemperatureAverage))
+                    LowDailyTemp = weatherReadings.Min(c => c.TemperatureAverage).Round(0).ToInt(),
+                    HighDailyTemp = weatherReadings.Max(c => c.TemperatureAverage).Round(0).ToInt(),
+                    AverageTemp = weatherReadings.Average(c => c.TemperatureAverage).Round(0).ToInt()
                 } : new TemperatureRange()
             };
         }

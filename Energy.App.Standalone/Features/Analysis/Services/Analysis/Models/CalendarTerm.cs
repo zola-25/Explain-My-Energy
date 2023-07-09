@@ -11,7 +11,6 @@
     {
         Current,
         Previous,
-        Historical,
         Next
     }
 }

@@ -240,7 +240,7 @@ namespace Energy.Test
                                                           decimal periodStandingChargePence,
                                                           decimal totalCostForPeriodPence,
                                                           int numExpectedReadings,
-                                                          ImmutableList<CostedReading> calculatedCostedReadings)
+                                                          List<CostedReading> calculatedCostedReadings)
         {
             var calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
             var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.ReadingTotalCostPence);

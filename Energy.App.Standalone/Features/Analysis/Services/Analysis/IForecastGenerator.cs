@@ -6,6 +6,6 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 {
     public interface IForecastGenerator
     {
-        ImmutableList<BasicReading> GetBasicReadingsForecast(DateTime start, DateTime end, decimal degreeDifference, LinearCoefficientsState linearCoefficientsState, ImmutableList<DailyWeatherReading> dailyWeatherReadings);
+        List<BasicReading> GetBasicReadingsForecast(decimal degreeDifference, LinearCoefficientsState linearCoefficientsState, List<DailyWeatherReading> forecastWeatherReadings);
     }
 }

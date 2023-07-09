@@ -8,7 +8,6 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using MathNet.Numerics;
 using Fluxor;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.App.Standalone.Features.Setup.Store;
 using Newtonsoft.Json;
@@ -23,8 +22,6 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     private readonly ITermDateRanges _periodDateRanges;
     private readonly IForecastGenerator _forecastGenerator;
     private readonly ICostCalculator _costCalculator;
-    IState<GasReadingsState> _gasReadingsState;
-    IState<ElectricityReadingsState> _electricityReadingsState;
     IState<WeatherState> _weatherState;
     IState<LinearCoefficientsState> _linearCoefficientsState;
 
@@ -37,8 +34,6 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         ITermDateRanges periodDateRanges,
         IForecastGenerator forecastGenerator,
         ICostCalculator costCalculator,
-        IState<GasReadingsState> gasReadingsState,
-        IState<ElectricityReadingsState> electricityReadingsState,
         IState<WeatherState> weatherState,
         IState<LinearCoefficientsState> linearCoefficientsState,
         IState<GasTariffsState> gasTariffsState,
@@ -48,8 +43,6 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         _periodDateRanges = periodDateRanges;
         _forecastGenerator = forecastGenerator;
         _costCalculator = costCalculator;
-        _gasReadingsState = gasReadingsState;
-        _electricityReadingsState = electricityReadingsState;
         _weatherState = weatherState;
         _linearCoefficientsState = linearCoefficientsState;
         _gasTariffsState = gasTariffsState;
@@ -57,34 +50,36 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     }
 
     public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
-        CalendarTerm duration,
+        CalendarTerm term,
         decimal degreeDifference)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(duration);
+        (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(term);
 
-        ForecastAnalysis results = ForecastAnalysis
+        var results = ForecastAnalysis
         (
             meterType,
             degreeDifference,
             start,
-            end
+            end,
+            term
         );
 
         return results;
     }
 
     public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
-        CalendarTerm duration,
+        CalendarTerm term,
         decimal degreeDifference)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
+        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
 
-        ForecastAnalysis results = ForecastAnalysis
+        var results = ForecastAnalysis
         (
             meterType,
             degreeDifference,
             start,
-            end
+            end,
+            term
         );
 
         return results;
@@ -95,20 +90,19 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         MeterType meterType,
         decimal degreeDifference,
         DateTime start,
-        DateTime end)
+        DateTime end,
+        CalendarTerm term)
     {
-        var periodWeatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).
-            ToImmutableList();
+        var periodWeatherReadings = _weatherState.Value.WeatherReadings
+            .Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).
+            ToList();
 
         var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast
         (
-            start,
-            end,
             degreeDifference,
             _linearCoefficientsState.Value,
             periodWeatherReadings
         );
-        
         
         ImmutableList<TariffDetailState> tariffDetailStates;
         switch (meterType)
@@ -123,19 +117,24 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
                 throw new NotImplementedException();
         }
 
-        var forecastCostedReadings = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
+        var forecastCosts = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
 
-        decimal forecastConsumption = forecastCostedReadings.Sum(c => c.KWh);
+        var totalKWh = forecastCosts.Sum(c => c.KWh);
+        var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPence) / 100m;
+        var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
+        
+        var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
+        var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
+        var totalCo2Rounded = totalCo2.Round(1);
 
-
-        ForecastAnalysis results = new ForecastAnalysis()
+        var results = new ForecastAnalysis()
         {
             NumberOfDays = periodWeatherReadings.Count,
             Start = start,
             End = end,
-            ForecastConsumption = forecastConsumption.Round(0),
-            ForecastCostPounds = (forecastCostedReadings.Sum(c => c.ReadingTotalCostPence) / 100m).Round(2),
-            ForecastCo2 = (forecastConsumption * _co2Conversion.GetCo2ConversionFactor(meterType)).Round(1),
+            ForecastConsumption = totalKWhRounded,
+            ForecastCostPounds = totalCostRounded,
+            ForecastCo2 = totalCo2Rounded,
             TemperatureRange = new TemperatureRange()
             {
                 LowDailyTemp = Convert.ToInt32(periodWeatherReadings.Min(c => c.TemperatureAverage)),

@@ -254,14 +254,12 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Store
         [EffectMethod]
         public async Task CalculateCosts(GasInitiateCostCalculationsAction initiateCostCalculationsAction, IDispatcher dispatcher)
         {
-            ImmutableList<CostedReading> costedReadings;
             try
             {
-                costedReadings =
-                    await Task.Run
-                    (
-                        () => _energyCostCalculator.GetCostReadings(_gasReadingsState.Value.BasicReadings, _gasTariffsState.Value.TariffDetails)
-                    );
+                var costedReadings = await Task.Run
+                (
+                    () => _energyCostCalculator.GetCostReadings(_gasReadingsState.Value.BasicReadings.ToList(), _gasTariffsState.Value.TariffDetails).ToImmutableList()
+                );
 
                 dispatcher.Dispatch(new GasStoreCostedReadingsAction(costedReadings));
                 dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());

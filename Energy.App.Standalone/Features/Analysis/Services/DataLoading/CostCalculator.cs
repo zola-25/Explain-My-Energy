@@ -12,9 +12,9 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
     public class CostCalculator : ICostCalculator
     {
-        public ImmutableList<CostedReading> GetCostReadings(
-            ImmutableList<BasicReading> basicReadings,
-            ImmutableList<TariffDetailState> meterTariffState)
+        public List<CostedReading> GetCostReadings(
+            IReadOnlyCollection<BasicReading> basicReadings,
+            IEnumerable<TariffDetailState> meterTariffState)
         {
             var allTariffsOrderedArray = meterTariffState.OrderBy(c => c.DateAppliesFrom).ToArray();
 
@@ -30,20 +30,20 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
             for (int i = 0; i < allTariffsOrderedArray.Length; i++)
             {
                 var currentTariff = allTariffsOrderedArray[i];
-                ImmutableList<BasicReading> tariffReadings;
+                List<BasicReading> tariffReadings;
 
                 if (i == allTariffsOrderedArray.Length - 1)
                 {
 
-                    tariffReadings = basicReadings.FindAll(
-                       c => c.UtcTime >= currentTariff.DateAppliesFrom);
+                    tariffReadings = basicReadings.Where(
+                       c => c.UtcTime >= currentTariff.DateAppliesFrom).ToList();
 
                 }
                 else
                 {
                     var nextTariff = allTariffsOrderedArray[i + 1];
-                    tariffReadings = basicReadings.FindAll(
-                       c => c.UtcTime >= currentTariff.DateAppliesFrom && c.UtcTime < nextTariff.DateAppliesFrom);
+                    tariffReadings = basicReadings.Where(
+                       c => c.UtcTime >= currentTariff.DateAppliesFrom && c.UtcTime < nextTariff.DateAppliesFrom).ToList();
 
                 }
 
@@ -52,14 +52,14 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                     continue;
                 }
 
-                List<HalfHourOfDayPrice> halfHourOfDayPrices = new();
+                IEnumerable<HalfHourOfDayPrice> halfHourOfDayPrices;
                 if (currentTariff.IsHourOfDayFixed)
                 {
-                    halfHourOfDayPrices = CreateUniformHalfHourOfDayPrices(currentTariff.PencePerKWh).ToList();
+                    halfHourOfDayPrices = CreateUniformHalfHourOfDayPrices(currentTariff.PencePerKWh);
                 }
                 else
                 {
-                    halfHourOfDayPrices = currentTariff.HourOfDayPrices.SelectMany(ToHalfHourly).ToList();
+                    halfHourOfDayPrices = currentTariff.HourOfDayPrices.SelectMany(ToHalfHourly);
                 }
                 decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
@@ -81,7 +81,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 costedReadings.AddRange(calculatedReadings);
             }
 
-            return costedReadings.ToImmutableList();
+            return costedReadings;
 
         }
 

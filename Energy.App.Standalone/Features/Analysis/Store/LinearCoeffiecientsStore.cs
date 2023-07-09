@@ -23,7 +23,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         public decimal PredictConsumptionY(decimal xTemperature)
         {
-            return Gradient * xTemperature + C;
+            return (Gradient * xTemperature) + C;
         }
 
 
