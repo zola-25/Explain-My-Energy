@@ -131,6 +131,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             
             dispatcher.Dispatch(new UpdateLinearCoefficientsAction(linearCoefficients.Gradient, linearCoefficients.C));
             dispatcher.Dispatch(new NotifyLinearCoefficientsReadyAction());
+            dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference: 0));
         }
 
         [EffectMethod]

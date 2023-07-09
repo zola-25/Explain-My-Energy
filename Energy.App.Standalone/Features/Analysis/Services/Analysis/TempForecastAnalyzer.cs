@@ -20,35 +20,17 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
-    private readonly IForecastGenerator _forecastGenerator;
-    private readonly ICostCalculator _costCalculator;
-    IState<WeatherState> _weatherState;
-    IState<LinearCoefficientsState> _linearCoefficientsState;
-
-    IState<ElectricityTariffsState> _electricityTariffsState;
-
-    IState<GasTariffsState> _gasTariffsState;
-
+    private readonly IState<HeatingForecastState> _heatingForecastState;
 
     public TempForecastAnalyzer(Co2ConversionFactors co2Conversion,
         ITermDateRanges periodDateRanges,
-        IForecastGenerator forecastGenerator,
-        ICostCalculator costCalculator,
-        IState<WeatherState> weatherState,
-        IState<LinearCoefficientsState> linearCoefficientsState,
-        IState<GasTariffsState> gasTariffsState,
-        IState<ElectricityTariffsState> electricityTariffsState)
+        IState<HeatingForecastState> heatingForecastState)
     {
         _co2Conversion = co2Conversion;
         _periodDateRanges = periodDateRanges;
-        _forecastGenerator = forecastGenerator;
-        _costCalculator = costCalculator;
-        _weatherState = weatherState;
-        _linearCoefficientsState = linearCoefficientsState;
-        _gasTariffsState = gasTariffsState;
-        _electricityTariffsState = electricityTariffsState;
+        _heatingForecastState = heatingForecastState;
     }
-
+    
     public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
         CalendarTerm term,
         decimal degreeDifference)
@@ -93,31 +75,12 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
         DateTime end,
         CalendarTerm term)
     {
-        var periodWeatherReadings = _weatherState.Value.WeatherReadings
-            .Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end).
+        var periodWeatherReadings = _heatingForecastState.Value.ForecastWeatherReadings
+            .Where(c => c.UtcTime >= start && c.UtcTime <= end).
             ToList();
 
-        var forecastBasicReadings = _forecastGenerator.GetBasicReadingsForecast
-        (
-            degreeDifference,
-            _linearCoefficientsState.Value,
-            periodWeatherReadings
-        );
-        
-        ImmutableList<TariffDetailState> tariffDetailStates;
-        switch (meterType)
-        {
-            case MeterType.Electricity:
-                tariffDetailStates = _electricityTariffsState.Value.TariffDetails;
-                break;
-            case MeterType.Gas:
-                tariffDetailStates = _gasTariffsState.Value.TariffDetails;
-                break;
-            default:
-                throw new NotImplementedException();
-        }
-
-        var forecastCosts = _costCalculator.GetCostReadings(forecastBasicReadings, tariffDetailStates);
+        var forecastCosts = _heatingForecastState.Value.ForecastDailyCosts
+            .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
 
         var totalKWh = forecastCosts.Sum(c => c.KWh);
         var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPence) / 100m;
@@ -137,9 +100,9 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
             ForecastCo2 = totalCo2Rounded,
             TemperatureRange = new TemperatureRange()
             {
-                LowDailyTemp = Convert.ToInt32(periodWeatherReadings.Min(c => c.TemperatureAverage)),
-                HighDailyTemp = Convert.ToInt32(periodWeatherReadings.Max(c => c.TemperatureAverage)),
-                AverageTemp = Convert.ToInt32(periodWeatherReadings.Average(c => c.TemperatureAverage))
+                LowDailyTemp = Convert.ToInt32(periodWeatherReadings.Min(c => c.TemperatureCelsius)),
+                HighDailyTemp = Convert.ToInt32(periodWeatherReadings.Max(c => c.TemperatureCelsius)),
+                AverageTemp = Convert.ToInt32(periodWeatherReadings.Average(c => c.TemperatureCelsius))
             }
         };
         return results;

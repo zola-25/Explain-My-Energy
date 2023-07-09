@@ -16,7 +16,7 @@ class ForecastCoefficientsCreator : IForecastCoefficientsCreator
                 (from er in basicReadings
                  group new { Readings = er } by er.UtcTime.Date
                     into daily
-                 join wr in dailyWeatherReadings on daily.Key equals wr.UtcReadDate
+                 join wr in dailyWeatherReadings on daily.Key equals wr.UtcTime
                  select new DailyConsumptionPoint
                  {
                      Date = daily.Key,

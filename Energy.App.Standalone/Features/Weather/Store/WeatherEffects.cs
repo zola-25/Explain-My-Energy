@@ -26,7 +26,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
         [EffectMethod]
         public async Task UpdateReadingsFromApi(InitiateWeatherUpdateReadingsAction action, IDispatcher dispatcher)
         {
-            var forecasts = (await _weatherDataService.GetForOutCode(action.OutCode, action.LatestHistorical, action.LatestReading)).OrderBy(c => c.UtcReadDate).ToList();
+            var forecasts = (await _weatherDataService.GetForOutCode(action.OutCode, action.LatestHistorical, action.LatestReading)).OrderBy(c => c.UtcTime).ToList();
             dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(forecasts));
         }
 

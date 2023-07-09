@@ -191,9 +191,9 @@
         }
 
         var latestReading = WeatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-            UtcReadDate;
+            UtcTime;
         var latestHistoricalReading = WeatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-            UtcReadDate;
+            UtcTime;
 
         if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
         {

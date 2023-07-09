@@ -21,12 +21,12 @@ namespace Energy.App.Standalone.Features.Weather.Store
         [ReducerMethod]
         public static WeatherState OnStoreUpdatedReadingsReducer(WeatherState state, StoreWeatherUpdatedReadingsAction action)
         {
-            var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcReadDate;
+            var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
             return state with
             {
                 Updating = false,
                 WeatherReadings = state.WeatherReadings
-                    .RemoveAll(c => c.UtcReadDate >= firstUpdateDate)
+                    .RemoveAll(c => c.UtcTime >= firstUpdateDate)
                     .AddRange(action.UpdatedWeatherReadings),
             };
         }

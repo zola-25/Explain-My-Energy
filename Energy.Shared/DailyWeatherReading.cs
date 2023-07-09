@@ -4,7 +4,7 @@
     {
         public string OutCode { get; set; }
 
-        public DateTime UtcReadDate { get; set; }
+        public DateTime UtcTime { get; set; }
         public string Summary { get; set; }
         public string Icon { get; set; }
 

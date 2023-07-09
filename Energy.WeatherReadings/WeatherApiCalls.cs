@@ -91,7 +91,7 @@ namespace Energy.WeatherReadings
                 {
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        UtcReadDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
+                        UtcTime = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         ApparentTemperatureMin = apparent_temperature_min[i],
@@ -181,7 +181,7 @@ namespace Energy.WeatherReadings
                     DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        UtcReadDate = readDate,
+                        UtcTime = readDate,
                         Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
                         ApparentTemperatureMin = apparent_temperature_min[i],
                         ApparentTemperatureMax = apparent_temperature_max[i],
@@ -259,7 +259,7 @@ namespace Energy.WeatherReadings
                     DateTime readDate = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime;
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
-                        UtcReadDate = readDate,
+                        UtcTime = readDate,
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         TemperatureMin = temperature_2m_min[i],
                         TemperatureMax = temperature_2m_max[i],

@@ -1,7 +1,7 @@
-﻿@*@inherits FluxorComponent
-@implements IAsyncDisposable
-@inject IState<MeterSetupState> MeterSetupState
-@inject IDispatcher Dispatcher
+﻿@inherits FluxorComponent     
+@using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
+@using Energy.App.Standalone.Features.EnergyReadings.Store
+@implements IAsyncDisposable     
 @inject IJSRuntime JsRuntime
 
 @if (_ready)
@@ -17,24 +17,49 @@
     public MeterType MeterType { get; set; }
 
     [Inject]
-    AnalysisOptions AnalysisOptions { get; set; }
+    IState<AnalysisOptionsState> AnalysisOptions { get; set; }
 
     [Inject]
-    ForecastState ForecastState { get; set; }
-
+    IState<MeterSetupState> MeterSetupState { get; set; }
+    
     [Inject]
-    MeterDataState MeterDataState { get; set; }
+    IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+    
+    [Inject]
+    IState<GasReadingsState> GasReadingsState { get; set; }
+
+    
+    [Inject]
+    IState<WeatherState> WeatherState { get; set; }
+    
+    [Inject]
+    IState<HeatingForecastState> HeatingForecastState { get; set; }
+
+    bool _chartRendered;
 
     private bool _ready;
     private Guid MeterGlobalId => MeterSetupState.Value[MeterType].GlobalId;
 
     protected override void OnParametersSet()
     {
-        AnalysisOptions[MeterType].NotifySetHighlightRange += OnHighlightRange;
-        AnalysisOptions[MeterType].NotifyRemoveHighlightRange += OnRemoveHighlightRange;
+        switch (MeterType)
+        {
+            case MeterType.Electricity:
+                SubscribeToAction<ElectricityAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
+                SubscribeToAction<ElectricityAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
+                SubscribeToAction<ElectricityAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
+                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
+                break;
+            case MeterType.Gas:
+                SubscribeToAction<GasAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
+                SubscribeToAction<GasAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
+                SubscribeToAction<GasAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
+                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>((a) => OnDegreeDifferenceHandler(a.DegreeDifference));
+                break;
 
-        AnalysisOptions[MeterType].NotifyToggleCostChange += OnToggledChanged;
-        ForecastState.NotifyDegreeDifferenceChange += OnDegreeDifferenceChange;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
         _ready = true;
     }
 
@@ -43,30 +68,71 @@
     {
         if (firstRender)
         {
-            var meterData = MeterDataState.GetMeterChartData(MeterType);
+            List<ChartReading> chartReadings = MeterType switch
+            {
+                MeterType.Gas => GasReadingsState.Value.CostedReadings.Select(Mapping.MapToChartReading).
+                    ToList(),
+                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings.Select(Mapping.MapToChartReading).
+                    ToList(),
+                _ => throw new ArgumentOutOfRangeException()
+                };
 
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterData.MeterChartProfile, meterData.TemperatureIconPoints);
-            await AnalysisOptions[MeterType].SetChartRendered(true);
+            var latestReading = chartReadings.Last().DateTicks;
+
+            var temperatureIconPoints = WeatherState.Value.WeatherReadings
+                .Where(c => c.UtcTime.Ticks > latestReading)
+                .Select(c => new TemperatureIconPoint()
+                {
+                    DateTicks = c.UtcTime.Ticks,
+                    TemperatureCelsius = c.TemperatureAverage,
+                    TemperatureCelsiusUnmodified = c.TemperatureAverage,
+                    Summary = c.Summary ?? string.Empty
+                        
+                }).ToList();
+            
+            var meterChartData = new MeterChartData()
+            {
+                MeterChartProfile = new MeterChartProfile()
+                {
+                    GlobalId = MeterGlobalId,
+                    LatestReading = latestReading,
+                    MostRecentWeekStart = latestReading,
+                    ProfileStart = chartReadings.First().DateTicks,
+                    ProfileEnd = latestReading,
+                    ChartReadings = chartReadings,
+                },
+                TemperatureIconPoints = temperatureIconPoints
+            };
+            
+
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterChartData, temperatureIconPoints);
+            _chartRendered = true;
         }
     }
 
-    private async Task OnHighlightRange(DateTime start, DateTime end)
+    private async void OnHighlightRangeHandler(DateTime start, DateTime end)
     {
-        if (!AnalysisOptions[MeterType].ChartRendered)
+        if (!_chartRendered)
         {
             return;
         }
 
         long startTicks = start.eToUnixTime();
-        long endTicks = end.AddDays(1).AddMilliseconds(-1).eToUnixTime();
+        long endTicks = end.AddDays(1).
+            AddMilliseconds(-1).
+            eToUnixTime();
 
 
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.highlightRange", $"profile-chart-meter-{MeterGlobalId}", startTicks, endTicks);
+        await JsRuntime.InvokeVoidAsync(
+            "ChartFunctions.highlightRange", 
+            $"profile-chart-meter-{MeterGlobalId}", 
+            startTicks, 
+            endTicks);
     }
 
-    private async Task OnRemoveHighlightRange()
+    private async void OnRemoveHighlightRangeHandler()
     {
-        if (!AnalysisOptions[MeterType].ChartRendered)
+        if (!_chartRendered)
         {
             return;
         }
@@ -74,43 +140,37 @@
         await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
     }
 
-    private async Task OnDegreeDifferenceChange(MeterType meterType, double degreeDifference)
+    private async void OnDegreeDifferenceHandler(decimal degreeDifference)
     {
-        if (meterType != MeterType)
+        if (MeterType.Electricity != MeterType)
         {
             return;
         }
 
-        if (!AnalysisOptions[MeterType].ChartRendered)
+        if (!_chartRendered)
         {
             return;
         }
 
-        var latestReading = MeterDataState.GetLatestReading(meterType);
-        var forecastCosts = ForecastState.GetTempDiffForecast(meterType);
-
-        var chartReadings = forecastCosts.Where(c => c.LocalTime > latestReading).Select(Mapping.MapToChartReading).ToList();
-
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries", $"profile-chart-meter-{MeterGlobalId}", chartReadings, degreeDifference);
+        // var chartReadings = forecastCosts.Where(c => c.LocalTime > latestReading).
+        //     Select(Mapping.MapToChartReading).
+        //     ToList();
+        //
+        // await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries", $"profile-chart-meter-{MeterGlobalId}", chartReadings, degreeDifference);
     }
 
-    
-
-    public async ValueTask DisposeAsync()
+    private async void OnToggledCostChangedHandler(bool showCost)
     {
-        AnalysisOptions[MeterType].NotifySetHighlightRange -= OnHighlightRange;
-        AnalysisOptions[MeterType].NotifyToggleCostChange -= OnToggledChanged;
-        ForecastState.NotifyDegreeDifferenceChange -= OnDegreeDifferenceChange;
-
-        await AnalysisOptions[MeterType].SetChartRendered(false);
-
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
-    }
-
-
-    private async Task OnToggledChanged(bool showCost)
-    {
+        if (!_chartRendered)
+        {
+            return;
+        }
         await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
     }
 
-}*@
+    public async ValueTask DisposeAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
+    }
+
+}

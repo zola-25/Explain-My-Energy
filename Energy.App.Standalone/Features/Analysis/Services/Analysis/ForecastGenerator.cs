@@ -17,7 +17,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                     return Enumerable.Range(0, 48).Select(i => new BasicReading
                         {
                             Forecast = true,
-                            UtcTime = c.UtcReadDate.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
+                            UtcTime = c.UtcTime.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
                             KWh = adjustedKWh / 48
                         });
                     }).ToList();

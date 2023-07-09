@@ -3,9 +3,9 @@
 
 public class TemperaturePoint
 {
-    public double TemperatureCelsiusUnmodified { get; set; }
-    public double TemperatureCelsius { get; set; }
-    public DateTime ReadDate { get; set; }
+    public decimal TemperatureCelsiusUnmodified { get; set; }
+    public decimal TemperatureCelsius { get; set; }
+    public DateTime UtcTime { get; set; }
     public long DateTicks { get; set; }
     public bool IsForecast { get; set; }
     public string Summary { get; set; }
@@ -13,8 +13,8 @@ public class TemperaturePoint
 
 public class TemperatureIconPoint
 {
-    public double TemperatureCelsiusUnmodified { get; set; }
-    public double TemperatureCelsius { get; set; }
+    public decimal TemperatureCelsiusUnmodified { get; set; }
+    public decimal TemperatureCelsius { get; set; }
     public long DateTicks { get; set; }
     public string Summary { get; set; }
 }

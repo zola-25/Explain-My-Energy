@@ -84,33 +84,7 @@ else
     [Inject]
     IState<GasReadingsState> GasReadingsState { get; set; }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        switch (MeterType)
-        {
-            case MeterType.Electricity:
-            {
-                if (ElectricityReadingsState.Value.CostedReadings.Count
-                    == 0)
-                {
-                    AppInit.InitializeElectricity();
-                }
-                break;
-            }
-            case MeterType.Gas:
-            {
-                if (GasReadingsState.Value.CostedReadings.Count
-                    == 0)
-                {
-                    AppInit.InitializeGas();
-                }
-                break;
-            }
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
+    
 
     protected override async Task OnParametersSetAsync()
     {
@@ -138,11 +112,7 @@ else
         switch (MeterType)
         {
             case MeterType.Electricity:
-                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(action =>
-                {
-                    _degreeDifference = action.DegreeDifference;
-                    SetForecastAnalyses();
-                });
+                
                 SubscribeToAction<ElectricityAnalysisOptionsSetCalenderTermAction>(
                     action =>
                     {
@@ -168,6 +138,12 @@ else
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        
+        SubscribeToAction<NotifyHeatingForecastReadyAction>(action =>
+        {
+            _degreeDifference = action.DegreeDifference;
+            SetForecastAnalyses();
+        });
 
         await Task.Delay(1);
 

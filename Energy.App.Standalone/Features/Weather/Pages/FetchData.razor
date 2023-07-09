@@ -45,7 +45,7 @@ else
             @foreach (var weatherReading in WeatherState.Value.WeatherReadings)
             {
                 <tr>
-                    <td>@weatherReading.UtcReadDate.ToShortDateString()</td>
+                    <td>@weatherReading.UtcTime.ToShortDateString()</td>
                     <td>@weatherReading.TemperatureAverage</td>
                     <td>@weatherReading.TemperatureMin</td>
                     <td>@weatherReading.TemperatureMax</td>

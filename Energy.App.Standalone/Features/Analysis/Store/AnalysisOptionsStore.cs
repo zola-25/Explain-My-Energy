@@ -398,6 +398,32 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         }
     }
 
+    public class AnalysisOptionsEffects
+    {
+        private readonly IState<HouseholdState> _householdState;
+
+        public AnalysisOptionsEffects(IState<HouseholdState> householdState)
+        {
+            _householdState = householdState;
+        }
+
+        [EffectMethod]
+        public async Task OnElectricitySetDegreeDifferenceAction(ElectricityAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
+        {
+            if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity) {
+                dispatcher.Dispatch(new LoadHeatingForecastAction(action.DegreeDifference));
+            }
+        }
+        
+        [EffectMethod]
+        public async Task OnGasSetDegreeDifferenceAction(GasAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
+        {
+            if (_householdState.Value.PrimaryHeatSource == MeterType.Gas) {
+                dispatcher.Dispatch(new LoadHeatingForecastAction(action.DegreeDifference));
+            }
+        }
+    }
+
 
     public interface IAnalysisOptionsAction { }
 

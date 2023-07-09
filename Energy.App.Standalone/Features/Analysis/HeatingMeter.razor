@@ -1,27 +1,50 @@
 ﻿@page "/HeatingMeter/{MeterTypeName}"
+@using System.Runtime.InteropServices
+@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit
+@using Energy.App.Standalone.Features.EnergyReadings.Store
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-<MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="true">
-    <EnergyChart>
-        @*<EnergyTemperatureChart MeterGlobalId="_meterGlobalId" MeterType="_meterType"></EnergyTemperatureChart>*@
-    </EnergyChart>
-    <Summary>
-        <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
-    </Summary>
+@if (_ready)
+{
+    <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="true">
+        <EnergyChart>
+            <EnergyTemperatureChart MeterType="_meterType"></EnergyTemperatureChart>
+        </EnergyChart>
+        <Summary>
+            <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
+        </Summary>
 
-</MeterAnalysisTemplate>
-
+    </MeterAnalysisTemplate>
+}
 @code {
 
-    [Parameter] public string MeterTypeName { get; set; }
+    [Parameter]
+    public string MeterTypeName { get; set; }
+
+    [Inject]
+    public AppInit AppInit { get; set; }
 
     MeterType _meterType;
+    
+    bool _ready = false;
+    [Inject]
+    IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+
+    [Inject]
+    IState<GasReadingsState> GasReadingsState { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         _meterType = MeterTypeName.eStringToEnum<MeterType>();
+        
+        SubscribeToAction<NotifyHeatingForecastReadyAction>(_ =>
+        {
+            _ready = true;
+        });
+        AppInit.Initialize();
     }
+
 }
 

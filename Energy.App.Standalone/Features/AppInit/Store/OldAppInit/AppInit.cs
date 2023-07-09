@@ -147,9 +147,9 @@ namespace Energy.App.Standalone.Features.AppInit.Store.OldAppInit
             }
 
             var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-                UtcReadDate;
+                UtcTime;
             var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-                UtcReadDate;
+                UtcTime;
 
             if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
             {

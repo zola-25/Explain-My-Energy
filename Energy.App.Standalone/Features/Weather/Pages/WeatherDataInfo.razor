@@ -22,13 +22,13 @@
         }
         else if (WeatherState.Value.WeatherReadings.Any())
         {
-            <MudTd DataLabel="Historical">From @WeatherState.Value.WeatherReadings.First().UtcReadDate.eToString("dnn MMM yyyy", true)</MudTd>
+            <MudTd DataLabel="Historical">From @WeatherState.Value.WeatherReadings.First().UtcTime.eToString("dnn MMM yyyy", true)</MudTd>
             <MudTd DataLabel="Latest">
                 @{
                     var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).
-                        OrderBy(c => c.UtcReadDate).
+                        OrderBy(c => c.UtcTime).
                         Last().
-                        UtcReadDate;
+                        UtcTime;
                 }
 
                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
@@ -49,18 +49,18 @@
             <MudTd DataLabel="Short-term">
                 @{
                     var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).
-                        OrderBy(c => c.UtcReadDate).
+                        OrderBy(c => c.UtcTime).
                         ToList();
                 }
-                @forecastReadings.First().UtcReadDate.eDateToMinimal() - @forecastReadings.Last().UtcReadDate.eDateToMinimal()
+                @forecastReadings.First().UtcTime.eDateToMinimal() - @forecastReadings.Last().UtcTime.eDateToMinimal()
             </MudTd>
             <MudTd DataLabel="Long-term">
                 @{
                     var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).
-                        OrderBy(c => c.UtcReadDate).
+                        OrderBy(c => c.UtcTime).
                         ToList();
                 }
-                @climateReadings.First().UtcReadDate.eDateToMinimal() - @climateReadings.Last().UtcReadDate.eDateToMinimal()
+                @climateReadings.First().UtcTime.eDateToMinimal() - @climateReadings.Last().UtcTime.eDateToMinimal()
 
             </MudTd>
         }

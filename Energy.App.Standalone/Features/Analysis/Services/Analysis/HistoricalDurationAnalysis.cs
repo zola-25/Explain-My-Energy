@@ -49,7 +49,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
     {
         var costedReadings = (meterType == MeterType.Electricity 
             ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings).ToList();
-        var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcReadDate >= start && c.UtcReadDate <= end)
+        var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcTime >= start && c.UtcTime <= end)
             .ToList();
 
         var historicalCosts = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime < end.AddDays(1));

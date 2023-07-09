@@ -1,0 +1,91 @@
+﻿@* @inject IJSRuntime JsRuntime *@
+@* @using MathNet.Numerics *@
+@* @implements IAsyncDisposable *@
+@* *@
+@* @if (_ready) *@
+@* { *@
+@*     <div id="profile-chart-meter-@MeterGlobalId" style="width: 100%; height: 500px; max-width: 100%"> *@
+@*     </div> *@
+@* } *@
+@* *@
+@* @code { *@
+@* *@
+@*     [Parameter, EditorRequired] *@
+@*     public Guid MeterGlobalId { get; set; } *@
+@* *@
+@*     [Parameter, EditorRequired] *@
+@*     public MeterType MeterType { get; set; } *@
+@* *@
+@*     [Inject] *@
+@*     AnalysisOptions AnalysisOptions { get; set; } *@
+@* *@
+@*     [Inject] *@
+@*     MeterDataState MeterDataState { get; set; } *@
+@* *@
+@*     private bool _ready; *@
+@* *@
+@*     protected override void OnParametersSet() *@
+@*     { *@
+@*         AnalysisOptions[MeterType].NotifySetHighlightRange += OnHighlightRange; *@
+@*         AnalysisOptions[MeterType].NotifyRemoveHighlightRange += OnRemoveHighlightRange; *@
+@* *@
+@*         AnalysisOptions[MeterType].NotifyToggleCostChange += OnToggledChanged; *@
+@*         _ready = true; *@
+@*     } *@
+@* *@
+@* *@
+@*     protected override async Task OnAfterRenderAsync(bool firstRender) *@
+@*     { *@
+@*         if (firstRender) *@
+@*         { *@
+@*             var meterData = MeterDataState.GetMeterChartData(MeterType); *@
+@* *@
+@*             await JsRuntime.InvokeVoidAsync("ChartFunctions.setChartNoTemperature", $"profile-chart-meter-{MeterGlobalId}", meterData.MeterChartProfile); *@
+@*             await AnalysisOptions[MeterType].SetChartRendered(true); *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private async Task OnHighlightRange(DateTime start, DateTime end) *@
+@*     { *@
+@*         if (!AnalysisOptions[MeterType].ChartRendered) *@
+@*         { *@
+@*             return; *@
+@*         } *@
+@* *@
+@*         long startTicks = start.eToUnixTime(); *@
+@*         long endTicks = end.AddDays(1).AddMilliseconds(-1).eToUnixTime(); *@
+@* *@
+@* *@
+@*         await JsRuntime.InvokeVoidAsync("ChartFunctions.highlightRange", $"profile-chart-meter-{MeterGlobalId}", startTicks, endTicks); *@
+@*     } *@
+@* *@
+@*     private async Task OnRemoveHighlightRange() *@
+@*     { *@
+@*         if (!AnalysisOptions[MeterType].ChartRendered) *@
+@*         { *@
+@*             return; *@
+@*         } *@
+@* *@
+@*         await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}"); *@
+@*     } *@
+@* *@
+@* *@
+@*     public async ValueTask DisposeAsync() *@
+@*     { *@
+@*         AnalysisOptions[MeterType].NotifySetHighlightRange -= OnHighlightRange; *@
+@*         AnalysisOptions[MeterType].NotifyRemoveHighlightRange -= OnRemoveHighlightRange; *@
+@* *@
+@*         AnalysisOptions[MeterType].NotifyToggleCostChange -= OnToggledChanged; *@
+@* *@
+@*         await AnalysisOptions[MeterType].SetChartRendered(false); *@
+@* *@
+@*         await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}"); *@
+@*     } *@
+@* *@
+@* *@
+@*     private async Task OnToggledChanged(bool showCost) *@
+@*     { *@
+@*         await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost); *@
+@*     } *@
+@* *@
+@* } *@
