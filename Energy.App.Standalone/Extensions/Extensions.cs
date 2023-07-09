@@ -28,6 +28,11 @@ public static class Extensions
         return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
     }
 
+    public static long eToUnixTicksNoOffset(this DateTime dateTime)
+    {
+        return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();
+    }
+
 
     public static List<HourOfDayPriceState> eMapToHourOfDayPriceState(this IEnumerable<DefaultHourOfDayPrice> hourOfDayPriceStates)
     {

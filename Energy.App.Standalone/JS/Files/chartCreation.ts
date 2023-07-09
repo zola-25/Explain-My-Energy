@@ -12,7 +12,8 @@ export namespace Charts {
         chart: am5xy.XYChart,
         start: number,
         end: number,
-        latestReading: number
+        latestReading: number,
+        oneMonthInTheFuture: number
     }
 
     class ChartFunctions {
@@ -210,7 +211,8 @@ export namespace Charts {
                 chart: chart,
                 start: meterChartProfile.profileStart,
                 end: meterChartProfile.profileEnd,
-                latestReading: meterChartProfile.latestReading
+                latestReading: meterChartProfile.latestReading,
+                oneMonthInTheFuture: meterChartProfile.oneMonthInTheFuture,
             };
 
             //xAxis.zoomToDates(new Date(meterProfile.mostRecentWeekStart), new Date(meterProfile.profileEnd));
@@ -255,11 +257,15 @@ export namespace Charts {
                 tooltip: am5.Tooltip.new(root, {})
             }));
 
+            let yConsumptionAxisRenderer = am5xy.AxisRendererY.new(root, {
+            })
+            yConsumptionAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
+
             let yConsumptionAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
                 ariaLabel: "kWh",
-                renderer: am5xy.AxisRendererY.new(root, {})
+                renderer: yConsumptionAxisRenderer,
+                visible: !meterChartProfile.showCost
             }));
-
             yConsumptionAxis.children.unshift(
                 am5.Label.new(root, {
                     rotation: -90,
@@ -282,7 +288,8 @@ export namespace Charts {
                 tooltip: am5.Tooltip.new(root, {
                     labelText: "{valueY.formatNumber('#.#')}kWh",
                 }),
-                fill: ChartFunctions.consumptionColor
+                fill: ChartFunctions.consumptionColor,
+                visible: !meterChartProfile.showCost
             }));
 
             consumptionSeries.strokes.template.setAll({
@@ -308,13 +315,13 @@ export namespace Charts {
 
             let yCostAxisRenderer = am5xy.AxisRendererY.new(root, {
             })
-            yCostAxisRenderer.grid.template.set("forceHidden", true);
+            yCostAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
 
             let yCostAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
                 ariaLabel: "Pounds",
                 numberFormat: "'£'#",
                 maxPrecision: 0,
-                visible: false,
+                visible: meterChartProfile.showCost,
                 renderer: yCostAxisRenderer
             }));
 
@@ -339,7 +346,7 @@ export namespace Charts {
                     labelText: "£{valueY.formatNumber('#,###.00')}",
                     forceHidden: true
                 }),
-                visible: false,
+                visible: meterChartProfile.showCost,
                 fill: ChartFunctions.costFill
             }));
 
@@ -502,19 +509,26 @@ export namespace Charts {
 
             costSeries.data.setAll(meterChartProfile.chartReadings);
             consumptionSeries.data.setAll(meterChartProfile.chartReadings);
-            //iconSeries.data.setAll(temperatureIconPoints);
+            iconSeries.data.setAll(temperatureIconPoints);
 
-            costSeries.hideTooltip();
-
+            if (meterChartProfile.showCost) {
+                costSeries.showTooltip();
+                consumptionSeries.hideTooltip();
+            } else {
+                costSeries.hideTooltip();
+                consumptionSeries.showTooltip();
+            }
+            
             this.activeCharts[divId] = {
                 chart: chart,
                 start: meterChartProfile.profileStart,
                 end: meterChartProfile.profileEnd,
-                latestReading: meterChartProfile.latestReading
+                latestReading: meterChartProfile.latestReading,
+                oneMonthInTheFuture: meterChartProfile.oneMonthInTheFuture,
             };
 
-            //xAxis.zoomToDates(new Date(meterProfile.mostRecentWeekStart), new Date(meterProfile.profileEnd));
-            //xTempAxis.zoomToDates(new Date(meterProfile.mostRecentWeekStart), new Date(meterProfile.profileEnd));
+            xAxis.zoomToDates(new Date(meterChartProfile.profileStart), new Date(meterChartProfile.oneMonthInTheFuture));
+            xTempAxis.zoomToDates(new Date(meterChartProfile.profileStart), new Date(meterChartProfile.oneMonthInTheFuture));
 
         }
 
@@ -587,7 +601,10 @@ export namespace Charts {
         public removeHighlight(divId: string): void {
             const chart = this.activeCharts[divId].chart
             const latestReading = this.activeCharts[divId].latestReading
+            const profileStart = this.activeCharts[divId].start
             const profileEnd = this.activeCharts[divId].end
+            const oneMonthForward = this.activeCharts[divId].oneMonthInTheFuture
+
 
             const consumptionSeries = chart.series.getIndex(0) as am5xy.LineSeries
             const costSeries = chart.series.getIndex(1) as am5xy.LineSeries
@@ -603,6 +620,12 @@ export namespace Charts {
             if (costSeries.axisRanges.hasIndex(1)) {
                 costSeries.axisRanges.removeIndex(1)
             }
+
+            xAxis.zoomToDates(new Date(profileStart), new Date(oneMonthForward));
+            const xTempAxis = chart.xAxes.hasIndex(1) ? (chart.xAxes.getIndex(1) as am5xy.DateAxis<am5xy.AxisRendererX>) : null;
+
+            xTempAxis.zoomToDates(new Date(profileStart), new Date(oneMonthForward));
+
         }
 
         public highlightRange(divId: string, highlightStart: number, highlightEnd: number): void {

@@ -12,7 +12,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
                 KWh = costedReading.KWh,
                 PencePerKWh = costedReading.TariffHalfHourlyPencePerKWh,
                 DailyStandingCharge = costedReading.TariffDailyStandingChargePence,
-                DateTicks = costedReading.UtcTime.eToUnixTime(),
+                DateTicks = costedReading.UtcTime.eToUnixTicksNoOffset(),
                 HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingChargePence,
                 TariffAppliesFrom = costedReading.TariffAppliesFrom,
                 TariffType = String.Empty,

@@ -27,8 +27,9 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                 CalendarTerm.Month => new DateTime(end.Year, end.Month, 1),
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
+
+            start = DateTime.SpecifyKind(start, DateTimeKind.Utc);
             
-            end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
             return (start, end);
         }
 
@@ -42,6 +43,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                 CalendarTerm.Day => start,
                 _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
             };
+
+            end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
             return (start, end);
         }
 

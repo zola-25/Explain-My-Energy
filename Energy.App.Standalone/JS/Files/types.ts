@@ -20,10 +20,12 @@ export interface ChartReading {
 
 
 export interface MeterChartProfile {
+    showCost: boolean,
     globalId: string,
     profileStart: number,
     profileEnd: number,
     mostRecentWeekStart: number,
+    oneMonthInTheFuture: number,
     latestReading: number,
     chartReadings: ChartReading[]
 }
