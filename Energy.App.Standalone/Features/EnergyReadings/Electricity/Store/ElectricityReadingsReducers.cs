@@ -72,7 +72,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
         {
             return state with
             {
-                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CostedReadings = ImmutableList<CstR>.Empty,
                 UpdatingReadings = false,
                 CalculationError = false,
                 LastUpdated = DateTime.MinValue
@@ -88,7 +88,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
         {
             return state with
             {
-                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CostedReadings = ImmutableList<CstR>.Empty,
                 UpdatingReadings = false,
                 ReloadingReadings = false,
                 CalculationError = true,

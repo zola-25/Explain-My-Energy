@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Fluxor.Persist.Storage;
-using LZStringCSharp;
 
 namespace Energy.App.Standalone.FluxorPersist
 {
@@ -16,23 +15,12 @@ namespace Energy.App.Standalone.FluxorPersist
 
         public async ValueTask<string> GetStateJsonAsync(string statename)
         {
-            var compressed = await LocalStorage.GetItemAsStringAsync(statename);
-            if (compressed == null)
-            {
-                return null;
-            }
-            return LZString.DecompressFromUTF16(compressed);
+            return await LocalStorage.GetItemAsStringAsync(statename);
         }
 
         public async ValueTask StoreStateJsonAsync(string statename, string json)
         {
-            if(json == null)
-            {
-                await LocalStorage.RemoveItemAsync(statename);
-                return;
-            }
-            var compressed = LZString.CompressToUTF16(json);
-            await LocalStorage.SetItemAsStringAsync(statename, compressed);
+            await LocalStorage.SetItemAsStringAsync(statename, json);
         }
     }
 }

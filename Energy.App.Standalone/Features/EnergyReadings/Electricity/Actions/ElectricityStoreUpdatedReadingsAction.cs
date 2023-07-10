@@ -5,9 +5,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
 {
     public class ElectricityStoreUpdatedReadingsAction
     {
-        public ImmutableList<CostedReading> NewCostedReadings { get; }
+        public ImmutableList<CstR> NewCostedReadings { get; }
 
-        public ElectricityStoreUpdatedReadingsAction(ImmutableList<CostedReading> newCostedReadings)
+        public ElectricityStoreUpdatedReadingsAction(ImmutableList<CstR> newCostedReadings)
         {
             NewCostedReadings = newCostedReadings;
         }

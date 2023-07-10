@@ -1,6 +1,6 @@
 ﻿namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
 {
-    public record CostedReading
+    public record CstR
     {
         public DateTime TApFrom { get; init; }
         public decimal TDStndP { get; init; }

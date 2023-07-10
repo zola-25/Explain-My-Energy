@@ -44,7 +44,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
             try
             {
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new GasStoreReloadedReadingsAction(costedReadings));
+                dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings.ToImmutableList(), costedReadings));
                 dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
                 dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Gas));
                 dispatcher.Dispatch(new NotifyGasStoreReady());
@@ -69,7 +69,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
                 List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
 
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(costedReadings));
+                dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings.ToImmutableList(), costedReadings));
                 dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
                 dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Gas));
 
@@ -95,7 +95,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
             return Task.CompletedTask;
         }
 
-        private async Task<ImmutableList<CostedReading>> CalculateCostedReadings(List<BasicReading> basicReadings)
+        private async Task<ImmutableList<CstR>> CalculateCostedReadings(List<BasicReading> basicReadings)
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,

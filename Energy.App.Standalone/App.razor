@@ -29,7 +29,6 @@
         SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
             Console.WriteLine($"**** State rehydrated ****");
-            StateHasChanged();
             AppInit.Initialize();
         });
         

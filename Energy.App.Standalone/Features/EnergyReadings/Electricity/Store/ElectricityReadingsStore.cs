@@ -19,7 +19,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 
         public DateTime LastUpdated { get; init; }
 
-        public ImmutableList<CostedReading> CostedReadings { get; init; }
+        public ImmutableList<CstR> CostedReadings { get; init; }
 
         [property: JsonIgnore]
         public bool CalculationError { get; init; }
@@ -39,7 +39,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
                 ReloadingReadings = false,
                 UpdatingReadings = false,
                 CalculationError = false,
-                CostedReadings = ImmutableList<CostedReading>.Empty
+                CostedReadings = ImmutableList<CstR>.Empty
             };
         }
     }

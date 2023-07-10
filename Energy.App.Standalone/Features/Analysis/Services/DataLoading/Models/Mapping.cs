@@ -4,7 +4,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
 {
     public static class Mapping
     {
-        public static ChartReading MapToChartReading(CostedReading costedReading)
+        public static ChartReading MapToChartReading(CstR costedReading)
         {
             return new ChartReading()
             {

@@ -13,6 +13,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         {
             return state with
             {
+                BasicReadings = action.BasicReadings,
                 CostedReadings = action.CostedReadings,
                 ReloadingReadings = false,
                 UpdatingReadings = false,
@@ -71,10 +72,13 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         {
             return state with
             {
-                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CostedReadings = ImmutableList<CstR>.Empty,
+                BasicReadings = ImmutableList<BasicReading>.Empty,
                 ReloadingReadings = false,
                 UpdatingReadings = false,
-                LastUpdated = DateTime.MinValue
+                LastUpdated = DateTime.MinValue,
+                CalculationError = false
+
             };
         }
 
@@ -85,7 +89,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         {
             return state with
             {
-                CostedReadings = ImmutableList<CostedReading>.Empty,
+                CostedReadings = ImmutableList<CstR>.Empty,
                 ReloadingReadings = false,
                 UpdatingReadings = false,
                 CalculationError = true,

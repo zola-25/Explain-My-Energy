@@ -87,7 +87,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
             return Task.CompletedTask;
 
         }
-        private async Task<ImmutableList<CostedReading>> CalculateCostedReadings(List<BasicReading> basicReadings)
+        private async Task<ImmutableList<CstR>> CalculateCostedReadings(List<BasicReading> basicReadings)
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,

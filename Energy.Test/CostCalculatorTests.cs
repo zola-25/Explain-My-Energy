@@ -99,7 +99,7 @@ namespace Energy.Test
 
             var halfHourlyPriceTariffLookup = tariffs.Single(c => !c.IsHourOfDayFixed).HourOfDayPrices.SelectMany(ToHalfHourly).ToDictionary(c => c.HourOfDay.Value);
 
-            Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
+            Assert.All<CstR>(calculatedCostedReadings, (costReading) =>
             {
                 var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TApFrom);
                 Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TDStndP);
@@ -202,7 +202,7 @@ namespace Energy.Test
                 c => c.ComparingRecordsByMembers().WithStrictOrdering()
             );
 
-            Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
+            Assert.All<CstR>(calculatedCostedReadings, (costReading) =>
             {
                 var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TApFrom);
 
@@ -240,7 +240,7 @@ namespace Energy.Test
                                                           decimal periodStandingChargePence,
                                                           decimal totalCostForPeriodPence,
                                                           int numExpectedReadings,
-                                                          List<CostedReading> calculatedCostedReadings)
+                                                          List<CstR> calculatedCostedReadings)
         {
             var calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
             var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.CostP);
@@ -251,7 +251,7 @@ namespace Energy.Test
 
             Assert.Equal(numExpectedReadings, calculatedCostedReadings.Count);
 
-            Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
+            Assert.All<CstR>(calculatedCostedReadings, (costReading) =>
             {
                 Assert.Equal(applicableTariff.DateAppliesFrom, costReading.TApFrom);
                 Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TDStndP);

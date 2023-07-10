@@ -12,7 +12,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
     public class CostCalculator : ICostCalculator
     {
-        public List<CostedReading> GetCostReadings(
+        public List<CstR> GetCostReadings(
             IReadOnlyCollection<BasicReading> basicReadings,
             IEnumerable<TariffDetailState> meterTariffState)
         {
@@ -26,7 +26,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
             }
 
             //List<(TariffDetailState TariffDetailState, ImmutableList<BasicReading> BasicReadings)> tariffsForReadings = new();
-            List<CostedReading> costedReadings = new();
+            List<CstR> costedReadings = new();
             for (int i = 0; i < allTariffsOrderedArray.Length; i++)
             {
                 var currentTariff = allTariffsOrderedArray[i];
@@ -63,10 +63,10 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 }
                 decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
-                IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
+                IEnumerable<CstR> calculatedReadings = from basicReading in tariffReadings
                                                                 join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.TimeOfDay
                                                                     equals halfHourlyPrice.HourOfDay
-                                                                select new CostedReading()
+                                                                select new CstR()
                                                                 {
                                                                     TApFrom = currentTariff.DateAppliesFrom.Value,
                                                                     TDStndP = currentTariff.DailyStandingChargePence,
