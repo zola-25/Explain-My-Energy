@@ -7,15 +7,23 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
     public class GasStoreUpdatedReadingsAction
     {
         public ImmutableList<BasicReading> BasicReadings { get; }
-        public ImmutableList<CstR> NewCostedReadings { get; }
 
-        public GasStoreUpdatedReadingsAction(ImmutableList<BasicReading> basicReadings, ImmutableList<CstR> newReadings)
+        public GasStoreUpdatedReadingsAction(ImmutableList<BasicReading> basicReadings)
         {
             BasicReadings = basicReadings;
-            NewCostedReadings = newReadings;
         }
 
 
+    }
+
+    public class GasStoreUpdatedCostsAction
+    {
+        public ImmutableList<CostedReading> NewCostedReadings { get; }
+
+        public GasStoreUpdatedCostsAction(ImmutableList<CostedReading> newReadings)
+        {
+            NewCostedReadings = newReadings;
+        }
     }
 
 }

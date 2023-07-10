@@ -15,17 +15,19 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using System.Text.Json.Serialization;
+using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 
-namespace Energy.App.Standalone.Features.Analysis.Store
+namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 {
     [PersistState]
     public record HeatingForecastState
     {
-        
-        [property: JsonIgnore] 
+
+        [property: JsonIgnore]
         public ImmutableList<DailyCostedReading> ForecastDailyCosts { get; init; }
 
-        [property: JsonIgnore] 
+        [property: JsonIgnore]
         public ImmutableList<TemperaturePoint> ForecastWeatherReadings { get; init; }
 
         public DateTime CoefficientsLastUpdate { get; init; }
@@ -42,7 +44,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         public decimal PredictConsumptionY(decimal xTemperature)
         {
-            return (Gradient * xTemperature) + C;
+            return Gradient * xTemperature + C;
         }
 
 
@@ -80,24 +82,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 ForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
                 ForecastWeatherReadings = ImmutableList<TemperaturePoint>.Empty
             };
-        }
-    }
-
-    public class InitiateForecastCoefficientsUpdateAction
-    { }
-
-    public class NotifyLinearCoefficientsReadyAction
-    { }
-
-    public class StoreLinearCoefficientsStateAction
-    {
-        public decimal Gradient { get; }
-        public decimal C { get; }
-
-        public StoreLinearCoefficientsStateAction(decimal gradient, decimal c)
-        {
-            Gradient = gradient;
-            C = c;
         }
     }
 
@@ -172,7 +156,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         [EffectMethod]
 
-        public async Task HandleInitiateUpdateLinearCoeffiecientsAction(InitiateForecastCoefficientsUpdateAction action, IDispatcher dispatcher)
+        public async Task HandleInitiateUpdateLinearCoeffiecientsAction(InitiateCoefficientsAndLoadForecastAction action, IDispatcher dispatcher)
         {
             IEnumerable<BasicReading> basicReadings;
             var heatingMeter = _householdState.Value.PrimaryHeatSource;
@@ -181,7 +165,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 case MeterType.Gas:
                     basicReadings = _gasReadingsState.Value.CostedReadings.Select(c => new BasicReading
                     {
-                        Forecast = c.Fcst,
+                        Forecast = c.IsForecast,
                         KWh = c.KWh,
                         UtcTime = c.UtcTime
                     });
@@ -189,7 +173,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 default:
                     basicReadings = _electricityReadingsState.Value.CostedReadings.Select(c => new BasicReading
                     {
-                        Forecast = c.Fcst,
+                        Forecast = c.IsForecast,
                         KWh = c.KWh,
                         UtcTime = c.UtcTime
                     });
@@ -199,16 +183,19 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             var linearCoefficients = _forecastCoefficientsCreator
                 .GetForecastCoefficients(basicReadings, _weatherState.Value.WeatherReadings);
 
-            var savedDegreeDifference = _analysisOptionsState.Value[heatingMeter].DegreeDifference;
+            
 
             dispatcher.Dispatch(new StoreLinearCoefficientsStateAction(linearCoefficients.Gradient, linearCoefficients.C));
-            dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference: savedDegreeDifference));
+            dispatcher.Dispatch(new LoadHeatingForecastAction(_analysisOptionsState?.Value[heatingMeter]?.DegreeDifference ?? 0));
         }
 
         [EffectMethod]
         public async Task HandleLoadHeatingForecastAction(LoadHeatingForecastAction action, IDispatcher dispatcher)
         {
-            var tariffs = _householdState.Value.PrimaryHeatSource == MeterType.Electricity
+            var heatingMeter = _householdState.Value.PrimaryHeatSource;
+            decimal degreeDifference = action.DegreeDifference;
+
+            var tariffs = heatingMeter == MeterType.Electricity
                 ? _electricityTariffsState.Value.TariffDetails
                 : _gasTariffsState.Value.TariffDetails;
 
@@ -219,7 +206,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                 ).
                 ToList();
             var basicReadingsForecast = _forecastGenerator.GetBasicReadingsForecast
-                (action.DegreeDifference, _heatingForecastState.Value, recentWeatherReadings);
+                (degreeDifference, _heatingForecastState.Value, recentWeatherReadings);
 
             var costedReadingsForecast = _costCalculator.GetCostReadings(basicReadingsForecast, tariffs);
             var dailyAggregatedCostedReadings = costedReadingsForecast.GroupBy(c => c.UtcTime.Date).
@@ -228,14 +215,14 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                     c => new DailyCostedReading()
                     {
                         UtcTime = c.Key,
-                        ReadingTotalCostPence = c.Sum(d => d.CostP).Round(2),
+                        ReadingTotalCostPence = c.Sum(d => d.CostPence).Round(2),
                         TariffAppliesFrom = c.First().
-                            TApFrom,
+                            TarrifAppliesFrom,
                         TariffDailyStandingChargePence = c.First().
-                            TDStndP,
-                        PencePerKWh = c.Average(d => d.TPpKWh).Round(2),
+                            TariffDailyStandingCharge,
+                        PencePerKWh = c.Average(d => d.TariffPencePerKWh).Round(2),
                         IsFixedCostPerHour = c.First().
-                            Fixed,
+                            IsFixedCostPerHour,
                         KWh = c.Sum(d => d.KWh).Round(2),
                         Forecast = true,
                     }
@@ -248,53 +235,44 @@ namespace Energy.App.Standalone.Features.Analysis.Store
                     {
                         UtcTime = c.UtcTime,
                         DateTicks = c.UtcTime.Ticks,
-                        TemperatureCelsius = c.TemperatureAverage + action.DegreeDifference,
+                        TemperatureCelsius = c.TemperatureAverage + degreeDifference,
                         TemperatureCelsiusUnmodified = c.TemperatureAverage,
-                        Summary = c.Summary ?? String.Empty
+                        Summary = c.Summary ?? string.Empty
                     }
                 ).
                 ToImmutableList();
 
             dispatcher.Dispatch(new StoreHeatingForecastStateAction(dailyAggregatedCostedReadings, temperatureIconPoints));
-            dispatcher.Dispatch(new NotifyHeatingForecastReadyAction(action.DegreeDifference));
+            dispatcher.Dispatch(new NotifyHeatingForecastReadyAction(degreeDifference));
         }
 
 
         [EffectMethod]
-        public async Task HandleUpdateIfSignificate(UpdateCoeffsAndOrForecastsIfSignificantOrOutdated action, IDispatcher dispatcher)
+        public async Task HandleUpdateIfSignificate(UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction action, IDispatcher dispatcher)
         {
             if (_householdState.Value.PrimaryHeatSource != action.MeterType)
             {
                 return;
             }
-            if (action.SizeOfUpdate >= 7 * 48 
+            dispatcher.Dispatch(new NotifyHeatingForecastUpdatingAction());
+
+            if (action.SizeOfUpdate >= 7 * 48
                 || !_heatingForecastState.Value.SavedCoefficients
                 || _heatingForecastState.Value.CoefficientsLastUpdate < DateTime.Today.AddDays(-7))
             {
-                dispatcher.Dispatch(new InitiateForecastCoefficientsUpdateAction());
-            } 
-            else if (_heatingForecastState.Value.ForecastWeatherReadings == null 
-                || _heatingForecastState.Value.ForecastDailyCosts == null 
-                || !_heatingForecastState.Value.ForecastWeatherReadings.Any()
-                || !_heatingForecastState.Value.ForecastDailyCosts.Any()
-                || _heatingForecastState.Value.ForecastsLastUpdate < DateTime.Today.AddDays(-1) )
+                dispatcher.Dispatch(new InitiateCoefficientsAndLoadForecastAction());
+            }
+            else if (_heatingForecastState.Value.ForecastWeatherReadings.eIsNullOrEmpty()
+                || _heatingForecastState.Value.ForecastDailyCosts.eIsNullOrEmpty()
+                || _heatingForecastState.Value.ForecastsLastUpdate < DateTime.Today.AddDays(-1))
             {
-                dispatcher.Dispatch(new LoadHeatingForecastAction(_analysisOptionsState.Value[action.MeterType].DegreeDifference));
+                dispatcher.Dispatch(new LoadHeatingForecastAction());
+            } else
+            {
+                dispatcher.Dispatch(new NotifyHeatingForecastReadyAction());
             }
         }
 
-    }
-
-    public class UpdateCoeffsAndOrForecastsIfSignificantOrOutdated
-    {
-        public MeterType MeterType { get; }
-        public int SizeOfUpdate { get; }
-
-        public UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(int sizeOfUpdate, MeterType meterType)
-        {
-            SizeOfUpdate = sizeOfUpdate;
-            MeterType = meterType;
-        }
     }
 
 

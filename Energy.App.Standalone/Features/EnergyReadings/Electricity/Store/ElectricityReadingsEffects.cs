@@ -1,7 +1,6 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Analysis.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
@@ -26,17 +25,15 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
         }
 
         [EffectMethod]
-        public async Task ReloadElectricityReadings(ElectricityReloadReadingsAndCostsAction loadReadingsAction, IDispatcher dispatcher)
+        public async Task ReloadElectricityReadingsAndCosts(ElectricityReloadReadingsAndCostsAction loadReadingsAction, IDispatcher dispatcher)
         {
-            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Electricity);
+            var basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Electricity);
             try
             {
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAction(costedReadings));
-                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction());
-                dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Electricity));
+                dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(basicReadings.ToImmutableList(), costedReadings));
 
-                dispatcher.Dispatch(new NotifyElectricityStoreReady());
+                dispatcher.Dispatch(new NotifyElectricityStoreReady(basicReadings.Count, costedReadings.Count));
 
             }
             catch (Exception e)
@@ -45,25 +42,21 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
                 Console.WriteLine(e);
 
                 dispatcher.Dispatch(new NotifyElectricityCostsCalculationFailedAction());
-                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction(failed: true));
 
             }
 
         }
 
         [EffectMethod]
-        public async Task UpdateElectricityReadings(ElectricityUpdateReadingsAndCostsAction updateReadingsAction, IDispatcher dispatcher)
+        public async Task ReloadElectricityCostsOnly(ElectricityReloadCostsOnlyAction reloadCostsAction, IDispatcher dispatcher)
         {
+            var basicReadings = _electricityReadingsState.Value.BasicReadings;
             try
             {
-                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Electricity, updateReadingsAction.LastReading);
-
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new ElectricityStoreUpdatedReadingsAction(costedReadings));
-                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction());
-                dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Electricity));
+                dispatcher.Dispatch(new ElectricityStoreReloadedCostsOnlysAction(costedReadings));
 
-                dispatcher.Dispatch(new NotifyElectricityStoreReady());
+                dispatcher.Dispatch(new NotifyElectricityStoreReady(0, costedReadings.Count));
 
             }
             catch (Exception e)
@@ -72,11 +65,34 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
                 Console.WriteLine(e);
 
                 dispatcher.Dispatch(new NotifyElectricityCostsCalculationFailedAction());
-                dispatcher.Dispatch(new NotifyElectricityCostsCalculationCompletedAction(failed: true));
 
             }
+        }
 
+        [EffectMethod]
+        public async Task UpdateElectricityReadingsAndReloadCosts(ElectricityUpdateReadingsAndReloadCostsAction updateReadingsAction, IDispatcher dispatcher)
+        {
+            try
+            {
+                var basicReadingsToUpdate = await _energyReadingImporter.ImportFromDate(MeterType.Electricity, updateReadingsAction.LastBasicReading);
 
+                dispatcher.Dispatch(new ElectricityStoreUpdatedReadingsAction(basicReadingsToUpdate.ToImmutableList()));
+
+                var basicReadings = _electricityReadingsState.Value.BasicReadings;
+                var costedReadings = await CalculateCostedReadings(basicReadings);
+                dispatcher.Dispatch(new ElectricityStoreReloadedCostsOnlysAction(costedReadings));
+
+                dispatcher.Dispatch(new NotifyElectricityStoreReady(basicReadingsToUpdate.Count, costedReadings.Count));
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error calculating Electricity reading costs:");
+                Console.WriteLine(e);
+
+                dispatcher.Dispatch(new NotifyElectricityCostsCalculationFailedAction());
+
+            }
         }
 
         [EffectMethod]
@@ -87,7 +103,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
             return Task.CompletedTask;
 
         }
-        private async Task<ImmutableList<CstR>> CalculateCostedReadings(List<BasicReading> basicReadings)
+        private async Task<ImmutableList<CostedReading>> CalculateCostedReadings(IReadOnlyCollection<BasicReading> basicReadings)
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,

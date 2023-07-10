@@ -60,7 +60,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
         bool hasData = historicalCosts.Count > 0;
         
         var totalKWh = historicalCosts.Sum(c => c.KWh);
-        var totalCost = historicalCosts.Sum(c => c.CostP) / 100m;
+        var totalCost = historicalCosts.Sum(c => c.CostPence) / 100m;
         var totalCo2 = totalKWh * co2ConversionFactor;
         
         var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());

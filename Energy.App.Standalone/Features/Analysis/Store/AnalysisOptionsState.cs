@@ -1,4 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;

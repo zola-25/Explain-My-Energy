@@ -3,5 +3,6 @@
     public class ElectricityReloadReadingsAndCostsAction
     { }
 
-
+    public class ElectricityReloadCostsOnlyAction
+    { }
 }

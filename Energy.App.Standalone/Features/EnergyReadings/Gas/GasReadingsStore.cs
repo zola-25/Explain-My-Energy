@@ -19,9 +19,11 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
         [property: JsonIgnore]
-        public ImmutableList<CstR> CostedReadings { get; init; }
+        public ImmutableList<CostedReading> CostedReadings { get; init; }
 
         [property: JsonIgnore] public bool CalculationError { get; init; }
+        public bool ReloadingCosts { get; internal set; }
+        public bool UpdatingCosts { get; internal set; }
     }
 
     public class GasReadingsFeature : Feature<GasReadingsState>
@@ -39,7 +41,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
                 UpdatingReadings = false,
                 CalculationError = false,
                 BasicReadings = ImmutableList<BasicReading>.Empty,
-                CostedReadings = ImmutableList<CstR>.Empty,
+                CostedReadings = ImmutableList<CostedReading>.Empty,
                 LastUpdated = DateTime.MinValue
             };
         }

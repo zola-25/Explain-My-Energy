@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 
-namespace Energy.App.Standalone.Features.Analysis.Store;
+namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 
 public class StoreHeatingForecastStateAction
 {
@@ -10,7 +10,7 @@ public class StoreHeatingForecastStateAction
 
     public StoreHeatingForecastStateAction(ImmutableList<DailyCostedReading> forecastDailyReadings, ImmutableList<TemperaturePoint> temperatureIconPoints)
     {
-        this.ForecastDailyReadings = forecastDailyReadings;
+        ForecastDailyReadings = forecastDailyReadings;
         TemperatureIconPoints = temperatureIconPoints;
     }
 }

@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Presentation", "2. Prese
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Test", "3. Test", "{6D421CD0-9BBF-4CF0-A8B4-F5E8B6A3FDFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Test", "Energy.Test\Energy.Test.csproj", "{7693E9B3-C3A7-4A16-A665-4316E566FFE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Test", "Energy.Test\Energy.Test.csproj", "{7693E9B3-C3A7-4A16-A665-4316E566FFE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

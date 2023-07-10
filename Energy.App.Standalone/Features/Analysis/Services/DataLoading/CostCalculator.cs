@@ -12,7 +12,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
 
     public class CostCalculator : ICostCalculator
     {
-        public List<CstR> GetCostReadings(
+        public List<CostedReading> GetCostReadings(
             IReadOnlyCollection<BasicReading> basicReadings,
             IEnumerable<TariffDetailState> meterTariffState)
         {
@@ -26,7 +26,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
             }
 
             //List<(TariffDetailState TariffDetailState, ImmutableList<BasicReading> BasicReadings)> tariffsForReadings = new();
-            List<CstR> costedReadings = new();
+            List<CostedReading> costedReadings = new();
             for (int i = 0; i < allTariffsOrderedArray.Length; i++)
             {
                 var currentTariff = allTariffsOrderedArray[i];
@@ -63,20 +63,20 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                 }
                 decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
-                IEnumerable<CstR> calculatedReadings = from basicReading in tariffReadings
+                IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
                                                                 join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.TimeOfDay
                                                                     equals halfHourlyPrice.HourOfDay
-                                                                select new CstR()
+                                                                select new CostedReading()
                                                                 {
-                                                                    TApFrom = currentTariff.DateAppliesFrom.Value,
-                                                                    TDStndP = currentTariff.DailyStandingChargePence,
-                                                                    THHStndCh = halfHourlyStandingChargePence,
-                                                                    TPpKWh = halfHourlyPrice.PencePerKWh,
-                                                                    Fixed = currentTariff.IsHourOfDayFixed,
+                                                                    TarrifAppliesFrom = currentTariff.DateAppliesFrom.Value,
+                                                                    TariffDailyStandingCharge = currentTariff.DailyStandingChargePence,
+                                                                    TariffHalfHourlyStandingCharge = halfHourlyStandingChargePence,
+                                                                    TariffPencePerKWh = halfHourlyPrice.PencePerKWh,
+                                                                    IsFixedCostPerHour = currentTariff.IsHourOfDayFixed,
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    CostP = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
-                                                                    Fcst = basicReading.Forecast
+                                                                    CostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
+                                                                    IsForecast = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);
             }

@@ -228,10 +228,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasUpdateReadingsAndCostsAction(GasReadingsState.Value.CostedReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new GasUpdateReadingsAndReloadCostsAction(GasReadingsState.Value.CostedReadings.Last().UtcTime.Date));
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityUpdateReadingsAndCostsAction(ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new ElectricityUpdateReadingsAndReloadCostsAction(ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.Date));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

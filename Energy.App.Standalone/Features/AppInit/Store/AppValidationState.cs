@@ -2,55 +2,50 @@
 
 namespace Energy.App.Standalone.Features.AppInit.Store;
 
-public record AppInitState
+public record AppValidationState
 {
+    public bool AppStarted { get; init; }
     
-    public bool CanUpdateWeatherData { get; init; }
     public bool WeatherDataInitializing { get; init; }
     public bool WeatherDataInitialized { get; init; }
+    public string WeatherDataStatus { get; init; }
 
-    public bool CanUpdateGasData { get; init; }
     public bool GasDataInitializing { get; init; }
     public bool GasDataInitialized { get; init; }
 
-    public bool CanUpdateElectricityData { get; init; }
     public bool ElectricityDataInitializing { get; init; }
     public bool ElectricityDataInitialized { get; init; }
     
     
-    public bool CanUpdateLinearCoefficients { get; init; }
-    public bool LinearCoefficientsInitializing { get; init; }
-    public bool LinearCoefficientsInitialized { get; init; }
-    public bool AppStarted { get; init; }
+    public bool ForecastInitializing { get; init; }
+    public bool ForecastInitialized { get; init; }
+
+    public bool IsLoading => WeatherDataInitializing || GasDataInitializing || ElectricityDataInitializing || ForecastInitializing;
 }
 
-public class AppInitFeature : Feature<AppInitState>
+public class AppInitFeature : Feature<AppValidationState>
 {
     public override string GetName()
     {
         return nameof(AppInitFeature);
     }
 
-    protected override AppInitState GetInitialState()
+    protected override AppValidationState GetInitialState()
     {
-        return new AppInitState
+        return new AppValidationState
         {
             AppStarted = false,
-            CanUpdateWeatherData = false,
             WeatherDataInitializing = false,
             WeatherDataInitialized = false,
             
-            CanUpdateGasData = false,
             GasDataInitializing = false,
             GasDataInitialized = false,
             
-            CanUpdateElectricityData = false,
             ElectricityDataInitializing = false,
             ElectricityDataInitialized = false,
             
-            CanUpdateLinearCoefficients = false,
-            LinearCoefficientsInitializing = false,
-            LinearCoefficientsInitialized = false
+            ForecastInitializing = false,
+            ForecastInitialized = false
         };
     }
 }

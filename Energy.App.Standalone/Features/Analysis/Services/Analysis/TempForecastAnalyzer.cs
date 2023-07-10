@@ -1,7 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
@@ -13,6 +12,7 @@ using Energy.App.Standalone.Features.Setup.Store;
 using Newtonsoft.Json;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 

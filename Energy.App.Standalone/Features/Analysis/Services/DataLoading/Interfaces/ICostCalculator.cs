@@ -7,5 +7,5 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interface
 
 public interface ICostCalculator
 {
-    List<CstR> GetCostReadings(IReadOnlyCollection<BasicReading> basicReadings, IEnumerable<TariffDetailState> meterTariffDetails);
+    List<CostedReading> GetCostReadings(IReadOnlyCollection<BasicReading> basicReadings, IEnumerable<TariffDetailState> meterTariffDetails);
 }

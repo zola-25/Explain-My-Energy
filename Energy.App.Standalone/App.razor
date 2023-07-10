@@ -1,4 +1,4 @@
-﻿@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit;
+﻿@using Energy.App.Standalone.Features.AppInit.Store;
 @using Fluxor.Persist.Middleware;
 @inherits FluxorComponent
 
@@ -17,21 +17,32 @@
         </NotFound>
     </Router>
 @code {
-    
+
     [Inject] IDispatcher Dispatcher { get; set; }
 
-    [Inject] AppInit AppInit { get; set; }
+    [Inject] AppStateValidator AppInit { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        
+        base.OnInitialized();
 
         SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
             Console.WriteLine($"**** State rehydrated ****");
-            AppInit.Initialize();
         });
         
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(1000);
+            Console.WriteLine(nameof(OnAfterRenderAsync));
 
+            Console.WriteLine($"**** App validating ****");
+
+            AppInit.Validate();
+
+        }
+    }
 }

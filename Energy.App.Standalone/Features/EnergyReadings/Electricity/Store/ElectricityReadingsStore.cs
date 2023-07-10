@@ -1,5 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
@@ -19,10 +20,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 
         public DateTime LastUpdated { get; init; }
 
-        public ImmutableList<CstR> CostedReadings { get; init; }
+        [property: JsonIgnore]
+        public ImmutableList<CostedReading> CostedReadings { get; init; }
+        
+        public ImmutableList<BasicReading> BasicReadings { get; init; }
+
 
         [property: JsonIgnore]
         public bool CalculationError { get; init; }
+        public bool UpdatingCosts { get; internal set; }
+        public bool ReloadingCosts { get; internal set; }
     }
 
     public class ElectricityReadingsFeature : Feature<ElectricityReadingsState>
@@ -39,7 +46,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
                 ReloadingReadings = false,
                 UpdatingReadings = false,
                 CalculationError = false,
-                CostedReadings = ImmutableList<CstR>.Empty
+                CostedReadings = ImmutableList<CostedReading>.Empty,
+                BasicReadings = ImmutableList<BasicReading>.Empty,
+                LastUpdated = DateTime.MinValue
             };
         }
     }

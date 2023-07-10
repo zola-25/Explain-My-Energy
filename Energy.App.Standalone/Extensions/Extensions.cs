@@ -9,7 +9,10 @@ namespace Energy.App.Standalone.Extensions;
 
 public static class Extensions
 {
-
+    public static bool eIsNullOrEmpty<T>(this IEnumerable<T> enumerable)
+    {
+        return enumerable == null || !enumerable.Any();
+    }
 
     public static string eTimeSpanToString(this TimeSpan timeSpan)
     {

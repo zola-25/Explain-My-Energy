@@ -1,5 +1,7 @@
-﻿@using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+﻿@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+@using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 @using Energy.App.Standalone.Features.EnergyReadings.Gas;
+@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 @inherits FluxorComponent     
 @implements IAsyncDisposable     
 @inject IJSRuntime JsRuntime
@@ -48,18 +50,18 @@
                 SubscribeToAction<ElectricityAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
                 SubscribeToAction<ElectricityAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<ElectricityAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
-                SubscribeToAction<ElectricityAnalysisOptionsSetDegreeDifferenceAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
                 break;
             case MeterType.Gas:
                 SubscribeToAction<GasAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
                 SubscribeToAction<GasAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<GasAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
-                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>((a) => OnDegreeDifferenceHandler(a.DegreeDifference));
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        SubscribeToAction<NotifyHeatingForecastReadyAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
+
         _ready = true;
     }
 

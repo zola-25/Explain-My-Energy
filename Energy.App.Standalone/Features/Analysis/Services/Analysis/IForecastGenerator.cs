@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Store;
+﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.Shared;
 using System.Collections.Immutable;
 

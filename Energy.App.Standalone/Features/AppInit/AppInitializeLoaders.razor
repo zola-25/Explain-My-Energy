@@ -1,5 +1,5 @@
-﻿@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit
-@using Energy.App.Standalone.Features.AppInit.Store
+﻿@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
+@using Energy.App.Standalone.Features.AppInit.Store;
 @using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 @using Energy.App.Standalone.Features.EnergyReadings.Gas;
 @using Microsoft.Extensions.FileSystemGlobbing.Abstractions
@@ -13,17 +13,17 @@
         </MudCardHeader>
         <MudCardContent Class="d-flex flex-column gap-3">
 
-            @if (!AppInit.AppStarted)
+            @if (!AppValidationState.Value.AppStarted)
             {
                 <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">App starting...</MudAlert>
                 <MudProgressLinear Size="Size.Large" Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
             }
 
-            @if (AppInit.AppStarted)
+            @if (AppValidationState.Value.AppStarted)
             {
                 @if (CanUpdateWeatherData)
                 {
-                    @if (WeatherDataLoading)
+                    @if (!AppValidationState.Value.WeatherDataInitialized)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -40,7 +40,7 @@
 
                 @if (CanUpdateElectricityData)
                 {
-                    @if (ElectricityDataLoading)
+                    @if (!AppValidationState.Value.ElectricityDataInitialized)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading electricity data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -57,7 +57,7 @@
 
                 @if (CanUpdateGasData)
                 {
-                    @if (GasDataLoading)
+                    @if (!AppValidationState.Value.GasDataInitialized)
                     {
                         <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading gas data...</MudAlert>
                         <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
@@ -71,9 +71,25 @@
                 {
                     <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Gas Meter for consumption analysis</MudAlert>
                 }
-
+                @if (CanUpdateLinearCoefficients)
+                {
+                    @if (!AppValidationState.Value.ForecastInitialized)
+                    {
+                        <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Calculating weather/consumption relationship...</MudAlert>
+                        <MudProgressLinear Size="Size.Large" Color="Color.Success" Indeterminate="true"></MudProgressLinear>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="@Severity.Success" Elevation="2" Dense="@true">Weather/consumption relationship calculated</MudAlert>
+                    }
+                }
+                else
+                {
+                    <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Setup your Heating Meter to see how weather changes affect your energy costs</MudAlert>
+                }
             }
 
+            
         </MudCardContent>
     </MudCard>
 
@@ -86,10 +102,10 @@
     int _loadingProgress = 0;
 
     [Inject]
-    private AppInit AppInit { get; set; }
+    private AppStateValidator AppStateValidator { get; set; }
 
     [Inject]
-    private IState<AppInitState> AppInitState { get; set; }
+    private IState<AppValidationState> AppValidationState { get; set; }
 
     [Inject]
     IState<HouseholdState> HouseholdState { get; set; }
@@ -107,38 +123,24 @@
     IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 
     [Inject]
-    IState<HeatingForecastState> LinearCoefficientsState { get; set; }
+    IState<HeatingForecastState> HeatingForecastState { get; set; }
 
-    bool CanUpdateWeatherData => AppInit.HouseholdSetupValid;
-    bool CanUpdateElectricityData => AppInit.ElectricityMeterSetupValid;
-    bool CanUpdateGasData => AppInit.GasMeterSetupValid;
+    bool CanUpdateWeatherData => HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
+    bool CanUpdateElectricityData => MeterSetupState.Value.ElectricityMeter.SetupValid;
+    bool CanUpdateGasData => MeterSetupState.Value.GasMeter.SetupValid;
 
-
-    bool WeatherDataLoading => AppInit.WeatherDataLoading;
-    bool ElectricityDataLoading => AppInit.ElectricityDataLoading;
-    bool GasDataLoading => AppInit.GasDataLoading;
+    bool CanUpdateLinearCoefficients => CanUpdateWeatherData && MeterSetupState.Value[HouseholdState.Value.PrimaryHeatSource].
+        SetupValid;
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-    }
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    if (firstRender)
-    //    {
-    //        await Task.Delay(1000);
-    //        Console.WriteLine(nameof(OnAfterRender));
 
-    //        Dispatcher.Dispatch(new InitializeAppAction());
-    //    }
-    //}
+
 
     private async Task WorkItem()
     {
         Console.WriteLine(DateTime.Now);
-        Console.WriteLine(AppInitState.Value);
+        Console.WriteLine(AppValidationState.Value);
         await Task.Yield();
         await Task.Delay(1);
         StateHasChanged();

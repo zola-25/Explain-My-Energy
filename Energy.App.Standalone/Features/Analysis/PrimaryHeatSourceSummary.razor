@@ -1,7 +1,9 @@
-﻿@using System.Collections.Immutable;
-@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit
+﻿@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+@using System.Collections.Immutable;
+@using Energy.App.Standalone.Features.AppInit.Store;
 @using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 @using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
@@ -55,7 +57,6 @@ else
     IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
 
 
-    MeterAnalysisOptions InitialMeterAnalysisOptions => AnalysisOptionsState.Value[MeterType];
 
     CalendarTerm _calenderTerm;
     decimal _degreeDifference;
@@ -72,8 +73,6 @@ else
 
     AnalysisOptionsActionFactory _analysisOptionsActionFactory;
 
-    [Inject]
-    AppInit AppInit { get; set; }
 
     [Inject]
     IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
@@ -85,14 +84,16 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        var initialMeterAnalysisOptions = AnalysisOptionsState.Value[MeterType];
+
         Ready = false;
 
         await Task.Delay(1);
         Progress = 30;
         Status = "Analysing Historical";
 
-        _calenderTerm = InitialMeterAnalysisOptions.CalendarTerm;
-        _degreeDifference = InitialMeterAnalysisOptions.DegreeDifference;
+        _calenderTerm = initialMeterAnalysisOptions.CalendarTerm;
+        _degreeDifference = initialMeterAnalysisOptions.DegreeDifference;
         await Task.Delay(1);
 
         SetHistoricalAnalyses();
@@ -119,11 +120,7 @@ else
                     });
                 break;
             case MeterType.Gas:
-                SubscribeToAction<GasAnalysisOptionsSetDegreeDifferenceAction>(action =>
-                {
-                    _degreeDifference = action.DegreeDifference;
-                    SetForecastAnalyses();
-                });
+
                 SubscribeToAction<GasAnalysisOptionsSetCalenderTermAction>(
                     action =>
                     {

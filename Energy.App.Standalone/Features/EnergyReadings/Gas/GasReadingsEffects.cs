@@ -1,8 +1,6 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Analysis.Store;
-using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
@@ -38,16 +36,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
 
 
         [EffectMethod]
-        public async Task ReloadGasReadings(GasReloadReadingsAndCostsAction loadReadingsAction, IDispatcher dispatcher)
+        public async Task ReloadGasReadingsAndCosts(GasReloadReadingsAndCostsAction loadReadingsAction, IDispatcher dispatcher)
         {
-            List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Gas);
             try
             {
+                var basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Gas);
+
+
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new GasStoreReloadedReadingsAction(basicReadings.ToImmutableList(), costedReadings));
-                dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
-                dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Gas));
-                dispatcher.Dispatch(new NotifyGasStoreReady());
+                dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(basicReadings.ToImmutableList(), costedReadings));
+                dispatcher.Dispatch(new NotifyGasStoreReady(basicReadings.Count, costedReadings.Count));
 
             }
             catch (Exception e)
@@ -56,24 +54,21 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
                 Console.WriteLine(e);
 
                 dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
-                dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction(calculationError: true));
 
             }
         }
 
         [EffectMethod]
-        public async Task UpdateGasReadings(GasUpdateReadingsAndCostsAction updateReadingsAction, IDispatcher dispatcher)
+        public async Task ReloadGasCostsOnly(GasReloadCostsOnlyAction reloadCostsAction, IDispatcher dispatcher)
         {
             try
             {
-                List<BasicReading> basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
+                var basicReadings = _gasReadingsState.Value.BasicReadings;
 
                 var costedReadings = await CalculateCostedReadings(basicReadings);
-                dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings.ToImmutableList(), costedReadings));
-                dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction());
-                dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(costedReadings.Count, MeterType.Gas));
+                dispatcher.Dispatch(new GasStoreReloadedCostsOnlysAction(costedReadings));
 
-                dispatcher.Dispatch(new NotifyGasStoreReady());
+                dispatcher.Dispatch(new NotifyGasStoreReady(0, costedReadings.Count));
 
             }
             catch (Exception e)
@@ -82,7 +77,30 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
                 Console.WriteLine(e);
 
                 dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
-                dispatcher.Dispatch(new NotifyGasCostsCalculationCompletedAction(calculationError: true));
+
+            }
+        }
+
+        [EffectMethod]
+        public async Task UpdateGasReadingsAndReloadCosts(GasUpdateReadingsAndReloadCostsAction updateReadingsAction, IDispatcher dispatcher)
+        {
+            try
+            {
+                var basicReadings = await _energyReadingImporter.ImportFromDate(MeterType.Gas, updateReadingsAction.LastReading);
+                dispatcher.Dispatch(new GasStoreUpdatedReadingsAction(basicReadings.ToImmutableList()));
+
+                var costedReadings = await CalculateCostedReadings(basicReadings);
+                dispatcher.Dispatch(new GasStoreReloadedCostsOnlysAction(costedReadings));
+
+                dispatcher.Dispatch(new NotifyGasStoreReady(basicReadings.Count, costedReadings.Count));
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error calculating Gas reading costs:");
+                Console.WriteLine(e);
+
+                dispatcher.Dispatch(new NotifyGasCostsCalculationFailedAction());
 
             }
         }
@@ -95,7 +113,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
             return Task.CompletedTask;
         }
 
-        private async Task<ImmutableList<CstR>> CalculateCostedReadings(List<BasicReading> basicReadings)
+        private async Task<ImmutableList<CostedReading>> CalculateCostedReadings(IReadOnlyCollection<BasicReading> basicReadings)
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,

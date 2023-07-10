@@ -24,7 +24,7 @@
                         <MudTextField Label='IHD MAC ID' Value="@HouseholdState.Value.IhdMacId" ReadOnly="true"></MudTextField>
                         <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
                     </div>
-                    <iframe src="https://data.n3rgy.com/consumer/sign-up" width="100%" style="height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
+                    <iframe src="https://data.n3rgy.com/consumer-sign-up" width="100%" style="height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
                     <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
 
                         <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
