@@ -1,5 +1,8 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Store;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.Shared;
@@ -45,118 +48,118 @@ namespace Energy.App.Standalone.Features.AppInit.Store
         //     dispatcher.Dispatch(new InitiateAppInitUpdateLinearCoefficientsAction(canUpdateLinearCoefficients));
         // }
 
-        [EffectMethod]
-        public async Task HandleAppInitWeatherAction(InitiateAppInitUpdateWeatherDataAction action, IDispatcher dispatcher)
-        {
-            if (!action.CanUpdateWeatherData)
-            {
-                dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction());
-                return;
-            }
+        //[EffectMethod]
+        //public async Task HandleAppInitWeatherAction(InitiateAppInitUpdateWeatherDataAction action, IDispatcher dispatcher)
+        //{
+        //    if (!action.CanUpdateWeatherData)
+        //    {
+        //        dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction());
+        //        return;
+        //    }
 
-            if (!_weatherState.Value.WeatherReadings.Any())
-            {
-                dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(_householdState.Value.OutCodeCharacters));
-                return;
-            }
+        //    if (!_weatherState.Value.WeatherReadings.Any())
+        //    {
+        //        dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(_householdState.Value.OutCodeCharacters));
+        //        return;
+        //    }
 
-            var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-                UtcTime;
-            var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-                UtcTime;
+        //    var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
+        //        UtcTime;
+        //    var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
+        //        UtcTime;
 
-            if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
-            {
-                dispatcher.Dispatch
-                (
-                    new InitiateWeatherUpdateReadingsAction
-                    (
-                        _householdState.Value.OutCodeCharacters,
-                        latestReading,
-                        latestHistoricalReading
-                    )
-                );
-            }
-            else
-            {
-                await Task.Delay(5000);
-                dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction());
-            }
-        }
+        //    if (latestReading < DateTime.UtcNow.Date.AddDays(-1))
+        //    {
+        //        dispatcher.Dispatch
+        //        (
+        //            new InitiateWeatherUpdateReadingsAction
+        //            (
+        //                _householdState.Value.OutCodeCharacters,
+        //                latestReading,
+        //                latestHistoricalReading
+        //            )
+        //        );
+        //    }
+        //    else
+        //    {
+        //        await Task.Delay(5000);
+        //        dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction());
+        //    }
+        //}
 
-        [EffectMethod]
-        public async Task HandleAppInitElectricityAction(InititateAppInitUpdateElectricityReadingsAction action, IDispatcher dispatcher)
-        {
-            if (!action.CanUpdateElectricityReadingsData)
-            {
-                return;
-            }
+        //[EffectMethod]
+        //public async Task HandleAppInitElectricityAction(InititateAppInitUpdateElectricityReadingsAction action, IDispatcher dispatcher)
+        //{
+        //    if (!action.CanUpdateElectricityReadingsData)
+        //    {
+        //        return;
+        //    }
 
-            await Task.Run
-            (
-                () =>
-                {
-                    if (_electricityReadingsState.Value.BasicReadings.Any())
-                    {
-                        DateTime lastReading = _electricityReadingsState.Value.BasicReadings.Last().
-                            UtcTime;
-                        if (lastReading < DateTime.Today.AddDays(-1))
-                        {
-                            dispatcher.Dispatch(new ElectricityUpdateReadingsAction(lastReading.Date));
-                        }
-                    }
-                    else
-                    {
-                        dispatcher.Dispatch(new ElectricityReloadReadingsAction());
-                    }
-                }
-            );
-
-
-            dispatcher.Dispatch(new ElectricityInitiateCostCalculationsAction());
+        //    await Task.Run
+        //    (
+        //        () =>
+        //        {
+        //            if (_electricityReadingsState.Value.CostedReadings.Any())
+        //            {
+        //                DateTime lastReading = _electricityReadingsState.Value.CostedReadings.Last().
+        //                    UtcTime;
+        //                if (lastReading < DateTime.Today.AddDays(-1))
+        //                {
+        //                    dispatcher.Dispatch(new ElectricityUpdateReadingsAndCostsAction(lastReading.Date));
+        //                }
+        //            }
+        //            else
+        //            {
+        //                dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
+        //            }
+        //        }
+        //    );
 
 
-            if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
-            {
-                dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
-            }
-        }
-
-        [EffectMethod]
-        public async Task HandleAppInitGasAction(InitiateAppInitUpdateGasReadingsAction action, IDispatcher dispatcher)
-        {
-            if (!action.CanUpdateGasReadingsData)
-            {
-                return;
-            }
-
-            await Task.Run
-            (
-                () =>
-                {
-                    if (_gasReadingsState.Value.BasicReadings.Any())
-                    {
-                        DateTime lastReading = _gasReadingsState.Value.BasicReadings.Last().
-                            UtcTime;
-                        if (lastReading < DateTime.Today.AddDays(-1))
-                        {
-                            dispatcher.Dispatch(new GasUpdateReadingsAction(lastReading.Date));
-                        }
-                    }
-                    else
-                    {
-                        dispatcher.Dispatch(new GasReloadReadingsAction());
-                    }
-                }
-            );
+        //    dispatcher.Dispatch(new ElectricityInitiateCostCalculationsAction());
 
 
-            dispatcher.Dispatch(new GasInitiateCostCalculationsAction());
+        //    if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
+        //    {
+        //        dispatcher.Dispatch(new InitiateForecastCoefficientsUpdateAction());
+        //    }
+        //}
 
-            if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
-            {
-                dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
-            }
-        }
+        //[EffectMethod]
+        //public async Task HandleAppInitGasAction(InitiateAppInitUpdateGasReadingsAction action, IDispatcher dispatcher)
+        //{
+        //    if (!action.CanUpdateGasReadingsData)
+        //    {
+        //        return;
+        //    }
+
+        //    await Task.Run
+        //    (
+        //        () =>
+        //        {
+        //            if (_gasReadingsState.Value.CostedReadings.Any())
+        //            {
+        //                DateTime lastReading = _gasReadingsState.Value.CostedReadings.Last().
+        //                    UtcTime;
+        //                if (lastReading < DateTime.Today.AddDays(-1))
+        //                {
+        //                    dispatcher.Dispatch(new GasUpdateReadingsAndCostsAction(lastReading.Date));
+        //                }
+        //            }
+        //            else
+        //            {
+        //                dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
+        //            }
+        //        }
+        //    );
+
+
+        //    dispatcher.Dispatch(new GasInitiateCostCalculationsAction());
+
+        //    if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
+        //    {
+        //        dispatcher.Dispatch(new InitiateForecastCoefficientsUpdateAction());
+        //    }
+        //}
     }
 }

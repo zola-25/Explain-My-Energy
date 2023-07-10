@@ -25,7 +25,7 @@ export namespace Charts {
         public static blackColor: am5.Color = am5.color(0x000000)
         public static highlightColor: am5.Color = am5.color(0xFFA726)
 
-        public activeCharts: { [divId: string]: ChartDetails; } = { };
+        public activeCharts: { [divId: string]: ChartDetails; } = {};
 
 
         public setChartNoTemperature(divId: string, meterChartProfile: MeterChartProfile): void {
@@ -225,7 +225,7 @@ export namespace Charts {
 
             console.log("setChart called");
 
-             // Create root element
+            // Create root element
             let root = am5.Root.new(divId);
             // Set themes
             root.setThemes([
@@ -241,7 +241,7 @@ export namespace Charts {
                 wheelY: "zoomX"
             }));
 
-            
+
             //
             // // Create axes
             let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
@@ -275,13 +275,13 @@ export namespace Charts {
                 })
             );
 
-            
+
             // Add series
             let consumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
                 name: `${meterChartProfile.globalId} - Consumption`,
                 xAxis: xAxis,
                 yAxis: yConsumptionAxis,
-                
+
                 valueYField: "kWh",
                 valueXField: "dateTicks",
                 valueYGrouped: "sum",
@@ -426,7 +426,7 @@ export namespace Charts {
                 valueYField: "temperatureCelsius",
                 valueXField: "dateTicks",
                 tooltip: am5.Tooltip.new(root, {
-                    
+
                     labelText: "{summary}"
                 }),
                 groupDataWithOriginals: true,
@@ -442,6 +442,43 @@ export namespace Charts {
                 }
             }))
 
+
+            let forecastConsumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
+                name: `${meterChartProfile.globalId} - ForecastConsumption`,
+                xAxis: xAxis,
+                yAxis: yConsumptionAxis,
+                valueYField: "kWh",
+                valueXField: "dateTicks",
+                valueYGrouped: "sum",
+                tooltip: am5.Tooltip.new(root, {
+                    labelText: "{valueY.formatNumber('#.#')}kWh",
+                }),
+                visible: !meterChartProfile.showCost
+            }));
+
+            forecastConsumptionSeries.strokes.template.setAll({
+                stroke: am5.color("#000000"),
+                strokeDasharray: [3, 3]
+            })
+
+
+            let forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
+                name: `${meterChartProfile.globalId} - ForecastConsumption`,
+                xAxis: xAxis,
+                yAxis: yCostAxis,
+                valueYField: "cost",
+                valueXField: "dateTicks",
+                valueYGrouped: "sum",
+                tooltip: am5.Tooltip.new(root, {
+                    labelText: "£{valueY.formatNumber('#.##')}",
+                }),
+                visible: meterChartProfile.showCost
+            }));
+
+            forecastCostSeries.strokes.template.setAll({
+                stroke: am5.color("#000000"),
+                strokeDasharray: [3, 3]
+            })
 
             //iconSeries.bullets.push(function (root, series, dataItem) {
             //    let grouped = dataItem.get("originals") ? true : false;
@@ -466,7 +503,7 @@ export namespace Charts {
             iconSeries.bullets.push(function (root, series, dataItem) {
 
                 let grouped = dataItem.get("originals") ? true : false;
-                
+
                 return am5.Bullet.new(root, {
                     sprite: am5.Circle.new(root, {
                         radius: 15,
@@ -509,16 +546,23 @@ export namespace Charts {
 
             costSeries.data.setAll(meterChartProfile.chartReadings);
             consumptionSeries.data.setAll(meterChartProfile.chartReadings);
+            forecastConsumptionSeries.data.setAll(meterChartProfile.chartDailyForecastReadings);
+            forecastCostSeries.data.setAll(meterChartProfile.chartDailyForecastReadings);
             iconSeries.data.setAll(temperatureIconPoints);
+
 
             if (meterChartProfile.showCost) {
                 costSeries.showTooltip();
+                forecastCostSeries.showTooltip();
                 consumptionSeries.hideTooltip();
+                forecastConsumptionSeries.hideTooltip();
             } else {
                 costSeries.hideTooltip();
+                forecastCostSeries.hideTooltip();
                 consumptionSeries.showTooltip();
+                forecastConsumptionSeries.showTooltip();
             }
-            
+
             this.activeCharts[divId] = {
                 chart: chart,
                 start: meterChartProfile.profileStart,
@@ -572,20 +616,20 @@ export namespace Charts {
             highlightEnd: number,
             root: am5.Root): void {
 
-            const forecastConsumptionRangeDataItem = xAxis.makeDataItem({
+            const consumptionRangeDataItem = xAxis.makeDataItem({
                 value: highlightStart,
                 endValue: highlightEnd
             });
 
-            const forecastConsumptionRange = consumptionSeries.createAxisRange(forecastConsumptionRangeDataItem);
+            const consumptionRange = consumptionSeries.createAxisRange(consumptionRangeDataItem);
 
-            forecastConsumptionRange.strokes.template.setAll({
+            consumptionRange.strokes.template.setAll({
                 stroke: ChartFunctions.highlightColor,
                 strokeOpacity: 0.9,
                 strokeWidth: 2,
             });
 
-            forecastConsumptionRange.fills.template.setAll({
+            consumptionRange.fills.template.setAll({
                 visible: true,
                 fillPattern: am5.LinePattern.new(root, {
                     color: ChartFunctions.highlightColor,
@@ -596,6 +640,9 @@ export namespace Charts {
                     height: 1200,
                 })
             });
+
+
+
         }
 
         public removeHighlight(divId: string): void {
@@ -639,19 +686,16 @@ export namespace Charts {
 
             let consumptionSeries = chart.series.getIndex(0) as am5xy.LineSeries
             let costSeries = chart.series.getIndex(1) as am5xy.LineSeries
+            let forecastConsumptionSeries = chart.series.getIndex(2) as am5xy.LineSeries
+            let forecastCostSeries = chart.series.getIndex(3) as am5xy.LineSeries
 
 
-            if (consumptionSeries.axisRanges.hasIndex(2)) {
-                consumptionSeries.axisRanges.removeIndex(2)
-            }
 
-            if (consumptionSeries.axisRanges.hasIndex(1)) {
-                consumptionSeries.axisRanges.removeIndex(1)
-            }
+            consumptionSeries.axisRanges.clear()
+            costSeries.axisRanges.clear()
+            forecastConsumptionSeries.axisRanges.clear()
+            forecastCostSeries.axisRanges.clear()
 
-            if (costSeries.axisRanges.hasIndex(1)) {
-                costSeries.axisRanges.removeIndex(1)
-            }
 
             if (highlightEnd <= latestReading) {
 
@@ -659,47 +703,49 @@ export namespace Charts {
 
             } else if (highlightStart <= latestReading && highlightEnd > latestReading) {
 
-                consumptionSeries.axisRanges.clear()
 
                 this.addRegularHighlightStyling(consumptionSeries, xAxis, highlightStart, latestReading);
-                this.addConsumptionForecastHighlightStyling(consumptionSeries,
+                this.addRegularHighlightStyling(costSeries, xAxis, highlightStart, latestReading);
+                
+                
+                this.addConsumptionForecastHighlightStyling(
+                    forecastConsumptionSeries,
                     xAxis,
                     latestReading,
                     highlightEnd,
                     chart.root);
-                this.addRegularConsumptionForecastStyling(consumptionSeries,
+
+                this.addRegularHighlightStyling(
+                    forecastCostSeries, 
+                    xAxis, 
+                    latestReading, 
+                    highlightEnd);
+
+                this.addRegularConsumptionForecastStyling(forecastConsumptionSeries,
                     xAxis,
                     highlightEnd,
                     profileEnd,
                     chart.root)
+
+
             }
             else if (highlightStart > latestReading && highlightEnd > latestReading) {
 
-                consumptionSeries.axisRanges.clear()
 
-                this.addRegularConsumptionForecastStyling(consumptionSeries,
-                    xAxis,
-                    latestReading,
-                    highlightStart,
-                    chart.root)
-
-                this.addConsumptionForecastHighlightStyling(consumptionSeries,
+                this.addConsumptionForecastHighlightStyling(
+                    forecastConsumptionSeries,
                     xAxis,
                     highlightStart,
                     highlightEnd,
                     chart.root);
 
-                this.addRegularConsumptionForecastStyling(consumptionSeries,
-                    xAxis,
-                    highlightEnd,
-                    profileEnd,
-                    chart.root)
+                this.addRegularHighlightStyling(forecastCostSeries, xAxis, highlightStart, highlightEnd);
 
 
             } else throw Error("Highlight range Out of bounds")
 
-            this.addRegularHighlightStyling(costSeries, xAxis, highlightStart, highlightEnd);
-            
+
+
             const startDate = new Date(highlightStart);
             startDate.setDate(startDate.getDate() - 1);
 
@@ -734,7 +780,7 @@ export namespace Charts {
         }
 
         private highlightSeriesSection(series: am5xy.XYSeries, startIndex: number, endIndex: number) {
-            
+
             let startEntry = series.data.getIndex(startIndex) as any;
 
             startEntry.strokeSettings = {
@@ -802,7 +848,7 @@ export namespace Charts {
 
             const values = consumptionSeries.data.values as ChartReading[]
 
-            let lastValue = values[values.length - 1] 
+            let lastValue = values[values.length - 1]
             while (lastValue.isForecast) {
                 lastValue = consumptionSeries.data.pop() as ChartReading
                 costSeries.data.pop()
@@ -840,7 +886,7 @@ export namespace Charts {
                     return tempPoint
                 }).value()
 
-            
+
             iconSeries.data.setAll(newPoints)
 
         }

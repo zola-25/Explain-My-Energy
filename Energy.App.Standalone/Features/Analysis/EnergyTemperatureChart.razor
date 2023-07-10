@@ -1,6 +1,6 @@
-﻿@inherits FluxorComponent     
-@using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
-@using Energy.App.Standalone.Features.EnergyReadings.Store
+﻿@using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+@using Energy.App.Standalone.Features.EnergyReadings.Gas;
+@inherits FluxorComponent     
 @implements IAsyncDisposable     
 @inject IJSRuntime JsRuntime
 
@@ -75,10 +75,16 @@
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            var chartReadings = costedReadings.Select(Mapping.MapToChartReading).ToList();
-
             var latestReading = costedReadings.Last();
             var firstReading = costedReadings.First();
+
+            var chartReadings = costedReadings.Select(Mapping.MapToChartReading).ToList();
+
+            var forecastDailyCosts = HeatingForecastState.Value.ForecastDailyCosts;
+            var applicableForecastCosts = forecastDailyCosts.Where(c => c.UtcTime > latestReading.UtcTime);
+
+            var forecastChartReadings = applicableForecastCosts.Select(Mapping.MapToChartReading).ToList();
+
             
             var firstReadingTicks = firstReading.UtcTime.eToUnixTicksNoOffset();
             var latestReadingTicks = chartReadings.Last().DateTicks;
@@ -103,9 +109,10 @@
                     LatestReading = latestReadingTicks,
                     MostRecentWeekStart = latestReadingTicks,
                     ProfileStart = chartReadings.First().DateTicks,
-                    OneMonthInTheFuture = latestReading.UtcTime.eToUnixTicksNoOffset(),
-                    ProfileEnd = latestReadingTicks,
+                    OneMonthInTheFuture = latestReading.UtcTime.AddMonths(1).eToUnixTicksNoOffset(),
+                    ProfileEnd = temperatureIconPoints.Last().DateTicks,
                     ChartReadings = chartReadings,
+                    ChartDailyForecastReadings = forecastChartReadings
                 };
             
 

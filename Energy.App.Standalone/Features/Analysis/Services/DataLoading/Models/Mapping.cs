@@ -8,15 +8,28 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
         {
             return new ChartReading()
             {
+                Cost = costedReading.CostP,
+                KWh = costedReading.KWh,
+                PencePerKWh = costedReading.TPpKWh,
+                DailyStandingCharge = costedReading.TDStndP,
+                DateTicks = costedReading.UtcTime.eToUnixTicksNoOffset(),
+                HalfHourlyStandingCharge = costedReading.THHStndCh,
+                TariffAppliesFrom = costedReading.TApFrom,
+                TariffType = String.Empty,
+                IsForecast = costedReading.Fcst
+            };
+        }
+
+        public static ChartDailyForecastReading MapToChartReading(DailyCostedReading costedReading)
+        {
+            return new ChartDailyForecastReading()
+            {
                 Cost = costedReading.ReadingTotalCostPence,
                 KWh = costedReading.KWh,
-                PencePerKWh = costedReading.TariffHalfHourlyPencePerKWh,
+                PencePerKWh = costedReading.PencePerKWh,
                 DailyStandingCharge = costedReading.TariffDailyStandingChargePence,
                 DateTicks = costedReading.UtcTime.eToUnixTicksNoOffset(),
-                HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingChargePence,
-                TariffAppliesFrom = costedReading.TariffAppliesFrom,
-                TariffType = String.Empty,
-                IsForecast = costedReading.Forecast
+                TariffAppliesFrom = costedReading.TariffAppliesFrom
             };
         }
     }

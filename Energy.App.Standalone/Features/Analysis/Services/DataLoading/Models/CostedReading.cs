@@ -2,14 +2,15 @@
 {
     public record CostedReading
     {
-        public DateTime TariffAppliesFrom { get; init; }
-        public decimal TariffDailyStandingChargePence { get; init; }
-        public decimal TariffHalfHourlyStandingChargePence { get; init; }
-        public decimal TariffHalfHourlyPencePerKWh { get; init; }
+        public DateTime TApFrom { get; init; }
+        public decimal TDStndP { get; init; }
+        public decimal THHStndCh { get; init; }
+        public decimal TPpKWh { get; init; }
 
         public DateTime UtcTime { get; init; }
         public decimal KWh { get; init; }
-        public decimal ReadingTotalCostPence { get; init; } 
-        public bool Forecast { get; init; }
+        public decimal CostP { get; init; } 
+        public bool Fcst { get; init; }
+        public bool Fixed { get; init; }
     }
 }

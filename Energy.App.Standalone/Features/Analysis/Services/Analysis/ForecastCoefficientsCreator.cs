@@ -8,8 +8,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 {
     public (decimal C, decimal Gradient) GetForecastCoefficients(
-        ImmutableList<BasicReading> basicReadings,
-        ImmutableList<DailyWeatherReading> dailyWeatherReadings)
+        IEnumerable<BasicReading> basicReadings,
+        IEnumerable<DailyWeatherReading> dailyWeatherReadings)
     {
 
         var dailyConsumptionPoints =
@@ -23,7 +23,7 @@ class ForecastCoefficientsCreator : IForecastCoefficientsCreator
                      TemperatureCelsius = (double)wr.TemperatureAverage,
                      ConsumptionKWh = (double)(daily.Sum(c => c.Readings.KWh))
                  }
-                ).ToImmutableList();
+                ).ToList();
 
 
         var winterData = GetOctAprilDailyData(dailyConsumptionPoints);
@@ -36,11 +36,11 @@ class ForecastCoefficientsCreator : IForecastCoefficientsCreator
         return (C: (decimal)consumptionFit.A, Gradient: (decimal)consumptionFit.B);
     }
 
-    private ImmutableList<DailyConsumptionPoint> GetOctAprilDailyData(ICollection<DailyConsumptionPoint> dailyConsumptionPoints)
+    private List<DailyConsumptionPoint> GetOctAprilDailyData(ICollection<DailyConsumptionPoint> dailyConsumptionPoints)
     {
         List<int> winterMonths = new List<int>() { 1, 2, 3, 4, 10, 11, 12 };
         var winterData = dailyConsumptionPoints
-            .Where(c => winterMonths.Contains(c.Date.Month)).ToImmutableList();
+            .Where(c => winterMonths.Contains(c.Date.Month)).ToList();
 
         return winterData;
     }

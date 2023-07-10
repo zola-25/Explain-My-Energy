@@ -1,4 +1,5 @@
-﻿@using Fluxor.Persist.Middleware;
+﻿@using Energy.App.Standalone.Features.AppInit.Store.OldAppInit;
+@using Fluxor.Persist.Middleware;
 @inherits FluxorComponent
 
 <Fluxor.Blazor.Web.StoreInitializer />
@@ -19,15 +20,17 @@
     
     [Inject] IDispatcher Dispatcher { get; set; }
 
+    [Inject] AppInit AppInit { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         
 
         SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
-
             Console.WriteLine($"**** State rehydrated ****");
-
+            StateHasChanged();
+            AppInit.Initialize();
         });
         
     }

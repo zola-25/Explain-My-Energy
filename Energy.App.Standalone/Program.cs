@@ -74,13 +74,13 @@ System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
     options = options.ScanAssemblies(currentAssembly);
-    
-    // options.UseReduxDevTools(devToolsOptions =>
-    // {
-    //     devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
-    //     devToolsOptions.UseSystemTextJson();
-    //     //devToolsOptions.EnableStackTrace();
-    // });
+
+    options.UseReduxDevTools(devToolsOptions =>
+    {
+        devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
+        devToolsOptions.UseSystemTextJson();
+        //devToolsOptions.EnableStackTrace();
+    });
     options.UsePersist(persistMiddlewareOptions =>
     {
         persistMiddlewareOptions.UseInclusionApproach();

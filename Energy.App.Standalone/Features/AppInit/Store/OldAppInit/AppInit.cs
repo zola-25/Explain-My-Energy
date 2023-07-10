@@ -1,5 +1,8 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Store;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.Shared;
@@ -15,7 +18,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store.OldAppInit
         private readonly IState<MeterSetupState> _meterSetupState;
         private readonly IState<GasReadingsState> _gasReadingsState;
         private readonly IState<ElectricityReadingsState> _electricityReadingsState;
-        private readonly IState<LinearCoefficientsState> _linearCoefficientsState;
+        private readonly IState<HeatingForecastState> _heatingForecastState;
         IActionSubscriber _actionSubscriber;
 
         public AppInit(IState<HouseholdState> householdState,
@@ -24,7 +27,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store.OldAppInit
             IState<GasReadingsState> gasReadingsState,
             IState<ElectricityReadingsState> electricityReadingsState,
             IDispatcher dispatcher,
-            IState<LinearCoefficientsState> linearCoefficientsState,
+            IState<HeatingForecastState> heatingForecastState,
             IActionSubscriber actionSubscriber)
         {
             _householdState = householdState;
@@ -33,113 +36,52 @@ namespace Energy.App.Standalone.Features.AppInit.Store.OldAppInit
             _gasReadingsState = gasReadingsState;
             _electricityReadingsState = electricityReadingsState;
             _dispatcher = dispatcher;
-            _linearCoefficientsState = linearCoefficientsState;
+            _heatingForecastState = heatingForecastState;
             _actionSubscriber = actionSubscriber;
         }
 
 
-        public bool CanUpdateWeatherData => _householdState.Value.Saved;
-        public bool CanUpdateElectricityData => _meterSetupState.Value.ElectricityMeter.SetupValid;
-        public bool CanUpdateGasData => _meterSetupState.Value.GasMeter.SetupValid;
+        public bool HouseholdSetupValid => _householdState.Value.Saved;
+        public bool ElectricityMeterSetupValid => _meterSetupState.Value.ElectricityMeter.SetupValid;
+        public bool GasMeterSetupValid => _meterSetupState.Value.GasMeter.SetupValid;
 
-        public bool CanUpdateLinearCoefficients =>
-            _meterSetupState.Value[_householdState.Value.PrimaryHeatSource].
-                SetupValid;
+        public bool WeatherDataLoading => _weatherState.Value.Loading || _weatherState.Value.Updating
+            || _weatherState.Value.LastUpdated < DateTime.Today;
 
-        public bool WeatherDataLoading => _weatherState.Value.Loading || _weatherState.Value.Updating;
-        public bool ElectricityDataLoading => _electricityReadingsState.Value.ReloadingReadings 
-                                              || _electricityReadingsState.Value.UpdatingReadings 
-                                              || _electricityReadingsState.Value.CalculatingCosts;
-        public bool GasDataLoading => _gasReadingsState.Value.Reloading || _gasReadingsState.Value.Updating || _gasReadingsState.Value.CalculatingCosts;
+        public bool ElectricityDataLoading => _electricityReadingsState.Value.ReloadingReadings
+                                              || _electricityReadingsState.Value.UpdatingReadings
+                                              || _electricityReadingsState.Value.LastUpdated < DateTime.Today;
+        public bool GasDataLoading => _gasReadingsState.Value.ReloadingReadings 
+            || _gasReadingsState.Value.UpdatingReadings
+            || _gasReadingsState.Value.LastUpdated < DateTime.Today;
 
-        public bool LinearCoefficientsLoading => !_linearCoefficientsState.Value.Saved;
-
-        public void Setup()
-        {
-            _meterSetupState.StateChanged += (sender, args) =>
-            {
-                if (CanUpdateElectricityData)
-                {
-                    InitializeElectricity();
-                }
-
-                if (CanUpdateGasData)
-                {
-                    InitializeGas();
-                }
-            };
-            
-            _householdState.StateChanged += (sender, args) =>
-            {
-                if (CanUpdateWeatherData)
-                {
-                    InitializeWeather();
-                }
-
-                if (CanUpdateLinearCoefficients)
-                {
-                    InitializeLinearCoefficients();
-                }
-            };
-            
-            _electricityReadingsState.StateChanged += (sender, args) =>
-            {
-                if (CanUpdateElectricityData)
-                {
-                    InitializeElectricity();
-                }
-            };
-            
-            _gasReadingsState.StateChanged += (sender, args) =>
-            {
-                if (CanUpdateGasData)
-                {
-                    InitializeGas();
-                }
-            };
-            
-            
-            
-            _linearCoefficientsState.StateChanged += (sender, args) =>
-            {
-                if (CanUpdateLinearCoefficients)
-                {
-                    InitializeLinearCoefficients();
-                }
-            };
-        } 
-
+        public bool AppStarted { get; private set; }
 
         public void Initialize()
         {
-            if (!_householdState.Value.Saved)
+            AppStarted = true;
+
+            if (!HouseholdSetupValid)
             {
                 return;
             }
 
-            if (CanUpdateWeatherData)
-            {
-                InitializeWeather();
-            }
 
-            if (CanUpdateElectricityData)
-            {
-                InitializeElectricity();
-            }
+            InitializeWeather();
 
-            if (CanUpdateGasData)
-            {
-                InitializeGas();
-            }
+            InitializeElectricity();
 
-            if (CanUpdateLinearCoefficients)
-            {
-                InitializeLinearCoefficients();
-            }
+            InitializeGas();
+
         }
 
         public void InitializeWeather()
         {
+            if (!HouseholdSetupValid)
+            {
+                return;
+            }
+
             if (!_weatherState.Value.WeatherReadings.Any())
             {
                 _dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(_householdState.Value.OutCodeCharacters));
@@ -168,45 +110,56 @@ namespace Energy.App.Standalone.Features.AppInit.Store.OldAppInit
 
         public void InitializeGas()
         {
-            if (_gasReadingsState.Value.BasicReadings.Any())
+            if (!GasMeterSetupValid)
             {
-                DateTime lastReading = _gasReadingsState.Value.BasicReadings.Last().
-                    UtcTime;
-                if (lastReading < DateTime.Today.AddDays(-1))
-                {
-                    _dispatcher.Dispatch(new GasUpdateReadingsAction(lastReading.Date));
-                }
+                return;
+            }
+            if (!_gasReadingsState.Value.CostedReadings.Any())
+            {
+                _dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
             }
             else
             {
-                _dispatcher.Dispatch(new GasReloadReadingsAction());
+                DateTime lastReading = _gasReadingsState.Value.CostedReadings.Last().
+                    UtcTime;
+                if (lastReading < DateTime.Today.AddDays(-1))
+                {
+                    _dispatcher.Dispatch(new GasUpdateReadingsAndCostsAction(lastReading.Date));
+                }
+                else  {
+                    _dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(0,MeterType.Gas));
+                } 
+
+
             }
 
-            _dispatcher.Dispatch(new GasInitiateCostCalculationsAction());
         }
 
         public void InitializeElectricity()
         {
-            if (_electricityReadingsState.Value.BasicReadings.Any())
+            if (!ElectricityMeterSetupValid)
             {
-                DateTime lastReading = _electricityReadingsState.Value.BasicReadings.Last().
-                    UtcTime;
-                if (lastReading < DateTime.Today.AddDays(-1))
-                {
-                    _dispatcher.Dispatch(new ElectricityUpdateReadingsAction(lastReading.Date));
-                }
+                return;
+            }
+
+            if (!_electricityReadingsState.Value.CostedReadings.Any())
+            {
+                _dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
             }
             else
             {
-                _dispatcher.Dispatch(new ElectricityReloadReadingsAction());
+                DateTime lastReading = _electricityReadingsState.Value.CostedReadings.Last().
+                    UtcTime;
+                if (lastReading < DateTime.Today.AddDays(-1))
+                {
+                    _dispatcher.Dispatch(new ElectricityUpdateReadingsAndCostsAction(lastReading.Date));
+                }
+                else {
+                    _dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdated(0,MeterType.Gas));
+                } 
             }
 
-            _dispatcher.Dispatch(new ElectricityInitiateCostCalculationsAction());
         }
 
-        public void InitializeLinearCoefficients()
-        {
-            _dispatcher.Dispatch(new InitiateUpdateLinearCoefficientsAction());
-        }
     }
 }

@@ -10,6 +10,8 @@
         public long MostRecentWeekStart { get; set; }
         public long OneMonthInTheFuture { get; set; }
         public List<ChartReading> ChartReadings { get; set; }
+        public List<ChartDailyForecastReading> ChartDailyForecastReadings { get; set; }
+
     }
 
     public class MeterChartData

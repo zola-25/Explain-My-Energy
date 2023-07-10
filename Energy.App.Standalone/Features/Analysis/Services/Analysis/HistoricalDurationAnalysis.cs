@@ -5,8 +5,9 @@ using Energy.Shared;
 using System.Collections.Immutable;
 using MathNet.Numerics;
 using Fluxor;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
 using Energy.App.Standalone.Features.Weather.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -59,7 +60,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
         bool hasData = historicalCosts.Count > 0;
         
         var totalKWh = historicalCosts.Sum(c => c.KWh);
-        var totalCost = historicalCosts.Sum(c => c.ReadingTotalCostPence) / 100m;
+        var totalCost = historicalCosts.Sum(c => c.CostP) / 100m;
         var totalCo2 = totalKWh * co2ConversionFactor;
         
         var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());

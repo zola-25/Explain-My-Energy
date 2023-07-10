@@ -1,5 +1,4 @@
 ﻿@page "/MeterAuthorization/{MeterTypeText}"
-@using Energy.App.Standalone.Features.EnergyReadings.Store;
 @inherits FluxorComponent
 @inject IState<MeterSetupState> MeterSetupState
 @inject IState<HouseholdState> HouseholdState
@@ -93,11 +92,11 @@
             {
                 case MeterType.Gas:
                     Dispatcher.Dispatch(new GasMeterSuccessfulAuthorizationAction());
-                    Dispatcher.Dispatch(new GasReloadReadingsAction());
+                    Dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new ElectricityMeterSuccessfulAuthorizationAction());
-                    Dispatcher.Dispatch(new ElectricityReloadReadingsAction());
+                    Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
 
                     break;
                 default:

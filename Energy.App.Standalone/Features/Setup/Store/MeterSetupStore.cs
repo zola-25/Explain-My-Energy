@@ -1,5 +1,6 @@
 ﻿using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models;
 using Energy.Shared;

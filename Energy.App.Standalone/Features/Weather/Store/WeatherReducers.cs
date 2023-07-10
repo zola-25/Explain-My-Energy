@@ -15,6 +15,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
             {
                 Loading = false,
                 WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList(),
+                LastUpdated = DateTime.UtcNow
             };
         }
 
@@ -28,6 +29,7 @@ namespace Energy.App.Standalone.Features.Weather.Store
                 WeatherReadings = state.WeatherReadings
                     .RemoveAll(c => c.UtcTime >= firstUpdateDate)
                     .AddRange(action.UpdatedWeatherReadings),
+                LastUpdated = DateTime.UtcNow
             };
         }
 

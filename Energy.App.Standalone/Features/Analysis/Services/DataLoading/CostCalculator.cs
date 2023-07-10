@@ -68,15 +68,15 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                                                                     equals halfHourlyPrice.HourOfDay
                                                                 select new CostedReading()
                                                                 {
-                                                                    TariffAppliesFrom = currentTariff.DateAppliesFrom.Value,
-                                                                    TariffDailyStandingChargePence = currentTariff.DailyStandingChargePence,
-                                                                    TariffHalfHourlyStandingChargePence = halfHourlyStandingChargePence,
-                                                                    TariffHalfHourlyPencePerKWh = halfHourlyPrice.PencePerKWh,
-
+                                                                    TApFrom = currentTariff.DateAppliesFrom.Value,
+                                                                    TDStndP = currentTariff.DailyStandingChargePence,
+                                                                    THHStndCh = halfHourlyStandingChargePence,
+                                                                    TPpKWh = halfHourlyPrice.PencePerKWh,
+                                                                    Fixed = currentTariff.IsHourOfDayFixed,
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    ReadingTotalCostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
-                                                                    Forecast = basicReading.Forecast
+                                                                    CostP = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
+                                                                    Fcst = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);
             }

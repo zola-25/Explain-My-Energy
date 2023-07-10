@@ -1,7 +1,7 @@
 ﻿@page "/HeatingMeter/{MeterTypeName}"
 @using System.Runtime.InteropServices
 @using Energy.App.Standalone.Features.AppInit.Store.OldAppInit
-@using Energy.App.Standalone.Features.EnergyReadings.Store
+@using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
@@ -42,8 +42,8 @@
         SubscribeToAction<NotifyHeatingForecastReadyAction>(_ =>
         {
             _ready = true;
+            InvokeAsync(StateHasChanged);
         });
-        AppInit.Initialize();
     }
 
 }

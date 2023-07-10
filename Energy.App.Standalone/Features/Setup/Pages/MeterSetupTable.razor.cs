@@ -1,5 +1,8 @@
 using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.EnergyReadings.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
 using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
@@ -145,8 +148,8 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         {
             return meterType switch
             {
-                MeterType.Electricity => ElectricityReadingsState.Value.BasicReadings.LastOrDefault()?.UtcTime.Date,
-                MeterType.Gas => GasReadingsState.Value.BasicReadings.LastOrDefault()?.UtcTime.Date,
+                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings.LastOrDefault()?.UtcTime.Date,
+                MeterType.Gas => GasReadingsState.Value.CostedReadings.LastOrDefault()?.UtcTime.Date,
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -156,7 +159,7 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             return meterType switch
             {
                 MeterType.Electricity => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings,
-                MeterType.Gas => GasReadingsState.Value.Reloading || GasReadingsState.Value.Updating,
+                MeterType.Gas => GasReadingsState.Value.ReloadingReadings || GasReadingsState.Value.UpdatingReadings,
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -225,10 +228,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasUpdateReadingsAction(GasReadingsState.Value.BasicReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new GasUpdateReadingsAndCostsAction(GasReadingsState.Value.CostedReadings.Last().UtcTime.Date));
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityUpdateReadingsAction(ElectricityReadingsState.Value.BasicReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new ElectricityUpdateReadingsAndCostsAction(ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.Date));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -240,10 +243,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasReloadReadingsAction());
+                    Dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityReloadReadingsAction());
+                    Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

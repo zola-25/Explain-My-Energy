@@ -7,7 +7,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
     public class ForecastGenerator : IForecastGenerator
     {
         public List<BasicReading> GetBasicReadingsForecast(decimal degreeDifference,
-            LinearCoefficientsState linearCoefficientsState,
+            HeatingForecastState linearCoefficientsState,
             List<DailyWeatherReading> forecastWeatherReadings)
         {
             var adjustedReadings = forecastWeatherReadings

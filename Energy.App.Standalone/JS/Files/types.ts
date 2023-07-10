@@ -18,6 +18,14 @@ export interface ChartReading {
     isForecast: boolean;
 }
 
+export interface ChartDailyForecastReading {
+    dateTicks: number,
+    pencePerKWh: number,
+    cost: number,
+    dailyStandingCharge: number,
+    kWh: number,
+    tariffAppliesFrom: Date
+}
 
 export interface MeterChartProfile {
     showCost: boolean,
@@ -27,7 +35,8 @@ export interface MeterChartProfile {
     mostRecentWeekStart: number,
     oneMonthInTheFuture: number,
     latestReading: number,
-    chartReadings: ChartReading[]
+    chartReadings: ChartReading[],
+    chartDailyForecastReadings: ChartDailyForecastReading[]
 }
 
 export interface MeterProfile {

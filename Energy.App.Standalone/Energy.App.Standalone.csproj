@@ -1,59 +1,63 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Fluxor" Version="5.9.0" />
-    <PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
-    <PackageReference Include="Fluxor.Persist" Version="2.5.3" />
-    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MudBlazor" Version="6.6.0" />
-	<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
-	<PackageReference Include="System.Linq.Async" Version="6.0.1" />
-	<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
-  </ItemGroup>
-  
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Energy.n3rgyApi\Energy.n3rgyApi.csproj" />
-    <ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
-    <ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
-  </ItemGroup>
-  
-  
-  <ItemGroup>
-    <Folder Include="wwwroot\js\" />
-  </ItemGroup>
-  
-  
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js.map" />
-    <_ContentIncludedByDefault Remove="wwwroot\js\Files\types.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\js\Files\types.js.map" />
-  </ItemGroup>
-  
-  
-  
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="npm run build --prefix JS/" />
-  </Target>
+	<ItemGroup>
+		<PackageReference Include="Fluxor" Version="5.9.0" />
+		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
+		<PackageReference Include="Fluxor.Persist" Version="2.5.3" />
+		<PackageReference Include="LZStringCSharp" Version="1.4.0" />
+		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="MudBlazor" Version="6.6.0" />
+		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
+		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
+		<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\Energy.n3rgyApi\Energy.n3rgyApi.csproj" />
+		<ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
+		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Folder Include="wwwroot\js\" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js" />
+		<_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js.map" />
+		<_ContentIncludedByDefault Remove="wwwroot\js\Files\types.js" />
+		<_ContentIncludedByDefault Remove="wwwroot\js\Files\types.js.map" />
+	</ItemGroup>
 
 
 
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="npm run build --prefix JS/" />
+	</Target>
+
+	<ItemGroup>
+
+		<Watch Include="wwwroot\js\**;wwwroot\css\**" />
+
+	</ItemGroup>
 
 </Project>
