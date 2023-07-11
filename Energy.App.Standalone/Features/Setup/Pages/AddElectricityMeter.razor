@@ -1,4 +1,5 @@
 ﻿@page "/AddElectricityMeter"
+@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 @inherits FluxorComponent
 @inject IState<MeterSetupState> MeterSetupState
 @inject IDispatcher Dispatcher
@@ -86,9 +87,7 @@
 
     protected override void OnParametersSet()
     {
-        SubscribeToAction<NotifyElectricityMeterInitialSetupValidAction>(SetupValidAction);
         MapElectricityMeter();
-
     }
 
     private void MapElectricityMeter()
@@ -111,23 +110,19 @@
         HideNationalGrid = !HideNationalGrid;
     }
 
-    private void SetupValidAction(NotifyElectricityMeterInitialSetupValidAction action)
-    {
-        MapElectricityMeter();
-        ShowSuccessMessage();
-    }
 
 
     private async Task HandleValidSubmit()
     {
         if (_addingNotUpdating)
         {
-            Dispatcher.Dispatch(new ElectricityMeterInitialAddAction(ElectricityMeter));
+            Dispatcher.Dispatch(new AddElectricityAction(ElectricityMeter));
         }
         else
         {
-            Dispatcher.Dispatch(new ElectricityMeterInitialUpdateAction(ElectricityMeter));
+            Dispatcher.Dispatch(new UpdateElectricityAction(ElectricityMeter));
         }
+        ShowSuccessMessage();
     }
 
     private void ShowSuccessMessage()

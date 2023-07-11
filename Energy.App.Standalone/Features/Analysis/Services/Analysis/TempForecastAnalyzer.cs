@@ -1,7 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
 using System.Text.Json;

@@ -1,12 +1,14 @@
-﻿using Energy.Shared;
+﻿using System.Collections.Immutable;
+using Energy.Shared;
 
-namespace Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+namespace Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 
 public record MeterState
 {
     public Guid GlobalId { get; init; }
     public MeterType MeterType { get; init; }
 
+    public MeterHeatingType MeterHeatingType { get; init; }
     public string Mpxn { get; init; }
 
     public bool InitialSetupValid { get; init; }
@@ -16,4 +18,5 @@ public record MeterState
 
     public bool SetupValid { get; init; }
 
+    public ImmutableList<TariffDetailState> TariffDetails { get; init; }
 }

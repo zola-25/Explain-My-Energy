@@ -1,7 +1,7 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 

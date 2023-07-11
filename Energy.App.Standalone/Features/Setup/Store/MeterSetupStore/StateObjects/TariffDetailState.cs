@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects
+namespace Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects
 {
     public record TariffDetailState
     {

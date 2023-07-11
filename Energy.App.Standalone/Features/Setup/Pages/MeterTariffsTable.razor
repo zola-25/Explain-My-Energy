@@ -1,11 +1,16 @@
-﻿@implements IDisposable
-@inject IState<GasTariffsState> GasTariffState
-@inject IState<ElectricityTariffsState> ElectricityTariffState
+﻿@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore
+@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects
+@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.Tariffs
+@using System.Collections.Immutable
+
 @inject IDispatcher Dispatcher
-@using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+@using Energy.App.Standalone.Features.Setup.Store;
+@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 @using Energy.App.Standalone.Models
 @using LabelPosition = MudBlazor.LabelPosition
-
+@using System.Collections.Immutable
+@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.Tariffs
+@inherits FluxorComponent
 
 <MudTooltip ShowOnHover="true" Text="Return to Setup">
     <MudLink  Underline="Underline.None"
@@ -126,6 +131,9 @@
 
     [Inject] IDialogService DialogService { get; set; }
 
+    [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
+
+    [Inject] IStateSelection<MeterSetupState, ImmutableList<TariffDetailState>> TariffState { get; set; }
 
 
     List<TariffDetailRow> _tariffDetailRows;
@@ -136,13 +144,7 @@
 
     TariffDetail _addEditTariffDetail;
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        ElectricityTariffState.StateChanged += HandleStateChanged;
-        GasTariffState.StateChanged += HandleStateChanged;
-
-    }
+    
 
     private record TariffDetailRow
     {
@@ -160,19 +162,15 @@
 
     protected override void OnParametersSet()
     {
-        switch (MeterType)
-        {
-            case MeterType.Gas:
-                _tariffDetailState = GasTariffState.Value.TariffDetails.ToList();
-                break;
-            case MeterType.Electricity:
-                _tariffDetailState = ElectricityTariffState.Value.TariffDetails.ToList();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        _tariffDetailState = MeterSetupState.Value[MeterType].TariffDetails.ToList();
+        TariffState.Select(c => c[MeterType].TariffDetails, selectedValueChanged: SelectedValueChanged);
 
         SetTariffDetailRows();
+    }
+
+    private void SelectedValueChanged(ImmutableList<TariffDetailState> newTariffState)
+    {
+        _tariffDetailState = newTariffState.ToList();
     }
 
     private void OnAddNewTariffClick()
@@ -209,7 +207,7 @@
                 DailyStandingChargePence = c.DailyStandingChargePence,
                 DateAppliesFrom = c.DateAppliesFrom,
                 ShowHourOfDayRows = false
-            }).OrderBy(c => c.DateAppliesFrom).ToList();
+            }).ToList();
     }
 
     private Task OnEditTariffClick(TariffDetailRow context)
@@ -257,15 +255,6 @@
         _addEditTariffDetail = null;
         _showEditDialogue = false;
     }
-
-    public void Dispose() 
-    {
-        GasTariffState.StateChanged -= HandleStateChanged;
-        ElectricityTariffState.StateChanged -= HandleStateChanged;
-
-    }
-
-    private void HandleStateChanged(object sender, EventArgs e) => InvokeAsync(StateHasChanged);
 
 
 }

@@ -1,5 +1,4 @@
 ﻿using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.Shared;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Factorization;
@@ -9,6 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 
 namespace Energy.Test
 {

@@ -6,6 +6,7 @@ using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 {
@@ -13,13 +14,13 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
     {
         private readonly IEnergyReadingImporter _energyReadingImporter;
         private readonly ICostCalculator _energyCostCalculator;
-        IState<ElectricityTariffsState> _electricityTariffsState;
+        IState<MeterSetupState> _meterSetupState;
         IState<ElectricityReadingsState> _electricityReadingsState;
 
-        public ElectricityReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<ElectricityTariffsState> electricityTariffsState, ICostCalculator energyCostCalculator, IState<ElectricityReadingsState> electricityReadingsState)
+        public ElectricityReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<MeterSetupState> meterSetupState, ICostCalculator energyCostCalculator, IState<ElectricityReadingsState> electricityReadingsState)
         {
             _energyReadingImporter = energyReadingImporter;
-            _electricityTariffsState = electricityTariffsState;
+            _meterSetupState = meterSetupState;
             _energyCostCalculator = energyCostCalculator;
             _electricityReadingsState = electricityReadingsState;
         }
@@ -107,7 +108,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,
-                        _electricityTariffsState.Value.TariffDetails).ToImmutableList();
+                        _meterSetupState.Value[MeterType.Electricity].TariffDetails).ToImmutableList();
             return costedReadings;
         }
 

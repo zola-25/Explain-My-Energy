@@ -1,12 +1,12 @@
 using Energy.App.Standalone.Data;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using System.Collections.Immutable;
 using Energy.App.Standalone.Extensions;
 using System.Xml.Schema;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 using FluentAssertions;
 using MathNet.Numerics;
 

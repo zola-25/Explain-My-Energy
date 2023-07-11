@@ -48,7 +48,7 @@ namespace Energy.App.Standalone.PageComponents
 
 
             WeatherLoaded = true;
-            //AppLoading = false;
+            AppLoading = false;
         }
 
 

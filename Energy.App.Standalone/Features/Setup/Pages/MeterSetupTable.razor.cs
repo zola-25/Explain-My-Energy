@@ -4,7 +4,8 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
-using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 using Energy.Shared;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
@@ -23,8 +24,6 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         [Inject] IState<HouseholdState> HouseholdState { get; set; }
         [Inject] IState<GasReadingsState> GasReadingsState { get; set; }
         [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
-        [Inject] IState<ElectricityTariffsState> ElectricityTariffsState { get; set; }
-        [Inject] IState<GasTariffsState> GasTariffsState { get; set; }
 
         [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
 
@@ -100,17 +99,6 @@ namespace Energy.App.Standalone.Features.Setup.Pages
                 await InvokeAsync(StateHasChanged);
             };
             
-            GasTariffsState.StateChanged += async (sender, state) =>
-            {
-                SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
-            };
-            
-            ElectricityTariffsState.StateChanged += async (sender, state) =>
-            {
-                SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
-            };
             
             SetMeterStatusList();
 
@@ -127,7 +115,7 @@ namespace Energy.App.Standalone.Features.Setup.Pages
 
         private MeterStatus MeterStateToStatus(MeterState meterState)
         {
-            TariffInfo tariffInfo = GetTariffInfo(meterState.MeterType);
+            TariffInfo tariffInfo = GetTariffInfo(meterState);
 
             return new MeterStatus()
             {
@@ -148,8 +136,8 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         {
             return meterType switch
             {
-                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings.LastOrDefault()?.UtcTime.Date,
-                MeterType.Gas => GasReadingsState.Value.CostedReadings.LastOrDefault()?.UtcTime.Date,
+                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings?.LastOrDefault()?.UtcTime.Date,
+                MeterType.Gas => GasReadingsState.Value.CostedReadings?.LastOrDefault()?.UtcTime.Date,
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -165,20 +153,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
         }
 
 
-        private TariffInfo GetTariffInfo(MeterType meterType)
+        private TariffInfo GetTariffInfo(MeterState meterState)
         {
-            List<TariffDetailState> tariffDetailState;
-            switch (meterType)
-            {
-                case MeterType.Gas:
-                    tariffDetailState = GasTariffsState.Value.TariffDetails.ToList();
-                    break;
-                case MeterType.Electricity:
-                    tariffDetailState = ElectricityTariffsState.Value.TariffDetails.ToList();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            List<TariffDetailState> tariffDetailState = meterState.TariffDetails.ToList();
+            
 
             string tariffUnitRateText = "No active tariff set";
             bool hasAnyTariffs = tariffDetailState?.Any() ?? false;
@@ -213,10 +191,10 @@ namespace Energy.App.Standalone.Features.Setup.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasMeterDeleteAction());
+                    Dispatcher.Dispatch(new DeleteGasAction());
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityMeterDeleteAction());
+                    Dispatcher.Dispatch(new DeleteElectricityAction());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

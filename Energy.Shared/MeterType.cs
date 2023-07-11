@@ -6,4 +6,10 @@
         Gas,
         Electricity
     }
+
+    public enum MeterHeatingType
+    {
+        Gas,
+        Electricity
+    }
 }

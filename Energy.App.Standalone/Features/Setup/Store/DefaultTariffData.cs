@@ -1,7 +1,10 @@
 ﻿using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
+using System.Collections.Immutable;
+using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 
-namespace Energy.App.Standalone.Data
+namespace Energy.App.Standalone.Features.Setup.Store
 {
     public static class DefaultTariffData
     {
@@ -10,6 +13,15 @@ namespace Energy.App.Standalone.Data
             return DefaultTariffs.Where(c => c.MeterType == meterType && c.ExampleTariffType == exampleTariffType && DateTime.Today >= c.DateAppliesFrom)
                 .OrderByDescending(c => c.DateAppliesFrom)
                 .First();
+        }
+
+        public static ImmutableList<TariffDetailState> GetDefaultTariffs(MeterType meterType,
+                                                                           ExampleTariffType exampleTariffType)
+        {
+            return DefaultTariffs
+                .Where(c => c.MeterType == meterType && c.ExampleTariffType == exampleTariffType)
+                .Select(c => Extensions.Extensions.eMapDefaultTariff(c))
+                .ToImmutableList();
         }
 
         public static readonly List<DefaultTariffDetail> DefaultTariffs = new List<DefaultTariffDetail>

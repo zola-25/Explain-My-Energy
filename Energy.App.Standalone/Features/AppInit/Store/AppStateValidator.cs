@@ -6,7 +6,7 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
-using Energy.App.Standalone.Features.Setup.Store.MeterSetup;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.Shared;
 using Fluxor;

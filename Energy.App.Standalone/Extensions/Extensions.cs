@@ -1,10 +1,10 @@
-﻿using Energy.App.Standalone.Features.Setup.Store.StateObjects;
-using Energy.App.Standalone.Models;
+﻿using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Immutable;
 using System.Text;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
 
 namespace Energy.App.Standalone.Extensions;
 
@@ -68,6 +68,24 @@ public static class Extensions
             HourOfDay = c.HourOfDay,
             PencePerKWh = c.PencePerKWh
         }).ToList();
+    }
+
+    public static TariffDetailState eMapDefaultTariff(this DefaultTariffDetail defaultTariffDetail)
+    {
+        return new TariffDetailState
+        {
+            GlobalId = Guid.NewGuid(),
+            PencePerKWh = defaultTariffDetail.PencePerKWh,
+            DailyStandingChargePence = defaultTariffDetail.DailyStandingChargePence,
+            DateAppliesFrom = defaultTariffDetail.DateAppliesFrom,
+            IsHourOfDayFixed = defaultTariffDetail.IsHourOfDayFixed,
+            HourOfDayPrices = defaultTariffDetail.DefaultHourOfDayPrices
+                .Select(h => new HourOfDayPriceState()
+                {
+                    HourOfDay = h.HourOfDay,
+                    PencePerKWh = h.PencePerKWh
+                }).ToImmutableList(),
+        };
     }
 
     public static TariffDetail eMapToTariffDto(this TariffDetailState tariffDetailState)

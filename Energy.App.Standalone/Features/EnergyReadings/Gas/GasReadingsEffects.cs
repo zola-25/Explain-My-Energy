@@ -6,6 +6,7 @@ using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas
 {
@@ -18,17 +19,17 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         private readonly IEnergyReadingImporter _energyReadingImporter;
         private readonly ICostCalculator _energyCostCalculator;
 
-        IState<GasReadingsState> _gasReadingsState;
-        IState<GasTariffsState> _gasTariffsState;
+        private readonly IState<MeterSetupState> _meterSetupState;
+        private readonly IState<GasReadingsState> _gasReadingsState;
 
         public GasReadingsEffects(IEnergyReadingImporter energyReadingImporter,
             IState<GasReadingsState> gasReadingsState,
-            IState<GasTariffsState> gasTariffsState,
+            IState<MeterSetupState> meterSetupState,
             ICostCalculator energyCostCalculator)
         {
             _energyReadingImporter = energyReadingImporter;
             _gasReadingsState = gasReadingsState;
-            _gasTariffsState = gasTariffsState;
+            _meterSetupState = meterSetupState;
             _energyCostCalculator = energyCostCalculator;
         }
 
@@ -117,7 +118,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         {
             var costedReadings = _energyCostCalculator
                     .GetCostReadings(basicReadings,
-                        _gasTariffsState.Value.TariffDetails).ToImmutableList();
+                        _meterSetupState.Value[MeterType.Gas].TariffDetails).ToImmutableList();
             return costedReadings;
         }
     }

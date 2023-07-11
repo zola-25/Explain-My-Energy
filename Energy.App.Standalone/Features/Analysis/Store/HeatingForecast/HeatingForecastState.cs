@@ -17,6 +17,7 @@ using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using System.Text.Json.Serialization;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 {
@@ -123,11 +124,11 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
         private readonly IState<WeatherState> _weatherState;
         private readonly IForecastGenerator _forecastGenerator;
         private readonly ICostCalculator _costCalculator;
-        private readonly IState<ElectricityTariffsState> _electricityTariffsState;
-        private readonly IState<GasTariffsState> _gasTariffsState;
         private readonly IState<HeatingForecastState> _heatingForecastState;
         private readonly IState<AnalysisOptionsState> _analysisOptionsState;
         private readonly IForecastCoefficientsCreator _forecastCoefficientsCreator;
+
+        private readonly IState<MeterSetupState> _meterSetupState;
 
         public HeatingForecastEffects(IState<GasReadingsState> gasReadingsState,
                                           IState<ElectricityReadingsState> electricityReadingsState,
@@ -135,11 +136,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                                           IState<WeatherState> weatherState,
                                           IForecastGenerator forecastGenerator,
                                           ICostCalculator costCalculator,
-                                          IState<ElectricityTariffsState> electricityTariffsState,
-                                          IState<GasTariffsState> gasTariffsState,
                                           IForecastCoefficientsCreator forecastCoefficientsCreator,
                                           IState<HeatingForecastState> linearCoefficientsState,
-                                          IState<AnalysisOptionsState> analysisOptionsState)
+                                          IState<AnalysisOptionsState> analysisOptionsState,
+                                          IState<MeterSetupState> meterSetupState)
         {
             _gasReadingsState = gasReadingsState;
             _electricityReadingsState = electricityReadingsState;
@@ -147,11 +147,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             _weatherState = weatherState;
             _forecastGenerator = forecastGenerator;
             _costCalculator = costCalculator;
-            _electricityTariffsState = electricityTariffsState;
-            _gasTariffsState = gasTariffsState;
             _forecastCoefficientsCreator = forecastCoefficientsCreator;
             _heatingForecastState = linearCoefficientsState;
             _analysisOptionsState = analysisOptionsState;
+            _meterSetupState = meterSetupState;
         }
 
         [EffectMethod]
@@ -195,9 +194,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             var heatingMeter = _householdState.Value.PrimaryHeatSource;
             decimal degreeDifference = action.DegreeDifference;
 
-            var tariffs = heatingMeter == MeterType.Electricity
-                ? _electricityTariffsState.Value.TariffDetails
-                : _gasTariffsState.Value.TariffDetails;
+
+            var tariffs = _meterSetupState.Value[heatingMeter].TariffDetails;
 
             var recentWeatherReadings = _weatherState.Value.WeatherReadings.Where
                 (
