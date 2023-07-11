@@ -1,5 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
-using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Weather.Store;
@@ -17,31 +16,31 @@ public static class AppValidationReducers
             AppStarted = true
         };
     }
-    
-    [ReducerMethod]
-    public static AppValidationState OnInitiateReloadWeatherData (AppValidationState state, InitiateWeatherReloadReadingsAction action)
-    {
-        return state with
-        {
-            WeatherDataInitialized = false,
-            WeatherDataInitializing = true,
-            WeatherDataStatus = $"Loading for area {action.OutCode}"
-        };
-    }
+
+    //[ReducerMethod]
+    //public static AppValidationState OnInitiateReloadWeatherData (AppValidationState state, InitiateWeatherReloadReadingsAction action)
+    //{
+    //    return state with
+    //    {
+    //        WeatherDataInitialized = false,
+    //        WeatherDataInitializing = true,
+    //        WeatherDataStatus = $"Loading for area {action.OutCode}"
+    //    };
+    //}
+
+    //[ReducerMethod]
+    //public static AppValidationState OnInitiateUpdateWeatherData (AppValidationState state, InitiateWeatherUpdateReadingsAction action)
+    //{
+    //    return state with
+    //    {
+    //        WeatherDataInitializing = true,
+    //        WeatherDataInitialized = false,
+    //        WeatherDataStatus = $"Updating for area {action.OutCode}"
+    //    };
+    //}
 
     [ReducerMethod]
-    public static AppValidationState OnInitiateUpdateWeatherData (AppValidationState state, InitiateWeatherUpdateReadingsAction action)
-    {
-        return state with
-        {
-            WeatherDataInitializing = true,
-            WeatherDataInitialized = false,
-            WeatherDataStatus = $"Updating for area {action.OutCode}"
-        };
-    }
-
-    [ReducerMethod]
-    public static AppValidationState OnNotifyWeathReaingsReady (AppValidationState state, NotifyWeatherReadingsReadyAction action)
+    public static AppValidationState OnNotifyWeathReaingsReady(AppValidationState state, NotifyWeatherReadingsReadyAction action)
     {
         return state with
         {
@@ -52,7 +51,7 @@ public static class AppValidationReducers
     }
 
     [ReducerMethod]
-    public static AppValidationState OnElectricityUpdatingNotification (AppValidationState state,  NotifyElectricityStoreUpdating action)
+    public static AppValidationState OnElectricityUpdatingNotification(AppValidationState state, NotifyElectricityStoreUpdating action)
     {
         return state with
         {
@@ -72,7 +71,7 @@ public static class AppValidationReducers
     }
 
     [ReducerMethod]
-    public static AppValidationState OnGasUpdatingNotification (AppValidationState state,  NotifyGasStoreUpdating action)
+    public static AppValidationState OnGasUpdatingNotification(AppValidationState state, NotifyGasStoreUpdating action)
     {
         return state with
         {
@@ -104,7 +103,7 @@ public static class AppValidationReducers
 
 
     [ReducerMethod]
-    public static AppValidationState OnHeatingForecastReady (AppValidationState state, NotifyHeatingForecastReadyAction action)
+    public static AppValidationState OnHeatingForecastReady(AppValidationState state, NotifyHeatingForecastReadyAction action)
     {
         return state with
         {

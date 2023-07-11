@@ -1,21 +1,24 @@
-﻿using Energy.App.Standalone.Features.AppInit.Store;
+﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Weather.Store;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
+using Fluxor.Persist.Middleware;
+using Microsoft.AspNetCore.Components;
 
 namespace Energy.App.Standalone.PageComponents
 {
     public partial class DataValidatorBase : FluxorComponent
     {
-        private AppStateValidator _appStateValidator;
-        private IState<AppValidationState> _appValidationState;
-        public TaskCompletionSource<bool> DataLoading { get; private set;} 
+        [Inject]
+        IDispatcher Dispatcher { get; set; }
 
-        public DataValidatorBase(AppStateValidator appStateValidator, IState<AppValidationState> appValidationState)
-        {
-            _appStateValidator = appStateValidator;
-            _appValidationState = appValidationState;
-        }
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
 
+        public bool WeatherLoaded { get; private set; }
+        public bool AppLoading = true;
+
+        public TaskCompletionSource<bool> StateLoadedFromStorage;
 
         protected override void Dispose(bool disposing)
         {
@@ -24,13 +27,31 @@ namespace Energy.App.Standalone.PageComponents
 
         protected override async Task OnInitializedAsync()
         {
-            DataLoading = new TaskCompletionSource<bool>();
+            this.eLogToConsole(nameof(OnInitializedAsync));
 
-            await base.OnInitializedAsync();
+            StateLoadedFromStorage = new TaskCompletionSource<bool>();
 
-            _appStateValidator.Validate(DataLoading);
+            SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
+            {
+                Console.WriteLine($"**** State rehydrated ****");
+                StateLoadedFromStorage.SetResult(true);
+            });
+
+            await StateLoadedFromStorage.Task;
+
+            TaskCompletionSource<bool> weatherCompletion = new TaskCompletionSource<bool>();
+            Dispatcher.Dispatch(new LoadWeatherAction(false, weatherCompletion));
+
+            await weatherCompletion.Task;
 
 
+
+
+            WeatherLoaded = true;
+            //AppLoading = false;
         }
+
+
+
     }
 }

@@ -21,6 +21,7 @@ public class Meter : IValidatableObject
     public List<TariffDetail> TariffDetails { get; set; }
 
     public bool HasData { get; set; }
+    public MeterHeatingType MeterHeatingType { get; internal set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

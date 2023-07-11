@@ -5,7 +5,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store;
 public record AppValidationState
 {
     public bool AppStarted { get; init; }
-    
+
     public bool WeatherDataInitializing { get; init; }
     public bool WeatherDataInitialized { get; init; }
     public string WeatherDataStatus { get; init; }
@@ -15,8 +15,8 @@ public record AppValidationState
 
     public bool ElectricityDataInitializing { get; init; }
     public bool ElectricityDataInitialized { get; init; }
-    
-    
+
+
     public bool ForecastInitializing { get; init; }
     public bool ForecastInitialized { get; init; }
 
@@ -37,13 +37,13 @@ public class AppInitFeature : Feature<AppValidationState>
             AppStarted = false,
             WeatherDataInitializing = false,
             WeatherDataInitialized = false,
-            
+
             GasDataInitializing = false,
             GasDataInitialized = false,
-            
+
             ElectricityDataInitializing = false,
             ElectricityDataInitialized = false,
-            
+
             ForecastInitializing = false,
             ForecastInitialized = false
         };

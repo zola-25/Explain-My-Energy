@@ -1,7 +1,8 @@
-﻿using Energy.App.Standalone.Features.Setup.Store.ImmutatableStateObjects;
+﻿using Energy.App.Standalone.Features.Setup.Store.StateObjects;
 using Energy.App.Standalone.Models;
 using Energy.App.Standalone.Models.Tariffs;
 using Energy.Shared;
+using Microsoft.AspNetCore.Components;
 using System.Collections.Immutable;
 using System.Text;
 
@@ -12,6 +13,11 @@ public static class Extensions
     public static bool eIsNullOrEmpty<T>(this IEnumerable<T> enumerable)
     {
         return enumerable == null || !enumerable.Any();
+    }
+
+    public static void eLogToConsole(this ComponentBase component, string action)
+    {
+        Console.WriteLine($"{component.GetType().Name}: {action}");
     }
 
     public static string eTimeSpanToString(this TimeSpan timeSpan)
@@ -191,7 +197,7 @@ public static class Extensions
     public static IEnumerable<DateTime> eGenerateAllDatesBetween(this DateTime startDate, DateTime endDate, bool endDateInclusive = true)
     {
         DateTime currentDate = startDate.Date;
-        var lastDateToInclude = endDateInclusive ? endDate.Date : endDate.AddDays(-1).Date;
+        DateTime lastDateToInclude = endDateInclusive ? endDate.Date : endDate.AddDays(-1).Date;
         while (currentDate <= lastDateToInclude)
         {
             yield return currentDate;
@@ -202,13 +208,13 @@ public static class Extensions
 
     public static int eGetDateCountInclusive(this DateTime startDate, DateTime endDate)
     {
-        var dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: true).ToList();
+        List<DateTime> dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: true).ToList();
         return dates.Count;
     }
 
     public static int eGetDateCountExcludeEnd(this DateTime startDate, DateTime endDate)
     {
-        var dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: false).ToList();
+        List<DateTime> dates = startDate.Date.eGenerateAllDatesBetween(endDate, endDateInclusive: false).ToList();
         return dates.Count;
     }
 
@@ -245,8 +251,8 @@ public static class Extensions
     {
         return dateTime.eToString("dddd, dnn MMMM yyyy", true);
     }
-    
-    
+
+
 
     public static string eToString(this DateTime? nullableDateTime, string format, bool useExtendedSpecifiers)
     {

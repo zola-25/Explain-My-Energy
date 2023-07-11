@@ -64,9 +64,11 @@ else
 
 @code {
 
-    private void LoadWeatherData()
+    private async Task LoadWeatherData()
     {
-        Dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(Outcode));
+        var completion = new TaskCompletionSource<bool>();
+        Dispatcher.Dispatch(new LoadWeatherAction(false, completion));
+        await completion.Task;
     }
 
     public string Outcode { get; set; }

@@ -1,6 +1,20 @@
-﻿<h3>DataLoaderBase</h3>
+﻿@inherits FluxorComponent
+<Fluxor.Blazor.Web.StoreInitializer />
 
-@if (DataLoaded != null)
-{
-    @await DataLoaded.Task
+@if(AppLoading) {
+
+
+    <MudOverlay @bind-Visible="AppLoading"  DarkBackground="true" ZIndex="9">
+
+        @if (!WeatherLoaded)
+        {
+            <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudAlert>
+        }
+        
+    </MudOverlay>
 }
+else
+{
+    @ChildContent
+}
+

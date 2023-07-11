@@ -1,5 +1,4 @@
 ﻿using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Analysis.Store;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
@@ -7,6 +6,7 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Store;
+using Energy.App.Standalone.Features.Setup.Store.MeterSetup;
 using Energy.App.Standalone.Features.Weather.Store;
 using Energy.Shared;
 using Fluxor;
@@ -86,39 +86,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
 
         public void InitializeWeather()
         {
-            if (!HouseholdSetupValid)
-            {
-                return;
-            }
 
-            if (!_weatherState.Value.WeatherReadings.Any())
-            {
-                _dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(_householdState.Value.OutCodeCharacters));
-                return;
-            }
-
-            var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-                UtcTime;
-            var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-                UtcTime;
-
-            if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
-            {
-                _dispatcher.Dispatch
-                (
-                    new InitiateWeatherUpdateReadingsAction
-                    (
-                        _householdState.Value.OutCodeCharacters,
-                        latestReading,
-                        latestHistoricalReading
-                    )
-                );
-                
-            } 
-            else
-            {
-                _dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction());
-            }
         }
 
         public void InitializeGas()
@@ -131,7 +99,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
                 return;
             }
 
-            var existingBasicReadings = _gasReadingsState.Value.BasicReadings;
+            System.Collections.Immutable.ImmutableList<BasicReading> existingBasicReadings = _gasReadingsState.Value.BasicReadings;
             if (existingBasicReadings.eIsNullOrEmpty())
             {
                 _dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
@@ -139,7 +107,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
             else
             {
 
-                var lastBasicReading = _gasReadingsState.Value.BasicReadings.Last().
+                DateTime lastBasicReading = _gasReadingsState.Value.BasicReadings.Last().
                     UtcTime;
 
                 if (lastBasicReading < DateTime.Today.AddDays(-1))
@@ -148,8 +116,8 @@ namespace Energy.App.Standalone.Features.AppInit.Store
                 }
                 else
                 {
-                    var costedReadings = _gasReadingsState.Value.CostedReadings;
-                    var lastCostedReading = costedReadings.Last().UtcTime;
+                    System.Collections.Immutable.ImmutableList<Analysis.Services.DataLoading.Models.CostedReading> costedReadings = _gasReadingsState.Value.CostedReadings;
+                    DateTime lastCostedReading = costedReadings.Last().UtcTime;
 
                     if (costedReadings.eIsNullOrEmpty()
                         || lastCostedReading <= lastBasicReading)
@@ -176,7 +144,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
                 return;
             }
 
-            var existingBasicReadings = _electricityReadingsState.Value.BasicReadings;
+            System.Collections.Immutable.ImmutableList<BasicReading> existingBasicReadings = _electricityReadingsState.Value.BasicReadings;
             if (existingBasicReadings.eIsNullOrEmpty())
             {
                 _dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
@@ -184,7 +152,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
             else
             {
 
-                var lastBasicReading = _electricityReadingsState.Value.BasicReadings.Last().
+                DateTime lastBasicReading = _electricityReadingsState.Value.BasicReadings.Last().
                     UtcTime;
 
                 if (lastBasicReading < DateTime.Today.AddDays(-1))
@@ -193,8 +161,8 @@ namespace Energy.App.Standalone.Features.AppInit.Store
                 }
                 else
                 {
-                    var costedReadings = _electricityReadingsState.Value.CostedReadings;
-                    var lastCostedReading = costedReadings.Last().UtcTime;
+                    System.Collections.Immutable.ImmutableList<Analysis.Services.DataLoading.Models.CostedReading> costedReadings = _electricityReadingsState.Value.CostedReadings;
+                    DateTime lastCostedReading = costedReadings.Last().UtcTime;
 
                     if (costedReadings.eIsNullOrEmpty()
                         || lastCostedReading <= lastBasicReading)

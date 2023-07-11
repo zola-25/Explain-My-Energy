@@ -66,74 +66,7 @@
         }
     </RowTemplate>
 </MudTable>
-@* *@
-@* <MudSimpleTable Style="overflow-x: auto;"> *@
-@*     <thead> *@
-@*     <tr> *@
-@*         <th>Historical Data</th> *@
-@*         <th>Latest Reading</th> *@
-@*         <th>Short-term Forecast Range</th> *@
-@*         <th>Long-term Climate Forecast Range</th> *@
-@* *@
-@*     </tr> *@
-@*     </thead> *@
-@*     <tbody> *@
-@*     <tr> *@
-@*         @if (!HouseholdState.Value.Saved) *@
-@*         { *@
-@*             <td colspan="4">Complete Household setup to import local weather data</td> *@
-@*         } *@
-@*         @if (WeatherState.Value.Loading) *@
-@*         { *@
-@*             <td colspan="4">Loading Weather Data...</td> *@
-@*         } *@
-@*         else if (WeatherState.Value.WeatherReadings.Any()) *@
-@*         { *@
-@*             <td>From @WeatherState.Value.WeatherReadings.First().UtcReadDate.eToString("dnn MMM yyyy", true)</td> *@
-@*             <td> *@
-@*                 @{ *@
-@*                     var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast). *@
-@*                         OrderBy(c => c.UtcReadDate). *@
-@*                         Last(). *@
-@*                         UtcReadDate; *@
-@*                 } *@
-@* *@
-@*                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1)) *@
-@*                 { *@
-@*                     <MudTooltip Text="Up to date"> *@
-@*                         @latestReading.eToString("ddd dnn MMM yy", true) *@
-@*                         <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon> *@
-@*                     </MudTooltip> *@
-@*                 } *@
-@*                 else *@
-@*                 { *@
-@*                     <MudTooltip Text="Missing Latest Weather Data"> *@
-@*                         @latestReading.eToString("ddd dnn MMM yy", true) *@
-@*                         <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Default"></MudIcon> *@
-@*                     </MudTooltip> *@
-@*                 } *@
-@*             </td> *@
-@*             <td> *@
-@*                 @{ *@
-@*                     var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast). *@
-@*                         OrderBy(c => c.UtcReadDate). *@
-@*                         ToList(); *@
-@*                 } *@
-@*                 @forecastReadings.First().UtcReadDate.eDateToMinimal() - @forecastReadings.Last().UtcReadDate.eDateToMinimal() *@
-@*             </td> *@
-@*             <td> *@
-@*                 @{ *@
-@*                     var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast). *@
-@*                         OrderBy(c => c.UtcReadDate). *@
-@*                         ToList(); *@
-@*                 } *@
-@*                 @climateReadings.First().UtcReadDate.eDateToMinimal() - @climateReadings.Last().UtcReadDate.eDateToMinimal() *@
-@* *@
-@*             </td> *@
-@*         } *@
-@*     </tr> *@
-@*     </tbody> *@
-@* </MudSimpleTable> *@
+
 
 @code {
 
@@ -144,9 +77,11 @@
         SubscribeToAction<NotifyHouseholdReadyAction>((action) => { LoadWeatherData(); });
     }
 
-    void LoadWeatherData()
+    async void LoadWeatherData()
     {
-        Dispatcher.Dispatch(new InitiateWeatherReloadReadingsAction(HouseholdState.Value.OutCodeCharacters));
+        var completion = new TaskCompletionSource<bool>();
+        Dispatcher.Dispatch(new LoadWeatherAction(true, completion));
+        await completion.Task;
     }
 
 }
