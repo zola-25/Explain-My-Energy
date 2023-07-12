@@ -56,12 +56,13 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
             SubscribeToAction<NotifyElectricityStoreReady>((a) =>
             {
+
                 Snackbar.Add("Electricity Readings Updated");
 
             });
             SubscribeToAction<NotifyGasLoadingFinished>((a) =>
             {
-                Snackbar.Add("Gas Readings Updated");
+                Snackbar.Add(String.IsNullOrEmpty(a.Error) ? "Gas Readings Update Error" : "Gas Readings Updated");
             });
 
             SubscribeToAction<GasDeleteReadingsAction>((a) =>
@@ -148,7 +149,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             return meterType switch
             {
                 MeterType.Electricity => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings,
-                MeterType.Gas => GasReadingsState.Value.Loading || GasReadingsState.Value.UpdatingReadings,
+                MeterType.Gas => GasReadingsState.Value.Loading,
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -207,7 +208,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasUpdateReadingsAndReloadCostsAction(GasReadingsState.Value.CostedReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, new TaskCompletionSource<int>()));
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new ElectricityUpdateReadingsAndReloadCostsAction(ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.Date));
@@ -222,7 +223,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true, new TaskCompletionSource<int>()));
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());

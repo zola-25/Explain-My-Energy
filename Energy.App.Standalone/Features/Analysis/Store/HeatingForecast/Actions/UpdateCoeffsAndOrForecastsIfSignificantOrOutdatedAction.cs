@@ -7,10 +7,16 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
         public MeterType MeterType { get; }
         public int SizeOfUpdate { get; }
 
-        public UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction(int sizeOfUpdate, MeterType meterType)
+        public TaskCompletionSource<bool> Completion { get; } 
+
+        public UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction(
+            int sizeOfUpdate,
+            MeterType meterType,
+            TaskCompletionSource<bool> completion)
         {
             SizeOfUpdate = sizeOfUpdate;
             MeterType = meterType;
+            Completion = completion;
         }
     }
 

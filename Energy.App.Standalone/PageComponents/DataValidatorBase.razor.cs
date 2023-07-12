@@ -1,10 +1,13 @@
 ﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
+using Energy.Shared;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Fluxor.Persist.Middleware;
 using Microsoft.AspNetCore.Components;
+using System.Data;
 
 namespace Energy.App.Standalone.PageComponents
 {
@@ -20,9 +23,12 @@ namespace Energy.App.Standalone.PageComponents
 
         public bool GasReadingsReady { get; private set; }
 
-        public bool AppLoading = true;
+        public string UpdateStatus { get; private set; }
 
-        public TaskCompletionSource<bool> StateLoadedFromStorage;
+        public bool ForecastsReady { get; private set; }
+
+        public bool AppLoading;
+
 
         protected override void Dispose(bool disposing)
         {
@@ -31,37 +37,62 @@ namespace Energy.App.Standalone.PageComponents
 
         protected override async Task OnInitializedAsync()
         {
+            AppLoading = true;
             this.eLogToConsole(nameof(OnInitializedAsync));
 
-            StateLoadedFromStorage = new TaskCompletionSource<bool>();
+            await Task.Delay(1);
 
-            SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
-            {
-                Console.WriteLine($"**** State rehydrated ****");
-                StateLoadedFromStorage.SetResult(true);
-            });
+            UpdateStatus = "Loading weather data...";
 
-            await StateLoadedFromStorage.Task;
-
-            var weatherCompletion = new TaskCompletionSource<int>();
-            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
-
-            int numWeatherDaysUpdated = await weatherCompletion.Task;
-
-            WeatherReady = true;
+            await Task.Delay(100000);
 
 
-            var gasReadingsCompletion = new TaskCompletionSource<int>();
-            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
+            //var weatherCompletion = new TaskCompletionSource<int>();
+            //Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
 
-            int numGasReadingsUpdated = await gasReadingsCompletion.Task;
-            // dispatch analysis action
-            GasReadingsReady = true;
+            //int numWeatherDaysUpdated = await weatherCompletion.Task;
 
-            var forecastCompletion = new TaskCompletionSource<bool>();
-            Dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction())
+
+
+            //UpdateStatus = "Loading gas readings...";
+            //StateHasChanged();
+
+            //await Task.Delay(1000);
+
+
+
+            //var gasReadingsCompletion = new TaskCompletionSource<int>();
+            //Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
+
+            //int numGasReadingsUpdated = await gasReadingsCompletion.Task;
+            //// dispatch analysis action
+
+            //UpdateStatus = "Loading forecasts...";
+            //StateHasChanged();
+
+            //await Task.Delay(1000);
+
+            //var forecastCompletion = new TaskCompletionSource<bool>();
+            //Dispatcher.Dispatch
+            //(
+            //    new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction
+            //    (
+            //        numGasReadingsUpdated,
+            //        MeterType.Gas,
+            //        forecastCompletion
+            //    )
+            //);
+
+            //await forecastCompletion.Task;
+
+
+            //UpdateStatus = "Ready";
+            //StateHasChanged();
+
+            //await Task.Delay(1000);
 
             AppLoading = false;
+
         }
 
 

@@ -3,6 +3,7 @@ using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
+using SpawnDev.BlazorJS.WebWorkers;
 
 namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
@@ -27,7 +28,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             };
         }
 
-        [ReducerMethod(typeof(NotifyWeatherLoadingFinished))]
+        [ReducerMethod]
         public static WeatherState Reduce(WeatherState state, NotifyWeatherLoadingFinished action)
         {
             if (action.DaysUpdated == 0) { 
@@ -72,14 +73,17 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             private readonly IState<HouseholdState> _householdState;
             private readonly IState<WeatherState> _weatherState;
             private readonly IWeatherDataService _weatherDataService;
+            private readonly WebWorkerService _webWorkerService;
 
             public Effect(IState<HouseholdState> householdState,
                           IState<WeatherState> weatherState,
-                          IWeatherDataService weatherDataService)
+                          IWeatherDataService weatherDataService,
+                          WebWorkerService webWorkerService)
             {
                 _householdState = householdState;
                 _weatherState = weatherState;
                 _weatherDataService = weatherDataService;
+                _webWorkerService = webWorkerService;
             }
 
             public override async Task HandleAsync(EnsureWeatherLoadedAction loadedAction, IDispatcher dispatcher)
@@ -96,7 +100,11 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 
                 if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || loadedAction.ForceReload)
                 {
-                    var results = await _weatherDataService.GetForOutCode(outCode);
+                    var webWorker = await _webWorkerService.GetWebWorker();
+                    var weatherWorkerService = webWorker.GetService<IWeatherDataService>();
+
+                    var results = await weatherWorkerService.GetForOutCode(outCode);
+                    //var results = await _weatherDataService.GetForOutCode(outCode);
 
                     dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results));
                     daysUpdated = results.Count;

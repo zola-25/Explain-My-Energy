@@ -1,4 +1,6 @@
-﻿
+﻿@using Fluxor.Persist.Middleware;
+@inherits FluxorComponent
+
 <Fluxor.Blazor.Web.StoreInitializer />
 
 <Router AppAssembly="@typeof(App).Assembly">
@@ -14,6 +16,13 @@
     </NotFound>
 </Router>
 @code {
-
+    protected override void OnInitialized()
+    {
+        SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
+        {
+            Console.WriteLine($"**** State rehydrated ****");
+            StateHasChanged();
+        });
+    }
 
 }

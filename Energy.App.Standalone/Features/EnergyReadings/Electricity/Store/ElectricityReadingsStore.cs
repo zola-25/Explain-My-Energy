@@ -4,7 +4,6 @@ using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
 using System.Text.Json.Serialization;
-using static Energy.App.Standalone.Features.EnergyReadings.Gas.GasReadingsReducers;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 {

@@ -93,7 +93,7 @@
             {
                 case MeterType.Gas:
                     Dispatcher.Dispatch(new AuthorizeGasAction());
-                    Dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, new TaskCompletionSource<int>()));
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new AuthorizeElectricityAction());

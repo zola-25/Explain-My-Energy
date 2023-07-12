@@ -1,6 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
@@ -8,10 +7,8 @@ using Fluxor;
 using System.Collections.Immutable;
 using MathNet.Numerics;
 using Fluxor.Persist.Storage;
-using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
-using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using System.Text.Json.Serialization;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
@@ -250,6 +247,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
         {
             if (_householdState.Value.PrimaryHeatSource != action.MeterType)
             {
+                action.Completion.SetResult(true);
                 return;
             }
             dispatcher.Dispatch(new NotifyHeatingForecastUpdatingAction());
@@ -269,6 +267,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             {
                 dispatcher.Dispatch(new NotifyHeatingForecastReadyAction());
             }
+            action.Completion.SetResult(true);
         }
 
     }

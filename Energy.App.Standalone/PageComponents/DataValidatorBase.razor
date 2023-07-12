@@ -5,10 +5,8 @@
 
     <MudOverlay @bind-Visible="AppLoading"  DarkBackground="true" ZIndex="9">
 
-        @if (!WeatherReady)
-        {
-            <MudProgressCircular Indeterminate="true" Size="Size.Large" Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudProgressCircular>
-        }
+        <MudText Typo="Typo.h4" >@UpdateStatus</MudText>
+        <MudProgressCircular Indeterminate="true" Size="Size.Large" Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudProgressCircular>
         
     </MudOverlay>
 }

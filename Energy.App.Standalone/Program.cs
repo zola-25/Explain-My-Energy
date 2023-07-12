@@ -2,13 +2,10 @@ using Blazored.LocalStorage;
 using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
-using Energy.App.Standalone.Features;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Store;
-using Energy.App.Standalone.Features.AppInit.Store;
 using Energy.App.Standalone.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
@@ -19,6 +16,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using SpawnDev.BlazorJS;
+using SpawnDev.BlazorJS.WebWorkers;
 
 WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -26,7 +25,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-
+builder.Services.AddBlazorJSRuntime();
+builder.Services.AddWebWorkerService();
 
 builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
@@ -67,8 +67,6 @@ builder.Services.AddBlazoredLocalStorage(config =>
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
 builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 
-builder.Services.AddScoped<AppStateValidator>();
-
 
 System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
@@ -87,4 +85,4 @@ builder.Services.AddFluxor(options =>
     });
 });
 
-await builder.Build().RunAsync();
+await builder.Build().BlazorJSRunAsync();
