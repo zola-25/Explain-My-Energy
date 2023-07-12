@@ -7,6 +7,7 @@ using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Fluxor.Persist.Middleware;
 using Microsoft.AspNetCore.Components;
+using MudBlazor.Interfaces;
 using System.Data;
 
 namespace Energy.App.Standalone.PageComponents
@@ -16,6 +17,7 @@ namespace Energy.App.Standalone.PageComponents
         [Inject]
         IDispatcher Dispatcher { get; set; }
 
+        
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -43,53 +45,54 @@ namespace Energy.App.Standalone.PageComponents
             await Task.Delay(1);
 
             UpdateStatus = "Loading weather data...";
+            StateHasChanged();
 
-            await Task.Delay(100000);
+            var weatherCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
 
-
-            //var weatherCompletion = new TaskCompletionSource<int>();
-            //Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
-
-            //int numWeatherDaysUpdated = await weatherCompletion.Task;
+            int numWeatherDaysUpdated = await weatherCompletion.Task;
 
 
+            await Task.Delay(1);
 
-            //UpdateStatus = "Loading gas readings...";
-            //StateHasChanged();
 
-            //await Task.Delay(1000);
+            UpdateStatus = "Loading gas readings...";
+            StateHasChanged();
 
 
 
-            //var gasReadingsCompletion = new TaskCompletionSource<int>();
-            //Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
 
-            //int numGasReadingsUpdated = await gasReadingsCompletion.Task;
-            //// dispatch analysis action
+            var gasReadingsCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
 
-            //UpdateStatus = "Loading forecasts...";
-            //StateHasChanged();
+            int numGasReadingsUpdated = await gasReadingsCompletion.Task;
+            // dispatch analysis action
 
-            //await Task.Delay(1000);
-
-            //var forecastCompletion = new TaskCompletionSource<bool>();
-            //Dispatcher.Dispatch
-            //(
-            //    new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction
-            //    (
-            //        numGasReadingsUpdated,
-            //        MeterType.Gas,
-            //        forecastCompletion
-            //    )
-            //);
-
-            //await forecastCompletion.Task;
+            await Task.Delay(1);
 
 
-            //UpdateStatus = "Ready";
-            //StateHasChanged();
+            UpdateStatus = "Loading forecasts...";
+            StateHasChanged();
 
-            //await Task.Delay(1000);
+
+            var forecastCompletion = new TaskCompletionSource<bool>();
+            Dispatcher.Dispatch
+            (
+                new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction
+                (
+                    numGasReadingsUpdated,
+                    MeterType.Gas,
+                    forecastCompletion
+                )
+            );
+
+            await forecastCompletion.Task;
+            await Task.Delay(1);
+
+
+            UpdateStatus = "Ready";
+            StateHasChanged();
+
 
             AppLoading = false;
 

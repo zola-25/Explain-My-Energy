@@ -203,8 +203,9 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             }
         }
 
-        protected void DispatchUpdateReadings(MeterType meterType)
+        protected async void DispatchUpdateReadings(MeterType meterType)
         {
+
             switch (meterType)
             {
                 case MeterType.Gas:
@@ -218,12 +219,20 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             }
         }
 
-        protected void DispatchReloadReadings(MeterType meterType)
+        bool Reloading = false;
+
+        protected async void DispatchReloadReadings(MeterType meterType)
         {
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true, new TaskCompletionSource<int>()));
+                    var reloadCompletion = new TaskCompletionSource<int>();
+                    Reloading = true;
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true, reloadCompletion));
+
+                    await reloadCompletion.Task;
+                    
+                    Reloading = false;
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());

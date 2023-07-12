@@ -8,6 +8,7 @@ using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 using Energy.Shared;
 using Fluxor;
+using SpawnDev.BlazorJS.WebWorkers;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 {
@@ -74,14 +75,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
             private readonly IState<GasReadingsState> _gasReadingsState;
             private readonly IEnergyReadingImporter _energyReadingImporter;
             private readonly ICostCalculator _costCalculator;
+            private readonly WebWorkerService _webWorkerService;
 
             public Effect(IState<MeterSetupState> meterSetupState, IState<GasReadingsState> gasReadingsState, IEnergyReadingImporter energyReadingImporter,
-                ICostCalculator costCalculator)
+                ICostCalculator costCalculator, WebWorkerService webWorkerService)
             {
                 _meterSetupState = meterSetupState;
                 _gasReadingsState = gasReadingsState;
                 _energyReadingImporter = energyReadingImporter;
                 _costCalculator = costCalculator;
+                _webWorkerService = webWorkerService;
             }
             // Loading on startup and stop on NotifyGasStoreReady and move reducers in here
 
@@ -98,10 +101,14 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                 try
                 {
+                    using var webWorker = await _webWorkerService.GetWebWorker();
+                    var energyReadingsWorker = webWorker.GetService<IEnergyReadingImporter>();
+                    var result = await energyReadingsWorker.Test();
+
                     var existingBasicReadings = _gasReadingsState.Value.BasicReadings;
                     if (existingBasicReadings.eIsNullOrEmpty() || action.ForceReload)
                     {
-                        var basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Gas);
+                        var basicReadings = await energyReadingsWorker.ImportFromMoveInOrPreviousYear(MeterType.Gas);
                         var costedReadings = CalculateCostedReadings(basicReadings);
                         basicReadingsUpdated = basicReadings.Count;
                         dispatcher.Dispatch
@@ -118,7 +125,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                         if (lastBasicReading < DateTime.UtcNow.Date.AddDays(-1))
                         {
-                            var newBasicReadings = await _energyReadingImporter.ImportFromDate
+                            var newBasicReadings = await energyReadingsWorker.ImportFromDate
                                 (MeterType.Gas, lastBasicReading.Date);
 
                             var updatedBasicReadings = existingBasicReadings.ToList();

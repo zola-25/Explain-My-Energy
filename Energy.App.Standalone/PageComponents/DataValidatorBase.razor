@@ -6,8 +6,8 @@
     <MudOverlay @bind-Visible="AppLoading"  DarkBackground="true" ZIndex="9">
 
         <MudText Typo="Typo.h4" >@UpdateStatus</MudText>
-        <MudProgressCircular Indeterminate="true" Size="Size.Large" Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudProgressCircular>
-        
+        <div class="spinner"></div>
+
     </MudOverlay>
 }
 else

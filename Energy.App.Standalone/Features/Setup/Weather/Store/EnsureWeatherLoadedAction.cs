@@ -31,7 +31,8 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         [ReducerMethod]
         public static WeatherState Reduce(WeatherState state, NotifyWeatherLoadingFinished action)
         {
-            if (action.DaysUpdated == 0) { 
+            if (action.DaysUpdated == 0)
+            {
                 return state with
                 {
                     Loading = false,
@@ -98,13 +99,14 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 
                 string outCode = _householdState.Value.OutCodeCharacters;
 
+                using var webWorker = await _webWorkerService.GetWebWorker();
+                var weatherWorkerService = webWorker.GetService<IWeatherDataService>();
+
+
                 if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || loadedAction.ForceReload)
                 {
-                    var webWorker = await _webWorkerService.GetWebWorker();
-                    var weatherWorkerService = webWorker.GetService<IWeatherDataService>();
 
                     var results = await weatherWorkerService.GetForOutCode(outCode);
-                    //var results = await _weatherDataService.GetForOutCode(outCode);
 
                     dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results));
                     daysUpdated = results.Count;
@@ -120,7 +122,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                     if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
                     {
 
-                        var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
+                        var results = await weatherWorkerService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
 
                         daysUpdated = results.Count;
 
@@ -128,10 +130,10 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                     }
                 }
 
-
                 dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
                 loadedAction.TaskCompletion.SetResult(daysUpdated);
             }
+
         }
     }
 }

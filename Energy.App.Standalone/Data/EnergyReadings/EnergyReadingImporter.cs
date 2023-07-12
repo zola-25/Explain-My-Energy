@@ -99,5 +99,11 @@ namespace Energy.App.Standalone.Data.EnergyReadings
             }
 
         }
+
+        public async Task<string> Test()
+        {
+            await Task.Delay(1000);
+            return "Test";
+        }
     }
 }
