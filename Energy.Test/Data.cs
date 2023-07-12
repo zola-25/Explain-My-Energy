@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
+using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 
 namespace Energy.Test
 {

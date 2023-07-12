@@ -3,8 +3,6 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Setup.Store;
-using Energy.App.Standalone.Features.Weather.Store;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
@@ -17,7 +15,9 @@ using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using System.Text.Json.Serialization;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
-using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
+using Energy.App.Standalone.Features.Setup.Household;
+using Energy.App.Standalone.Features.Setup.Meter.Store;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 {

@@ -1,9 +1,5 @@
-﻿@using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
-@using Energy.App.Standalone.Features.AppInit.Store;
-@using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
-@using Energy.App.Standalone.Features.EnergyReadings.Gas;
-@using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore
-@using Microsoft.Extensions.FileSystemGlobbing.Abstractions
+﻿
+
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
@@ -100,7 +96,6 @@
 
 @code {
 
-    int _loadingProgress = 0;
 
     [Inject]
     private AppStateValidator AppStateValidator { get; set; }

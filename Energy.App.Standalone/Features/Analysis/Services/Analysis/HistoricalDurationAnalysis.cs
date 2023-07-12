@@ -5,9 +5,9 @@ using Energy.Shared;
 using System.Collections.Immutable;
 using MathNet.Numerics;
 using Fluxor;
-using Energy.App.Standalone.Features.Weather.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 

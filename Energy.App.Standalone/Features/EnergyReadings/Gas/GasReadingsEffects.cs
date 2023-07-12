@@ -2,11 +2,10 @@
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
-using Energy.App.Standalone.Features.Setup.Store;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
-using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore;
+using Energy.App.Standalone.Features.Setup.Meter.Store;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas
 {

@@ -68,7 +68,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
                 LastUpdated = DateTime.UtcNow
             };
         }
-
+        
 
         [ReducerMethod(typeof(GasReloadReadingsAndCostsAction))]
         public static GasReadingsState OnBeginReloadReadingsAndCostsReducer(GasReadingsState state)

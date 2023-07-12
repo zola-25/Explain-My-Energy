@@ -1,10 +1,10 @@
-﻿using Energy.App.Standalone.Models;
-using Energy.App.Standalone.Models.Tariffs;
-using Energy.Shared;
+﻿using Energy.Shared;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Immutable;
 using System.Text;
-using Energy.App.Standalone.Features.Setup.Store.MeterSetupStore.StateObjects;
+using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
+using Energy.App.Standalone.DTOs;
+using Energy.App.Standalone.DTOs.Tariffs;
 
 namespace Energy.App.Standalone.Extensions;
 

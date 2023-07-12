@@ -1,0 +1,124 @@
+﻿@inherits FluxorComponent
+@inject IState<HouseholdState> HouseholdState
+@inject IDispatcher Dispatcher
+
+@if (_readyToInteract)
+{
+    <EditForm Model="@_householdDetails" OnValidSubmit="HandleValidSubmit">
+
+        <MudCard Elevation="0">
+            <MudCardHeader>
+                <MudText Typo="Typo.h5">Household Setup</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <ObjectGraphDataAnnotationsValidator/>
+                <ValidationSummary/>
+                <div class="my-3">
+                    <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
+                                   Placeholder="Select Move-in Date"
+                                   Clearable="true"
+                                   DateFormat="D"
+                                   MaxDate="DateTime.Today"></MudDatePicker>
+                </div>
+
+                <div class="my-3">
+                    <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required
+                                  Placeholder="IHD MAC ID"></MudTextField>
+                </div>
+                <div class="my-3">
+                    <MudAutocomplete @bind-Value="_householdDetails.OutCode"
+                                     For="@(() => _householdDetails.OutCode)"
+                                     T="OutCode" CoerceText="true"
+                                     Clearable="true"
+                                     Required
+                                     ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
+                                     MinCharacters="2"
+                                     OnClearButtonClick="ClearPostalArea"
+                                     SearchFuncWithCancel="SearchOutCodes"></MudAutocomplete>
+
+                </div>
+                <MudText>What is your home's primary heating source?</MudText>
+                <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
+                    <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
+                    <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
+                </MudRadioGroup>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
+
+                <MudText Class="m-1" Color="Color.Success" hidden="@(!_submitSuccessful)">
+                    @_saveResponseMessage
+                </MudText>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+}
+@code {
+
+    private HouseholdDetails _householdDetails = new();
+
+
+    private async Task<IEnumerable<OutCode>> SearchOutCodes(string inputString, CancellationToken ctx)
+    {
+        return await OutCodeLookup.SearchOutCodes(inputString, ctx);
+    }
+
+
+
+    string _saveResponseMessage = string.Empty;
+    bool _submitSuccessful;
+
+    bool _readyToInteract;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        HouseholdState.StateChanged += async (sender, state) =>
+        {
+            SetHouseholdInputs();
+            await InvokeAsync(StateHasChanged);
+        };
+
+        SetHouseholdInputs();
+        SubscribeToAction<NotifyHouseholdUpdatedAction>(ShowSuccessMessage);
+    }
+
+    private void SetHouseholdInputs()
+    {
+        _householdDetails = new HouseholdDetails()
+            {
+                IhdMacId = HouseholdState.Value.IhdMacId,
+                MoveInDate = HouseholdState.Value.MoveInDate,
+                OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
+                PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
+            };
+
+
+        _readyToInteract = true;
+
+    }
+
+
+    private void ShowSuccessMessage(NotifyHouseholdUpdatedAction obj)
+    {
+        _submitSuccessful = true;
+        _saveResponseMessage = "Household Details Saved";
+    }
+
+
+    private void HandleValidSubmit()
+    {
+        Dispatcher.Dispatch(new HouseholdSubmitSuccessAction(
+            _householdDetails.MoveInDate,
+            _householdDetails.IhdMacId,
+            _householdDetails.OutCode.OutCodeCharacters, _householdDetails.PrimaryHeatSource));
+
+    }
+
+
+    private void ClearPostalArea()
+    {
+        _householdDetails.OutCode = null;
+    }
+}

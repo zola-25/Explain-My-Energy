@@ -1,5 +1,5 @@
 ﻿using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Weather.Store;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Fluxor.Persist.Middleware;

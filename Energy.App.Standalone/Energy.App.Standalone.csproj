@@ -25,7 +25,6 @@
 		<PackageReference Include="MudBlazor" Version="6.6.0" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
-		<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
 	</ItemGroup>
 
 

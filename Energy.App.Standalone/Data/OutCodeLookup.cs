@@ -1,5 +1,5 @@
-﻿using Energy.App.Standalone.Models;
-using System.Globalization;
+﻿using System.Globalization;
+using Energy.App.Standalone.DTOs;
 
 namespace Energy.App.Standalone.Data
 {

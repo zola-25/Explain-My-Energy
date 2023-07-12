@@ -1,0 +1,117 @@
+﻿@page "/MeterAuthorization/{MeterTypeText}"
+
+@inherits FluxorComponent
+@inject IState<MeterSetupState> MeterSetupState
+@inject IState<HouseholdState> HouseholdState
+
+@inject IDispatcher Dispatcher
+
+<PageTitle>@MeterTypeText Authorization</PageTitle>
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2 mt-2">
+
+            <MudCard Elevation="0">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">@_meterType.ToString() Meter Authorization</MudText>
+                    <MudAlert Severity="Severity.Info"></MudAlert>
+                </MudCardHeader>
+                <MudCardContent Style="height: auto;
+                                       min-height: 100%;">
+                    
+                    <div class="mb-1">
+                        <MudTextField Label="@MpxnLabel" Value="@MeterSetupState.Value[_meterType].Mpxn" ReadOnly="true"></MudTextField>
+                        <MudTextField Label='IHD MAC ID' Value="@HouseholdState.Value.IhdMacId" ReadOnly="true"></MudTextField>
+                        <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
+                    </div>
+                    <iframe src="https://data.n3rgy.com/consumer-sign-up" width="100%" style="height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
+                    <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
+
+                        <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
+                        <MudText>Your meter data is now being loaded</MudText>
+
+                        <MudTooltip ShowOnHover="true" Text="Return to Setup">
+                            <MudLink Underline="Underline.None"
+                                     Href="@($"/Setup")">
+                                <MudButton Color="Color.Primary"
+                                           ButtonType="ButtonType.Button"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+                            </MudLink>
+                        </MudTooltip>
+
+                            @*<LoadingDataDisplay GlobalId="_meter.GlobalId"></LoadingDataDisplay>*@
+                    </div>
+                    <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
+                        <p class="text-warning">Authorization Failed</p>
+                        <p>We could not access your smart meter data - have you completed the authorization process with n3rgy?</p>
+                        <p>n3rgy responded with: @AuthorizeResponseMessage</p>
+                    </div>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton @onclick="CheckAuthorization" Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code
+{
+    [Inject]
+    public IMeterAuthorizationCheck MeterAuthorizationCheck { get; set; }
+
+    [Parameter]
+    public string MeterTypeText { get; set; }
+
+    private string MpxnLabel => _meterType == MeterType.Gas ? "Gas MPRN" : "Electricity MPAN";
+
+    private string MoveInDateString => HouseholdState.Value.MoveInDate!.Value.ToString("d");
+
+    private bool AuthorizeSucceeded { get; set; }
+    private bool AuthorizeFailed { get; set; }
+
+    private string AuthorizeResponseMessage { get; set; }
+
+
+    private MeterType _meterType;
+
+
+    protected override void OnParametersSet()
+    {
+        _meterType = MeterTypeText.eStringToEnum<MeterType>();
+    }
+
+    private async Task CheckAuthorization()
+    {
+        var response = await MeterAuthorizationCheck.TestAccess(_meterType, HouseholdState.Value.IhdMacId);
+        if (response.Success)
+        {
+            switch (_meterType)
+            {
+                case MeterType.Gas:
+                    Dispatcher.Dispatch(new AuthorizeGasAction());
+                    Dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
+                    break;
+                case MeterType.Electricity:
+                    Dispatcher.Dispatch(new AuthorizeElectricityAction());
+                    Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            AuthorizeSucceeded = true;
+            AuthorizeFailed = false;
+        }
+        else
+        {
+            AuthorizeSucceeded = false;
+            AuthorizeFailed = true;
+            AuthorizeResponseMessage = response.FailureReason;
+        }
+    }
+}

@@ -1,5 +1,5 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
-using Energy.App.Standalone.Features.Setup.Store;
+using Energy.App.Standalone.Features.Setup.Household;
 using Energy.n3rgyApi.Interfaces;
 using Energy.n3rgyApi.Models;
 using Energy.Shared;

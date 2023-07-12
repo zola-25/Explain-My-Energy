@@ -1,7 +1,7 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
-using Energy.App.Standalone.Features.Weather.Store;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Fluxor;
 
 namespace Energy.App.Standalone.Features.AppInit.Store;

@@ -1,0 +1,30 @@
+﻿@page "/Setup"
+
+@inherits FluxorComponent
+
+
+<PageTitle>Setup</PageTitle>
+
+
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2 mt-2">
+
+            <Household></Household>
+
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2">
+            <WeatherDataInfo></WeatherDataInfo>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2">
+            <MeterSetupTable></MeterSetupTable>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
