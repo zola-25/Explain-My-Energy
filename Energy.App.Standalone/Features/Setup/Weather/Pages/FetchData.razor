@@ -66,8 +66,8 @@ else
 
     private async Task LoadWeatherData()
     {
-        var completion = new TaskCompletionSource<bool>();
-        Dispatcher.Dispatch(new LoadWeatherAction(false, completion));
+        var completion = new TaskCompletionSource<int>();
+        Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, completion));
         await completion.Task;
     }
 

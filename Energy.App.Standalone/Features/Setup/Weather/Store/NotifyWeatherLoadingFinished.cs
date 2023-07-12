@@ -1,10 +1,10 @@
 ﻿namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
-    public class NotifyWeatherReadingsReadyAction
+    public class NotifyWeatherLoadingFinished
     {
         public int DaysUpdated { get; }
 
-        public NotifyWeatherReadingsReadyAction(int daysUpdated)
+        public NotifyWeatherLoadingFinished(int daysUpdated)
         {
             DaysUpdated = daysUpdated;
         }

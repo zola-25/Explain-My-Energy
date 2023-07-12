@@ -10,10 +10,8 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
     [PersistState]
     public record GasReadingsState
     {
-        [property: JsonIgnore] public bool ReloadingReadings { get; init; }
-
-
-        [property: JsonIgnore] public bool UpdatingReadings { get; init; }
+        [property: JsonIgnore] 
+        public bool Loading { get; init; }
 
         public DateTime LastUpdated { get; init; }
         public ImmutableList<BasicReading> BasicReadings { get; init; }
@@ -21,9 +19,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
 
-        [property: JsonIgnore] public bool CalculationError { get; init; }
-        public bool ReloadingCosts { get; internal set; }
-        public bool UpdatingCosts { get; internal set; }
+        public string CalculationError { get; init; }
     }
 
     public class GasReadingsFeature : Feature<GasReadingsState>
@@ -37,9 +33,8 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         {
             return new GasReadingsState
             {
-                ReloadingReadings = false,
-                UpdatingReadings = false,
-                CalculationError = false,
+                Loading = false,
+                CalculationError = null,
                 BasicReadings = ImmutableList<BasicReading>.Empty,
                 CostedReadings = ImmutableList<CostedReading>.Empty,
                 LastUpdated = DateTime.MinValue

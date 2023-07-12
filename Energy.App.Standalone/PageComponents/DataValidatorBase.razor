@@ -5,9 +5,9 @@
 
     <MudOverlay @bind-Visible="AppLoading"  DarkBackground="true" ZIndex="9">
 
-        @if (!WeatherLoaded)
+        @if (!WeatherReady)
         {
-            <MudAlert Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudAlert>
+            <MudProgressCircular Indeterminate="true" Size="Size.Large" Severity="@Severity.Info" Elevation="2" Dense="@true">Loading weather data...</MudProgressCircular>
         }
         
     </MudOverlay>

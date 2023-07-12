@@ -81,8 +81,8 @@
 
     private async void LoadWeatherData(NotifyHouseholdUpdatedAction _)
     {
-        var completion = new TaskCompletionSource<bool>();
-        Dispatcher.Dispatch(new LoadWeatherAction(true, completion));
+        var completion = new TaskCompletionSource<int>();
+        Dispatcher.Dispatch(new EnsureWeatherLoadedAction(true, completion));
         await completion.Task;
     }
 

@@ -23,7 +23,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
         {
             public override async Task HandleAsync(DeleteGasAction action, IDispatcher dispatcher)
             {
-                dispatcher.Dispatch(new GasInitiateDeleteReadingsAction());
+                dispatcher.Dispatch(new GasDeleteReadingsAction());
                 dispatcher.Dispatch(new DeleteAllGasTariffsAction());
             }
         }

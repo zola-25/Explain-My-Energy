@@ -17,16 +17,4 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
             BasicReadings = basicReadings;
         }
     }
-
-    public class GasStoreReloadedCostsOnlysAction
-    {
-        public ImmutableList<CostedReading> CostedReadings { get; }
-
-        public GasStoreReloadedCostsOnlysAction(
-                ImmutableList<CostedReading> costedReadings)
-        {
-            CostedReadings = costedReadings;
-        }
-    }
-
 }

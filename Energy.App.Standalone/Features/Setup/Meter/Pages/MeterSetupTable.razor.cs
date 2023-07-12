@@ -59,12 +59,12 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
                 Snackbar.Add("Electricity Readings Updated");
 
             });
-            SubscribeToAction<NotifyGasStoreReady>((a) =>
+            SubscribeToAction<NotifyGasLoadingFinished>((a) =>
             {
                 Snackbar.Add("Gas Readings Updated");
             });
 
-            SubscribeToAction<NotifyGasReadingsDeletedAction>((a) =>
+            SubscribeToAction<GasDeleteReadingsAction>((a) =>
             {
                 Snackbar.Add("Gas Readings Deleted");
 
@@ -148,7 +148,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             return meterType switch
             {
                 MeterType.Electricity => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings,
-                MeterType.Gas => GasReadingsState.Value.ReloadingReadings || GasReadingsState.Value.UpdatingReadings,
+                MeterType.Gas => GasReadingsState.Value.Loading || GasReadingsState.Value.UpdatingReadings,
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }

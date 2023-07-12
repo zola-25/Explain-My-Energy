@@ -7,18 +7,18 @@ using Fluxor;
 namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
 
-    public record LoadWeatherAction
+    public record EnsureWeatherLoadedAction
     {
         public bool ForceReload { get; }
-        public TaskCompletionSource<bool> TaskCompletion { get; }
+        public TaskCompletionSource<int> TaskCompletion { get; }
 
-        public LoadWeatherAction(bool forceReload, TaskCompletionSource<bool> taskCompletion)
+        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<int> taskCompletion)
         {
             ForceReload = forceReload;
             TaskCompletion = taskCompletion;
         }
 
-        [ReducerMethod(typeof(LoadWeatherAction))]
+        [ReducerMethod(typeof(EnsureWeatherLoadedAction))]
         public static WeatherState Reduce(WeatherState state)
         {
             return state with
@@ -27,12 +27,27 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             };
         }
 
+        [ReducerMethod(typeof(NotifyWeatherLoadingFinished))]
+        public static WeatherState Reduce(WeatherState state, NotifyWeatherLoadingFinished action)
+        {
+            if (action.DaysUpdated == 0) { 
+                return state with
+                {
+                    Loading = false,
+                };
+            }
+            return state with
+            {
+                Loading = false,
+                LastUpdated = DateTime.UtcNow
+            };
+        }
+
         [ReducerMethod]
         public static WeatherState Reduce(WeatherState state, StoreWeatherReloadedReadingsAction action)
         {
             return state with
             {
-                Loading = false,
                 LastUpdated = DateTime.UtcNow,
                 WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList()
             };
@@ -41,11 +56,10 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         [ReducerMethod]
         public static WeatherState Reduce(WeatherState state, StoreWeatherUpdatedReadingsAction action)
         {
-            DateTime firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
+            var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
 
             return state with
             {
-                Loading = false,
                 LastUpdated = DateTime.UtcNow,
                 WeatherReadings = state.WeatherReadings
                     .RemoveAll(c => c.UtcTime >= firstUpdateDate)
@@ -53,7 +67,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             };
         }
 
-        private class Effect : Effect<LoadWeatherAction>
+        private class Effect : Effect<EnsureWeatherLoadedAction>
         {
             private readonly IState<HouseholdState> _householdState;
             private readonly IState<WeatherState> _weatherState;
@@ -68,21 +82,21 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 _weatherDataService = weatherDataService;
             }
 
-            public override async Task HandleAsync(LoadWeatherAction action, IDispatcher dispatcher)
+            public override async Task HandleAsync(EnsureWeatherLoadedAction loadedAction, IDispatcher dispatcher)
             {
-                int daysUpdated = 0;
+                var daysUpdated = 0;
 
                 if (!_householdState.Value.Saved)
                 {
-                    dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction(daysUpdated));
-                    action.TaskCompletion.SetResult(true);
+                    dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
+                    loadedAction.TaskCompletion.SetResult(daysUpdated);
                 }
 
                 string outCode = _householdState.Value.OutCodeCharacters;
 
-                if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || action.ForceReload)
+                if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || loadedAction.ForceReload)
                 {
-                    List<Energy.Shared.DailyWeatherReading> results = await _weatherDataService.GetForOutCode(outCode);
+                    var results = await _weatherDataService.GetForOutCode(outCode);
 
                     dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results));
                     daysUpdated = results.Count;
@@ -90,15 +104,15 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 else
                 {
 
-                    DateTime? latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
+                    var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
                         UtcTime;
-                    DateTime? latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
+                    var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
                         UtcTime;
 
                     if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
                     {
 
-                        List<Energy.Shared.DailyWeatherReading> results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
+                        var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
 
                         daysUpdated = results.Count;
 
@@ -107,8 +121,8 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 }
 
 
-                dispatcher.Dispatch(new NotifyWeatherReadingsReadyAction(daysUpdated));
-                action.TaskCompletion.SetResult(true);
+                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
+                loadedAction.TaskCompletion.SetResult(daysUpdated);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
@@ -15,7 +16,10 @@ namespace Energy.App.Standalone.PageComponents
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        public bool WeatherLoaded { get; private set; }
+        public bool WeatherReady { get; private set; }
+
+        public bool GasReadingsReady { get; private set; }
+
         public bool AppLoading = true;
 
         public TaskCompletionSource<bool> StateLoadedFromStorage;
@@ -39,15 +43,24 @@ namespace Energy.App.Standalone.PageComponents
 
             await StateLoadedFromStorage.Task;
 
-            TaskCompletionSource<bool> weatherCompletion = new TaskCompletionSource<bool>();
-            Dispatcher.Dispatch(new LoadWeatherAction(false, weatherCompletion));
+            var weatherCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
 
-            await weatherCompletion.Task;
+            int numWeatherDaysUpdated = await weatherCompletion.Task;
+
+            WeatherReady = true;
 
 
+            var gasReadingsCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
 
+            int numGasReadingsUpdated = await gasReadingsCompletion.Task;
+            // dispatch analysis action
+            GasReadingsReady = true;
 
-            WeatherLoaded = true;
+            var forecastCompletion = new TaskCompletionSource<bool>();
+            Dispatcher.Dispatch(new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction())
+
             AppLoading = false;
         }
 

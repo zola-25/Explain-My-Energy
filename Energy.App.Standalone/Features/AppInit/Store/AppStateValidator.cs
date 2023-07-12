@@ -1,4 +1,5 @@
-﻿using Energy.App.Standalone.Extensions;
+﻿using System.Collections.Immutable;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
@@ -71,7 +72,7 @@ namespace Energy.App.Standalone.Features.AppInit.Store
             InitializeElectricity();
 
 
-            _actionSubscriber.SubscribeToAction<NotifyGasStoreReady>(this, action =>
+            _actionSubscriber.SubscribeToAction<NotifyGasLoadingFinished>(this, action =>
             {
                 if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
                 {
@@ -94,44 +95,6 @@ namespace Energy.App.Standalone.Features.AppInit.Store
 
 
 
-            if (!GasMeterSetupValid)
-            {
-                return;
-            }
-
-            System.Collections.Immutable.ImmutableList<BasicReading> existingBasicReadings = _gasReadingsState.Value.BasicReadings;
-            if (existingBasicReadings.eIsNullOrEmpty())
-            {
-                _dispatcher.Dispatch(new GasReloadReadingsAndCostsAction());
-            }
-            else
-            {
-
-                DateTime lastBasicReading = _gasReadingsState.Value.BasicReadings.Last().
-                    UtcTime;
-
-                if (lastBasicReading < DateTime.Today.AddDays(-1))
-                {
-                    _dispatcher.Dispatch(new GasUpdateReadingsAndReloadCostsAction(lastBasicReading.Date));
-                }
-                else
-                {
-                    System.Collections.Immutable.ImmutableList<Analysis.Services.DataLoading.Models.CostedReading> costedReadings = _gasReadingsState.Value.CostedReadings;
-                    DateTime lastCostedReading = costedReadings.Last().UtcTime;
-
-                    if (costedReadings.eIsNullOrEmpty()
-                        || lastCostedReading <= lastBasicReading)
-                    {
-                        _dispatcher.Dispatch(new GasReloadCostsOnlyAction());
-                    }
-                    else
-                    {
-                        _dispatcher.Dispatch(new NotifyGasStoreReady(0, 0));
-
-                    }
-                }
-
-            }
 
         }
 

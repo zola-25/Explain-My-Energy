@@ -40,7 +40,7 @@ public static class AppValidationReducers
     //}
 
     [ReducerMethod]
-    public static AppValidationState OnNotifyWeathReaingsReady(AppValidationState state, NotifyWeatherReadingsReadyAction action)
+    public static AppValidationState OnNotifyWeathReaingsReady(AppValidationState state, NotifyWeatherLoadingFinished action)
     {
         return state with
         {
@@ -81,7 +81,7 @@ public static class AppValidationReducers
     }
 
     [ReducerMethod]
-    public static AppValidationState OnGasReadyNotification(AppValidationState state, NotifyGasStoreReady action)
+    public static AppValidationState OnGasReadyNotification(AppValidationState state, NotifyGasLoadingFinished action)
     {
         return state with
         {
