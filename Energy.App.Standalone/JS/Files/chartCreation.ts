@@ -214,22 +214,45 @@ export namespace Charts {
                 xAxis: xTempAxis,
                 yAxis: yTemperatureAxis,
                 opacity: 0,
+
+
+
+
+
                 valueYField: "temperatureCelsius",
                 valueXField: "dateTicks",
                 tooltip: am5.Tooltip.new(root, {
-
-                    labelText: "{summary}"
+                    labelText: "{summary}",
                 }),
                 groupDataWithOriginals: true,
                 groupDataCallback: function (dataItem, interval) {
                     var group = dataItem.get("originals").map(c => c.get("valueY"));
-
                     const sum = group.reduce((a, b) => a + b, 0);
                     const avg = (sum / group.length) || 0;
                     const roundAvg = Math.round(avg);
 
                     dataItem.set("valueY", roundAvg)
                     dataItem.set("valueYWorking", roundAvg)
+
+                    // Find the most common summary
+                    //var summaries = dataItem.get("originals").map(c => c.);
+                    //var frequencyCounter = {};
+                    //var maxCount = 0;
+                    //var mostCommonSummary = "Variable";
+
+                    //for (var i = 0; i < summaries.length; i++) {
+                    //    var summary = summaries[i];
+                    //    frequencyCounter[summary] = (frequencyCounter[summary] || 0) + 1;
+                    //    if (frequencyCounter[summary] > maxCount) {
+                    //        maxCount = frequencyCounter[summary];
+                    //        mostCommonSummary = summary;
+                    //    }
+                    //}
+
+                    //// If the most common summary appears only once, display "Variable"
+                    //if (maxCount === 1) {
+                    //    mostCommonSummary = "Variable";
+                    //}
                 }
             }))
             var weatherIconSeriesIndex = seriesIndex++;
@@ -246,10 +269,10 @@ export namespace Charts {
                     labelText: "{valueY.formatNumber('#.#')}kWh",
                 }),
                 stroke: ChartFunctions.consumptionColor,
-                
+
                 visible: !meterChartProfile.showCost,
                 fill: ChartFunctions.consumptionColor,
-                
+
             }));
 
             forecastConsumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);

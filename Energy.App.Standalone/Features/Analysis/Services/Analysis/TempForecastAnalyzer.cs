@@ -74,7 +74,7 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
             .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
 
         var totalKWh = forecastCosts.Sum(c => c.KWh);
-        var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPence) / 100m;
+        var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPounds);
         var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
         
         var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());

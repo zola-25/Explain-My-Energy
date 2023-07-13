@@ -9,7 +9,7 @@
 
         public DateTime UtcTime { get; init; }
         public decimal KWh { get; init; }
-        public decimal CostPence { get; init; } 
+        public decimal CostPounds { get; init; } 
         public bool IsForecast { get; init; }
         public bool IsFixedCostPerHour { get; init; }
     }

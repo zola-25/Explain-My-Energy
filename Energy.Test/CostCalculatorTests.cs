@@ -105,7 +105,7 @@ namespace Energy.Test
                     Assert.Equal(applicableTariff.PencePerKWh, costReading.TariffPencePerKWh);
 
                     decimal expectedCost = (costReading.KWh * applicableTariff.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
-                    Assert.Equal(expectedCost, costReading.CostPence);
+                    Assert.Equal(expectedCost, costReading.CostPounds);
 
                 }
                 else
@@ -115,7 +115,7 @@ namespace Energy.Test
                     Assert.Equal(halfHourlyPrice.PencePerKWh, costReading.TariffPencePerKWh);
 
                     decimal expectedCost = (costReading.KWh * halfHourlyPrice.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
-                    Assert.Equal(expectedCost, costReading.CostPence);
+                    Assert.Equal(expectedCost, costReading.CostPounds);
                 }
 
                 Assert.False(costReading.IsForecast);
@@ -123,7 +123,7 @@ namespace Energy.Test
             });
 
             decimal calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
-            decimal calculatedTotalCost = calculatedCostedReadings.Sum(c => c.CostPence);
+            decimal calculatedTotalCost = calculatedCostedReadings.Sum(c => c.CostPounds);
             decimal calculatedTotalStandingCharge = calculatedCostedReadings.Sum(c => c.TariffHalfHourlyStandingCharge);
 
             Assert.Equal(expectedTotalKWh, calculatedTotalKWh, 0);
@@ -173,7 +173,7 @@ namespace Energy.Test
             var calculatedCostedReadings = costCalculator.GetCostReadings(basicReadings, tariffs);
 
             var calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
-            var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.CostPence);
+            var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.CostPounds);
 
             var calculatedTotalStandingChargePence = calculatedCostedReadings.Sum(c => c.TariffHalfHourlyStandingCharge);
 
@@ -207,7 +207,7 @@ namespace Energy.Test
                 Assert.Equal(applicableTariff.PencePerKWh, costReading.TariffPencePerKWh);
 
                 decimal expectedCost = (costReading.KWh * applicableTariff.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48);
-                Assert.Equal(expectedCost, costReading.CostPence);
+                Assert.Equal(expectedCost, costReading.CostPounds);
 
 
                 Assert.False(costReading.IsForecast);
@@ -239,7 +239,7 @@ namespace Energy.Test
                                                           List<CostedReading> calculatedCostedReadings)
         {
             var calculatedTotalKWh = calculatedCostedReadings.Sum(c => c.KWh);
-            var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.CostPence);
+            var calculatedTotalCostPence = calculatedCostedReadings.Sum(c => c.CostPounds);
 
             var calculatedTotalStandingChargePence = calculatedCostedReadings.Sum(c => c.TariffHalfHourlyStandingCharge);
 

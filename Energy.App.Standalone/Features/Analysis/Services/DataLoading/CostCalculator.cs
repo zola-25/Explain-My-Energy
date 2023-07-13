@@ -76,7 +76,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                                                                     IsFixedCostPerHour = currentTariff.IsHourOfDayFixed,
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    CostPence = (basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence,
+                                                                    CostPounds = ((basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence) / 100,
                                                                     IsForecast = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);

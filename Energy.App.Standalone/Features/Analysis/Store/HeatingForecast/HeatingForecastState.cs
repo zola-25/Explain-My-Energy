@@ -124,6 +124,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
         private readonly IState<HeatingForecastState> _heatingForecastState;
         private readonly IState<AnalysisOptionsState> _analysisOptionsState;
         private readonly IForecastCoefficientsCreator _forecastCoefficientsCreator;
+        private readonly ICostedReadingsToDailyAggregator _costedReadingsToDailyAggregator;
 
         private readonly IState<MeterSetupState> _meterSetupState;
 
@@ -136,7 +137,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                                           IForecastCoefficientsCreator forecastCoefficientsCreator,
                                           IState<HeatingForecastState> linearCoefficientsState,
                                           IState<AnalysisOptionsState> analysisOptionsState,
-                                          IState<MeterSetupState> meterSetupState)
+                                          IState<MeterSetupState> meterSetupState,
+                                          ICostedReadingsToDailyAggregator costedReadingsToDailyAggregator)
         {
             _gasReadingsState = gasReadingsState;
             _electricityReadingsState = electricityReadingsState;
@@ -148,6 +150,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             _heatingForecastState = linearCoefficientsState;
             _analysisOptionsState = analysisOptionsState;
             _meterSetupState = meterSetupState;
+            _costedReadingsToDailyAggregator = costedReadingsToDailyAggregator;
         }
 
         [EffectMethod]
@@ -204,25 +207,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                 (degreeDifference, _heatingForecastState.Value, recentWeatherReadings);
 
             var costedReadingsForecast = _costCalculator.GetCostReadings(basicReadingsForecast, tariffs);
-            var dailyAggregatedCostedReadings = costedReadingsForecast.GroupBy(c => c.UtcTime.Date).
-                Select
-                (
-                    c => new DailyCostedReading()
-                    {
-                        UtcTime = c.Key,
-                        ReadingTotalCostPence = c.Sum(d => d.CostPence).Round(2),
-                        TariffAppliesFrom = c.First().
-                            TarrifAppliesFrom,
-                        TariffDailyStandingChargePence = c.First().
-                            TariffDailyStandingCharge,
-                        PencePerKWh = c.Average(d => d.TariffPencePerKWh).Round(2),
-                        IsFixedCostPerHour = c.First().
-                            IsFixedCostPerHour,
-                        KWh = c.Sum(d => d.KWh).Round(2),
-                        Forecast = true,
-                    }
-                ).
-                ToImmutableList();
+            var dailyAggregatedCostedReadings = 
+                _costedReadingsToDailyAggregator
+                    .Aggregate(costedReadingsForecast)
+                    .ToImmutableList();
 
             var temperaturePoints = recentWeatherReadings.Select
                 (

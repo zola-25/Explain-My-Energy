@@ -33,6 +33,60 @@ namespace Energy.Shared
         {
             return new List<T> { item }.ToImmutableList();
         }
+
+
+        /// <summary>
+        /// Converts an enum value from 'PascalCase' to friendlier 'Pascal case'. Will not work for multi-set flags enums
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="anEnum"></param>
+        /// <returns></returns>
+        public static string eEnumToFormatted<TEnum>(this TEnum anEnum, bool keepFirstUpper = true, bool keepRestUpper = true) where TEnum : Enum
+        {
+            int selectedValue = Convert.ToInt32(anEnum);
+
+            string selectedName = Enum.GetName(typeof(TEnum), selectedValue);
+
+            return selectedName.eFormatPascalCaseToReadable(keepFirstUpper, keepRestUpper);
+
+        }
+
+        public static string eFormatPascalCaseToReadable(this string pascalCaseString, bool keepFirstUpper = true, bool keepRestUpper = false)
+        {
+            char[] split = pascalCaseString.ToCharArray();
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < split.Length; i++)
+            {
+                char character = split[i];
+
+                if (i == 0 && keepFirstUpper)
+                {
+                    char upperChar = char.ToUpperInvariant(character);
+                    sb.Append(upperChar);
+                    continue;
+                }
+
+                if (char.IsUpper(character) && !char.IsDigit(character))
+                {
+                    sb.Append(' ');
+                    sb.Append(keepRestUpper ? character : char.ToLowerInvariant(character));
+                    continue;
+                }
+
+                if (char.IsDigit(character) && !char.IsDigit(split[i - 1]))
+                {
+                    sb.Append(' ');
+                    sb.Append(character);
+                    continue;
+                }
+
+                sb.Append(character);
+
+            }
+            string formattedName = sb.ToString();
+            return formattedName;
+        }
     }
 
 

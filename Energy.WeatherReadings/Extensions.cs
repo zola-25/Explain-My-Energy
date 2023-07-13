@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Energy.Shared;
+using Energy.WeatherReadings.Models;
+using System.Text;
 
 namespace Energy.WeatherReadings
 {
@@ -22,6 +24,18 @@ namespace Energy.WeatherReadings
             }
 
             return queryStringBuilder.ToString();
+        }
+
+        public static string WeatherCodeToSummary(this int? weatherCode)
+        {
+            if(weatherCode == null)
+            {
+                return String.Empty;
+            }
+
+            var wmoEnum = (WMOCodes)weatherCode;
+
+            return wmoEnum.eEnumToFormatted(keepFirstUpper: true, keepRestUpper: false);
         }
 
     }

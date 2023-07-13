@@ -2,6 +2,7 @@
 using Energy.WeatherReadings.Interfaces;
 using Energy.WeatherReadings.Models;
 using System.Text.Json;
+using Energy.WeatherReadings;
 
 namespace Energy.WeatherReadings
 {
@@ -92,7 +93,7 @@ namespace Energy.WeatherReadings
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
                         UtcTime = DateTimeOffset.FromUnixTimeSeconds(time[i]).DateTime,
-                        Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
+                        Summary = weathercode[i].WeatherCodeToSummary(),
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         ApparentTemperatureMin = apparent_temperature_min[i],
                         ApparentTemperatureMax = apparent_temperature_max[i],
@@ -182,7 +183,7 @@ namespace Energy.WeatherReadings
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
                         UtcTime = readDate,
-                        Icon = weathercode[i].HasValue ? weathercode[i].Value.ToString() : null,
+                        Summary = weathercode[i].WeatherCodeToSummary(),
                         ApparentTemperatureMin = apparent_temperature_min[i],
                         ApparentTemperatureMax = apparent_temperature_max[i],
                         TemperatureAverage = Math.Round(((temperature_2m_max[i] ?? 0) + (temperature_2m_min[i] ?? 0)) / 2m, 2),
@@ -260,6 +261,7 @@ namespace Energy.WeatherReadings
                     DailyWeatherReading reading = new DailyWeatherReading
                     {
                         UtcTime = readDate,
+                        Summary = "Long-term Climate Forecast",
                         TemperatureAverage = temperature_2m_mean[i] ?? 0,
                         TemperatureMin = temperature_2m_min[i],
                         TemperatureMax = temperature_2m_max[i],

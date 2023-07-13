@@ -8,7 +8,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
         {
             return new ChartReading()
             {
-                Cost = costedReading.CostPence,
+                Cost = costedReading.CostPounds,
                 KWh = costedReading.KWh,
                 PencePerKWh = costedReading.TariffPencePerKWh,
                 DailyStandingCharge = costedReading.TariffDailyStandingCharge,
@@ -24,7 +24,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
         {
             return new ChartDailyForecastReading()
             {
-                Cost = costedReading.ReadingTotalCostPence,
+                Cost = costedReading.ReadingTotalCostPounds,
                 KWh = costedReading.KWh,
                 PencePerKWh = costedReading.PencePerKWh,
                 DailyStandingCharge = costedReading.TariffDailyStandingChargePence,
