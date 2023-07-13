@@ -3,7 +3,7 @@ using Energy.Shared;
 
 namespace Energy.n3rgyApi.Interfaces;
 
-public interface IConsumptionDataRetriever
+public interface IN3rgyEnergyDataService
 {
     Task<N3RgyConsumptionResponse> GetConsumptionResponse(string mac,
         MeterType meterType,

@@ -45,7 +45,7 @@ namespace Energy.n3rgyApi
             }).AddPolicyHandler(GetRetryPolicy());
 
 
-            services.AddTransient<IConsumptionDataRetriever, ConsumptionDataRetriever>();
+            services.AddTransient<IN3rgyEnergyDataService, N3rgyEnergyDataService>();
 
             // Register other services here if needed
             return services;

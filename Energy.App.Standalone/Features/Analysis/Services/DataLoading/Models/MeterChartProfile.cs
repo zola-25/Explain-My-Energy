@@ -17,6 +17,6 @@
     public class MeterChartData
     {
         public MeterChartProfile MeterChartProfile { get; set; }
-        public List<TemperatureIconPoint> TemperatureIconPoints { get; set; }
+        public List<TemperaturePoint> TemperaturePoints { get; set; }
     }
 }

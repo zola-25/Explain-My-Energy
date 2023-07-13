@@ -11,7 +11,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
     {
         [property: JsonIgnore]
         public bool Loading { get; init; }
-        public ImmutableList<DailyWeatherReading> WeatherReadings { get; init; }
+        public ImmutableList<DailyWeatherRecord> WeatherReadings { get; init; }
 
 
         public DateTime LastUpdated { get; init; }
@@ -32,7 +32,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             {
                 Loading = false,
                 LastUpdated = DateTime.MinValue,
-                WeatherReadings = ImmutableList<DailyWeatherReading>.Empty
+                WeatherReadings = ImmutableList<DailyWeatherRecord>.Empty
             };
         }
     }

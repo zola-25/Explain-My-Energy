@@ -6,12 +6,12 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 public class StoreHeatingForecastStateAction
 {
     public ImmutableList<DailyCostedReading> ForecastDailyReadings { get; }
-    public ImmutableList<TemperaturePoint> TemperatureIconPoints { get; }
+    public ImmutableList<TemperaturePoint> TemperaturePoints { get; }
 
-    public StoreHeatingForecastStateAction(ImmutableList<DailyCostedReading> forecastDailyReadings, ImmutableList<TemperaturePoint> temperatureIconPoints)
+    public StoreHeatingForecastStateAction(ImmutableList<DailyCostedReading> forecastDailyReadings, ImmutableList<TemperaturePoint> temperaturePoints)
     {
         ForecastDailyReadings = forecastDailyReadings;
-        TemperatureIconPoints = temperatureIconPoints;
+        TemperaturePoints = temperaturePoints;
     }
 }
 

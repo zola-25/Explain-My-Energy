@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Data.Weather;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
@@ -32,7 +33,8 @@ builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
 
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
-builder.Services.AddTransient<IEnergyReadingImporter, EnergyReadingImporter>();
+builder.Services.AddTransient<IEnergyReadingRetriever, EnergyReadingRetriever>();
+builder.Services.AddTransient<IEnergyReadingWorkerService, EnergyReadingWorkerService>();
 
 builder.Services.AddTransient<IForecastGenerator, ForecastGenerator>();
 builder.Services.AddTransient<IForecastCoefficientsCreator, ForecastCoefficientsCreator>();
@@ -44,6 +46,7 @@ builder.Services.AddTransient<ITempForecastAnalyzer, TempForecastAnalyzer>();
 builder.Services.AddTransient<ITermDateRanges, TermDateRanges>();
 builder.Services.AddTransient<ICostCalculator, CostCalculator>();
 
+builder.Services.AddTransient<IWeatherDataWorkerService, WeatherDataWorkerService>();
 
 
 builder.Services.AddMudServices(config =>

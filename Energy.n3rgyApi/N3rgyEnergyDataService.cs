@@ -6,12 +6,12 @@ using System.Text.Json;
 
 namespace Energy.n3rgyApi;
 
-public class ConsumptionDataRetriever : IConsumptionDataRetriever
+public class N3rgyEnergyDataService : IN3rgyEnergyDataService
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<ConsumptionDataRetriever> _logger;
+    private readonly ILogger<N3rgyEnergyDataService> _logger;
 
-    public ConsumptionDataRetriever(IHttpClientFactory httpClientFactory, ILogger<ConsumptionDataRetriever> logger)
+    public N3rgyEnergyDataService(IHttpClientFactory httpClientFactory, ILogger<N3rgyEnergyDataService> logger)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;

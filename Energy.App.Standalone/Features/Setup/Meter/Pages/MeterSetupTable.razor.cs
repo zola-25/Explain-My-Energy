@@ -62,7 +62,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             });
             SubscribeToAction<NotifyGasLoadingFinished>((a) =>
             {
-                Snackbar.Add(String.IsNullOrEmpty(a.Error) ? "Gas Readings Update Error" : "Gas Readings Updated");
+                Snackbar.Add(!String.IsNullOrEmpty(a.Error) ? "Gas Readings Update Error" : "Gas Readings Updated");
             });
 
             SubscribeToAction<GasDeleteReadingsAction>((a) =>

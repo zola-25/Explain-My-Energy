@@ -1,11 +1,4 @@
 ﻿
-export interface EnergyReading {
-    dateTicks: number;
-    consumptionKWh: number;
-    cost: number;
-    isForecast: boolean;
-}
-
 export interface ChartReading {
     dateTicks: number;
     pencePerKWh: number;
@@ -39,24 +32,12 @@ export interface MeterChartProfile {
     chartDailyForecastReadings: ChartDailyForecastReading[]
 }
 
-export interface MeterProfile {
-    globalId: string,
-    profileStart: number,
-    profileEnd: number,
-    mostRecentWeekStart: number,
-    latestReading: number,
-    energyReadings: EnergyReading[]
-}
 
 
-export interface TemperatureIconPoint {
+export interface TemperaturePoint {
     temperatureCelsiusUnmodified: number;
     temperatureCelsius: number;
     dateTicks: number;
     summary: string;
 }
 
-export interface ProgressWithMessage {
-    totalProgressed: number;
-    message: string;
-}

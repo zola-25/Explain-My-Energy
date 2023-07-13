@@ -11,23 +11,23 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
 {
     public class ElectricityReadingsEffects
     {
-        private readonly IEnergyReadingImporter _energyReadingImporter;
+        private readonly IEnergyReadingWorkerService _energyReadingWorkerService;
         private readonly ICostCalculator _energyCostCalculator;
         IState<MeterSetupState> _meterSetupState;
         IState<ElectricityReadingsState> _electricityReadingsState;
 
-        public ElectricityReadingsEffects(IEnergyReadingImporter energyReadingImporter, IState<MeterSetupState> meterSetupState, ICostCalculator energyCostCalculator, IState<ElectricityReadingsState> electricityReadingsState)
+        public ElectricityReadingsEffects(IState<MeterSetupState> meterSetupState, ICostCalculator energyCostCalculator, IState<ElectricityReadingsState> electricityReadingsState, IEnergyReadingWorkerService energyReadingWorkerService)
         {
-            _energyReadingImporter = energyReadingImporter;
             _meterSetupState = meterSetupState;
             _energyCostCalculator = energyCostCalculator;
             _electricityReadingsState = electricityReadingsState;
+            this._energyReadingWorkerService = energyReadingWorkerService;
         }
 
         [EffectMethod]
         public async Task ReloadElectricityReadingsAndCosts(ElectricityReloadReadingsAndCostsAction loadReadingsAction, IDispatcher dispatcher)
         {
-            var basicReadings = await _energyReadingImporter.ImportFromMoveInOrPreviousYear(MeterType.Electricity);
+            var basicReadings = await _energyReadingWorkerService.ImportFromMoveInOrPreviousYear(MeterType.Electricity);
             try
             {
                 var costedReadings = await CalculateCostedReadings(basicReadings);
@@ -74,7 +74,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Store
         {
             try
             {
-                var basicReadingsToUpdate = await _energyReadingImporter.ImportFromDate(MeterType.Electricity, updateReadingsAction.LastBasicReading);
+                var basicReadingsToUpdate = await _energyReadingWorkerService.ImportFromDate(MeterType.Electricity, updateReadingsAction.LastBasicReading);
 
                 dispatcher.Dispatch(new ElectricityStoreUpdatedReadingsAction(basicReadingsToUpdate.ToImmutableList()));
 

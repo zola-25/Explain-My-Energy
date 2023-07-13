@@ -1,4 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 using MathNet.Numerics;
 using System.Collections.Immutable;
@@ -9,7 +10,7 @@ class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 {
     public (decimal C, decimal Gradient) GetForecastCoefficients(
         IEnumerable<BasicReading> basicReadings,
-        IEnumerable<DailyWeatherReading> dailyWeatherReadings)
+        IEnumerable<DailyWeatherRecord> dailyWeatherReadings)
     {
 
         var dailyConsumptionPoints =

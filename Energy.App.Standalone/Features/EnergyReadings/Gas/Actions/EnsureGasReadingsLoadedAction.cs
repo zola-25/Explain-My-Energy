@@ -3,12 +3,9 @@ using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
-using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 using Energy.Shared;
 using Fluxor;
-using SpawnDev.BlazorJS.WebWorkers;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 {
@@ -73,19 +70,22 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
         {
             private readonly IState<MeterSetupState> _meterSetupState;
             private readonly IState<GasReadingsState> _gasReadingsState;
-            private readonly IEnergyReadingImporter _energyReadingImporter;
             private readonly ICostCalculator _costCalculator;
-            private readonly WebWorkerService _webWorkerService;
+            private readonly IEnergyReadingWorkerService _energyReadingWorkerService;
 
-            public Effect(IState<MeterSetupState> meterSetupState, IState<GasReadingsState> gasReadingsState, IEnergyReadingImporter energyReadingImporter,
-                ICostCalculator costCalculator, WebWorkerService webWorkerService)
+            public Effect(IState<MeterSetupState> meterSetupState,
+                          IState<GasReadingsState> gasReadingsState,
+                          ICostCalculator costCalculator,
+                          IEnergyReadingWorkerService energyReadingWorkerService)
             {
                 _meterSetupState = meterSetupState;
                 _gasReadingsState = gasReadingsState;
-                _energyReadingImporter = energyReadingImporter;
                 _costCalculator = costCalculator;
-                _webWorkerService = webWorkerService;
+                _energyReadingWorkerService = energyReadingWorkerService;
             }
+
+
+
             // Loading on startup and stop on NotifyGasStoreReady and move reducers in here
 
             public override async Task HandleAsync(EnsureGasReadingsLoadedAction action, IDispatcher dispatcher)
@@ -101,14 +101,11 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                 try
                 {
-                    using var webWorker = await _webWorkerService.GetWebWorker();
-                    var energyReadingsWorker = webWorker.GetService<IEnergyReadingImporter>();
-                    var result = await energyReadingsWorker.Test();
 
                     var existingBasicReadings = _gasReadingsState.Value.BasicReadings;
                     if (existingBasicReadings.eIsNullOrEmpty() || action.ForceReload)
                     {
-                        var basicReadings = await energyReadingsWorker.ImportFromMoveInOrPreviousYear(MeterType.Gas);
+                        var basicReadings = await _energyReadingWorkerService.ImportFromMoveInOrPreviousYear(MeterType.Gas);
                         var costedReadings = CalculateCostedReadings(basicReadings);
                         basicReadingsUpdated = basicReadings.Count;
                         dispatcher.Dispatch
@@ -125,7 +122,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                         if (lastBasicReading < DateTime.UtcNow.Date.AddDays(-1))
                         {
-                            var newBasicReadings = await energyReadingsWorker.ImportFromDate
+                            var newBasicReadings = await _energyReadingWorkerService.ImportFromDate
                                 (MeterType.Gas, lastBasicReading.Date);
 
                             var updatedBasicReadings = existingBasicReadings.ToList();
@@ -173,8 +170,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    dispatcher.Dispatch(new NotifyGasLoadingFinished(false, e.Message));
                     action.TaskCompletion.SetResult(0);
+
+                    dispatcher.Dispatch(new NotifyGasLoadingFinished(false, e.Message));
                 }
             }
 

@@ -47,15 +47,11 @@ else
                 <tr>
                     <td>@weatherReading.UtcTime.ToShortDateString()</td>
                     <td>@weatherReading.TemperatureAverage</td>
-                    <td>@weatherReading.TemperatureMin</td>
-                    <td>@weatherReading.TemperatureMax</td>
-                    <td>@((weatherReading.TemperatureMin + weatherReading.TemperatureMax)/2m)</td>
 
                     <td>@weatherReading.IsHistorical</td>
                     <td>@weatherReading.IsRecentForecast</td>
                     <td>@weatherReading.IsNearForecast</td>
                     <td>@weatherReading.IsClimateForecast</td>
-                    <td>@weatherReading.Icon</td>
                 </tr>
             }
         </tbody>

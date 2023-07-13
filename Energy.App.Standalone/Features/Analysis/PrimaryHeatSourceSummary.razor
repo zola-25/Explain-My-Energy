@@ -23,8 +23,8 @@ else
         <CurrentPeriodAnalysisCard PrimaryHeatSource="true"
                                    Term="_calenderTerm"
                                    MeterType="MeterType"
-                                   TotalsForecast="_currentTermForecastAnalysis"
-                                   TotalsSoFar="_thisDurationAnalysis">
+                                   CurrentPeriodAnalysis="_currentTermForecastAnalysis"
+                                   CurrentPeriodAnalysisToDate="_thisDurationAnalysis">
         </CurrentPeriodAnalysisCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
@@ -74,7 +74,7 @@ else
     [Inject]
     IState<GasReadingsState> GasReadingsState { get; set; }
 
-    
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -104,7 +104,7 @@ else
         switch (MeterType)
         {
             case MeterType.Electricity:
-                
+
                 SubscribeToAction<ElectricityAnalysisOptionsSetCalenderTermAction>(
                     action =>
                     {
@@ -125,9 +125,15 @@ else
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
+
         }
-        
-        
+        SubscribeToAction<NotifyHeatingForecastReadyAction>(action =>
+            {
+                _degreeDifference = action.DegreeDifference;
+                SetForecastAnalyses();
+            });
+
+
         await Task.Delay(1);
 
         SetForecastAnalyses();

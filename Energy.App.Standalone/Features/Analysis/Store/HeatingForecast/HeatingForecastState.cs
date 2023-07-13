@@ -104,7 +104,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             return state with
             {
                 ForecastDailyCosts = action.ForecastDailyReadings,
-                ForecastWeatherReadings = action.TemperatureIconPoints,
+                ForecastWeatherReadings = action.TemperaturePoints,
                 ForecastsLastUpdate = DateTime.UtcNow
             };
         }
@@ -224,12 +224,12 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                 ).
                 ToImmutableList();
 
-            var temperatureIconPoints = recentWeatherReadings.Select
+            var temperaturePoints = recentWeatherReadings.Select
                 (
                     c => new TemperaturePoint()
                     {
                         UtcTime = c.UtcTime,
-                        DateTicks = c.UtcTime.Ticks,
+                        DateTicks = c.UtcTime.eToUnixTicksNoOffset(),
                         TemperatureCelsius = c.TemperatureAverage + degreeDifference,
                         TemperatureCelsiusUnmodified = c.TemperatureAverage,
                         Summary = c.Summary ?? string.Empty
@@ -237,7 +237,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                 ).
                 ToImmutableList();
 
-            dispatcher.Dispatch(new StoreHeatingForecastStateAction(dailyAggregatedCostedReadings, temperatureIconPoints));
+            dispatcher.Dispatch(new StoreHeatingForecastStateAction(dailyAggregatedCostedReadings, temperaturePoints));
             dispatcher.Dispatch(new NotifyHeatingForecastReadyAction(degreeDifference));
         }
 
@@ -245,6 +245,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
         [EffectMethod]
         public async Task HandleUpdateIfSignificate(UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction action, IDispatcher dispatcher)
         {
+            decimal degreeDifference = _analysisOptionsState?.Value?[action.MeterType]?.DegreeDifference ?? 0;
             if (_householdState.Value.PrimaryHeatSource != action.MeterType)
             {
                 action.Completion.SetResult(true);
@@ -262,10 +263,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
                 || _heatingForecastState.Value.ForecastDailyCosts.eIsNullOrEmpty()
                 || _heatingForecastState.Value.ForecastsLastUpdate < DateTime.Today.AddDays(-1))
             {
-                dispatcher.Dispatch(new LoadHeatingForecastAction());
+                dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference));
             } else
             {
-                dispatcher.Dispatch(new NotifyHeatingForecastReadyAction());
+                dispatcher.Dispatch(new NotifyHeatingForecastReadyAction(degreeDifference));
             }
             action.Completion.SetResult(true);
         }

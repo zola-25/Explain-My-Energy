@@ -4,9 +4,9 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
     public class StoreWeatherUpdatedReadingsAction
     {
-        public List<DailyWeatherReading> UpdatedWeatherReadings { get; }
+        public List<DailyWeatherRecord> UpdatedWeatherReadings { get; }
 
-        public StoreWeatherUpdatedReadingsAction(List<DailyWeatherReading> updatedWeatherReadings)
+        public StoreWeatherUpdatedReadingsAction(List<DailyWeatherRecord> updatedWeatherReadings)
         {
             UpdatedWeatherReadings = updatedWeatherReadings;
         }

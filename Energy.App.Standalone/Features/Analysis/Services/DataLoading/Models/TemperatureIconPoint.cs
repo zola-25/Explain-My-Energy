@@ -1,20 +1,11 @@
 ﻿namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 
 
-public class TemperaturePoint
+public record TemperaturePoint
 {
-    public decimal TemperatureCelsiusUnmodified { get; set; }
-    public decimal TemperatureCelsius { get; set; }
-    public DateTime UtcTime { get; set; }
-    public long DateTicks { get; set; }
-    public bool IsForecast { get; set; }
-    public string Summary { get; set; }
-}
-
-public class TemperatureIconPoint
-{
-    public decimal TemperatureCelsiusUnmodified { get; set; }
-    public decimal TemperatureCelsius { get; set; }
-    public long DateTicks { get; set; }
-    public string Summary { get; set; }
+    public decimal TemperatureCelsiusUnmodified { get; init; }
+    public decimal TemperatureCelsius { get; init; }
+    public DateTime UtcTime { get; init; }
+    public long DateTicks { get; init; }
+    public string Summary { get; init; }
 }

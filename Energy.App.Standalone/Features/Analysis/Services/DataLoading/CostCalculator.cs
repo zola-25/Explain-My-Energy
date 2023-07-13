@@ -14,6 +14,11 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         {
             var allTariffsOrderedArray = meterTariffState.OrderBy(c => c.DateAppliesFrom).ToArray();
 
+            if (basicReadings.Count == 0)
+            {
+                return new List<CostedReading>();
+            }
+
             var firstReadingTime = basicReadings.First().UtcTime;
             if (firstReadingTime < allTariffsOrderedArray[0].DateAppliesFrom)
             {

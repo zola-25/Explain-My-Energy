@@ -1,4 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
+using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 using System.Collections.Immutable;
 
@@ -8,7 +9,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
     {
         public List<BasicReading> GetBasicReadingsForecast(decimal degreeDifference,
             HeatingForecastState linearCoefficientsState,
-            List<DailyWeatherReading> forecastWeatherReadings)
+            List<DailyWeatherRecord> forecastWeatherReadings)
         {
             var adjustedReadings = forecastWeatherReadings
                 .SelectMany(c => {
