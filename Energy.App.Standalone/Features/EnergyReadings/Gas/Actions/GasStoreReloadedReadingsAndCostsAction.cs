@@ -10,8 +10,9 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
         public ImmutableList<BasicReading> BasicReadings { get; }
 
         public GasStoreReloadedReadingsAndCostsAction(
-            ImmutableList<BasicReading> basicReadings, 
-            ImmutableList<CostedReading> costedReadings)
+            ImmutableList<BasicReading> basicReadings,
+            ImmutableList<CostedReading> costedReadings
+            )
         {
             CostedReadings = costedReadings;
             BasicReadings = basicReadings;

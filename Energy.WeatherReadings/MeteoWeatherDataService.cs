@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Energy.WeatherReadings;
 
-public class WeatherDataService : IWeatherDataService
+public class MeteoWeatherDataService : IMeteoWeatherDataService
 {
     private readonly IOutCodeLocationLookup _outCodeLocationLookup;
-    private readonly IWeatherApiCalls _weatherApiCalls;
-    private readonly ILogger<WeatherDataService> _logger;
+    private readonly IMeteoWeatherApiCalls _weatherApiCalls;
+    private readonly ILogger<MeteoWeatherDataService> _logger;
 
 
-    public WeatherDataService(IOutCodeLocationLookup outCodeLocationLookup, IWeatherApiCalls weatherApiCalls, ILogger<WeatherDataService> logger)
+    public MeteoWeatherDataService(IOutCodeLocationLookup outCodeLocationLookup, IMeteoWeatherApiCalls weatherApiCalls, ILogger<MeteoWeatherDataService> logger)
     {
         _outCodeLocationLookup = outCodeLocationLookup;
         _weatherApiCalls = weatherApiCalls;

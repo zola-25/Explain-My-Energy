@@ -1,27 +1,30 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
-@if (_ready)
+@if (!Ready)
 {
-    // Tooltips/badges?
+    <MudItem xs="12" sm="6" md="4">
+        <MudText Typo="Typo.h5">@Status</MudText>
+        <div class="spinner"></div>
+    </MudItem>
+} else {
     <MudItem xs="12" sm="6" md="4">
         <HistoricalAnalysisCard PrimaryHeatSource="false"
-                            Term="_calendarTerm"
-                            MeterType="MeterType"
-                            Period="RelativePeriod.Previous"
-                            DurationAnalysis="_previousDurationAnalysis">
+                                Term="_calendarTerm"
+                                MeterType="MeterType"
+                                DurationAnalysis="_previousDurationAnalysis">
         </HistoricalAnalysisCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <CurrentPeriodAnalysisCard PrimaryHeatSource="false"
-                               Term="_calendarTerm"
-                               MeterType="MeterType"
-                               TotalsForecast="_currentTermForecastAnalysis"
-                               TotalsSoFar="_thisDurationAnalysis">
+                                   Term="_calendarTerm"
+                                   MeterType="MeterType"
+                                   CurrentPeriodForecastAnalysis="_currentTermForecastAnalysis"
+                                   CurrentPeriodAnalysisToDate="_thisDurationAnalysis">
         </CurrentPeriodAnalysisCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="4">
         <ForecastCard PrimaryHeatSource="false"
-            Term="_calendarTerm"
+                      Term="_calendarTerm"
                       ForecastAnalysis="_nextTermForecastAnalysis"
                       MeterType="MeterType">
         </ForecastCard>
@@ -52,26 +55,27 @@
 
     ForecastAnalysis _currentTermForecastAnalysis;
     ForecastAnalysis _nextTermForecastAnalysis;
-    bool _ready;
+    public bool Ready { get; set; }
+    public string Status { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
 
         var initialMeterAnalysisOptions = AnalysisOptionsState.Value[MeterType];
 
-        _ready = false;
+        Ready = false;
 
         await Task.Delay(1);
+        Status = "Analyzing historical data...";
 
         _calendarTerm = initialMeterAnalysisOptions.CalendarTerm;
         await Task.Delay(1);
 
         SetHistoricalAnalyses();
 
-
         await Task.Delay(1);
 
-
+        Status = "Analyzing forecast data...";
 
         switch (MeterType)
         {
@@ -80,7 +84,7 @@
                 SubscribeToAction<ElectricityAnalysisOptionsSetCalenderTermAction>(
                     action =>
                     {
-                        _calenderTerm = action.CalendarTerm;
+                        _calendarTerm = action.CalendarTerm;
                         SetHistoricalAnalyses();
                         SetForecastAnalyses();
                     });
@@ -90,7 +94,7 @@
                 SubscribeToAction<GasAnalysisOptionsSetCalenderTermAction>(
                     action =>
                     {
-                        _calenderTerm = action.CalendarTerm;
+                        _calendarTerm = action.CalendarTerm;
                         SetHistoricalAnalyses();
                         SetForecastAnalyses();
                     });
@@ -98,12 +102,6 @@
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        SubscribeToAction<NotifyHeatingForecastReadyAction>(action =>
-            {
-                _degreeDifference = action.DegreeDifference;
-                SetForecastAnalyses();
-            });
-
 
         await Task.Delay(1);
 
@@ -113,30 +111,17 @@
     }
 
 
-    private Task OnTermChanged(CalendarTerm newTerm)
-    {
-        _calendarTerm = newTerm;
-        SetData();
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
 
-    
-
-    private void SetData()
+    void SetHistoricalAnalyses()
     {
         _thisDurationAnalysis = HistoricalDataAnalyzer.GetCurrentDurationAnalysis(MeterType, _calendarTerm);
         _previousDurationAnalysis = HistoricalDataAnalyzer.GetPreviousDurationAnalysis(MeterType, _calendarTerm);
-
-
-        _currentTermForecastAnalysis = SimpleForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm);
-        _nextTermForecastAnalysis = SimpleForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm);
     }
 
-
-    public void Dispose()
+    void SetForecastAnalyses()
     {
-        AnalysisOptions[MeterType].NotifyTermChanged -= OnTermChanged;
+        _currentTermForecastAnalysis = SimpleForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calendarTerm);
+        _nextTermForecastAnalysis = SimpleForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calendarTerm);
     }
 
 }

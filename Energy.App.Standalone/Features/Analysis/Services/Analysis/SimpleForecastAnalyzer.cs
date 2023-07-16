@@ -1,6 +1,11 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
+using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
+using Energy.Shared;
+using Fluxor;
+using MathNet.Numerics;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -8,54 +13,76 @@ public class SimpleForecastAnalyzer : ISimpleForecastAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
-    private readonly HistoricalAverageForecastState _historicalAverageForecastState;
+    private readonly IState<HistoricalForecastState> _historicalForecastState;
 
-
-    public SimpleForecastAnalyzer(ITermDateRanges periodDateRanges, HistoricalAverageForecastState historicalAverageForecastState)
+    public SimpleForecastAnalyzer(Co2ConversionFactors co2Conversion,
+                                  ITermDateRanges periodDateRanges,
+                                  IState<HistoricalForecastState> historicalForecastState)
     {
+        _co2Conversion = co2Conversion;
         _periodDateRanges = periodDateRanges;
-        _historicalAverageForecastState = historicalAverageForecastState;
-        _co2Conversion = new Co2ConversionFactors();
+        _historicalForecastState = historicalForecastState;
     }
 
-    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, CalendarTerm duration)
+    public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
+        CalendarTerm term)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(duration);
+        (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(term);
 
-        var forecastCosts = _historicalAverageForecastState.GetHistoricalAverageForecast(meterType);
-
-        var costReadings = forecastCosts.Where(c => c.LocalTime >= start && c.LocalTime < end).ToList();
-
-        ForecastAnalysis results = ForecastAnalysis(meterType, costReadings);
+        var results = ForecastAnalysis
+        (
+            meterType,
+            start,
+            end,
+            term
+        );
 
         return results;
     }
 
     public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
-        CalendarTerm duration)
+        CalendarTerm term)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(duration);
-        var forecastCosts = _historicalAverageForecastState.GetHistoricalAverageForecast(meterType);
+        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
 
-        var costReadings = forecastCosts.Where(c => c.LocalTime >= start && c.LocalTime < end).ToList();
+        var results = ForecastAnalysis
+        (
+            meterType,
+            start,
+            end,
+            term
+        );
 
-        return ForecastAnalysis(meterType, costReadings);
+        return results;
     }
 
 
-    private ForecastAnalysis ForecastAnalysis(MeterType meterType, ICollection<CostedReading> costedReadings)
+    private ForecastAnalysis ForecastAnalysis(
+        MeterType meterType,
+        DateTime start,
+        DateTime end,
+        CalendarTerm term)
     {
-        double forecastConsumption = costedReadings.Sum(c => c.KWh);
-        int numOfDays = costedReadings.GroupBy(c => c.LocalTime.Date).Count();
 
-        ForecastAnalysis results = new ForecastAnalysis()
+        var forecastDailyCosts = _historicalForecastState.Value[meterType]
+            .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
+
+        var totalKWh = forecastDailyCosts.Sum(c => c.KWh);
+        var totalCost = forecastDailyCosts.Sum(c => c.ReadingTotalCostPounds);
+        var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
+        
+        var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
+        var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
+        var totalCo2Rounded = totalCo2.Round(1);
+
+        var results = new ForecastAnalysis()
         {
-            NumberOfDays = numOfDays,
-            Start = costedReadings.First().LocalTime.Date,
-            End = costedReadings.First().LocalTime.Date,
-            ForecastConsumption = forecastConsumption.Round(0),
-            ForecastCostPence = costedReadings.Sum(c => c.CostPence).Round(2),
-            ForecastCo2 = (forecastConsumption * _co2Conversion.GetCo2ConversionFactor(meterType)).Round(1),
+            NumberOfDays = forecastDailyCosts.Count,
+            Start = start,
+            End = end,
+            ForecastConsumption = totalKWhRounded,
+            ForecastCostPounds = totalCostRounded,
+            ForecastCo2 = totalCo2Rounded,
             TemperatureRange = new TemperatureRange()
         };
         return results;

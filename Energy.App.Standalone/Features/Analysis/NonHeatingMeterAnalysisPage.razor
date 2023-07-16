@@ -1,0 +1,36 @@
+﻿@page "/Meter/{MeterTypeName}"
+
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+
+@if (_ready)
+{
+    <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="false">
+        <EnergyChart>
+            <EnergyOnlyChart MeterType="_meterType"></EnergyOnlyChart>
+        </EnergyChart>
+        <Summary>
+            <NonHeatingMeterSummary MeterType="_meterType"></NonHeatingMeterSummary>
+        </Summary>
+
+    </MeterAnalysisTemplate>
+}
+@code {
+
+    [Parameter]
+    public string MeterTypeName { get; set; }
+
+    MeterType _meterType;
+    
+    bool _ready = false;
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _meterType = MeterTypeName.eStringToEnum<MeterType>();
+        _ready = true;
+    }
+
+}
+

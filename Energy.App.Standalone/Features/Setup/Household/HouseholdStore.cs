@@ -4,6 +4,7 @@ using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Household
 {
+    [FeatureState(Name = nameof(HouseholdState))]
     [PersistState, PriorityLoad]
     public record HouseholdState
     {
@@ -15,28 +16,18 @@ namespace Energy.App.Standalone.Features.Setup.Household
         public string OutCodeCharacters { get; init; }
 
         public MeterType PrimaryHeatSource { get; init; }
-    }
 
-    public class HouseholdSetupFeature : Feature<HouseholdState>
-    {
-        public override string GetName()
+        public HouseholdState()
         {
-            return nameof(HouseholdSetupFeature);
-        }
-
-        protected override HouseholdState GetInitialState()
-        {
-            return new HouseholdState
-            {
-                OutCodeCharacters = null,
-                IhdMacId = null,
-                Invalid = false,
-                MoveInDate = null,
-                PrimaryHeatSource = MeterType.Gas,
-                Saved = false,
-            };
+            OutCodeCharacters = null;
+            IhdMacId = null;
+            Invalid = false;
+            MoveInDate = null;
+            PrimaryHeatSource = MeterType.Gas;
+            Saved = false;
         }
     }
+
 
     public class HouseholdSubmitSuccessAction
     {
@@ -84,7 +75,7 @@ namespace Energy.App.Standalone.Features.Setup.Household
             };
         }
 
-        
+
     }
 
     public class HouseholdEffects

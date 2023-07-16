@@ -15,7 +15,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
                 DateTicks = costedReading.UtcTime.eToUnixTicksNoOffset(),
                 HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingCharge,
                 TariffAppliesFrom = costedReading.TarrifAppliesFrom,
-                TariffType = String.Empty,
+                TariffType = costedReading.IsFixedCostPerHour ? "Fixed Rate" : "Variable Rate",
                 IsForecast = costedReading.IsForecast
             };
         }

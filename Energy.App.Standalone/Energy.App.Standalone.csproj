@@ -23,7 +23,6 @@
 		</PackageReference>
 		<PackageReference Include="MudBlazor" Version="6.7.0" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
-		<PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.1.15" />
 	</ItemGroup>
 
 

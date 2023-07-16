@@ -1,6 +1,6 @@
 ﻿namespace Energy.WeatherReadings;
 
-public class WeatherDataOptions
+public class MeteoWeatherDataOptions
 {
     public string PostcodeLocationApi { get; set; }
     public string HistoricalApi { get; set; }

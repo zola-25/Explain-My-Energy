@@ -6,12 +6,12 @@ using Energy.WeatherReadings;
 
 namespace Energy.WeatherReadings
 {
-    public class WeatherApiCalls : IWeatherApiCalls
+    public class MeteoWeatherApiCalls : IMeteoWeatherApiCalls
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public WeatherApiCalls(
+        public MeteoWeatherApiCalls(
             IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;

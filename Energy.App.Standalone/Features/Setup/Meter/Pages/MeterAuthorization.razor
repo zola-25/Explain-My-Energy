@@ -25,7 +25,7 @@
                         <MudTextField Label='IHD MAC ID' Value="@HouseholdState.Value.IhdMacId" ReadOnly="true"></MudTextField>
                         <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
                     </div>
-                    <iframe src="https://data.n3rgy.com/consumer-sign-up" width="100%" style="height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
+                    <iframe src="https://data.n3rgy.com/consumer-sign-up" style="width: 100%; height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
                     <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
 
                         <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
@@ -93,11 +93,11 @@
             {
                 case MeterType.Gas:
                     Dispatcher.Dispatch(new AuthorizeGasAction());
-                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, new TaskCompletionSource<int>()));
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true));
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new AuthorizeElectricityAction());
-                    Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
+                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(true));
 
                     break;
                 default:

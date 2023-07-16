@@ -23,15 +23,13 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     }
     
     public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
-        CalendarTerm term,
-        decimal degreeDifference)
+        CalendarTerm term)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(term);
 
         var results = ForecastAnalysis
         (
             meterType,
-            degreeDifference,
             start,
             end,
             term
@@ -41,15 +39,13 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
     }
 
     public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
-        CalendarTerm term,
-        decimal degreeDifference)
+        CalendarTerm term)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
 
         var results = ForecastAnalysis
         (
             meterType,
-            degreeDifference,
             start,
             end,
             term
@@ -61,7 +57,6 @@ public class TempForecastAnalyzer : ITempForecastAnalyzer
 
     private ForecastAnalysis ForecastAnalysis(
         MeterType meterType,
-        decimal degreeDifference,
         DateTime start,
         DateTime end,
         CalendarTerm term)

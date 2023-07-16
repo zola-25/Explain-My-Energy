@@ -6,6 +6,7 @@ using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
+    [FeatureState(Name = nameof(WeatherState))]
     [PersistState]
     public record WeatherState
     {
@@ -16,24 +17,13 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 
         public DateTime LastUpdated { get; init; }
 
-        
-    }
-
-    public class WeatherFeature : Feature<WeatherState>
-    {
-        public override string GetName()
+        public WeatherState()
         {
-            return nameof(WeatherFeature);
+            Loading = false;
+            WeatherReadings = ImmutableList<DailyWeatherRecord>.Empty;
+            LastUpdated = DateTime.MinValue;
         }
 
-        protected override WeatherState GetInitialState()
-        {
-            return new WeatherState
-            {
-                Loading = false,
-                LastUpdated = DateTime.MinValue,
-                WeatherReadings = ImmutableList<DailyWeatherRecord>.Empty
-            };
-        }
     }
+
 }

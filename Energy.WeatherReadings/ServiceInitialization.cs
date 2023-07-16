@@ -19,11 +19,11 @@ namespace Energy.WeatherReadings
             });
         }
 
-        public static IServiceCollection AddWeatherDataService(this IServiceCollection services, Action<WeatherDataOptions> config)
+        public static IServiceCollection AddWeatherDataService(this IServiceCollection services, Action<MeteoWeatherDataOptions> config)
         {
             ArgumentException.ThrowIfNullOrEmpty(nameof(config));
 
-            WeatherDataOptions options = new WeatherDataOptions();
+            MeteoWeatherDataOptions options = new MeteoWeatherDataOptions();
             config(options);
 
             if (String.IsNullOrWhiteSpace(options.HistoricalApi))
@@ -38,8 +38,8 @@ namespace Energy.WeatherReadings
 
             services.Configure(config);
 
-            services.AddTransient<IWeatherApiCalls, WeatherApiCalls>();
-            services.AddTransient<IWeatherDataService, WeatherDataService>();
+            services.AddTransient<IMeteoWeatherApiCalls, MeteoWeatherApiCalls>();
+            services.AddTransient<IMeteoWeatherDataService, MeteoWeatherDataService>();
             services.AddTransient<IOutCodeLocationLookup, OutCodeLocationLookup>();
 
             services.AddHttpClient("Historical",

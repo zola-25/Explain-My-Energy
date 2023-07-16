@@ -15,7 +15,6 @@ else
         <HistoricalAnalysisCard PrimaryHeatSource="true"
                                 Term="_calenderTerm"
                                 MeterType="MeterType"
-                                Period="RelativePeriod.Previous"
                                 DurationAnalysis="_previousDurationAnalysis">
         </HistoricalAnalysisCard>
     </MudItem>
@@ -23,7 +22,7 @@ else
         <CurrentPeriodAnalysisCard PrimaryHeatSource="true"
                                    Term="_calenderTerm"
                                    MeterType="MeterType"
-                                   CurrentPeriodAnalysis="_currentTermForecastAnalysis"
+                                   CurrentPeriodForecastAnalysis="_currentTermForecastAnalysis"
                                    CurrentPeriodAnalysisToDate="_thisDurationAnalysis">
         </CurrentPeriodAnalysisCard>
     </MudItem>
@@ -64,8 +63,6 @@ else
 
     ForecastAnalysis _currentTermForecastAnalysis;
     ForecastAnalysis _nextTermForecastAnalysis;
-
-    AnalysisOptionsActionFactory _analysisOptionsActionFactory;
 
 
     [Inject]
@@ -149,8 +146,8 @@ else
 
     void SetForecastAnalyses()
     {
-        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
-        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm, _degreeDifference);
+        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm);
+        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm);
     }
 
 }

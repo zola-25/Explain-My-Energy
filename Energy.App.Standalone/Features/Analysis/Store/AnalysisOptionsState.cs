@@ -8,6 +8,7 @@ using Fluxor.Persist.Storage;
 namespace Energy.App.Standalone.Features.Analysis.Store
 {
     [PersistState]
+    [FeatureState(Name = nameof(AnalysisOptionsState))]
     public record AnalysisOptionsState
     {
         public MeterAnalysisOptions this[MeterType meterType]
@@ -29,6 +30,33 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         public MeterAnalysisOptions Electricity { get; init; }
 
         public MeterAnalysisOptions Gas { get; init; }
+
+        public AnalysisOptionsState()
+        {
+
+            Gas = new MeterAnalysisOptions
+            {
+                CalendarTerm = CalendarTerm.Week,
+                DegreeDifference = 0,
+                ChartRendered = false,
+                HighlightSet = false,
+                HighlightStart = null,
+                HighlightEnd = null,
+                ShowCost = false,
+                ToggleSource = ToggleSource.None
+            };
+            Electricity = new MeterAnalysisOptions
+            {
+                CalendarTerm = CalendarTerm.Week,
+                DegreeDifference = 0,
+                ChartRendered = false,
+                HighlightSet = false,
+                HighlightStart = null,
+                HighlightEnd = null,
+                ShowCost = false,
+                ToggleSource = ToggleSource.None
+            };
+        }
     }
 
     public record MeterAnalysisOptions
@@ -48,6 +76,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         public CalendarTerm CalendarTerm { get; init; }
 
         public ToggleSource ToggleSource { get; init; }
+
+
     }
 
     public enum ToggleSource
@@ -59,42 +89,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     }
 
 
-    public class AnalysisOptionsFeature : Feature<AnalysisOptionsState>
-    {
-        public override string GetName()
-        {
-            return nameof(AnalysisOptionsFeature);
-        }
-
-        protected override AnalysisOptionsState GetInitialState()
-        {
-            return new AnalysisOptionsState
-            {
-                Gas = new MeterAnalysisOptions
-                {
-                    CalendarTerm = CalendarTerm.Week,
-                    DegreeDifference = 0,
-                    ChartRendered = false,
-                    HighlightSet = false,
-                    HighlightStart = null,
-                    HighlightEnd = null,
-                    ShowCost = false,
-                    ToggleSource = ToggleSource.None
-                },
-                Electricity = new MeterAnalysisOptions
-                {
-                    CalendarTerm = CalendarTerm.Week,
-                    DegreeDifference = 0,
-                    ChartRendered = false,
-                    HighlightSet = false,
-                    HighlightStart = null,
-                    HighlightEnd = null,
-                    ShowCost = false,
-                    ToggleSource = ToggleSource.None
-                },
-            };
-        }
-    }
 
     public class GasAnalysisOptionsShowCostAction : IAnalysisOptionsAction
     {
@@ -184,6 +178,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         public ElectricityAnalysisOptionsSetHighlightRangeAction(ToggleSource toggleSource, DateTime start, DateTime end)
         {
+            ToggleSource = toggleSource;
             Start = start;
             End = end;
         }

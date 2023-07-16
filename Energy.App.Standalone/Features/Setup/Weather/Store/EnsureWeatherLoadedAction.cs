@@ -1,10 +1,9 @@
 ﻿using System.Collections.Immutable;
-using Energy.App.Standalone.Data.Weather;
+using Energy.App.Standalone.Data.Weather.Interfaces;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
-using SpawnDev.BlazorJS.WebWorkers;
 
 namespace Energy.App.Standalone.Features.Setup.Weather.Store
 {
@@ -74,15 +73,15 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         {
             private readonly IState<HouseholdState> _householdState;
             private readonly IState<WeatherState> _weatherState;
-            private readonly IWeatherDataWorkerService _weatherDataWorkerSerice;
+            private readonly IWeatherDataService _weatherDataService;
 
             public Effect(IState<HouseholdState> householdState,
                           IState<WeatherState> weatherState,
-                          IWeatherDataWorkerService weatherDataWorkerService)
+                          IWeatherDataService weatherDataService)
             {
                 _householdState = householdState;
                 _weatherState = weatherState;
-                _weatherDataWorkerSerice = weatherDataWorkerService;
+                _weatherDataService = weatherDataService;
             }
 
             public override async Task HandleAsync(EnsureWeatherLoadedAction loadedAction, IDispatcher dispatcher)
@@ -93,6 +92,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 {
                     dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
                     loadedAction.TaskCompletion.SetResult(daysUpdated);
+                    return;
                 }
 
                 string outCode = _householdState.Value.OutCodeCharacters;
@@ -101,7 +101,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || loadedAction.ForceReload)
                 {
 
-                    var results = await _weatherDataWorkerSerice.GetForOutCode(outCode);
+                    var results = await _weatherDataService.GetForOutCode(outCode);
 
                     dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results));
                     daysUpdated = results.Count;
@@ -117,7 +117,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                     if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
                     {
 
-                        var results = await _weatherDataWorkerSerice.GetForOutCode(outCode, latestHistoricalReading, latestReading);
+                        var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
 
                         daysUpdated = results.Count;
 

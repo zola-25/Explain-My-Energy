@@ -8,7 +8,7 @@ using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store;
 
-[FeatureState]
+[FeatureState(Name = nameof(MeterSetupState))]
 [PersistState, PriorityLoad]
 public record MeterSetupState
 {
@@ -22,15 +22,12 @@ public record MeterSetupState
     {
         get
         {
-            switch (meterType)
+            return meterType switch
             {
-                case MeterType.Gas:
-                    return GasMeter;
-                case MeterType.Electricity:
-                    return ElectricityMeter;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null);
-            }
+                MeterType.Gas => GasMeter,
+                MeterType.Electricity => ElectricityMeter,
+                _ => throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null),
+            };
         }
     }
 

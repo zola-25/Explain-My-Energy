@@ -5,19 +5,19 @@ using Energy.Shared;
 using System.Collections.Immutable;
 using MathNet.Numerics;
 using Fluxor;
-using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
 public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
 {
     private readonly Co2ConversionFactors _co2Conversion;
-    readonly ITermDateRanges _periodDateRanges;
-    IState<ElectricityReadingsState> _electricityReadingsState;
-    IState<GasReadingsState> _gasReadingsState;
-    IState<WeatherState> _weatherState;
+    private readonly ITermDateRanges _periodDateRanges;
+    private readonly IState<ElectricityReadingsState> _electricityReadingsState;
+    private readonly IState<GasReadingsState> _gasReadingsState;
+    private readonly IState<WeatherState> _weatherState;
 
 
     public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges, IState<GasReadingsState> gasReadingsState, IState<ElectricityReadingsState> electricityReadingsState, IState<WeatherState> weatherState)

@@ -5,7 +5,7 @@
 
         <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right">
             <MudNavLink Href="/Setup" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
-                Household Setup
+                Setup
                 @if (HouseholdSetupValid)
                 {
                     <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
@@ -20,12 +20,12 @@
         <MudDivider></MudDivider>
 
         <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right">
-            <MudNavLink Disabled="ElectricityDisabled" Class="menu-nav-item" Href="/HeatingMeter/Electricity" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
+            <MudNavLink Disabled="ElectricityDisabled" Class="menu-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsElectricity">Electricity</MeterNavLinkContent>
             </MudNavLink>
         </MudTooltip>
         <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right">
-            <MudNavLink Disabled="GasDisabled" Class="menu-nav-item" Href="/HeatingMeter/Gas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
+            <MudNavLink Disabled="GasDisabled" Class="menu-nav-item" Href="@GasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsGas">Gas</MeterNavLinkContent>
             </MudNavLink>
         </MudTooltip>
@@ -56,8 +56,8 @@
     bool GasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid;
     bool ElectricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid;
 
-    string _gasHref;
-    string _electricityHref;
+    string GasHref => HeatingMeterIsGas ? "/HeatingMeter/Gas" : "/Meter/Gas";
+    string ElectricityHref => HeatingMeterIsElectricity ? "/HeatingMeter/Electricity" : "/Meter/Electricity";
 
 
     private bool HeatingMeterIsElectricity => HouseholdState.Value.Saved && HouseholdState.Value.PrimaryHeatSource == MeterType.Electricity;

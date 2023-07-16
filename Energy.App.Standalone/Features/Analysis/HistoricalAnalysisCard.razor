@@ -21,7 +21,7 @@
             <MudDivider DividerType="DividerType.Middle"></MudDivider>
             <MudPaper Class="my-2 d-flex justify-center" Elevation="0">
 
-                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@DurationAnalysis.TemperatureRange.TemperatureText</MudChip>
+                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@_temperatureText</MudChip>
 
             </MudPaper>
         }
@@ -47,7 +47,6 @@
     [Parameter, EditorRequired] public bool PrimaryHeatSource { get; set; }
     [Parameter, EditorRequired] public MeterType MeterType { get; set; }
     [Parameter, EditorRequired] public CalendarTerm Term { get; set; }
-    [Parameter, EditorRequired] public RelativePeriod Period { get; set; }
 
     [Parameter, EditorRequired] public HistoricalAnalysis DurationAnalysis { get; set; }
 
@@ -68,9 +67,9 @@
 
         _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
 
-        _headerText = Term.AnalysisPeriodHeader(Period, DurationAnalysis.Start);
-        _rangeText = Term.AnalysisPeriodDateRangeText(Period, DurationAnalysis.Start, DurationAnalysis.End);
-        _temperatureText = Term.AnalysisPeriodTemperatureText(Period, DurationAnalysis.TemperatureRange);
+        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Previous, DurationAnalysis.Start);
+        _rangeText = Term.AnalysisPeriodDateRangeText(RelativePeriod.Previous, DurationAnalysis.Start, DurationAnalysis.End);
+        _temperatureText = Term.AnalysisPeriodTemperatureText(RelativePeriod.Previous, DurationAnalysis.TemperatureRange);
         
         _consumptionIcon = MeterType == MeterType.Electricity ? Icons.Material.Filled.ElectricBolt : Icons.Material.Filled.LocalFireDepartment;
         _highlightToggled = AnalysisOptionsState.Value[MeterType].ToggleSource == ToggleSource.Historical;

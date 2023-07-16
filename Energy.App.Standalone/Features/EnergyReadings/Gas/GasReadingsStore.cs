@@ -7,39 +7,36 @@ using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas
 {
+    [FeatureState(Name = nameof(GasReadingsState))]
     [PersistState]
     public record GasReadingsState
     {
         [property: JsonIgnore] 
         public bool Loading { get; init; }
 
-        public DateTime LastUpdated { get; init; }
+
+        
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
         [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
+        public DateTime LastUpdated { get; init; }
+
 
         public string CalculationError { get; init; }
-    }
 
-    public class GasReadingsFeature : Feature<GasReadingsState>
-    {
-        public override string GetName()
+        public GasReadingsState()
         {
-            return nameof(GasReadingsFeature);
+            Loading = false;
+            CostedReadings = ImmutableList<CostedReading>.Empty;
+            BasicReadings = ImmutableList<BasicReading>.Empty;
+            LastUpdated = DateTime.MinValue;
+
+            CalculationError = null;
+
         }
 
-        protected override GasReadingsState GetInitialState()
-        {
-            return new GasReadingsState
-            {
-                Loading = false,
-                CalculationError = null,
-                BasicReadings = ImmutableList<BasicReading>.Empty,
-                CostedReadings = ImmutableList<CostedReading>.Empty,
-                LastUpdated = DateTime.MinValue
-            };
-        }
     }
+
 
 }

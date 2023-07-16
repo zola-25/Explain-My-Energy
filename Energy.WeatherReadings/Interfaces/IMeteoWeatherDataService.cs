@@ -2,7 +2,7 @@
 
 namespace Energy.WeatherReadings.Interfaces
 {
-    public interface IWeatherDataService
+    public interface IMeteoWeatherDataService
     {
         Task<List<DailyWeatherReading>> GetForOutCode(string outCode, DateTime? latestHistorical = null, DateTime? latestReading = null);
     }

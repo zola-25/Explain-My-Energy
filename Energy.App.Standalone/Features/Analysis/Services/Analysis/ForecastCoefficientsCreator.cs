@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
-class ForecastCoefficientsCreator : IForecastCoefficientsCreator
+internal class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 {
     public (decimal C, decimal Gradient) GetForecastCoefficients(
         IEnumerable<BasicReading> basicReadings,

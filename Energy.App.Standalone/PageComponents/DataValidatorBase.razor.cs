@@ -1,6 +1,9 @@
 ﻿using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
+using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 using Fluxor;
@@ -15,22 +18,19 @@ namespace Energy.App.Standalone.PageComponents
     public partial class DataValidatorBase : FluxorComponent
     {
         [Inject]
-        IDispatcher Dispatcher { get; set; }
+        private IDispatcher Dispatcher { get; set; }
 
-        
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        public bool WeatherReady { get; private set; }
-
-        public bool GasReadingsReady { get; private set; }
-
         public string UpdateStatus { get; private set; }
 
-        public bool ForecastsReady { get; private set; }
 
         public bool AppLoading;
 
+        [Inject]
+        IState<HouseholdState> HouseholdState { get; set; }
 
         protected override void Dispose(bool disposing)
         {
@@ -42,60 +42,85 @@ namespace Energy.App.Standalone.PageComponents
             AppLoading = true;
             this.eLogToConsole(nameof(OnInitializedAsync));
 
-            await Task.Delay(1);
-
             UpdateStatus = "Loading weather data...";
+            await Task.Delay(1);
             StateHasChanged();
 
             var weatherCompletion = new TaskCompletionSource<int>();
             Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
 
             int numWeatherDaysUpdated = await weatherCompletion.Task;
-
-
-            await Task.Delay(1);
-
+            
 
             UpdateStatus = "Loading gas readings...";
+            await Task.Delay(1);
             StateHasChanged();
-
-
 
 
             var gasReadingsCompletion = new TaskCompletionSource<int>();
             Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
-
             int numGasReadingsUpdated = await gasReadingsCompletion.Task;
-            // dispatch analysis action
 
+
+            UpdateStatus = "Loading electricity readings...";
             await Task.Delay(1);
-
-
-            UpdateStatus = "Loading forecasts...";
             StateHasChanged();
 
+            var electricityReadingsCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityReadingsCompletion));
+
+            int numElectricityReadingsUpdated = await electricityReadingsCompletion.Task;
+
+
+            UpdateStatus = "Loading historical forecasts...";
+            await Task.Delay(1);
+            StateHasChanged();
+
+            var electricityHistoricalForecastCompletion = new TaskCompletionSource<(bool, string)>();
+            var gasHistoricalForecastCompletion = new TaskCompletionSource<(bool, string)>();
+
+            Dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(false, electricityHistoricalForecastCompletion));
+
+            Dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(false, gasHistoricalForecastCompletion));
+
+
+            await electricityHistoricalForecastCompletion.Task;
+            await gasHistoricalForecastCompletion.Task;
+
+
+
+            UpdateStatus = "Loading weather dependent forecasts...";
+            await Task.Delay(1);
+            StateHasChanged();
+
+
+            int numHeatingReadingsUpdated = 
+                HouseholdState.Value.PrimaryHeatSource
+                    switch
+                    {
+                        MeterType.Gas => numGasReadingsUpdated,
+                        MeterType.Electricity => numElectricityReadingsUpdated,
+                        _ => throw new NotImplementedException()
+                    };
 
             var forecastCompletion = new TaskCompletionSource<bool>();
             Dispatcher.Dispatch
             (
                 new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction
                 (
-                    numGasReadingsUpdated,
-                    MeterType.Gas,
+                    numHeatingReadingsUpdated,
                     forecastCompletion
                 )
             );
 
             await forecastCompletion.Task;
-            await Task.Delay(1);
 
 
             UpdateStatus = "Ready";
+            await Task.Delay(1);
             StateHasChanged();
 
-
             AppLoading = false;
-
         }
 
 

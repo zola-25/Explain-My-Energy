@@ -50,7 +50,7 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
 
         response.EnsureSuccessStatusCode();
 
-        await using Stream streamResponse = await httpClient.GetStreamAsync(path, ctx);
+        using Stream streamResponse = await response.Content.ReadAsStreamAsync(ctx);
 
         JsonSerializerOptions deserializeOptions = new JsonSerializerOptions()
         {

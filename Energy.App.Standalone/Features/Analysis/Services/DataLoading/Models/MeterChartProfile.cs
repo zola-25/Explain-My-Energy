@@ -12,6 +12,9 @@
         public List<ChartReading> ChartReadings { get; set; }
         public List<ChartDailyForecastReading> ChartDailyForecastReadings { get; set; }
 
+        public long? HighlightStart {get; set; }
+        public long? HighlightEnd {get; set; }
+
     }
 
     public class MeterChartData

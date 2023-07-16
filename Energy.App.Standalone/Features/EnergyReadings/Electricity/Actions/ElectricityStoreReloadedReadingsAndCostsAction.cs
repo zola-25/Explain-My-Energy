@@ -10,24 +10,12 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
         public ImmutableList<BasicReading> BasicReadings { get; }
 
         public ElectricityStoreReloadedReadingsAndCostsAction(
-            ImmutableList<BasicReading> basicReadings, 
-            ImmutableList<CostedReading> costedReadings)
+            ImmutableList<BasicReading> basicReadings,
+            ImmutableList<CostedReading> costedReadings
+            )
         {
             CostedReadings = costedReadings;
             BasicReadings = basicReadings;
         }
     }
-
-    public class ElectricityStoreReloadedCostsOnlysAction
-    {
-        public ImmutableList<CostedReading> CostedReadings { get; }
-
-        public ElectricityStoreReloadedCostsOnlysAction(
-                ImmutableList<CostedReading> costedReadings)
-        {
-            CostedReadings = costedReadings;
-        }
-    }
-
-
 }

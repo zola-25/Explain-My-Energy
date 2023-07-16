@@ -3,10 +3,13 @@ using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Data.Weather;
+using Energy.App.Standalone.Data.Weather.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Validation;
+using Energy.App.Standalone.Features.EnergyReadings;
 using Energy.App.Standalone.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
@@ -17,8 +20,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
-using SpawnDev.BlazorJS;
-using SpawnDev.BlazorJS.WebWorkers;
 
 WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -26,15 +27,17 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddBlazorJSRuntime();
-builder.Services.AddWebWorkerService();
+//builder.Services.AddBlazorJSRuntime();
+//builder.Services.AddWebWorkerService();
 
 builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
 
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
 builder.Services.AddTransient<IEnergyReadingRetriever, EnergyReadingRetriever>();
-builder.Services.AddTransient<IEnergyReadingWorkerService, EnergyReadingWorkerService>();
+
+builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
+//builder.Services.AddTransient<IEnergyReadingWorkerService, EnergyReadingWorkerService>();
 
 builder.Services.AddTransient<IForecastGenerator, ForecastGenerator>();
 builder.Services.AddTransient<IForecastCoefficientsCreator, ForecastCoefficientsCreator>();
@@ -43,10 +46,18 @@ builder.Services.AddTransient<Co2ConversionFactors>();
 
 builder.Services.AddTransient<IHistoricalDurationAnalyzer, HistoricalDurationAnalyzer>();
 builder.Services.AddTransient<ITempForecastAnalyzer, TempForecastAnalyzer>();
+builder.Services.AddTransient<ISimpleForecastAnalyzer, SimpleForecastAnalyzer>();
+
 builder.Services.AddTransient<ITermDateRanges, TermDateRanges>();
 builder.Services.AddTransient<ICostCalculator, CostCalculator>();
+builder.Services.AddTransient<ICostedReadingsToDailyAggregator, CostedReadingsToDailyAggregator>();
+builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMovingAverage>();
+builder.Services.AddTransient<IHistoricalForecastValidation,HistoricalForecastValidation>();
 
-builder.Services.AddTransient<IWeatherDataWorkerService, WeatherDataWorkerService>();
+builder.Services.AddTransient<IEnergyUpdateMethodService, EnergyUpdateMethodService>();   
+
+//builder.Services.AddTransient<IWeatherDataWorkerService, WeatherDataWorkerService>();
+builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
 
 builder.Services.AddMudServices(config =>
@@ -88,4 +99,4 @@ builder.Services.AddFluxor(options =>
     });
 });
 
-await builder.Build().BlazorJSRunAsync();
+await builder.Build().RunAsync();

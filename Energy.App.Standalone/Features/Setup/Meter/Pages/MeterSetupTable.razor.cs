@@ -1,6 +1,6 @@
 using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
-using Energy.App.Standalone.Features.EnergyReadings.Electricity.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
@@ -16,17 +16,17 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 {
     public partial class MeterSetupTable
     {
-        [Inject] ISnackbar Snackbar { get; set; }
+        [Inject] private ISnackbar Snackbar { get; set; }
 
         //[Inject] UserState UserState { get; set; }
         [Inject]
-        NavigationManager NavManager { get; set; }
+        private NavigationManager NavManager { get; set; }
 
-        [Inject] IState<HouseholdState> HouseholdState { get; set; }
-        [Inject] IState<GasReadingsState> GasReadingsState { get; set; }
-        [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
+        [Inject] private IState<HouseholdState> HouseholdState { get; set; }
+        [Inject] private IState<GasReadingsState> GasReadingsState { get; set; }
+        [Inject] private IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 
-        [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
+        [Inject] private IState<MeterSetupState> MeterSetupState { get; set; }
 
 
 
@@ -35,7 +35,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
         [Inject]
         private IDialogService DialogService { get; set; }
 
-        Dictionary<MeterType, MeterStatus> _meterStatusList;
+        private Dictionary<MeterType, MeterStatus> _meterStatusList;
         private record MeterStatus
         {
             public Guid GlobalId { get; init; }
@@ -54,7 +54,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
         {
             base.OnInitialized();
 
-            SubscribeToAction<NotifyElectricityStoreReady>((a) =>
+            SubscribeToAction<NotifyElectricityLoadingFinished>((a) =>
             {
 
                 Snackbar.Add("Electricity Readings Updated");
@@ -71,7 +71,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
             });
 
-            SubscribeToAction<NotifyElectricityReadingsDeletedAction>((a) =>
+            SubscribeToAction<ElectricityDeleteReadingsAction>((a) =>
             {
                 Snackbar.Add("Electricity Readings Deleted");
 
@@ -107,9 +107,6 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
         }
 
 
-
-
-
         private void SetMeterStatusList()
         {
             _meterStatusList = MeterSetupState.Value.MeterStates.Select(MeterStateToStatus).ToDictionary(status => status.MeterType);
@@ -140,7 +137,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             {
                 MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings?.LastOrDefault()?.UtcTime.Date,
                 MeterType.Gas => GasReadingsState.Value.CostedReadings?.LastOrDefault()?.UtcTime.Date,
-                _ => throw new ArgumentOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException(nameof(meterType)),
             };
         }
 
@@ -148,14 +145,14 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
         {
             return meterType switch
             {
-                MeterType.Electricity => ElectricityReadingsState.Value.ReloadingReadings || ElectricityReadingsState.Value.UpdatingReadings,
+                MeterType.Electricity => ElectricityReadingsState.Value.Loading,
                 MeterType.Gas => GasReadingsState.Value.Loading,
-                _ => throw new ArgumentOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException(nameof(meterType)),
             };
         }
 
 
-        private TariffInfo GetTariffInfo(MeterState meterState)
+        private static TariffInfo GetTariffInfo(MeterState meterState)
         {
             List<TariffDetailState> tariffDetailState = meterState.TariffDetails.ToList();
 
@@ -177,10 +174,15 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
             bool hasActiveTariff = hasAnyTariffs && currentTariff != null;
 
-            return new TariffInfo(hasActiveTariff, tariffUnitRateText, tariffStandingChargeText);
+            return new TariffInfo()
+            {
+                HasActiveTariff = hasActiveTariff,
+                TariffUnitRateText = tariffUnitRateText,
+                TariffStandingChargeText = tariffStandingChargeText
+            };
         }
 
-        MudMessageBox DeleteBox { get; set; }
+        private MudMessageBox DeleteBox { get; set; }
 
         private async Task RemoveMeterAsync(Guid globalId, MeterType meterType)
         {
@@ -199,7 +201,8 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
                     Dispatcher.Dispatch(new DeleteElectricityAction());
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(meterType));
+                    
             }
         }
 
@@ -209,43 +212,49 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, new TaskCompletionSource<int>()));
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false));
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityUpdateReadingsAndReloadCostsAction(ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.Date));
+                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false));;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(meterType));
             }
         }
 
-        bool Reloading = false;
+        private bool Reloading = false;
 
         protected async void DispatchReloadReadings(MeterType meterType)
         {
+            var reloadCompletion = new TaskCompletionSource<int>();
+            Reloading = true;
+
             switch (meterType)
             {
                 case MeterType.Gas:
-                    var reloadCompletion = new TaskCompletionSource<int>();
-                    Reloading = true;
                     Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true, reloadCompletion));
-
-                    await reloadCompletion.Task;
-                    
-                    Reloading = false;
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new ElectricityReloadReadingsAndCostsAction());
+                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(true, reloadCompletion));
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(meterType));
             }
+            if (!reloadCompletion.Task.IsCompleted)
+            {
+                await reloadCompletion.Task;
+            }
+
+            Reloading = false;
+            await InvokeAsync(StateHasChanged);
         }
 
     }
 
-    public record TariffInfo(bool HasActiveTariff, string TariffUnitRateText, string TariffStandingChargeText)
+    public record TariffInfo()
     {
-
+        public bool HasActiveTariff {get; init;}
+        public string TariffUnitRateText {get; init;}  
+        public string TariffStandingChargeText {get; init;}
     }
 }

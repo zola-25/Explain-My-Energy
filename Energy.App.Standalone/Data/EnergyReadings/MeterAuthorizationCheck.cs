@@ -6,7 +6,7 @@ namespace Energy.App.Standalone.Data.EnergyReadings
 {
     public class MeterAuthorizationCheck : IMeterAuthorizationCheck
     {
-        IN3rgyEnergyDataService _n3rgyEnergyDataService;
+        private readonly IN3rgyEnergyDataService _n3rgyEnergyDataService;
 
         public MeterAuthorizationCheck(IN3rgyEnergyDataService n3rgyEnergyDataService)
         {
