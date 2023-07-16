@@ -81,9 +81,11 @@
 
     private async void LoadWeatherData(NotifyHouseholdUpdatedAction _)
     {
-        var completion = new TaskCompletionSource<int>();
-        Dispatcher.Dispatch(new EnsureWeatherLoadedAction(true, completion));
-        await completion.Task;
+        if (HouseholdState.Value.Saved 
+            && HouseholdState.Value.OutCodeCharacters != WeatherState.Value.OutCodeCharacters)
+        {
+            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(true));
+        }
     }
 
 

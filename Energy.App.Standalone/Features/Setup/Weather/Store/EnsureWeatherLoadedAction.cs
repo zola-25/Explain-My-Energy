@@ -13,7 +13,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         public bool ForceReload { get; }
         public TaskCompletionSource<int> TaskCompletion { get; }
 
-        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<int> taskCompletion)
+        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<int> taskCompletion = null)
         {
             ForceReload = forceReload;
             TaskCompletion = taskCompletion;
@@ -50,6 +50,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         {
             return state with
             {
+                OutCodeCharacters = action.OutCodeCharacters,
                 LastUpdated = DateTime.UtcNow,
                 WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList()
             };
@@ -91,7 +92,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 if (!_householdState.Value.Saved)
                 {
                     dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
-                    loadedAction.TaskCompletion.SetResult(daysUpdated);
+                    loadedAction.TaskCompletion?.SetResult(daysUpdated);
                     return;
                 }
 
@@ -103,7 +104,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 
                     var results = await _weatherDataService.GetForOutCode(outCode);
 
-                    dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results));
+                    dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode));
                     daysUpdated = results.Count;
                 }
                 else
@@ -126,7 +127,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 }
 
                 dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
-                loadedAction.TaskCompletion.SetResult(daysUpdated);
+                loadedAction.TaskCompletion?.SetResult(daysUpdated);
             }
 
         }

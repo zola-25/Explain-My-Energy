@@ -66,4 +66,6 @@ export  class ChartDefaults {
     public static blackColor: am5.Color = am5.color(0x000000)
     public static highlightColor: am5.Color = am5.color(0xFFA726)
     public static tariffLabelFormat: string = "[bold]£{valueY.formatNumber('#,###.00')}[/]\nTariff: [/]{tariffAppliesFrom.formatDate('MMM dt, yyyy')}[/]\nRate: {pencePerKWh}p/kWh[/]\nStanding Charge (daily): {dailyStandingCharge}p"
+    public static tariffForecastLabelFormat: string = "[bold]Forecast: £{valueY.formatNumber('#,###.00')}[/]\nTariff: [/]{tariffAppliesFrom.formatDate('MMM dt, yyyy')}[/]\nRate: {pencePerKWh}p/kWh[/]\nStanding Charge (daily): {dailyStandingCharge}p"
+
 }

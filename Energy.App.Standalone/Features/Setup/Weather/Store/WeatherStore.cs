@@ -14,11 +14,12 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         public bool Loading { get; init; }
         public ImmutableList<DailyWeatherRecord> WeatherReadings { get; init; }
 
-
+        public string OutCodeCharacters {get; init;} 
         public DateTime LastUpdated { get; init; }
 
         public WeatherState()
         {
+            OutCodeCharacters = String.Empty;
             Loading = false;
             WeatherReadings = ImmutableList<DailyWeatherRecord>.Empty;
             LastUpdated = DateTime.MinValue;

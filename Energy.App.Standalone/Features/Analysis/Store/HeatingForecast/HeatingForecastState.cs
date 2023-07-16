@@ -220,7 +220,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             var meterType = _householdState.Value.PrimaryHeatSource;
             if (!_meterSetupState.Value[meterType].SetupValid)
             {
-                action.Completion.SetResult(true);
+                action.Completion?.SetResult(true);
                 return;
             }
 
@@ -243,7 +243,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             {
                 dispatcher.Dispatch(new NotifyHeatingForecastReadyAction(degreeDifference));
             }
-            action.Completion.SetResult(true);
+            action.Completion?.SetResult(true);
         }
 
     }

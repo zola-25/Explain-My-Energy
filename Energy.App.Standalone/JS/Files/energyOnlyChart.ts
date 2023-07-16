@@ -76,6 +76,7 @@ export class EnergyOnlyChart {
         }));
         let consumptionSeriesIndex = seriesIndex++;
 
+        consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
 
         consumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -153,7 +154,7 @@ export class EnergyOnlyChart {
             valueXField: "dateTicks",
             valueYGrouped: "sum",
             tooltip: am5.Tooltip.new(root, {
-                labelText: "{valueY.formatNumber('#.#')}kWh",
+                labelText: "Forecast: {valueY.formatNumber('#.#')}kWh",
             }),
             stroke: ChartDefaults.consumptionColor,
 
@@ -180,14 +181,14 @@ export class EnergyOnlyChart {
 
 
         let forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
-            name: `${meterChartProfile.globalId} - ForecastConsumption`,
+            name: `${meterChartProfile.globalId} - ForecastCost`,
             xAxis: xAxis,
             yAxis: yCostAxis,
             valueYField: "cost",
             valueXField: "dateTicks",
             valueYGrouped: "sum",
             tooltip: am5.Tooltip.new(root, {
-                labelText: ChartDefaults.tariffLabelFormat,
+                labelText: ChartDefaults.tariffForecastLabelFormat,
                 forceHidden: true
             }),
             stroke: ChartDefaults.costColor,

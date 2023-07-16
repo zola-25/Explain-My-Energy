@@ -10,7 +10,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
 
         public UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction(
             int sizeOfUpdate,
-            TaskCompletionSource<bool> completion)
+            TaskCompletionSource<bool> completion = null)
         {
             SizeOfUpdate = sizeOfUpdate;
             Completion = completion;
