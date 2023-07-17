@@ -72,38 +72,51 @@ namespace Energy.App.Standalone.PageComponents
                 Snackbar.Add("Weather-dependent Forecast Ready", Severity.Info);
             });
 
-            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false));
+            var weatherReadingCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
+
+            UpdateStatus = "Loading energy readings...";
+            await Task.Delay(1);
+            StateHasChanged(); 
+
+            var gasReadingsCompletion = new TaskCompletionSource<int>();
+
+            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
+
+            var electricityReadingsCompletion = new TaskCompletionSource<int>();
+            Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityReadingsCompletion));
+
+            
+
+            var electricityForecastCompletion = new TaskCompletionSource<(bool, string)>();
+            Dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(false, electricityForecastCompletion));
+
+            var gasForecastCompletion = new TaskCompletionSource<(bool, string)>();
+            Dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(false, gasForecastCompletion));
 
 
-
-            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false));
-
-            Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false));
-
-
-
-            Dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(false));
-
-            Dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(false));
-
-
+            var heatingForecastCompletion = new TaskCompletionSource<bool>();
             Dispatcher.Dispatch
             (
-                new UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction
+                new EnsureCoeffsAndHeatingForecastLoaded
                 (
-                    0
+                    0,
+                    heatingForecastCompletion
                 )
             );
 
+            await Task.WhenAll (weatherReadingCompletion.Task,
+             gasReadingsCompletion.Task,
+             electricityReadingsCompletion.Task,
+             electricityForecastCompletion.Task,
+             gasForecastCompletion.Task,
+             heatingForecastCompletion.Task);
 
-            UpdateStatus = "Ready";
             await Task.Delay(1);
-            StateHasChanged();
+            StateHasChanged(); 
+            UpdateStatus = "Ready";
 
             AppLoading = false;
         }
-
-
-
     }
 }

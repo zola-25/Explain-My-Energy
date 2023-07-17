@@ -29,7 +29,7 @@
 
             @if (context.Added)
             {
-                <MudButton Class="m-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.GlobalId, context.MeterType))">Remove</MudButton>
+                <MudButton Class="m-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
             }
             else
             {

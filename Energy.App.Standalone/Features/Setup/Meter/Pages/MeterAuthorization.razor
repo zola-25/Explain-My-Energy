@@ -3,8 +3,8 @@
 @inherits FluxorComponent
 @inject IState<MeterSetupState> MeterSetupState
 @inject IState<HouseholdState> HouseholdState
-
 @inject IDispatcher Dispatcher
+@inject NavigationManager NavigationManager
 
 <PageTitle>@MeterTypeText Authorization</PageTitle>
 
@@ -19,30 +19,34 @@
                 </MudCardHeader>
                 <MudCardContent Style="height: auto;
                                        min-height: 100%;">
-                    
+
                     <div class="mb-1">
                         <MudTextField Label="@MpxnLabel" Value="@MeterSetupState.Value[_meterType].Mpxn" ReadOnly="true"></MudTextField>
                         <MudTextField Label='IHD MAC ID' Value="@HouseholdState.Value.IhdMacId" ReadOnly="true"></MudTextField>
                         <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
                     </div>
-                    <iframe src="https://data.n3rgy.com/consumer-sign-up" style="width: 100%; height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
+                    <div class="mb-1">
+                        <MudButton @onclick="CheckAuthorization" Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
+                    </div>
+                    <iframe id="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" style="width: 100%; height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
+
+
                     <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
 
                         <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
                         <MudText>Your meter data is now being loaded</MudText>
 
-                        <MudTooltip ShowOnHover="true" Text="Return to Setup">
-                            <MudLink Underline="Underline.None"
-                                     Href="@($"/Setup")">
-                                <MudButton Color="Color.Primary"
-                                           ButtonType="ButtonType.Button"
-                                           Variant="Variant.Filled"
-                                           Size="Size.Small"
-                                           StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
-                            </MudLink>
+                        <MudTooltip ShowOnHover="true" Text="Return to Setup to import your meter data">
+
+                            <MudButton OnClick="LoadDataAndReturnToSetup"
+                                       Color="Color.Primary"
+                                       ButtonType="ButtonType.Button"
+                                       Variant="Variant.Filled"
+                                       Size="Size.Small"
+                                       StartIcon="@Icons.Material.Filled.ArrowBack">Load Readings and Return to Setup</MudButton>
                         </MudTooltip>
 
-                            @*<LoadingDataDisplay GlobalId="_meter.GlobalId"></LoadingDataDisplay>*@
+                        @*<LoadingDataDisplay GlobalId="_meter.GlobalId"></LoadingDataDisplay>*@
                     </div>
                     <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
                         <p class="text-warning">Authorization Failed</p>
@@ -51,7 +55,6 @@
                     </div>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton @onclick="CheckAuthorization" Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudPaper>
@@ -79,9 +82,30 @@
     private MeterType _meterType;
 
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         _meterType = MeterTypeText.eStringToEnum<MeterType>();
+        await CheckAuthorization();
+    }
+
+    private void LoadDataAndReturnToSetup()
+    {
+
+        switch (_meterType)
+        {
+            case MeterType.Gas:
+                Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true));
+                break;
+            case MeterType.Electricity:
+                Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(true));
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        NavigationManager.NavigateTo("/Setup");
+
     }
 
     private async Task CheckAuthorization()
@@ -93,12 +117,9 @@
             {
                 case MeterType.Gas:
                     Dispatcher.Dispatch(new AuthorizeGasAction());
-                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true));
                     break;
                 case MeterType.Electricity:
                     Dispatcher.Dispatch(new AuthorizeElectricityAction());
-                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(true));
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -114,4 +135,5 @@
             AuthorizeResponseMessage = response.FailureReason;
         }
     }
+
 }

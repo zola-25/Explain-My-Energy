@@ -99,4 +99,9 @@ builder.Services.AddFluxor(options =>
     });
 });
 
+builder.Services.AddLogging(c =>
+{
+    c.SetMinimumLevel(LogLevel.Warning);
+});
+
 await builder.Build().RunAsync();

@@ -215,7 +215,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 
 
         [EffectMethod]
-        public async Task HandleUpdateIfSignificate(UpdateCoeffsAndOrForecastsIfSignificantOrOutdatedAction action, IDispatcher dispatcher)
+        public async Task HandleUpdateIfSignificate(EnsureCoeffsAndHeatingForecastLoaded action, IDispatcher dispatcher)
         {
             var meterType = _householdState.Value.PrimaryHeatSource;
             if (!_meterSetupState.Value[meterType].SetupValid)

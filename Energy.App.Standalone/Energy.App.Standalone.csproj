@@ -34,11 +34,6 @@
 
 
 	<ItemGroup>
-		<Folder Include="wwwroot\js\" />
-	</ItemGroup>
-
-
-	<ItemGroup>
 		<_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js" />
 		<_ContentIncludedByDefault Remove="wwwroot\js\Files\chartCreation.js.map" />
 		<_ContentIncludedByDefault Remove="wwwroot\js\Files\types.js" />
@@ -53,11 +48,5 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="npm run build --prefix JS/" />
 	</Target>
-
-	<ItemGroup>
-
-		<Watch Include="wwwroot\js\**;wwwroot\css\**" />
-
-	</ItemGroup>
 
 </Project>

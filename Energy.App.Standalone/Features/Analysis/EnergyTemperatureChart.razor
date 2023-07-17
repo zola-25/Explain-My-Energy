@@ -1,7 +1,7 @@
 ﻿@inherits FluxorComponent
 @implements IAsyncDisposable
 @inject IJSRuntime JsRuntime
-
+@inject ILogger<EnergyTemperatureChart> Logger
 @if (_ready)
 {
     <h1>Hi</h1>
@@ -33,9 +33,14 @@
     [Inject]
     IState<HeatingForecastState> HeatingForecastState { get; set; }
 
+
+    [Inject]
+    IState<HistoricalForecastState> HistoricalForecastState { get; set; }
+
     bool _chartRendered;
 
     private bool _ready;
+
     private Guid MeterGlobalId => MeterSetupState.Value[MeterType].GlobalId;
 
     protected override void OnParametersSet()
@@ -46,26 +51,26 @@
                 SubscribeToAction<ElectricityAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
                 SubscribeToAction<ElectricityAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<ElectricityAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
+                SubscribeToAction<ElectricityAnalysisOptionsUseHistoricalForecastAction>(c => OnUseHistoricalForecastHandler(c.UseHistoricalForecast));
                 break;
             case MeterType.Gas:
                 SubscribeToAction<GasAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
                 SubscribeToAction<GasAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<GasAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
+                SubscribeToAction<GasAnalysisOptionsUseHistoricalForecastAction>(c => OnUseHistoricalForecastHandler(c.UseHistoricalForecast));
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException();
         }
         SubscribeToAction<NotifyHeatingForecastReadyAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
-
         _ready = true;
     }
 
     DateTime _latestReadingTime;
 
-    private List<ChartDailyForecastReading> GetChartDailyForecastReadings(DateTime latestReadingTime)
+    private List<ChartDailyForecastReading> GetChartDailyForecastReadings(DateTime latestReadingTime, ImmutableList<DailyCostedReading> forecastDailyCosts)
     {
-        var forecastDailyCosts = HeatingForecastState.Value.ForecastDailyCosts;
         var latestReadingWeekStart = latestReadingTime.eStartOfWeek(DayOfWeek.Monday);
 
         var lastDate = forecastDailyCosts.Last().UtcTime.eStartOfWeek(DayOfWeek.Monday).AddDays(-1);
@@ -91,7 +96,11 @@
 
             var chartReadings = costedReadings.Select(Mapping.MapToChartReading).ToList();
 
-            var forecastChartReadings = GetChartDailyForecastReadings(latestReading.UtcTime);
+            var forecastReadingsState = AnalysisOptions.Value[MeterType].UseHistoricalForecast ?
+                        HistoricalForecastState.Value[MeterType]
+                        : HeatingForecastState.Value.ForecastDailyCosts;
+
+            var forecastChartReadings = GetChartDailyForecastReadings(latestReading.UtcTime, forecastReadingsState);
 
             var firstReadingTicks = firstReading.UtcTime.eToUnixTicksNoOffset();
             var latestReadingTicks = chartReadings.Last().DateTicks;
@@ -138,54 +147,106 @@
 
     private async void OnHighlightRangeHandler(DateTime start, DateTime end)
     {
-        if (!_chartRendered)
+        try
         {
-            return;
+            if (!_chartRendered)
+            {
+                return;
+            }
+
+            long startTicks = start.eToUnixTicksNoOffset();
+            long endTicks = end.eToUnixTicksNoOffset();
+
+
+            await JsRuntime.InvokeVoidAsync(
+                "ChartFunctions.highlightRange",
+                $"profile-chart-meter-{MeterGlobalId}",
+                startTicks,
+                endTicks);
         }
-
-        long startTicks = start.eToUnixTicksNoOffset();
-        long endTicks = end.eToUnixTicksNoOffset();
-
-
-        await JsRuntime.InvokeVoidAsync(
-            "ChartFunctions.highlightRange",
-            $"profile-chart-meter-{MeterGlobalId}",
-            startTicks,
-            endTicks);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
     }
 
     private async void OnRemoveHighlightRangeHandler()
     {
-        if (!_chartRendered)
+        try
         {
-            return;
-        }
+            if (!_chartRendered)
+            {
+                return;
+            }
 
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
+    }
+
+    private async void OnUseHistoricalForecastHandler(bool useHistoricalForecast)
+    {
+        try
+        {
+            if (!_chartRendered)
+            {
+                return;
+            }
+            var forecastReadingsState = useHistoricalForecast ? HistoricalForecastState.Value[MeterType] : HeatingForecastState.Value.ForecastDailyCosts;
+            var chartForecastReadings = GetChartDailyForecastReadings(_latestReadingTime, forecastReadingsState);
+
+            var degreeDifference = AnalysisOptions.Value[MeterType].DegreeDifference;
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries", $"profile-chart-meter-{MeterGlobalId}", chartForecastReadings, degreeDifference);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
     }
 
     private async void OnDegreeDifferenceHandler(decimal degreeDifference)
     {
-
-        if (!_chartRendered)
+        try
         {
-            return;
+            if (!_chartRendered)
+            {
+                return;
+            }
+
+            var forecastReadingsState = AnalysisOptions.Value[MeterType].UseHistoricalForecast ?
+                        HistoricalForecastState.Value[MeterType]
+                        : HeatingForecastState.Value.ForecastDailyCosts;
+
+            var chartForecastReadings = GetChartDailyForecastReadings(_latestReadingTime, forecastReadingsState);
+
+
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries",
+                    $"profile-chart-meter-{MeterGlobalId}",
+                    chartForecastReadings, degreeDifference);
         }
-
-        var chartReadings = GetChartDailyForecastReadings(_latestReadingTime);
-
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries",
-                $"profile-chart-meter-{MeterGlobalId}",
-                chartReadings, degreeDifference);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
     }
 
     private async void OnToggledCostChangedHandler(bool showCost)
     {
-        if (!_chartRendered)
+        try
         {
-            return;
+            if (!_chartRendered)
+            {
+                return;
+            }
+            await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
         }
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
     }
 
     public async ValueTask DisposeAsync()

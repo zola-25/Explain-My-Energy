@@ -1,66 +1,86 @@
-﻿
-@inherits FluxorComponent
+﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-<MudToolBar>
-    <MudPaper Elevation="0">
+<MudToolBar WrapContent="true" Class="justify-space-between">
+    <MudPaper Elevation="0" Class="m-2">
 
-        <MudSwitch Checked="_toggled"
-                   T="bool"
-                   CheckedChanged="OnToggledChanged"
-                   Color="Color.Surface"
-                   ThumbIcon="@(_toggled ? Icons.Material.Filled.CurrencyPound : Icons.Material.Filled.ShowChart)"
-                   UnCheckedColor="Color.Primary"
-                   Label="@_labelText"
-                   LabelPosition="LabelPosition.Start" />
+        <MudTooltip Placement="Placement.Top" Text="Chart kWh Consumption, or Costs with Tariff Details">
+            <MudSwitch Checked="_costToggled"
+                       T="bool"
+                       CheckedChanged="OnToggledChanged"
+                       Color="Color.Surface"
+                       ThumbIcon="@(_costToggled ? Icons.Material.Filled.CurrencyPound : Icons.Material.Filled.ShowChart)"
+                       UnCheckedColor="Color.Primary"
+                       Label="@_costToggleLabelText"
+                       LabelPosition="LabelPosition.Start" />
+        </MudTooltip>
     </MudPaper>
 
-    <MudSpacer />
 
-    <MudPaper Elevation="0" MinWidth="200px;">
+    <MudPaper Elevation="0" Class="term-select-paper m-2" >
+        <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
-        <MudSelect 
-                    Class="w-100"
-                   Value="_calendarTerm"
-                   ValueChanged="TermChanged"
-                   Label="Change Term"
-                   Variant="Variant.Text"
-                   T="CalendarTerm"
-                   Dense="true"
-                   OpenIcon="@Icons.Material.Filled.AccessTime"
-                   AdornmentColor="Color.Dark">
-            @foreach (CalendarTerm term in Enum.GetValues(typeof(CalendarTerm)))
-            {
-                <MudSelectItem Value="@term">@term.TermAdjective()</MudSelectItem>
-            }
-        </MudSelect>
+            <MudSelect  Class="w-100"
+                       Value="_calendarTerm"
+                       ValueChanged="TermChanged"
+                       Label="Change Term"
+                       Variant="Variant.Text"
+                       T="CalendarTerm"
+                       OpenIcon="@Icons.Material.Filled.AccessTime"
+                       AdornmentColor="Color.Dark">
+                @foreach (CalendarTerm term in Enum.GetValues(typeof(CalendarTerm)))
+                {
+                    <MudSelectItem Value="@term">@term.TermAdjective()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudTooltip>
     </MudPaper>
 
-    <MudSpacer />
+    @if (IsPrimaryHeatingSource)
+    {
+        <MudPaper Elevation="0" Class="m-2">
 
-    <MudPaper Elevation="0">
-        @if (IsPrimaryHeatingSource)
-        {
-            <MudNumericField Value="@_degreesDifference"
-                             TextChanged="DegreeDifferenceChange"
-                             Immediate="true"
-                             Max="50"
-                             Min="-50"
-                             Class="right-align-input"
-                             Style="width: 150px;"
-                             T="decimal"
-                             Label="Adjust Forecast" Variant="Variant.Text"
-                             Step="1"
-                             Adornment="Adornment.End"
-                             AdornmentText="°C"/>
-        }
-    </MudPaper>
+            <MudTooltip Placement="Placement.Top" Text="Forecast using Historical Moving Average, or the Temperature effect on your consumption. For warm weather periods, Historical Forecasts may be more accurate. For colder months, Temperature forecasts will show how your consumption increases as it gets colder.">
+                <MudSwitch Checked="_historicalForecastToggled"
+                           T="bool"
+                           CheckedChanged="OnHistoricalForecastToggledChanged"
+                           Color="Color.Surface"
+                           ThumbIcon="@(_historicalForecastToggled ? Icons.Material.Filled.Timeline : Icons.Material.Filled.Thermostat)"
+                           UnCheckedColor="Color.Secondary"
+                           Label="@_historicalForecastToggleLabelText"
+                           LabelPosition="LabelPosition.Start" />
+            </MudTooltip>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="m-2">
+            <MudTooltip Placement="Placement.Top" Text="If using Temperature Forecast, see how your consumption is effected by increasing or decreasing the daily forecast Temperature">
+                <MudNumericField Value="@_degreesDifference"
+                                 TextChanged="DegreeDifferenceChange"
+                                 Immediate="true"
+                                 Max="50"
+                                 Min="-50"
+                                 Format="+#;-#;0"
+                                 AdornmentAriaLabel="Degrees Celsius"
+                                 Class="right-align-input"
+                                 Style="width: 150px;"
+                                 T="decimal"
+                                 Label="Adjust Forecast" Variant="Variant.Text"
+                                 Step="1"
+                                 Adornment="Adornment.End"
+                                 AdornmentText="°C" />
+            </MudTooltip>
+        </MudPaper>
+    }
     @*<MudText Style="font-size: xx-large" Inline="true">@ForecastAnalysis.TemperatureRange.Symbol</MudText>*@
 </MudToolBar>
 
 <style>
     .right-align-input input {
         text-align: right;
+    }
+
+    .term-select-paper .mud-select {
+        min-width: 100px;
     }
 </style>
 @code {
@@ -69,7 +89,7 @@
 
     [Parameter, EditorRequired] public MeterType MeterType { get; set; }
 
-    AnalysisOptionsActionFactory AnalysisOptionsActionFactory { get; set; } 
+    AnalysisOptionsActionFactory AnalysisOptionsActionFactory { get; set; }
 
     [Inject] IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
@@ -78,8 +98,10 @@
 
     CalendarTerm _calendarTerm;
 
-    bool _toggled;
-    string _labelText => _toggled ? "Chart Cost" : "Chart kWh";
+    bool _costToggled;
+    bool _historicalForecastToggled;
+    string _costToggleLabelText => _costToggled ? "Chart Diplaying Costs" : "Chart Diplaying kWh";
+    string _historicalForecastToggleLabelText => _historicalForecastToggled ? "Using Historical Forecasts" : "Using Temperature Forecasts";
 
     protected override void OnParametersSet()
     {
@@ -87,8 +109,18 @@
         _firstSet = true;
 
 
-        _toggled = AnalysisOptionsState.Value[MeterType].ShowCost;
+        _costToggled = AnalysisOptionsState.Value[MeterType].ShowCost;
         _calendarTerm = AnalysisOptionsState.Value[MeterType].CalendarTerm;
+        _historicalForecastToggled = AnalysisOptionsState.Value[MeterType].UseHistoricalForecast;
+    }
+
+    private void OnHistoricalForecastToggledChanged(bool on)
+    {
+        var action = AnalysisOptionsActionFactory.Create(AnalysisAction.UseHistoricalForecast, on);
+
+        Dispatcher.Dispatch(action);
+
+        _historicalForecastToggled = on;
     }
 
     private void OnToggledChanged(bool on)
@@ -97,7 +129,7 @@
 
         Dispatcher.Dispatch(action);
 
-        _toggled = on;
+        _costToggled = on;
     }
 
     private void TermChanged(CalendarTerm newTerm)
@@ -126,7 +158,7 @@
 
         var degreeDifference = Convert.ToDecimal(degreesFromForecastString);
 
-        if (Math.Abs(degreeDifference - _degreesDifference) < 0.01m)
+        if (Math.Abs(degreeDifference - _degreesDifference) < 0.5m)
         {
             return;
         }

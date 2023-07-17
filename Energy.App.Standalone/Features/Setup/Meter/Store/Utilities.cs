@@ -2,7 +2,7 @@
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
 
-namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions;
+namespace Energy.App.Standalone.Features.Setup.Meter.Store;
 
 public static class Utilities
 {
@@ -17,6 +17,7 @@ public static class Utilities
             Mpxn = null,
             SetupValid = false,
             TariffDetails = ImmutableList<TariffDetailState>.Empty,
+            InitialSetupValid = false,
         };
     }
 

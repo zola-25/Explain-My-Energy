@@ -53,6 +53,7 @@ else
 
     CalendarTerm _calenderTerm;
     decimal _degreeDifference;
+    bool _useHistoricalForcast;
 
     public string Status { get; set; }
     public bool Ready { get; set; }
@@ -85,6 +86,8 @@ else
 
         _calenderTerm = initialMeterAnalysisOptions.CalendarTerm;
         _degreeDifference = initialMeterAnalysisOptions.DegreeDifference;
+        _useHistoricalForcast = initialMeterAnalysisOptions.UseHistoricalForecast;
+
         await Task.Delay(1);
 
         SetHistoricalAnalyses();
@@ -109,6 +112,12 @@ else
                         SetHistoricalAnalyses();
                         SetForecastAnalyses();
                     });
+                SubscribeToAction<ElectricityAnalysisOptionsUseHistoricalForecastAction>(
+                    action =>
+                    {
+                        _useHistoricalForcast = action.UseHistoricalForecast;
+                        SetForecastAnalyses();
+                    });
                 break;
             case MeterType.Gas:
 
@@ -117,6 +126,12 @@ else
                     {
                         _calenderTerm = action.CalendarTerm;
                         SetHistoricalAnalyses();
+                        SetForecastAnalyses();
+                    });
+                SubscribeToAction<GasAnalysisOptionsUseHistoricalForecastAction>(
+                    action =>
+                    {
+                        _useHistoricalForcast = action.UseHistoricalForecast;
                         SetForecastAnalyses();
                     });
                 break;
@@ -146,8 +161,8 @@ else
 
     void SetForecastAnalyses()
     {
-        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm);
-        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm);
+        _currentTermForecastAnalysis = TempForecastAnalyzer.GetCurrentPeriodForecastTotals(MeterType, _calenderTerm, _useHistoricalForcast);
+        _nextTermForecastAnalysis = TempForecastAnalyzer.GetNextPeriodForecastTotals(MeterType, _calenderTerm, _useHistoricalForcast);
     }
 
 }

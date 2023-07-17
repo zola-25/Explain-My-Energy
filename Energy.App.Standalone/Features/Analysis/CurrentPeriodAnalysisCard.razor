@@ -95,7 +95,7 @@
         _highlightToggled = AnalysisOptionsState.Value[MeterType].ToggleSource == ToggleSource.Current;
     }
 
-    private async Task ToggleHighlight(bool toggled)
+    private void ToggleHighlight(bool toggled)
     {
         if (toggled)
         {

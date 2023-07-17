@@ -5,13 +5,13 @@
 @inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
 
-
-<MudTable Items="Enumerable.Range(0, 1)" T="int" >
+<MudText Align="Align.Left" Typo="Typo.h5" Class="m-3 fw-bolder">Weather Data Status</MudText>
+<MudTable Items="Enumerable.Range(0, 1)" T="int" Elevation="0" >
     <HeaderContent>
-        <MudTh>Historical Data</MudTh>
-        <MudTh>Latest Reading</MudTh>
-        <MudTh>Short-term Forecast Range</MudTh>
-        <MudTh>Long-term Climate Forecast Range</MudTh>
+        <MudTh Class="fw-bold">Historical Data</MudTh>
+        <MudTh Class="fw-bold">Latest Reading</MudTh>
+        <MudTh Class="fw-bold">Short-term Forecast Range</MudTh>
+        <MudTh Class="fw-bold">Long-term Climate Forecast Range</MudTh>
     </HeaderContent>
     <RowTemplate>
         @if (!HouseholdState.Value.Saved)

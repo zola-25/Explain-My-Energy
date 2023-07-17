@@ -210,7 +210,7 @@
         return Task.CompletedTask;
     }
 
-    private async Task TariffSubmitted(TariffDetail tariffDetail)
+    private Task TariffSubmitted(TariffDetail tariffDetail)
     {
         if (_adding)
         {
@@ -245,6 +245,8 @@
         SetTariffDetailRows();
         _addEditTariffDetail = null;
         _showEditDialogue = false;
+        
+        return Task.CompletedTask;
     }
 
 

@@ -61,30 +61,26 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 
         private IEnumerable<BasicReading> GetMovingAverageHistoricalReadings(ImmutableList<BasicReading> historicalReadings)
         {
+            var latestReadingDate = historicalReadings.Last().UtcTime.Date;
 
-            var applicableHistoricalReadings = historicalReadings.Where(c => 
-            c.UtcTime.Date >= DateTime.UtcNow.AddYears(-1).AddDays(-30).Date
-            && c.UtcTime.Date < DateTime.UtcNow.Date.AddDays(-1))
+            var startHistoricalReadingsDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (-365 - 30)).Date;
+            var endHistoricalReadingDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (- 30)).Date;
+
+            var applicableHistoricalReadings = historicalReadings
+                .SkipWhile(c=> c.UtcTime.Hour != 0 && c.UtcTime.Minute != 0)
+                .Where(x => x.UtcTime >= startHistoricalReadingsDate && x.UtcTime <= endHistoricalReadingDate)
                 .ToArray();
+                
+            var startMovingStatsDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * -365).Date;
+            var firstWindow = applicableHistoricalReadings.Take(48 * 30).Select(c=>(double)c.KWh).ToList();
+            var movingStats = new MovingStatistics(48 * 30, firstWindow);
 
-            var startMovingStatsDate = DateTime.UtcNow.AddYears(-1).Date;
 
-            var movingStats = new MovingStatistics(48 * 30);
-
-
-            for (int i = 0; i < applicableHistoricalReadings.Length; i++)
+            for (int i = (48 * 30); i < applicableHistoricalReadings.Length; i++)
             {
+                
                 var historicalReading = applicableHistoricalReadings[i];
-                if (historicalReading.UtcTime < startMovingStatsDate)
-                {
-                    movingStats.Push((double)historicalReading.KWh);
-                    continue;
-                }
-
-                movingStats.Push((double)historicalReading.KWh);
-
                 var movingAverage = movingStats.Mean;
-
 
                 yield return new BasicReading
                 {
@@ -92,6 +88,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                     UtcTime = historicalReading.UtcTime,
                     Forecast = true
                 };
+                movingStats.Push((double)historicalReading.KWh);
+
 
             }
         }

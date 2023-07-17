@@ -4,6 +4,7 @@ using Energy.App.Standalone.Features.Setup.Household;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
+using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Features.Analysis.Store
 {
@@ -11,21 +12,22 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     [FeatureState(Name = nameof(AnalysisOptionsState))]
     public record AnalysisOptionsState
     {
+        [property: JsonIgnore]
         public MeterAnalysisOptions this[MeterType meterType]
         {
             get
             {
-                switch (meterType)
+                return meterType switch
                 {
-                    case MeterType.Gas:
-                        return Gas;
-                    case MeterType.Electricity:
-                        return Electricity;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null);
-                }
+                    MeterType.Gas => Gas,
+                    MeterType.Electricity => Electricity,
+                    _ => throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null),
+                };
             }
         }
+
+        [property: JsonIgnore]
+        public IEnumerable<MeterAnalysisOptions> All => new[] { Electricity, Gas };
 
         public MeterAnalysisOptions Electricity { get; init; }
 
@@ -36,31 +38,34 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
             Gas = new MeterAnalysisOptions
             {
+                MeterType = MeterType.Gas,
                 CalendarTerm = CalendarTerm.Week,
                 DegreeDifference = 0,
-                ChartRendered = false,
                 HighlightSet = false,
                 HighlightStart = null,
                 HighlightEnd = null,
                 ShowCost = false,
-                ToggleSource = ToggleSource.None
+                ToggleSource = ToggleSource.None,
+                UseHistoricalForecast = true
             };
             Electricity = new MeterAnalysisOptions
             {
+                MeterType = MeterType.Electricity,
                 CalendarTerm = CalendarTerm.Week,
                 DegreeDifference = 0,
-                ChartRendered = false,
                 HighlightSet = false,
                 HighlightStart = null,
                 HighlightEnd = null,
                 ShowCost = false,
-                ToggleSource = ToggleSource.None
+                ToggleSource = ToggleSource.None,
+                UseHistoricalForecast = true
             };
         }
     }
 
     public record MeterAnalysisOptions
     {
+        public MeterType MeterType { get; init; }
         public DateTime? HighlightStart { get; init; }
         public DateTime? HighlightEnd { get; init; }
 
@@ -71,13 +76,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         public decimal DegreeDifference { get; init; }
 
-        public bool ChartRendered { get; init; }
-
         public CalendarTerm CalendarTerm { get; init; }
 
         public ToggleSource ToggleSource { get; init; }
-
-
+        public bool UseHistoricalForecast { get; init; }
     }
 
     public enum ToggleSource
@@ -88,7 +90,49 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         Forecast
     }
 
+    public class GasAnalysisOptionsUseHistoricalForecastAction : IAnalysisOptionsAction
+    {
+        public bool UseHistoricalForecast { get; }
 
+        public GasAnalysisOptionsUseHistoricalForecastAction(bool useHistoricalForecast)
+        {
+            UseHistoricalForecast = useHistoricalForecast;
+        }
+
+        [ReducerMethod]
+        public static AnalysisOptionsState Reduce(AnalysisOptionsState state, GasAnalysisOptionsUseHistoricalForecastAction action)
+        {
+            return state with
+            {
+                Gas = state.Gas with
+                {
+                    UseHistoricalForecast = action.UseHistoricalForecast
+                }
+            };
+        }
+    }
+
+    public class ElectricityAnalysisOptionsUseHistoricalForecastAction : IAnalysisOptionsAction
+    {
+        public bool UseHistoricalForecast { get; }
+
+        public ElectricityAnalysisOptionsUseHistoricalForecastAction(bool useHistoricalForecast)
+        {
+            UseHistoricalForecast = useHistoricalForecast;
+        }
+
+        [ReducerMethod]
+        public static AnalysisOptionsState Reduce(AnalysisOptionsState state, ElectricityAnalysisOptionsUseHistoricalForecastAction action)
+        {
+            return state with
+            {
+                Electricity = state.Electricity with
+                {
+                    UseHistoricalForecast = action.UseHistoricalForecast
+                }
+            };
+        }
+    }
 
     public class GasAnalysisOptionsShowCostAction : IAnalysisOptionsAction
     {
@@ -141,15 +185,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
     {
     }
 
-    public class GasAnalysisOptionsSetChartRenderedAction : IAnalysisOptionsAction
-    {
-        public bool ChartRendered { get; }
-
-        public GasAnalysisOptionsSetChartRenderedAction(bool chartRendered)
-        {
-            ChartRendered = chartRendered;
-        }
-    }
+    
 
     public class GasAnalysisOptionsSetCalenderTermAction : IAnalysisOptionsAction
     {
@@ -225,6 +261,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             {
                 Gas = meterState with
                 {
+                    MeterType = MeterType.Gas,
                     ShowCost = showCostAction.ShowCost
                 }
             };
@@ -265,18 +302,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         }
 
-        [ReducerMethod]
-        public static AnalysisOptionsState OnGasSetChartRenderedReducer(AnalysisOptionsState analysisOptionsState, GasAnalysisOptionsSetChartRenderedAction action)
-        {
-            var meterState = analysisOptionsState.Gas;
-            return analysisOptionsState with
-            {
-                Gas = meterState with
-                {
-                    ChartRendered = action.ChartRendered
-                }
-            };
-        }
 
         [ReducerMethod]
         public static AnalysisOptionsState OnGasSetCalenderTermReducer(AnalysisOptionsState analysisOptionsState, GasAnalysisOptionsSetCalenderTermAction action)
@@ -299,6 +324,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             {
                 Electricity = meterState with
                 {
+                    MeterType = MeterType.Electricity,
                     ShowCost = showCostAction.ShowCost
                 }
             };
@@ -339,18 +365,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         }
 
-        [ReducerMethod]
-        public static AnalysisOptionsState OnElectricitySetChartRenderedReducer(AnalysisOptionsState analysisOptionsState, ElectricityAnalysisOptionsSetChartRenderedAction action)
-        {
-            var meterState = analysisOptionsState.Electricity;
-            return analysisOptionsState with
-            {
-                Electricity = meterState with
-                {
-                    ChartRendered = action.ChartRendered
-                }
-            };
-        }
 
         [ReducerMethod]
         public static AnalysisOptionsState OnElectricitySetCalenderTermReducer(AnalysisOptionsState analysisOptionsState, ElectricityAnalysisOptionsSetCalenderTermAction action)
@@ -430,7 +444,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         RemoveHighlightRange,
         SetChartRendered,
         SetCalenderTerm,
-        SetDegreeDifference
+        SetDegreeDifference,
+        UseHistoricalForecast
     }
 
     public class AnalysisOptionsActionFactory
@@ -454,11 +469,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             string fullClassName = $"{GetThisNamespace()}.{className}";
 
             // Get the Type based on the class name
-            Type type = Type.GetType(fullClassName);
-            if (type == null)
-            {
-                throw new ArgumentException($"Type '{fullClassName}' not found.");
-            }
+            var type = Type.GetType(fullClassName) ?? throw new ArgumentException($"Type '{fullClassName}' not found.");
 
             // Create an instance of the class
             return (IAnalysisOptionsAction)Activator.CreateInstance(type, constructorArgs);

@@ -18,22 +18,12 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
     {
         [Inject] private ISnackbar Snackbar { get; set; }
 
-        //[Inject] UserState UserState { get; set; }
-        [Inject]
-        private NavigationManager NavManager { get; set; }
-
         [Inject] private IState<HouseholdState> HouseholdState { get; set; }
         [Inject] private IState<GasReadingsState> GasReadingsState { get; set; }
         [Inject] private IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 
         [Inject] private IState<MeterSetupState> MeterSetupState { get; set; }
 
-
-
-        //[Inject] IMeterApi MeterApi { get; set; }
-        //[Inject] IEnergyDataProcessor EnergyDataProcessor { get; set; }
-        [Inject]
-        private IDialogService DialogService { get; set; }
 
         private Dictionary<MeterType, MeterStatus> _meterStatusList;
         private record MeterStatus
@@ -54,17 +44,6 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
         {
             base.OnInitialized();
 
-            SubscribeToAction<NotifyElectricityLoadingFinished>((a) =>
-            {
-
-                Snackbar.Add("Electricity Readings Updated");
-
-            });
-            SubscribeToAction<NotifyGasLoadingFinished>((a) =>
-            {
-                Snackbar.Add(!String.IsNullOrEmpty(a.Error) ? "Gas Readings Update Error" : "Gas Readings Updated");
-            });
-
             SubscribeToAction<GasDeleteReadingsAction>((a) =>
             {
                 Snackbar.Add("Gas Readings Deleted");
@@ -77,28 +56,28 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
             });
 
-            HouseholdState.StateChanged += async (sender, state) =>
+            HouseholdState.StateChanged += (sender, state) =>
             {
                 SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
             };
 
-            MeterSetupState.StateChanged += async (sender, state) =>
+            MeterSetupState.StateChanged += (sender, state) =>
             {
                 SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
             };
 
-            GasReadingsState.StateChanged += async (sender, state) =>
+            GasReadingsState.StateChanged += (sender, state) =>
             {
                 SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
             };
 
-            ElectricityReadingsState.StateChanged += async (sender, state) =>
+            ElectricityReadingsState.StateChanged += (sender, state) =>
             {
                 SetMeterStatusList();
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
             };
 
 
@@ -184,7 +163,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
         private MudMessageBox DeleteBox { get; set; }
 
-        private async Task RemoveMeterAsync(Guid globalId, MeterType meterType)
+        private async Task RemoveMeterAsync(MeterType meterType)
         {
             bool? result = await DeleteBox.Show();
             if (result == null || result == false)
@@ -208,18 +187,24 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
         protected async void DispatchUpdateReadings(MeterType meterType)
         {
-
+            var updateCompletion = new TaskCompletionSource<int>();
+            Reloading = true;
             switch (meterType)
             {
                 case MeterType.Gas:
-                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false));
+                    Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, updateCompletion));
                     break;
                 case MeterType.Electricity:
-                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false));;
+                    Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, updateCompletion));;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(meterType));
             }
+
+            await updateCompletion.Task;
+
+            Reloading = false;
+            StateHasChanged();
         }
 
         private bool Reloading = false;
@@ -240,13 +225,12 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
                 default:
                     throw new ArgumentOutOfRangeException(nameof(meterType));
             }
-            if (!reloadCompletion.Task.IsCompleted)
-            {
-                await reloadCompletion.Task;
-            }
+
+            await reloadCompletion.Task;
 
             Reloading = false;
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
+
         }
 
     }

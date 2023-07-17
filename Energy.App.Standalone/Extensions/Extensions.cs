@@ -10,6 +10,7 @@ namespace Energy.App.Standalone.Extensions;
 
 public static class Extensions
 {
+#pragma warning disable IDE1006 // Naming Styles
     public static bool eIsNullOrEmpty<T>(this IEnumerable<T> enumerable)
     {
         return enumerable == null || !enumerable.Any();
@@ -320,24 +321,17 @@ public static class Extensions
 
     public static string eToOccurrenceSuffix(this int integer)
     {
-        switch (integer % 100)
+        return (integer % 100) switch
         {
-            case 11:
-            case 12:
-            case 13:
-                return "th";
-        }
-        switch (integer % 10)
-        {
-            case 1:
-                return "st";
-            case 2:
-                return "nd";
-            case 3:
-                return "rd";
-            default:
-                return "th";
-        }
+            11 or 12 or 13 => "th",
+            _ => (integer % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th",
+            },
+        };
     }
 
     public static string eTempToHexColour(this int temp)
@@ -347,133 +341,71 @@ public static class Extensions
 
     public static string eTempToHexColour(this double temp)
     {
-        switch (temp)
+        return temp switch
         {
-            case <= -20:
-                return "#0054ff";
-            case <= -19:
-                return "#0054ff";
-            case <= -18:
-                return "#0054ff";
-            case <= -17:
-                return "#0054ff";
-            case <= -16:
-                return "#0054ff";
-            case <= -15:
-                return "#0054ff";
-            case <= -14:
-                return "#0054ff";
-            case <= -13:
-                return "#0054ff";
-            case <= -12:
-                return "#0054ff";
-            case <= -11:
-                return "#0094ff";
-            case <= -10:
-                return "#0094ff";
-            case <= -9:
-                return "#0094ff";
-            case <= -8:
-                return "#0094ff";
-            case <= -7:
-                return "#00b4ff";
-            case <= -6:
-                return "#00b4ff";
-            case <= -5:
-                return "#00b4ff";
-            case <= -4:
-                return "#00b4ff";
-            case <= -3:
-                return "#00d4ff";
-            case <= -2:
-                return "#00d4ff";
-            case <= -1:
-                return "#00d4ff";
-            case <= 0:
-                return "#00d4ff";
-            case <= 1:
-                return "#00ffd0";
-            case <= 2:
-                return "#00ffd0";
-            case <= 3:
-                return "#00ffd0";
-            case <= 4:
-                return "#00ffd0";
-            case <= 5:
-                return "#d7ff00";
-            case <= 6:
-                return "#d7ff00";
-            case <= 7:
-                return "#d7ff00";
-            case <= 8:
-                return "#d7ff00";
-            case <= 9:
-                return "#ffe600";
-            case <= 10:
-                return "#ffe600";
-            case <= 11:
-                return "#ffe600";
-            case <= 12:
-                return "#ffe600";
-            case <= 13:
-                return "#ffd200";
-            case <= 14:
-                return "#ffd200";
-            case <= 15:
-                return "#ffd200";
-            case <= 16:
-                return "#ffd200";
-            case <= 17:
-                return "#ffb400";
-            case <= 18:
-                return "#ffb400";
-            case <= 19:
-                return "#ffb400";
-            case <= 20:
-                return "#ffb400";
-            case <= 21:
-                return "#ffa000";
-            case <= 22:
-                return "#ffa000";
-            case <= 23:
-                return "#ffa000";
-            case <= 24:
-                return "#ffa000";
-            case <= 25:
-                return "#ff7800";
-            case <= 26:
-                return "#ff7800";
-            case <= 27:
-                return "#ff7800";
-            case <= 28:
-                return "#ff7800";
-            case <= 29:
-                return "#ff5000";
-            case <= 30:
-                return "#ff5000";
-            case <= 31:
-                return "#ff5000";
-            case <= 32:
-                return "#ff5000";
-            case <= 33:
-                return "#ff0000";
-            case <= 34:
-                return "#ff0000";
-            case <= 35:
-                return "#ff0000";
-            case <= 36:
-                return "#ff0000";
-            case <= 37:
-                return "#ff0000";
-            case <= 38:
-                return "#ff0000";
-            case <= 39:
-                return "#ff0000";
-            case <= 40:
-                return "#ff0000";
-            default:
-                return "#ff0000";
-        }
+            <= -20 => "#0054ff",
+            <= -19 => "#0054ff",
+            <= -18 => "#0054ff",
+            <= -17 => "#0054ff",
+            <= -16 => "#0054ff",
+            <= -15 => "#0054ff",
+            <= -14 => "#0054ff",
+            <= -13 => "#0054ff",
+            <= -12 => "#0054ff",
+            <= -11 => "#0094ff",
+            <= -10 => "#0094ff",
+            <= -9 => "#0094ff",
+            <= -8 => "#0094ff",
+            <= -7 => "#00b4ff",
+            <= -6 => "#00b4ff",
+            <= -5 => "#00b4ff",
+            <= -4 => "#00b4ff",
+            <= -3 => "#00d4ff",
+            <= -2 => "#00d4ff",
+            <= -1 => "#00d4ff",
+            <= 0 => "#00d4ff",
+            <= 1 => "#00ffd0",
+            <= 2 => "#00ffd0",
+            <= 3 => "#00ffd0",
+            <= 4 => "#00ffd0",
+            <= 5 => "#d7ff00",
+            <= 6 => "#d7ff00",
+            <= 7 => "#d7ff00",
+            <= 8 => "#d7ff00",
+            <= 9 => "#ffe600",
+            <= 10 => "#ffe600",
+            <= 11 => "#ffe600",
+            <= 12 => "#ffe600",
+            <= 13 => "#ffd200",
+            <= 14 => "#ffd200",
+            <= 15 => "#ffd200",
+            <= 16 => "#ffd200",
+            <= 17 => "#ffb400",
+            <= 18 => "#ffb400",
+            <= 19 => "#ffb400",
+            <= 20 => "#ffb400",
+            <= 21 => "#ffa000",
+            <= 22 => "#ffa000",
+            <= 23 => "#ffa000",
+            <= 24 => "#ffa000",
+            <= 25 => "#ff7800",
+            <= 26 => "#ff7800",
+            <= 27 => "#ff7800",
+            <= 28 => "#ff7800",
+            <= 29 => "#ff5000",
+            <= 30 => "#ff5000",
+            <= 31 => "#ff5000",
+            <= 32 => "#ff5000",
+            <= 33 => "#ff0000",
+            <= 34 => "#ff0000",
+            <= 35 => "#ff0000",
+            <= 36 => "#ff0000",
+            <= 37 => "#ff0000",
+            <= 38 => "#ff0000",
+            <= 39 => "#ff0000",
+            <= 40 => "#ff0000",
+            _ => "#ff0000",
+        };
     }
 
     public static DateTime eStartOfWeek(this DateTime date, DayOfWeek startOfWeek)
@@ -493,5 +425,6 @@ public static class Extensions
     {
         return items;
     }
+#pragma warning restore IDE1006 // Naming Styles
 
 }
