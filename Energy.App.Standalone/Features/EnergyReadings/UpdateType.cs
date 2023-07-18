@@ -3,7 +3,8 @@
     public enum UpdateType
     {
         NotValid,
-        FullUpdate,
+        FullReload,
+        Update,
         JustCosts,
         NoUpdateNeeded
     }

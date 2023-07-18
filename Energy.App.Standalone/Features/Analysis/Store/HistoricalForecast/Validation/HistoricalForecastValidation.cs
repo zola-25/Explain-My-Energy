@@ -1,4 +1,5 @@
-﻿using Energy.App.Standalone.Extensions;
+﻿using Energy.App.Standalone.Data;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
@@ -6,50 +7,84 @@ using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Validation
 {
+    public class HistoricalForecastValidationResult 
+    {
+        public bool CanUpdate { get; init; }
+        public string Message { get; init; }
+        public bool IsWarning { get; init;}
+    }
     public class HistoricalForecastValidation : IHistoricalForecastValidation
     {
-        public bool Validate(MeterState meterSetup,
-                bool forceRefresh,
-                DateTime lastUpdate,
-                ImmutableList<BasicReading> existingHistoricalReadings,
-                ImmutableList<DailyCostedReading> existingForecastReadings,
-                TaskCompletionSource<(bool, string)> taskCompletionSource)
+        public HistoricalForecastValidationResult Validate(MeterState meterSetup,
+                                                           bool forceRefresh,
+                                                           DateTime lastUpdate,
+                                                           ImmutableList<BasicReading> existingHistoricalReadings,
+                                                           ImmutableList<DailyCostedReading> existingForecastReadings)
         {
+            var meterType = meterSetup.MeterType;
             if (meterSetup == null
                 || !meterSetup.SetupValid)
             {
-                taskCompletionSource?.SetResult((false, $"{meterSetup.MeterType} meter not setup"));
-                return false;
+                return new HistoricalForecastValidationResult
+                {
+                    CanUpdate = false,
+                    IsWarning = true,
+                    Message = $"{meterType} meter not setup"
+                };
             }
 
             if (meterSetup.TariffDetails.eIsNullOrEmpty())
             {
-                taskCompletionSource?.SetResult((false, $"{meterSetup.MeterType} meter tariffs not setup"));
-                return false;
+                return new HistoricalForecastValidationResult
+                {
+                    CanUpdate = false,
+                    IsWarning = true,
+                    Message = $"{meterType} meter tariffs not setup"
+                };
             }
 
             if (existingHistoricalReadings.eIsNullOrEmpty())
             {
-                taskCompletionSource?.SetResult((false, $"No historical {meterSetup.MeterType} readings"));
-                return false;
+                return new HistoricalForecastValidationResult
+                {
+                    CanUpdate = false,
+                    IsWarning = true,
+                    Message = $"No historical {meterType} readings"
+                };
             }
+            var latestReadingDate = existingHistoricalReadings.Last().UtcTime;
+            var earliestReadingDate = existingHistoricalReadings.First().UtcTime;
 
-            if (existingHistoricalReadings.First().UtcTime > DateTime.UtcNow.Date.AddDays(-180))
+            var numDays = (latestReadingDate - earliestReadingDate).TotalDays;
+            if (numDays < 180)
             {
-                taskCompletionSource?.SetResult((false, $"Not enough historical {meterSetup.MeterType} readings"));
-                return false;
+                return new HistoricalForecastValidationResult
+                {
+                    CanUpdate = false,
+                    IsWarning = true,
+                    Message = $"Not enough historical {meterType} readings - need data {180} days ago, earliest historical reading is {earliestReadingDate.eDateToDowShortMonthYY()}"
+                };
             }
 
             if (!forceRefresh
                 && existingForecastReadings.eIsNotNullOrEmpty()
-                && existingForecastReadings.Count > 180
+                && existingForecastReadings.Count >= 180 
                 && lastUpdate > DateTime.UtcNow.Date.AddDays(-7))
             {
-                taskCompletionSource?.SetResult((true, "Forecast already exists"));
-                return false;
+                return new HistoricalForecastValidationResult
+                {
+                    CanUpdate = false,
+                    IsWarning = false,
+                    Message = $"{meterType} Historical Forecast already exists"
+                };
             }
 
-            return true;
+            return new HistoricalForecastValidationResult
+            {
+                CanUpdate = true,
+                IsWarning = false,
+                Message = "Can update"
+            };
 
         }
     }

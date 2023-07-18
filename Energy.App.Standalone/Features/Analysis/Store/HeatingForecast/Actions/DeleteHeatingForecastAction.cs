@@ -16,8 +16,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
                 ForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
                 ForecastWeatherReadings = ImmutableList<TemperaturePoint>.Empty,
                 SavedCoefficients = false,
-                CoefficientsLastUpdate = DateTime.MinValue,
-                ForecastsLastUpdate = DateTime.MinValue,
+                CoefficientsUpdatedWithReadingDate = DateTime.MinValue,
+                ForecastsUpdatedWithReadingDate = DateTime.MinValue,
+                LoadingHeatingForecast = false,
+                LatestReadingDate = DateTime.MinValue,
             };
         }
     }

@@ -2,13 +2,13 @@
 {
     public class NotifyElectricityLoadingFinished { 
 
-        public bool Updated { get; }
-        public string Error { get; }
+        public bool Success { get; }
+        public string Message { get; }
 
-        public NotifyElectricityLoadingFinished(bool updated, string error = null)
+        public NotifyElectricityLoadingFinished(bool success, string message)
         {
-            Updated = updated;
-            Error = error;
+            Success = success;
+            Message = message;
         }
 
     }

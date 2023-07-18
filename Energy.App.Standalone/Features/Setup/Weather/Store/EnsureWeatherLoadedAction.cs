@@ -11,9 +11,9 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
     public record EnsureWeatherLoadedAction
     {
         public bool ForceReload { get; }
-        public TaskCompletionSource<int> TaskCompletion { get; }
+        public TaskCompletionSource<(bool success, string message)> TaskCompletion { get; }
 
-        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<int> taskCompletion = null)
+        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<(bool success, string message)> taskCompletion = null)
         {
             ForceReload = forceReload;
             TaskCompletion = taskCompletion;
@@ -28,25 +28,17 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             };
         }
 
-        [ReducerMethod]
-        public static WeatherState Reduce(WeatherState state, NotifyWeatherLoadingFinished action)
+        [ReducerMethod(typeof(NotifyWeatherLoadingFinished))]
+        public static WeatherState NotifyWeatherLoadingFinishedReducer(WeatherState state)
         {
-            if (action.DaysUpdated == 0)
-            {
-                return state with
-                {
-                    Loading = false,
-                };
-            }
             return state with
             {
-                Loading = false,
-                LastUpdated = DateTime.UtcNow
+                Loading = false
             };
         }
 
         [ReducerMethod]
-        public static WeatherState Reduce(WeatherState state, StoreWeatherReloadedReadingsAction action)
+        public static WeatherState StoreWeatherReloadedReadingsActionReducer(WeatherState state, StoreWeatherReloadedReadingsAction action)
         {
             return state with
             {
@@ -57,7 +49,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
         }
 
         [ReducerMethod]
-        public static WeatherState Reduce(WeatherState state, StoreWeatherUpdatedReadingsAction action)
+        public static WeatherState StoreWeatherUpdatedReadingsActionReducer(WeatherState state, StoreWeatherUpdatedReadingsAction action)
         {
             var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
 
@@ -85,27 +77,31 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                 _weatherDataService = weatherDataService;
             }
 
-            public override async Task HandleAsync(EnsureWeatherLoadedAction loadedAction, IDispatcher dispatcher)
+            public override async Task HandleAsync(EnsureWeatherLoadedAction action, IDispatcher dispatcher)
             {
-                var daysUpdated = 0;
 
-                if (!_householdState.Value.Saved)
+                if (!_householdState.Value.Saved || _householdState.Value.Invalid)
                 {
-                    dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
-                    loadedAction.TaskCompletion?.SetResult(daysUpdated);
+                    var message = "Household not saved or invalid";
+                    dispatcher.Dispatch(new NotifyWeatherLoadingFinished(false, message));
+                    action.TaskCompletion?.SetResult((false, message));
                     return;
                 }
 
                 string outCode = _householdState.Value.OutCodeCharacters;
 
 
-                if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || loadedAction.ForceReload)
+                if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || action.ForceReload)
                 {
 
                     var results = await _weatherDataService.GetForOutCode(outCode);
 
                     dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode));
-                    daysUpdated = results.Count;
+
+                    var message = $"Loaded {results.Count} days of weather data for {outCode}";
+                    dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
+                    action.TaskCompletion?.SetResult((true, message));
+                    return;
                 }
                 else
                 {
@@ -120,14 +116,28 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
 
                         var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
 
-                        daysUpdated = results.Count;
+                        if (results.Count == 0)
+                        {
+                            var noNewDataMessage = $"No new weather data available for {outCode}";
+                            dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noNewDataMessage));
+                            action.TaskCompletion?.SetResult((true, noNewDataMessage));
+                            return;
+                        }
 
                         dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results));
+
+                        var message = $"Updated {results.Count} new days of weather data for {outCode}";
+                        dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
+                        action.TaskCompletion?.SetResult((true, message));
+
+                        return;
+
                     }
                 }
 
-                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(daysUpdated));
-                loadedAction.TaskCompletion?.SetResult(daysUpdated);
+                var noUpdateNeededMessage = $"Weather Data already up-to-date for {outCode}";
+                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noUpdateNeededMessage));
+                action.TaskCompletion?.SetResult((true, noUpdateNeededMessage));
             }
 
         }

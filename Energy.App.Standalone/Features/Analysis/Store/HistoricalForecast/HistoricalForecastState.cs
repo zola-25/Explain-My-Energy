@@ -1,9 +1,9 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast
 {
@@ -11,6 +11,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast
     [PersistState]
     public record HistoricalForecastState
     {
+        [property: JsonIgnore]
         public ImmutableList<DailyCostedReading> this[MeterType meterType]
         {
             get

@@ -5,8 +5,8 @@ using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.EnergyReadings
 {
-    public interface IEnergyUpdateMethodService
+    public interface IEnergyImportValidation
     {
-        Task<UpdateMethod> GetUpdateMethod(MeterState meterSetup, bool forceReload, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
+        EnergyImportValidationResult Validate(MeterState meterSetup, bool forceReload, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
     }
 }

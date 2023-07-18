@@ -1,30 +1,31 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-<MudPaper Class="p-3" Elevation="0">
-    <MudText Typo="Typo.h5">Meter Setup</MudText>
+<MudPaper Class="m-3 " Elevation="0">
+    <MudText Class="fw-bolder" Typo="Typo.h5">Meter Setup</MudText>
 </MudPaper>
+
 
 <MudOverlay @bind-Visible="Reloading" DarkBackground="true" ZIndex="9">
 
-    <MudText Typo="Typo.h4">Reloading Gas Readings</MudText>
+    <MudText Typo="Typo.h4">Reloading Energy Readings</MudText>
     <div class="spinner"></div>
 
 </MudOverlay>
 
-<MudTable Items="@_meterStatusList.Values" Breakpoint="Breakpoint.Sm">
+<MudTable Items="@_meterStatusList.Values" Breakpoint="Breakpoint.Sm" Elevation="0">
     <HeaderContent>
-        <MudTh>Type</MudTh>
-        <MudTh>Add / Remove </MudTh>
-        <MudTh>MPAN / MPRN</MudTh>
-        <MudTh>Authorized</MudTh>
-        <MudTh>Energy Readings</MudTh>
-        <MudTh>Manual Update Readings</MudTh>
-        <MudTh>Current Tariff</MudTh>
-        <MudTh></MudTh>
+        <MudTh Class="fw-bold">Type</MudTh>
+        <MudTh Class="fw-bold">Add / Remove </MudTh>
+        <MudTh Class="fw-bold">MPAN / MPRN</MudTh>
+        <MudTh Class="fw-bold">Authorized</MudTh>
+        <MudTh Class="fw-bold">Energy Readings</MudTh>
+        <MudTh Class="fw-bold">Manual Update Readings</MudTh>
+        <MudTh Class="fw-bold">Current Tariff</MudTh>
+        <MudTh Class="fw-bold"></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Type">@context.MeterType</MudTd>
+        <MudTd Class="fw-bold" DataLabel="Type">@context.MeterType</MudTd>
         <MudTd DataLabel="Add / Remove">
 
             @if (context.Added)

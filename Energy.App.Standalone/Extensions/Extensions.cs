@@ -213,6 +213,11 @@ public static class Extensions
         return date.eToString("ddd dnn MMM", useExtendedSpecifiers: true);
     }
 
+    public static string eDateToDowShortMonthYY(this DateTime date)
+    {
+        return date.eToString("ddd dnn MMM yy", true);
+    }
+
     public static bool eUpToDate(this DateTime? latestReading)
     {
         return latestReading.HasValue && latestReading >= DateTime.Today.AddDays(-1).Date;

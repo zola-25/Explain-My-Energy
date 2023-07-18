@@ -1,3 +1,5 @@
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
 namespace Energy.WeatherReadings.Models;
 
 public record OutCodeWeatherUpdateRanges
@@ -27,17 +29,17 @@ public record OutCodeWeatherUpdateRanges
     {
 
         DateTime utcToday = UtcToday;
-        DateTime utcTwoMonthsAgo = utcToday.AddDays(-60);
-        DateTime oneYearAgo = utcToday.AddYears(-1);
+        DateTime utcTwoMonthsAgo = utcToday.AddDays(-60).Date;
+        DateTime oneYearAnd30DaysAgo = utcToday.AddYears(-1).AddDays(-30).Date;
 
         if (!HasAnyReadings)
         {
-            return (oneYearAgo, utcTwoMonthsAgo, true);
+            return (oneYearAnd30DaysAgo, utcTwoMonthsAgo, true);
         }
 
         if (!LatestHistoricalUtc.HasValue) // no historical values? Make them until the last two months
         {
-            return (oneYearAgo, utcTwoMonthsAgo, true);
+            return (oneYearAnd30DaysAgo, utcTwoMonthsAgo, true);
         }
 
         if (LatestHistoricalUtc < utcTwoMonthsAgo)

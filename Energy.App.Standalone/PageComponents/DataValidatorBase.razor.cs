@@ -47,46 +47,48 @@ namespace Energy.App.Standalone.PageComponents
 
             SubscribeToAction<NotifyWeatherLoadingFinished>((action) =>
             {
-                if (action.DaysUpdated > 0)
-                {
-                    Snackbar.Add($"Weather Updated with {action.DaysUpdated} days updated)", Severity.Info);
-                }
-                else
-                {
-                    Snackbar.Add("Weather Data Ready", Severity.Info);
-                }
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
             });
 
             SubscribeToAction<NotifyGasLoadingFinished>((action) =>
             {
-                Snackbar.Add("Gas Readings Ready", Severity.Info);
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+
             });
 
             SubscribeToAction<NotifyElectricityLoadingFinished>((action) =>
             {
-                Snackbar.Add("Electricity Readings Ready", Severity.Info);
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
             });
 
-            SubscribeToAction<NotifyHeatingForecastReadyAction>((action) =>
+            SubscribeToAction<NotifyHeatingForecastUpdatedAction>((action) =>
             {
-                Snackbar.Add("Weather-dependent Forecast Ready", Severity.Info);
+                Snackbar.Add("Temperature-Consumption Forecast Ready", Severity.Info);
+            });
+            SubscribeToAction<NotifyElectricityForecastResult>((action) =>
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+            });
+            SubscribeToAction<NotifyGasForecastResult>((action) =>
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
             });
 
-            var weatherReadingCompletion = new TaskCompletionSource<int>();
+            var weatherReadingCompletion = new TaskCompletionSource<(bool, string)>();
             Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
 
             UpdateStatus = "Loading energy readings...";
             await Task.Delay(1);
-            StateHasChanged(); 
+            StateHasChanged();
 
-            var gasReadingsCompletion = new TaskCompletionSource<int>();
+            var gasReadingsCompletion = new TaskCompletionSource<(bool, string)>();
 
             Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
 
-            var electricityReadingsCompletion = new TaskCompletionSource<int>();
+            var electricityReadingsCompletion = new TaskCompletionSource<(bool, string)>();
             Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityReadingsCompletion));
 
-            
+
 
             var electricityForecastCompletion = new TaskCompletionSource<(bool, string)>();
             Dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(false, electricityForecastCompletion));
@@ -95,7 +97,7 @@ namespace Energy.App.Standalone.PageComponents
             Dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(false, gasForecastCompletion));
 
 
-            var heatingForecastCompletion = new TaskCompletionSource<bool>();
+            var heatingForecastCompletion = new TaskCompletionSource<(bool, string)>();
             Dispatcher.Dispatch
             (
                 new EnsureCoeffsAndHeatingForecastLoaded
@@ -105,7 +107,7 @@ namespace Energy.App.Standalone.PageComponents
                 )
             );
 
-            await Task.WhenAll (weatherReadingCompletion.Task,
+            await Task.WhenAll(weatherReadingCompletion.Task,
              gasReadingsCompletion.Task,
              electricityReadingsCompletion.Task,
              electricityForecastCompletion.Task,
@@ -113,7 +115,7 @@ namespace Energy.App.Standalone.PageComponents
              heatingForecastCompletion.Task);
 
             await Task.Delay(1);
-            StateHasChanged(); 
+            StateHasChanged();
             UpdateStatus = "Ready";
 
             AppLoading = false;

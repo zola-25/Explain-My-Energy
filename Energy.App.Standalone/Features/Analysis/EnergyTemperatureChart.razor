@@ -63,7 +63,7 @@
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        SubscribeToAction<NotifyHeatingForecastReadyAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
+        SubscribeToAction<NotifyHeatingForecastUpdatedAction>(a => OnDegreeDifferenceHandler(a.DegreeDifference));
         _ready = true;
     }
 

@@ -7,16 +7,14 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
     public class NotifyGasLoadingFinished
     {
         
-        public bool Updated { get; }
-        public string Error { get; }
+        public string Message { get; }
+        public bool Success { get; }
 
-        public NotifyGasLoadingFinished(bool updated, string error = null)
+        public NotifyGasLoadingFinished(bool success, string message = null)
         {
-            Updated = updated;
-            Error = error;
+            Success = success;
+            Message = message;
         }
-
-        
     }
 
 }

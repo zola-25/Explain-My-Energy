@@ -8,12 +8,12 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
     public class ForecastGenerator : IForecastGenerator
     {
         public List<BasicReading> GetBasicReadingsForecast(decimal degreeDifference,
-            HeatingForecastState linearCoefficientsState,
+            Coefficients coefficients,
             List<DailyWeatherRecord> forecastWeatherReadings)
         {
             var adjustedReadings = forecastWeatherReadings
                 .SelectMany(c => {
-                    decimal adjustedKWh = linearCoefficientsState.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
+                    decimal adjustedKWh = coefficients.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
                     adjustedKWh = adjustedKWh < 0 ? 0 : adjustedKWh;
                     return Enumerable.Range(0, 48).Select(i => new BasicReading
                         {

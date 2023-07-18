@@ -14,16 +14,11 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         [property: JsonIgnore] 
         public bool Loading { get; init; }
 
-
-        
         public ImmutableList<BasicReading> BasicReadings { get; init; }
 
         [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
         public DateTime LastUpdated { get; init; }
-
-
-        public string CalculationError { get; init; }
 
         public GasReadingsState()
         {
@@ -31,12 +26,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
             CostedReadings = ImmutableList<CostedReading>.Empty;
             BasicReadings = ImmutableList<BasicReading>.Empty;
             LastUpdated = DateTime.MinValue;
-
-            CalculationError = null;
-
         }
-
     }
-
-
 }

@@ -18,9 +18,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                 CostedReadings = ImmutableList<CostedReading>.Empty,
                 BasicReadings = ImmutableList<BasicReading>.Empty,
                 Loading = false,
-                LastUpdated = DateTime.MinValue,
-                CalculationError = String.Empty
-
+                BasicReadingLastUpdated = DateTime.MinValue,
             };
         }}
 

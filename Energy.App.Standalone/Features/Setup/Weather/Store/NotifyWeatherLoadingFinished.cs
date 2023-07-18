@@ -2,11 +2,13 @@
 {
     public class NotifyWeatherLoadingFinished
     {
-        public int DaysUpdated { get; }
+        public string Message { get; }
+        public bool Success { get; }
 
-        public NotifyWeatherLoadingFinished(int daysUpdated)
+        public NotifyWeatherLoadingFinished(bool success, string message)
         {
-            DaysUpdated = daysUpdated;
+            Success = success;
+            Message = message;
         }
     }
 }

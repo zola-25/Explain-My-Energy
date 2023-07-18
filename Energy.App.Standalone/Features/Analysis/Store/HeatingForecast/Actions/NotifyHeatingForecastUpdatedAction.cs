@@ -1,12 +1,11 @@
 ﻿using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
-
-public class NotifyHeatingForecastReadyAction
+public class NotifyHeatingForecastUpdatedAction
 {
     public decimal DegreeDifference { get; }
 
-    public NotifyHeatingForecastReadyAction(decimal degreeDifference = 0)
+    public NotifyHeatingForecastUpdatedAction(decimal degreeDifference = 0)
     {
         DegreeDifference = degreeDifference;
     }

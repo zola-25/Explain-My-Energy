@@ -1,4 +1,5 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+﻿using Energy.App.Standalone.Data;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 using MathNet.Numerics;
@@ -16,7 +17,7 @@ internal class ForecastCoefficientsCreator : IForecastCoefficientsCreator
         var dailyConsumptionPoints =
                 (from er in basicReadings
                  group new { Readings = er } by er.UtcTime.Date
-                    into daily
+                    into daily where daily.Count() == 48
                  join wr in dailyWeatherReadings on daily.Key equals wr.UtcTime
                  select new DailyConsumptionPoint
                  {
@@ -39,9 +40,8 @@ internal class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 
     private List<DailyConsumptionPoint> GetOctAprilDailyData(ICollection<DailyConsumptionPoint> dailyConsumptionPoints)
     {
-        List<int> winterMonths = new List<int>() { 1, 2, 3, 4, 10, 11, 12 };
         var winterData = dailyConsumptionPoints
-            .Where(c => winterMonths.Contains(c.Date.Month)).ToList();
+            .Where(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.Date.Month)).ToList();
 
         return winterData;
     }

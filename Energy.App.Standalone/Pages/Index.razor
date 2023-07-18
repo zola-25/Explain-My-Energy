@@ -6,6 +6,8 @@
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
+            <MudText Typo="Typo.h5" Class="m-4 fw-bolder">Setup Status</MudText>
+
             <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@HouseholdSeverity">@HouseholdStatus</MudAlert>
             <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@ElectricitySeverity">@ElectricityStatus</MudAlert>
             <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@GasSeverity">@GasStatus</MudAlert>

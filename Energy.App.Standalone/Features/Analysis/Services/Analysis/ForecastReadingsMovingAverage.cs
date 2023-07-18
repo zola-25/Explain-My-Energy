@@ -1,4 +1,5 @@
-﻿using Energy.App.Standalone.Extensions;
+﻿using Energy.App.Standalone.Data;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
@@ -20,9 +21,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
             _costedReadingsToDailyAggregator = costedReadingsToDailyAggregator;
         }
 
-        public ImmutableList<DailyCostedReading> GetDailyCostedReadings(
-                       ImmutableList<BasicReading> historicalReadings,
-                                  ImmutableList<TariffDetailState> meterTariffs)
+        public ImmutableList<DailyCostedReading> GetDailyCostedReadings(ImmutableList<BasicReading> historicalReadings,
+                                                                        ImmutableList<TariffDetailState> meterTariffs)
         {
             var costedReadings = GetCostedReadings(historicalReadings, meterTariffs);
             var dailyCostedReadings = _costedReadingsToDailyAggregator.Aggregate(costedReadings);
@@ -34,24 +34,21 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                 ImmutableList<TariffDetailState> meterTariffs)
         {
 
-            var predictionStartDate = DateTime.UtcNow.Date.AddMonths(-2);
-            var predictionEndDate = DateTime.UtcNow.Date.AddMonths(6);
-
-            var predictionDates = predictionStartDate.eGenerateAllDatesBetween(predictionEndDate, true);
+            var predictionDates = AppWideForecastProperties.PredictionDates(historicalReadings.Last().UtcTime);
 
             var movingAverages = GetMovingAverageHistoricalReadings(historicalReadings);
-                
+
             var forecastReadings = (
-                                   from pred in predictionDates 
-                                   join hist in movingAverages 
+                                   from pred in predictionDates
+                                   join hist in movingAverages
                                         on pred.DayOfYear equals hist.UtcTime.DayOfYear
-                                    select new BasicReading
-                                      {
-                                        Forecast = true,
-                                        KWh = hist.KWh,
-                                        UtcTime = pred
-                                      }).ToList();
-                
+                                   select new BasicReading
+                                   {
+                                       Forecast = true,
+                                       KWh = hist.KWh,
+                                       UtcTime = pred
+                                   }).ToList();
+
 
 
             var costedReadings = _costCalculator
@@ -61,25 +58,26 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 
         private IEnumerable<BasicReading> GetMovingAverageHistoricalReadings(ImmutableList<BasicReading> historicalReadings)
         {
-            var latestReadingDate = historicalReadings.Last().UtcTime.Date;
+            var latestReadingDate = historicalReadings.Last().UtcTime;
 
-            var startHistoricalReadingsDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (-365 - 30)).Date;
-            var endHistoricalReadingDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (- 30)).Date;
+            var dayWindowSize = AppWideForecastProperties.MovingAverageWindowSizeDays;
+            var hhWindowSize = AppWideForecastProperties.MovingAverageWindowSizeHalfHours;
 
-            var applicableHistoricalReadings = historicalReadings
-                .SkipWhile(c=> c.UtcTime.Hour != 0 && c.UtcTime.Minute != 0)
-                .Where(x => x.UtcTime >= startHistoricalReadingsDate && x.UtcTime <= endHistoricalReadingDate)
+            var minMovingAverageDate = latestReadingDate.AddYears(-1).AddTicks(TimeSpan.TicksPerDay * (-dayWindowSize)).Date;
+            var maxMovingAverageDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (-dayWindowSize)).Date;
+
+            var movingAverageInputReadings = historicalReadings
+                .SkipWhile(c => c.UtcTime < minMovingAverageDate)
+                .Where(x => x.UtcTime < maxMovingAverageDate)
                 .ToArray();
-                
-            var startMovingStatsDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * -365).Date;
-            var firstWindow = applicableHistoricalReadings.Take(48 * 30).Select(c=>(double)c.KWh).ToList();
-            var movingStats = new MovingStatistics(48 * 30, firstWindow);
 
+            var firstWindowReadings = movingAverageInputReadings[..hhWindowSize].Select(c => (double)c.KWh);
+            var movingStats = new MovingStatistics(hhWindowSize, firstWindowReadings);
+            var movingAverageIterateArray = movingAverageInputReadings[hhWindowSize..];
 
-            for (int i = (48 * 30); i < applicableHistoricalReadings.Length; i++)
+            for (int i = 0; i < movingAverageIterateArray.Length; i++)
             {
-                
-                var historicalReading = applicableHistoricalReadings[i];
+                var historicalReading = movingAverageIterateArray[i];
                 var movingAverage = movingStats.Mean;
 
                 yield return new BasicReading
@@ -89,9 +87,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                     Forecast = true
                 };
                 movingStats.Push((double)historicalReading.KWh);
-
-
             }
+
         }
     }
 }

@@ -139,7 +139,7 @@ else
                 throw new ArgumentOutOfRangeException();
 
         }
-        SubscribeToAction<NotifyHeatingForecastReadyAction>(action =>
+        SubscribeToAction<NotifyHeatingForecastUpdatedAction>(action =>
             {
                 _degreeDifference = action.DegreeDifference;
                 SetForecastAnalyses();

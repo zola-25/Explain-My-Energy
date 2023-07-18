@@ -36,14 +36,14 @@
                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
                 {
                     <MudTooltip Text="Up to date">
-                        @latestReading.eToString("ddd dnn MMM yy", true)
+                        @latestReading.eDateToDowShortMonthYY()
                         <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon>
                     </MudTooltip>
                 }
                 else
                 {
                     <MudTooltip Text="Missing Latest Weather Data">
-                        @latestReading.eToString("ddd dnn MMM yy", true)
+                        @latestReading.eDateToDowShortMonthYY()
                         <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Default"></MudIcon>
                     </MudTooltip>
                 }
@@ -54,7 +54,7 @@
                         OrderBy(c => c.UtcTime).
                         ToList();
                 }
-                @forecastReadings.First().UtcTime.eDateToMinimal() - @forecastReadings.Last().UtcTime.eDateToMinimal()
+                @forecastReadings.First().UtcTime.eDateToDowShortMonthYY() - @forecastReadings.Last().UtcTime.eDateToDowShortMonthYY()
             </MudTd>
             <MudTd DataLabel="Long-term">
                 @{
@@ -62,7 +62,7 @@
                         OrderBy(c => c.UtcTime).
                         ToList();
                 }
-                @climateReadings.First().UtcTime.eDateToMinimal() - @climateReadings.Last().UtcTime.eDateToMinimal()
+                @climateReadings.First().UtcTime.eToString("dnn MMM yy", true) - @climateReadings.Last().UtcTime.eToString("dnn MMM yy", true)
 
             </MudTd>
         }

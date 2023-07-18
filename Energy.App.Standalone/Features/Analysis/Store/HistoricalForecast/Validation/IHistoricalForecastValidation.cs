@@ -7,11 +7,10 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Valid
 {
     public interface IHistoricalForecastValidation
     {
-        bool Validate(MeterState meterSetup,
+        HistoricalForecastValidationResult Validate(MeterState meterSetup,
                       bool forceRefresh,
                       DateTime lastUpdate,
                       ImmutableList<BasicReading> existingHistoricalReadings,
-                      ImmutableList<DailyCostedReading> existingForecastReadings,
-                      TaskCompletionSource<(bool, string)> taskCompletionSource);
+                      ImmutableList<DailyCostedReading> existingForecastReadings);
     }
 }

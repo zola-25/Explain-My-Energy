@@ -54,7 +54,7 @@ builder.Services.AddTransient<ICostedReadingsToDailyAggregator, CostedReadingsTo
 builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMovingAverage>();
 builder.Services.AddTransient<IHistoricalForecastValidation,HistoricalForecastValidation>();
 
-builder.Services.AddTransient<IEnergyUpdateMethodService, EnergyUpdateMethodService>();   
+builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();   
 
 //builder.Services.AddTransient<IWeatherDataWorkerService, WeatherDataWorkerService>();
 builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
