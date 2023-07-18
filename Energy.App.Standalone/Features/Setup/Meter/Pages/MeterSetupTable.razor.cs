@@ -187,7 +187,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
         protected async void DispatchUpdateReadings(MeterType meterType)
         {
-            var updateCompletion = new TaskCompletionSource<int>();
+            var updateCompletion = new TaskCompletionSource<(bool,string)>();
             Reloading = true;
             switch (meterType)
             {
@@ -211,7 +211,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Pages
 
         protected async void DispatchReloadReadings(MeterType meterType)
         {
-            var reloadCompletion = new TaskCompletionSource<int>();
+            var reloadCompletion = new TaskCompletionSource<(bool,string)>();
             Reloading = true;
 
             switch (meterType)

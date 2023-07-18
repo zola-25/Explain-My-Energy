@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
-internal class ForecastCoefficientsCreator : IForecastCoefficientsCreator
+public class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 {
     public (decimal C, decimal Gradient) GetForecastCoefficients(
         IEnumerable<BasicReading> basicReadings,
@@ -33,9 +33,9 @@ internal class ForecastCoefficientsCreator : IForecastCoefficientsCreator
         double[] x = winterData.Select(c => c.TemperatureCelsius).ToArray();
         double[] yConsumption = winterData.Select(c => c.ConsumptionKWh).ToArray();
 
-        var consumptionFit = Fit.Line(x, yConsumption);
+        var (A, B) = Fit.Line(x, yConsumption);
 
-        return (C: (decimal)consumptionFit.A, Gradient: (decimal)consumptionFit.B);
+        return (C: (decimal)A, Gradient: (decimal)B);
     }
 
     private List<DailyConsumptionPoint> GetOctAprilDailyData(ICollection<DailyConsumptionPoint> dailyConsumptionPoints)

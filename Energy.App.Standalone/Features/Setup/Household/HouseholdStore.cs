@@ -51,6 +51,7 @@ namespace Energy.App.Standalone.Features.Setup.Household
 
     public class NotifyHouseholdUpdatedAction
     {
+
     }
 
 
@@ -81,8 +82,8 @@ namespace Energy.App.Standalone.Features.Setup.Household
     public class HouseholdEffects
     {
 
-        [EffectMethod(typeof(HouseholdSubmitSuccessAction))]
-        public async Task NotifyHouseholdReady(IDispatcher dispatcher)
+        [EffectMethod]
+        public async Task NotifyHouseholdReady(HouseholdSubmitSuccessAction action, IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new NotifyHouseholdUpdatedAction());
         }

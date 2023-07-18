@@ -1,6 +1,4 @@
-﻿
-
-@inherits FluxorComponent
+﻿@inherits FluxorComponent
 @inject IState<WeatherState> WeatherState
 @inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
@@ -71,22 +69,6 @@
 
 
 @code {
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-
-        SubscribeToAction<NotifyHouseholdUpdatedAction>(LoadWeatherData);
-    }
-
-    private async void LoadWeatherData(NotifyHouseholdUpdatedAction _)
-    {
-        if (HouseholdState.Value.Saved 
-            && HouseholdState.Value.OutCodeCharacters != WeatherState.Value.OutCodeCharacters)
-        {
-            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(true));
-        }
-    }
 
 
 }

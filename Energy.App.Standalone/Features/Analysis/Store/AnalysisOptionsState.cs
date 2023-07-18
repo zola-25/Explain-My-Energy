@@ -285,8 +285,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         }
 
-        [ReducerMethod]
-        public static AnalysisOptionsState OnGasRemoveHighlightRangeReducer(AnalysisOptionsState analysisOptionsState, GasAnalysisOptionsRemoveHighlightRangeAction removeHighlightRangeAction)
+        [ReducerMethod(typeof(GasAnalysisOptionsRemoveHighlightRangeAction))]
+        public static AnalysisOptionsState OnGasRemoveHighlightRangeReducer(AnalysisOptionsState analysisOptionsState)
         {
             var meterState = analysisOptionsState.Gas;
             return analysisOptionsState with
@@ -348,8 +348,8 @@ namespace Energy.App.Standalone.Features.Analysis.Store
 
         }
 
-        [ReducerMethod]
-        public static AnalysisOptionsState OnElectricityRemoveHighlightRangeReducer(AnalysisOptionsState analysisOptionsState, ElectricityAnalysisOptionsRemoveHighlightRangeAction removeHighlightRangeAction)
+        [ReducerMethod(typeof(ElectricityAnalysisOptionsRemoveHighlightRangeAction))]
+        public static AnalysisOptionsState OnElectricityRemoveHighlightRangeReducer(AnalysisOptionsState analysisOptionsState)
         {
             var meterState = analysisOptionsState.Electricity;
             return analysisOptionsState with

@@ -26,8 +26,8 @@ namespace Energy.App.Standalone.Data
             return days;
         }
 
-        public static int ForecastFromDays = -60;
-        public static int ForecastFutureDays = 180;
+        public static readonly int ForecastFromDays = -60;
+        public static readonly int ForecastFutureDays = 180;
 
         public static DateTime PredictionStartDate(DateTime latestReadingDate)
         {
@@ -46,8 +46,8 @@ namespace Energy.App.Standalone.Data
             return startDate.eGenerateAllDatesBetween(endDate, true);
         }
 
-        public static int MovingAverageWindowSizeDays = 30;
-        public static int MovingAverageWindowSizeHalfHours = 48 * MovingAverageWindowSizeDays;
+        public static readonly int MovingAverageWindowSizeDays = 30;
+        public static readonly int MovingAverageWindowSizeHalfHours = 48 * MovingAverageWindowSizeDays;
 
     }
 }

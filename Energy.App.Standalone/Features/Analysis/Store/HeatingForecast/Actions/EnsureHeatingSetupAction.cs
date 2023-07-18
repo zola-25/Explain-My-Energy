@@ -19,7 +19,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
         public bool ForceReloadCoefficients { get; }
 
         public bool ForceReloadHeatingForecast { get; }
-        
+
         public EnsureHeatingSetupAction(bool forceReloadHeatingForecast, bool forceReloadCoefficients, TaskCompletionSource<(bool success, string message)> completion = null)
         {
             Completion = completion;
@@ -66,7 +66,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
             private readonly IState<HeatingForecastState> _heatingForecastState;
             private readonly IState<AnalysisOptionsState> _analysisOptionsState;
             private readonly IState<MeterSetupState> _meterSetupState;
-            private readonly IState<HeatingForecastState> _state;
             private readonly IState<GasReadingsState> _gasReadingsState;
             private readonly IState<ElectricityReadingsState> _electricityReadingsState;
             private readonly IForecastCoefficientsCreator _forecastCoefficientsCreator;
@@ -77,7 +76,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
                                                   IState<HeatingForecastState> heatingForecastState,
                                                   IState<AnalysisOptionsState> analysisOptionsState,
                                                   IState<MeterSetupState> meterSetupState,
-                                                  IState<HeatingForecastState> state,
                                                   IState<GasReadingsState> gasReadingsState,
                                                   IState<ElectricityReadingsState> electricityReadingsState,
                                                   IForecastCoefficientsCreator forecastCoefficientsCreator,
@@ -88,7 +86,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
                 _heatingForecastState = heatingForecastState;
                 _analysisOptionsState = analysisOptionsState;
                 _meterSetupState = meterSetupState;
-                _state = state;
                 _gasReadingsState = gasReadingsState;
                 _electricityReadingsState = electricityReadingsState;
                 _forecastCoefficientsCreator = forecastCoefficientsCreator;
@@ -97,120 +94,154 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
 
             public override async Task HandleAsync(EnsureHeatingSetupAction action, IDispatcher dispatcher)
             {
-                var heatingMeterType = _householdState.Value.PrimaryHeatSource;
-                var meterSetup = _meterSetupState.Value[heatingMeterType];
-                if (!meterSetup.SetupValid)
+                try
                 {
-                    string meterNotSetupMessage = $"Heating Forecast Setup: Cannot load heating forecast for {heatingMeterType} Meter as it is not setup";
-                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, meterNotSetupMessage));
-                    action.Completion?.SetResult((false, meterNotSetupMessage));
-                    return;
-                }
+                    var heatingMeterType = _householdState.Value.PrimaryHeatSource;
+                    var meterSetup = _meterSetupState.Value[heatingMeterType];
+                    if (!meterSetup.SetupValid)
+                    {
+                        string meterNotSetupMessage = $"Heating Forecast Setup: Cannot load heating forecast for {heatingMeterType} Meter as it is not setup";
+                        dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, meterNotSetupMessage));
+                        action.Completion?.SetResult((false, meterNotSetupMessage));
+                        return;
+                    }
 
-                if (meterSetup.TariffDetails.eIsNullOrEmpty())
-                {
-                    string noTariffsMessage = $"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter as tariff details are not setup";
-                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noTariffsMessage));
-                    action.Completion?.SetResult((false, noTariffsMessage));
-                    return;
-                }
+                    if (meterSetup.TariffDetails.eIsNullOrEmpty())
+                    {
+                        string noTariffsMessage = $"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter as tariff details are not setup";
+                        dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noTariffsMessage));
+                        action.Completion?.SetResult((false, noTariffsMessage));
+                        return;
+                    }
 
-                
 
-                var basicReadings = heatingMeterType switch
-                {
-                    MeterType.Gas => _gasReadingsState.Value.BasicReadings,
-                    MeterType.Electricity => _electricityReadingsState.Value.BasicReadings,
-                    _ => throw new NotImplementedException()
-                };
 
-                var latestReadingDate = basicReadings.Last().UtcTime;
+                    var basicReadings = heatingMeterType switch
+                    {
+                        MeterType.Gas => _gasReadingsState.Value.BasicReadings,
+                        MeterType.Electricity => _electricityReadingsState.Value.BasicReadings,
+                        _ => throw new NotImplementedException()
+                    };
 
-                var weatherReadings = _weatherState.Value.WeatherReadings;
-                var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(DateTime.UtcNow);
-                int forgiveMissingDays = 10;
+                    var latestReadingDate = basicReadings.Last().UtcTime;
 
-                if (weatherReadings.eIsNullOrEmpty()
-                    || weatherReadings.Count(c => c.UtcTime <= DateTime.UtcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < numLowTempDays - forgiveMissingDays)
-                {
-                    string noSeasonalWeatherMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
+                    var weatherReadings = _weatherState.Value.WeatherReadings;
+                    var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(DateTime.UtcNow);
+                    int forgiveMissingDays = 10;
+
+                    if (weatherReadings.eIsNullOrEmpty()
+                        || weatherReadings.Count(c => c.UtcTime <= DateTime.UtcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < numLowTempDays - forgiveMissingDays)
+                    {
+                        string noSeasonalWeatherMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season historical weather readings";
 
-                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noSeasonalWeatherMessage));
+                        dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noSeasonalWeatherMessage));
 
-                    action.Completion?.SetResult((false, noSeasonalWeatherMessage));
-                    return;
-                }
+                        action.Completion?.SetResult((false, noSeasonalWeatherMessage));
+                        return;
+                    }
 
-                if (basicReadings.eIsNullOrEmpty())
-                {
-                    string noReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
+                    if (basicReadings.eIsNullOrEmpty())
+                    {
+                        string noReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are no {heatingMeterType} readings";
 
-                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noReadingsMessage));
+                        dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noReadingsMessage));
 
-                    action.Completion?.SetResult((false, noReadingsMessage));
-                    return;
-                }
+                        action.Completion?.SetResult((false, noReadingsMessage));
+                        return;
+                    }
 
-                if(basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
-                {
-                    string noSeasonalEnergyReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
+                    if (basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
+                    {
+                        string noSeasonalEnergyReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season {heatingMeterType} readings";
 
-                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noSeasonalEnergyReadingsMessage));
+                        dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, noSeasonalEnergyReadingsMessage));
 
-                    action.Completion?.SetResult((false, noSeasonalEnergyReadingsMessage));
-                    return;
+                        action.Completion?.SetResult((false, noSeasonalEnergyReadingsMessage));
+                        return;
+                    }
+
+
+                    var heatingForecastState = _heatingForecastState.Value;
+                    var timeElapsedSinceLatestCoeffReading = latestReadingDate - heatingForecastState.CoefficientsUpdatedWithReadingDate;
+
+                    bool reloadedCoefficients = false;
+
+                    if (!heatingForecastState.SavedCoefficients
+                        || heatingForecastState.HeatingMeterType != heatingMeterType
+                        || timeElapsedSinceLatestCoeffReading.TotalDays >= 7
+
+                        || action.ForceReloadCoefficients)
+                    {
+                        var (C, Gradient) = _forecastCoefficientsCreator.GetForecastCoefficients(basicReadings, weatherReadings);
+
+                        dispatcher.Dispatch(new StoreCoefficientsAction(Gradient, C, heatingMeterType, latestReadingDate));
+
+                        reloadedCoefficients = true;
+                    }
+
+                    decimal degreeDifference = _analysisOptionsState?.Value?[heatingMeterType]?.DegreeDifference ?? 0;
+
+                    var loadHeatingCompletion = new TaskCompletionSource<(bool success, string message)>();
+
+                    if (reloadedCoefficients
+                        || action.ForceReloadHeatingForecast
+                        || heatingForecastState.ForecastWeatherReadings.eIsNullOrEmpty()
+                        || heatingForecastState.ForecastDailyCosts.eIsNullOrEmpty()
+                        || heatingForecastState.ForecastsUpdatedWithReadingDate < DateTime.UtcNow.Date.AddDays(-1))
+                    {
+                        dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference, loadHeatingCompletion));
+                    }
+                    else
+                    {
+                        string heatingForecastAlreadyLoadedMessage =
+                            $"Heating Forecast: Using cached heating forecast for {heatingMeterType} Meter";
+                        loadHeatingCompletion.SetResult((true, heatingForecastAlreadyLoadedMessage));
+                    }
+                    var (loadingSuccess, loadingResultMessage) = await loadHeatingCompletion.Task;
+
+                    string heatingForecastSetupMessage = reloadedCoefficients ? $"Heating Forecast Setup: new Temperature-Consumption relationship analysed"
+                            : $"Heating Forecast Setup: Using cached Temperature-Consumption relationship";
+
+                    string finalResultMessage = $"{heatingForecastSetupMessage}{Environment.NewLine}{loadingResultMessage}";
+
+                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(loadingSuccess, finalResultMessage));
+
+                    action.Completion?.SetResult((loadingSuccess, finalResultMessage));
                 }
-
-
-                var heatingForecastState = _heatingForecastState.Value;
-                var timeElapsedSinceLatestCoeffReading = latestReadingDate - heatingForecastState.CoefficientsUpdatedWithReadingDate;
-
-                bool reloadedCoefficients = false;
-
-                if (!heatingForecastState.SavedCoefficients
-                    || heatingForecastState.HeatingMeterType != heatingMeterType
-                    || timeElapsedSinceLatestCoeffReading.TotalDays >= 7
-
-                    || action.ForceReloadCoefficients)
+                catch (Exception ex)
                 {
-                    var (C, Gradient) = _forecastCoefficientsCreator.GetForecastCoefficients(basicReadings, weatherReadings);
-                    
-                    dispatcher.Dispatch(new StoreCoefficientsAction(C, Gradient, heatingMeterType, latestReadingDate));
-                    
-                    reloadedCoefficients = true;
+                    _logger.LogError(ex, "Error in EnsureHeatingSetupActionEffect");
+
+                    var message = "Error in EnsureHeatingSetupActionEffect";
+                    dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(false, message));
+                    action.Completion?.SetResult((false, message));
+
                 }
+            }
+        }
 
-                decimal degreeDifference = _analysisOptionsState?.Value?[heatingMeterType]?.DegreeDifference ?? 0;
-                    
-                var loadHeatingCompletion = new TaskCompletionSource<(bool success, string message)>();
+        private class NotifyHouseholdUpdatedEffect : Effect<NotifyHouseholdUpdatedAction>
+        {
+            IState<HouseholdState> _householdState;
+            IState<HeatingForecastState> _heatingForecastState;
 
-                if (reloadedCoefficients 
-                    || action.ForceReloadHeatingForecast
-                    || heatingForecastState.ForecastWeatherReadings.eIsNullOrEmpty()
-                    || heatingForecastState.ForecastDailyCosts.eIsNullOrEmpty()
-                    || heatingForecastState.ForecastsUpdatedWithReadingDate < DateTime.UtcNow.Date.AddDays(-1))
+            public NotifyHouseholdUpdatedEffect(IState<HouseholdState> householdState,
+                                                IState<HeatingForecastState> heatingForecastState)
+            {
+                _householdState = householdState;
+                _heatingForecastState = heatingForecastState;
+            }
+
+            public override Task HandleAsync(NotifyHouseholdUpdatedAction action, IDispatcher dispatcher)
+            {
+                if(_householdState.Value.PrimaryHeatSource != _heatingForecastState.Value.HeatingMeterType)
                 {
-                    dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference, loadHeatingCompletion));
+                    dispatcher.Dispatch(new EnsureHeatingSetupAction(true, true));
                 }
-                else
-                {
-                    string heatingForecastAlreadyLoadedMessage = 
-                        $"Heating Forecast: Using cached heating forecast for {heatingMeterType} Meter";
-                    loadHeatingCompletion.SetResult((true, heatingForecastAlreadyLoadedMessage));
-                }
-                var (loadingSuccess, loadingResultMessage) = await loadHeatingCompletion.Task;
-                
-                string heatingForecastSetupMessage = reloadedCoefficients ? $"Heating Forecast Setup: new Temperature-Consumption relationship analysed"
-                        : $"Heating Forecast Setup: Using cached Temperature-Consumption relationship";
-                
-                string finalResultMessage = $"{heatingForecastSetupMessage}{Environment.NewLine}{loadingResultMessage}";
-                
-                dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(loadingSuccess, finalResultMessage));
-
-                action.Completion?.SetResult((loadingSuccess, finalResultMessage));
+                return Task.CompletedTask;
             }
         }
     }

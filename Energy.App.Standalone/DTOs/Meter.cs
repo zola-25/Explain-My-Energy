@@ -13,22 +13,10 @@ public class Meter : IValidatableObject
     [Required] public string Mpxn { get; set; }
 
     public bool Authorized { get; set; }
-    public bool QueueFreshImport { get; set; }
 
-    /// <summary>
-    /// Only for retrieving, do not set on client site with intention of updating DB
-    /// </summary>
-    public List<TariffDetail> TariffDetails { get; set; }
-
-    public bool HasData { get; set; }
-    public MeterHeatingType MeterHeatingType { get; internal set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (TariffDetails != null)
-        {
-            yield return new ValidationResult("Tariffs should not be set here", new[] { "TariffDetails" });
-        }
 
         switch (MeterType)
         {

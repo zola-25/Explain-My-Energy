@@ -141,5 +141,25 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
             }
 
         }
+
+        private class NotifyHouseholdUpdatedEffect : Effect<NotifyHouseholdUpdatedAction>
+        {
+            private readonly IState<HouseholdState> _householdState;
+            private readonly IState<WeatherState> _weatherState;
+
+            public NotifyHouseholdUpdatedEffect(IState<HouseholdState> householdState, IState<WeatherState> weatherState)
+            {
+                _householdState = householdState;
+                _weatherState = weatherState;
+            }
+
+            public override Task HandleAsync(NotifyHouseholdUpdatedAction action, IDispatcher dispatcher)
+            {
+                if(_householdState.Value.OutCodeCharacters != _weatherState.Value.OutCodeCharacters) {
+                    dispatcher.Dispatch(new EnsureWeatherLoadedAction(forceReload: true));
+                }
+                return Task.CompletedTask;
+            }
+        }
     }
 }

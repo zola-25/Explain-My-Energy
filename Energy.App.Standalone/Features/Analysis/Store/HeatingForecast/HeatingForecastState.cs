@@ -1,20 +1,9 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
-using MathNet.Numerics;
 using Fluxor.Persist.Storage;
-using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using System.Text.Json.Serialization;
-using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
-using Energy.App.Standalone.Features.Setup.Household;
-using Energy.App.Standalone.Features.Setup.Meter.Store;
-using Energy.App.Standalone.Features.Setup.Weather.Store;
-using Energy.App.Standalone.Features.EnergyReadings.Electricity;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 {
@@ -40,6 +29,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 
         public MeterType HeatingMeterType { get; init; }
         public DateTime LatestReadingDate { get; init; }
+        public bool LoadingCoefficients { get; init; }
 
         public HeatingForecastState()
         {
@@ -52,6 +42,7 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
             Gradient = 0;
             C = 0;
             LoadingHeatingForecast = false;
+            LoadingCoefficients = false;
             HeatingMeterType = MeterType.Gas;
         }
     }

@@ -164,6 +164,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        base.Dispose();
         await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
     }
 

@@ -94,14 +94,16 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
                 try
                 {
                     var validationResult = _energyImportValidation.Validate(meterSetup, action.ForceReload, existingBasicReadings, existingCostedReadings);
+                    string message = String.Empty;
+                    bool valid = false;
+                    bool loadForecasts = false;
+                    bool fullReloadForecasts = false;
 
                     switch (validationResult.UpdateType)
                     {
                         case UpdateType.NotValid:
-
-                            dispatcher.Dispatch(new NotifyGasLoadingFinished(false, validationResult.Message));
-                            action.TaskCompletion?.SetResult((false, validationResult.Message));
-                            return;
+                            message = validationResult.Message;
+                            break;
                         case UpdateType.Update:
                             var lastBasicReading = existingBasicReadings.Last().UtcTime;
                             var newBasicReadings = await _energyReadingService.ImportFromDate(meterType, lastBasicReading.Date);
@@ -115,19 +117,19 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                                 var newCostedReadings = CalculateCostedReadings(basicReadingsToUpdate, meterSetup.TariffDetails);
                                 dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(newBasicReadings.ToImmutableList(), newCostedReadings));
-                                dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(forceRefresh: true));
+                                
+                                fullReloadForecasts = true;
+                                message = $"{meterType} Readings: Updated {newBasicReadings.Count} readings";
 
-                                var updateMessage = $"{meterType} Readings: Updated {newBasicReadings.Count} readings";
-                                dispatcher.Dispatch(new NotifyGasLoadingFinished(true, updateMessage));
-                                action.TaskCompletion?.SetResult((true, updateMessage));
                             }
                             else
                             {
-                                var updateMessage = $"{meterType} Readings: No new readings available";
-                                dispatcher.Dispatch(new NotifyGasLoadingFinished(true, updateMessage));
-                                action.TaskCompletion?.SetResult((true, updateMessage));
+                                message = $"{meterType} Readings: No new readings available";
+                                loadForecasts = true;
+    
                             }
-                            return;
+                            valid = true;
+                            break;
 
 
                         case UpdateType.FullReload:
@@ -136,36 +138,47 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
                             var reloadedCostedReadings = CalculateCostedReadings(reloadedBasicReadings, meterSetup.TariffDetails);
 
                             dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(reloadedBasicReadings, reloadedCostedReadings));
-                            dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(forceRefresh: true));
 
-                            var reloadMessage = $"{meterType} Readings: Loaded {reloadedBasicReadings.Count} readings";
-                            dispatcher.Dispatch(new NotifyGasLoadingFinished(true, reloadMessage));
-                            action.TaskCompletion?.SetResult((true, reloadMessage));
-                            return;
+                            message = $"{meterType} Readings: Loaded {reloadedBasicReadings.Count} readings";
+                            
+                            fullReloadForecasts = true;
+                            valid = true;
+                            break;
 
                         case UpdateType.JustCosts:
 
                             var costedReadings = CalculateCostedReadings(existingBasicReadings, meterSetup.TariffDetails);
                             dispatcher.Dispatch(new GasStoreReloadedCostsOnlyAction(costedReadings));
 
-                            var costMessage = $"{meterType} Readings: Updated {costedReadings.Count} cost readings only";
-                            dispatcher.Dispatch(new NotifyGasLoadingFinished(true, costMessage));
-
-                            action.TaskCompletion?.SetResult((true, costMessage));
-                            return;
+                            message = $"{meterType} Readings: Updated {costedReadings.Count} cost readings only";
+                            valid = true;
+                            loadForecasts = true;
+                            break;
                         case UpdateType.NoUpdateNeeded:
 
-                            var noUpdateMessage = $"{meterType} Readings: Data already up to date";
+                            message = $"{meterType} Readings: Data already up to date";
 
-                            dispatcher.Dispatch(new NotifyGasLoadingFinished(true, noUpdateMessage));
-                            action.TaskCompletion?.SetResult((true, noUpdateMessage));
+                            valid = true;
+                            loadForecasts = true;
 
-                            return;
+                            break;
 
                         default:
                             throw new NotImplementedException(nameof(validationResult.UpdateType));
-
                     }
+
+
+                    if (loadForecasts || fullReloadForecasts)
+                    {
+                        var forecastCompletion = new TaskCompletionSource<(bool, string)>();
+
+                        dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(forceRefresh: fullReloadForecasts, forecastCompletion));
+                        
+                        await forecastCompletion.Task;
+                    }
+
+                    dispatcher.Dispatch(new NotifyGasLoadingFinished(valid, message));
+                    action.TaskCompletion?.SetResult((valid, message));
 
                 }
                 catch (Exception e)

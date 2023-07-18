@@ -17,12 +17,12 @@ public record OutCodeWeatherUpdateRanges
 
     public (DateTime start, DateTime end) GetNearTermForecastRange()
     {
-        return (UtcToday.AddDays(-59), UtcToday.AddDays(14));
+        return (UtcToday.AddTicks(TimeSpan.TicksPerDay * (-59)), UtcToday.AddTicks(TimeSpan.TicksPerDay * 12));
     }
 
     public (DateTime start, DateTime end) GetLongTermForecastRange()
     {
-        return (UtcToday.AddDays(15), UtcToday.AddMonths(6));
+        return (UtcToday.AddTicks(TimeSpan.TicksPerDay * 13), UtcToday.AddMonths(6));
     }
 
     public (DateTime start, DateTime end, bool update) GetHistoricalRange()

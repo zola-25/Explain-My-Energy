@@ -62,7 +62,7 @@ else
 
     private async Task LoadWeatherData()
     {
-        var completion = new TaskCompletionSource<int>();
+        var completion = new TaskCompletionSource<(bool,string)>();
         Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, completion));
         await completion.Task;
     }

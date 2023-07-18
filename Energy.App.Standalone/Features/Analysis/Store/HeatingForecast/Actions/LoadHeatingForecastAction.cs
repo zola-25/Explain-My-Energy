@@ -120,13 +120,19 @@ public class LoadHeatingForecastAction
                 dispatcher.Dispatch(new StoreHeatingForecastAction(dailyAggregatedCostedReadings, temperaturePoints, latestReadingDate));
                 dispatcher.Dispatch(new NotifyHeatingForecastUpdatedAction(degreeDifference));
                 
-                action.CompletionSource?.SetResult((true, string.Empty));
-                dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction());
+                string completionMessage = $"Heating Forecast: {dailyAggregatedCostedReadings.Count} readings updated with {degreeDifference} degree difference";
+
+                action.CompletionSource?.SetResult((true, completionMessage));
+                dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction(true, completionMessage));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading heating forecast");
-                dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction());
+
+                string errorMessage = $"Error loading heating forecast";
+                action.CompletionSource?.SetResult((false, errorMessage));
+
+                dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction(false, errorMessage));
             }
         }
     }

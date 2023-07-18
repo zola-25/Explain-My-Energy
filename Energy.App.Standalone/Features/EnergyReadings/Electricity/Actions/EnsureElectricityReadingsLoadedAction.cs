@@ -1,6 +1,7 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
@@ -168,10 +169,14 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                             throw new NotImplementedException(nameof(validationResult.UpdateType));
                     }
 
+
                     if (loadForecasts || fullReloadForecasts)
                     {
                         var forecastCompletion = new TaskCompletionSource<(bool, string)>();
+
                         dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(forceRefresh: fullReloadForecasts, forecastCompletion));
+                        
+                        
                         await forecastCompletion.Task;
                     }
 

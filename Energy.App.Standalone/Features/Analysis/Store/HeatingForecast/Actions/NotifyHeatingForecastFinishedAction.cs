@@ -1,17 +1,14 @@
 ﻿namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 
-class NotifyHeatingForecastFinishedAction
-    {
-        public NotifyHeatingForecastFinishedAction()
-        {
-        }
+public class NotifyHeatingForecastFinishedAction
+{
 
-    public NotifyHeatingForecastFinishedAction(bool v1, string v2)
+    public NotifyHeatingForecastFinishedAction(bool success, string message)
     {
-        V1 = v1;
-        V2 = v2;
+        Success = success;
+        Message = message;
     }
 
-    public bool V1 { get; }
-    public string V2 { get; }
+    public bool Success { get; }
+    public string Message { get; }
 }
