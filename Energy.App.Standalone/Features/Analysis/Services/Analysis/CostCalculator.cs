@@ -1,9 +1,9 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.Shared;
+﻿using Energy.Shared;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 
-namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
 {
 
     public class CostCalculator : ICostCalculator
@@ -76,7 +76,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
                                                                     IsFixedCostPerHour = currentTariff.IsHourOfDayFixed,
                                                                     UtcTime = basicReading.UtcTime,
                                                                     KWh = basicReading.KWh,
-                                                                    CostPounds = ((basicReading.KWh * halfHourlyPrice.PencePerKWh) + halfHourlyStandingChargePence) / 100,
+                                                                    CostPounds = (basicReading.KWh * halfHourlyPrice.PencePerKWh + halfHourlyStandingChargePence) / 100,
                                                                     IsForecast = basicReading.Forecast
                                                                 };
                 costedReadings.AddRange(calculatedReadings);
@@ -106,7 +106,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
             yield return new HalfHourOfDayPrice()
             {
                 HourOfDay = new TimeSpan(price.HourOfDay.Value.Hours, 30, 0),
-                PencePerKWh = price.PencePerKWh 
+                PencePerKWh = price.PencePerKWh
             };
         }
         private record HalfHourOfDayPrice
@@ -201,7 +201,7 @@ namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading
         //    else
         //        throw new ArgumentException("No tariff found");
 
-        
+
     }
 
 

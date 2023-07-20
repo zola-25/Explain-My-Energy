@@ -5,18 +5,17 @@ using MathNet.Numerics;
 using Fluxor;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
-public class TempForecastAnalyzer : ITempForecastAnalyzer
+public class TempForecastSummarizer : ITempForecastSummarizer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
     private readonly IState<HeatingForecastState> _heatingForecastState;
     private readonly IState<HistoricalForecastState> _historicalForecastState;
 
-    public TempForecastAnalyzer(Co2ConversionFactors co2Conversion,
+    public TempForecastSummarizer(Co2ConversionFactors co2Conversion,
         ITermDateRanges periodDateRanges,
         IState<HeatingForecastState> heatingForecastState,
         IState<HistoricalForecastState> historicalForecastState)

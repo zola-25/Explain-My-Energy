@@ -1,6 +1,6 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
 using Energy.App.Standalone.Features.Setup.Household;

@@ -1,4 +1,5 @@
-﻿using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 using System.Collections.Immutable;

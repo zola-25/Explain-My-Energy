@@ -135,7 +135,7 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store
                     }
                 }
 
-                var noUpdateNeededMessage = $"Weather Data already up-to-date for {outCode}";
+                var noUpdateNeededMessage = $"Weather Data up-to-date for {outCode}";
                 dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noUpdateNeededMessage));
                 action.TaskCompletion?.SetResult((true, noUpdateNeededMessage));
             }

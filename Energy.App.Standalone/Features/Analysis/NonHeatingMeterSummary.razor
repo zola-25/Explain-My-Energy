@@ -1,12 +1,7 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
-@if (!Ready)
+@if (_ready)
 {
-    <MudItem xs="12" sm="6" md="4">
-        <MudText Typo="Typo.h5">@Status</MudText>
-        <div class="spinner"></div>
-    </MudItem>
-} else {
     <MudItem xs="12" sm="6" md="4">
         <HistoricalAnalysisCard PrimaryHeatSource="false"
                                 Term="_calendarTerm"
@@ -43,39 +38,31 @@
 
 
     [Inject]
-    ISimpleForecastAnalyzer SimpleForecastAnalyzer { get; set; }
+    IHistoricalForecastSummarizer SimpleForecastAnalyzer { get; set; }
 
     [Inject]
-    IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
+    IHistoricalConsumptionSummarizer HistoricalDataAnalyzer { get; set; }
 
     CalendarTerm _calendarTerm;
+    bool _ready;
 
     HistoricalAnalysis _thisDurationAnalysis;
     HistoricalAnalysis _previousDurationAnalysis;
 
     ForecastAnalysis _currentTermForecastAnalysis;
     ForecastAnalysis _nextTermForecastAnalysis;
-    public bool Ready { get; set; }
-    public string Status { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
+        _ready = false;
 
         var initialMeterAnalysisOptions = AnalysisOptionsState.Value[MeterType];
 
-        Ready = false;
-
-        await Task.Delay(1);
-        Status = "Analyzing historical data...";
 
         _calendarTerm = initialMeterAnalysisOptions.CalendarTerm;
-        await Task.Delay(1);
 
         SetHistoricalAnalyses();
 
-        await Task.Delay(1);
-
-        Status = "Analyzing forecast data...";
 
         switch (MeterType)
         {
@@ -103,11 +90,10 @@
                 throw new ArgumentOutOfRangeException();
         }
 
-        await Task.Delay(1);
 
         SetForecastAnalyses();
 
-        Ready = true;
+        _ready = true;
     }
 
 

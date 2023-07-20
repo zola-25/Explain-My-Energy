@@ -1,16 +1,8 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-@if (!Ready)
-{
-    <MudItem xs="12" sm="6" md="4">
-        <MudText Typo="Typo.h5">@Status</MudText>
-        <MudProgressCircular Stroke="7" Size="@Size.Large" Value="Progress" Color="Color.Primary">
-        </MudProgressCircular>
-    </MudItem>
-}
-else
-{
+
+@if(_ready) {
     <MudItem xs="12" sm="6" md="4">
         <HistoricalAnalysisCard PrimaryHeatSource="true"
                                 Term="_calenderTerm"
@@ -40,30 +32,15 @@ else
     [Parameter, EditorRequired]
     public MeterType MeterType { get; set; }
 
-    [Inject]
-    public IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
     [Inject]
-    ITempForecastAnalyzer TempForecastAnalyzer { get; set; }
+    IState<AnalysisOptionsState> AnalysisOptionsState { get; set; }
 
     [Inject]
-    IHistoricalDurationAnalyzer HistoricalDataAnalyzer { get; set; }
+    ITempForecastSummarizer TempForecastAnalyzer { get; set; }
 
-
-
-    CalendarTerm _calenderTerm;
-    decimal _degreeDifference;
-    bool _useHistoricalForcast;
-
-    public string Status { get; set; }
-    public bool Ready { get; set; }
-    public double Progress { get; set; }
-
-    HistoricalAnalysis _thisDurationAnalysis;
-    HistoricalAnalysis _previousDurationAnalysis;
-
-    ForecastAnalysis _currentTermForecastAnalysis;
-    ForecastAnalysis _nextTermForecastAnalysis;
+    [Inject]
+    IHistoricalConsumptionSummarizer HistoricalDataAnalyzer { get; set; }
 
 
     [Inject]
@@ -74,32 +51,30 @@ else
 
 
 
-    protected override async Task OnParametersSetAsync()
+    CalendarTerm _calenderTerm;
+    decimal _degreeDifference;
+    bool _useHistoricalForcast;
+
+    bool _ready;
+
+    HistoricalAnalysis _thisDurationAnalysis;
+    HistoricalAnalysis _previousDurationAnalysis;
+
+    ForecastAnalysis _currentTermForecastAnalysis;
+    ForecastAnalysis _nextTermForecastAnalysis;
+
+
+    protected override void OnParametersSet()
     {
+        _ready = false;
         var initialMeterAnalysisOptions = AnalysisOptionsState.Value[MeterType];
 
-        Ready = false;
-
-        await Task.Delay(1);
-        Progress = 30;
-        Status = "Analysing Historical";
 
         _calenderTerm = initialMeterAnalysisOptions.CalendarTerm;
         _degreeDifference = initialMeterAnalysisOptions.DegreeDifference;
         _useHistoricalForcast = initialMeterAnalysisOptions.UseHistoricalForecast;
 
-        await Task.Delay(1);
-
         SetHistoricalAnalyses();
-
-        Progress = 60;
-
-        Status = "Analysing Forecast";
-
-        await Task.Delay(1);
-
-
-        Progress = 80;
 
         switch (MeterType)
         {
@@ -146,12 +121,13 @@ else
             });
 
 
-        await Task.Delay(1);
 
         SetForecastAnalyses();
 
-        Ready = true;
+        _ready = true;
+
     }
+
 
     void SetHistoricalAnalyses()
     {

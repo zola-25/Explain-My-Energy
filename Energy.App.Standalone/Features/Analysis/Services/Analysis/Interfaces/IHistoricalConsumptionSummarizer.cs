@@ -3,7 +3,7 @@ using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 
-public interface IHistoricalDurationAnalyzer
+public interface IHistoricalConsumptionSummarizer
 {
     HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType,
                                                   CalendarTerm term);

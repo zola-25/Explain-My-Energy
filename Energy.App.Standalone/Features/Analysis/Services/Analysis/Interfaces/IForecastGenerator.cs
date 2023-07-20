@@ -2,7 +2,7 @@
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.Shared;
 
-namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces
 {
     public interface IForecastGenerator
     {

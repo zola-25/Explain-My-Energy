@@ -31,7 +31,7 @@ public class DeleteElectricityAction
             _householdState = householdState;
         }
 
-        public override async Task HandleAsync(DeleteElectricityAction action, IDispatcher dispatcher)
+        public override Task HandleAsync(DeleteElectricityAction action, IDispatcher dispatcher)
         {
             dispatcher.Dispatch(new ElectricityDeleteReadingsAction());
             dispatcher.Dispatch(new DeleteElectricityHistoricalForecastAction());
@@ -39,6 +39,7 @@ public class DeleteElectricityAction
             {
                 dispatcher.Dispatch(new DeleteHeatingForecastAction(MeterType.Electricity));
             }
+            return Task.CompletedTask;
         }
     }
 }

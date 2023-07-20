@@ -1,7 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
 using Energy.Shared;
 using Fluxor;
@@ -9,13 +7,13 @@ using MathNet.Numerics;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
-public class SimpleForecastAnalyzer : ISimpleForecastAnalyzer
+public class HistoricalForecastSummarizer : IHistoricalForecastSummarizer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
     private readonly IState<HistoricalForecastState> _historicalForecastState;
 
-    public SimpleForecastAnalyzer(Co2ConversionFactors co2Conversion,
+    public HistoricalForecastSummarizer(Co2ConversionFactors co2Conversion,
                                   ITermDateRanges periodDateRanges,
                                   IState<HistoricalForecastState> historicalForecastState)
     {

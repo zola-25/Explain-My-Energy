@@ -418,19 +418,21 @@ namespace Energy.App.Standalone.Features.Analysis.Store
         }
 
         [EffectMethod]
-        public async Task OnElectricitySetDegreeDifferenceAction(ElectricityAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
+        public Task OnElectricitySetDegreeDifferenceAction(ElectricityAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
         {
             if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity) {
                 dispatcher.Dispatch(new LoadHeatingForecastAction(action.DegreeDifference));
             }
+            return Task.CompletedTask;
         }
         
         [EffectMethod]
-        public async Task OnGasSetDegreeDifferenceAction(GasAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
+        public Task OnGasSetDegreeDifferenceAction(GasAnalysisOptionsSetDegreeDifferenceAction action, IDispatcher dispatcher)
         {
             if (_householdState.Value.PrimaryHeatSource == MeterType.Gas) {
                 dispatcher.Dispatch(new LoadHeatingForecastAction(action.DegreeDifference));
             }
+            return Task.CompletedTask;
         }
     }
 

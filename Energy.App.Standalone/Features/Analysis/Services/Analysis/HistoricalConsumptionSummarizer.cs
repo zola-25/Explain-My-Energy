@@ -1,8 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
-using System.Collections.Immutable;
 using MathNet.Numerics;
 using Fluxor;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
@@ -11,7 +9,7 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
-public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
+public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
 {
     private readonly Co2ConversionFactors _co2Conversion;
     private readonly ITermDateRanges _periodDateRanges;
@@ -20,7 +18,7 @@ public class HistoricalDurationAnalyzer : IHistoricalDurationAnalyzer
     private readonly IState<WeatherState> _weatherState;
 
 
-    public HistoricalDurationAnalyzer(ITermDateRanges periodDateRanges, IState<GasReadingsState> gasReadingsState, IState<ElectricityReadingsState> electricityReadingsState, IState<WeatherState> weatherState)
+    public HistoricalConsumptionSummarizer(ITermDateRanges periodDateRanges, IState<GasReadingsState> gasReadingsState, IState<ElectricityReadingsState> electricityReadingsState, IState<WeatherState> weatherState)
     {
         _periodDateRanges = periodDateRanges;
         _co2Conversion = new Co2ConversionFactors();

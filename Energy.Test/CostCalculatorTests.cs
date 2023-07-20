@@ -1,10 +1,10 @@
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.Shared;
 using System.Collections.Immutable;
 using Energy.App.Standalone.Extensions;
 using FluentAssertions;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 
 namespace Energy.Test
 {

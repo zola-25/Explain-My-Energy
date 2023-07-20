@@ -6,11 +6,4 @@
         Day,
         Month,
     }
-
-    public enum RelativePeriod
-    {
-        Current,
-        Previous,
-        Next
-    }
 }

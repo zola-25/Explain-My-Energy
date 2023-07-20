@@ -5,14 +5,8 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 
 
 
-public interface ITempForecastAnalyzer
+public interface ITempForecastSummarizer
 {
     ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType, CalendarTerm term, bool useHistorical);
     ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, CalendarTerm term, bool useHistorical);
-}
-
-public interface ISimpleForecastAnalyzer
-{
-    ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType, CalendarTerm term);
-    ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType, CalendarTerm term);
 }

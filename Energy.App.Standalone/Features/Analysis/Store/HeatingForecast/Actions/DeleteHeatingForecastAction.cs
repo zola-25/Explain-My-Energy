@@ -1,7 +1,8 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Fluxor;
 using Energy.Shared;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
 {

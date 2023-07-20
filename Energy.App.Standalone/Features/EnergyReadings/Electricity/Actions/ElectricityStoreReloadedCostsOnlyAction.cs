@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions

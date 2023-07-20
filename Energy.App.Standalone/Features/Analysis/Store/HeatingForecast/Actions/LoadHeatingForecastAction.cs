@@ -1,9 +1,7 @@
 ﻿using Energy.App.Standalone.Data;
 using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
@@ -75,7 +73,7 @@ public class LoadHeatingForecastAction
             _logger = logger;
         }
 
-        public override async Task HandleAsync(LoadHeatingForecastAction action, IDispatcher dispatcher)
+        public override Task HandleAsync(LoadHeatingForecastAction action, IDispatcher dispatcher)
         {
             try
             {
@@ -124,6 +122,7 @@ public class LoadHeatingForecastAction
 
                 action.CompletionSource?.SetResult((true, completionMessage));
                 dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction(true, completionMessage));
+                return Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -133,6 +132,8 @@ public class LoadHeatingForecastAction
                 action.CompletionSource?.SetResult((false, errorMessage));
 
                 dispatcher.Dispatch(new NotifyHeatingForecastFinishedAction(false, errorMessage));
+                return Task.CompletedTask;
+
             }
         }
     }

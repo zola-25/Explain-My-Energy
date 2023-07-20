@@ -29,8 +29,9 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
             public Effects(IState<HouseholdState> householdState)
             {
                 _householdState = householdState;
+
             }
-            public override async Task HandleAsync(DeleteGasAction action, IDispatcher dispatcher)
+            public override Task HandleAsync(DeleteGasAction action, IDispatcher dispatcher)
             {
                 dispatcher.Dispatch(new GasDeleteReadingsAction());
                 dispatcher.Dispatch(new DeleteGasHistoricalForecastAction());
@@ -38,7 +39,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
                 {
                     dispatcher.Dispatch(new DeleteHeatingForecastAction(MeterType.Gas));
                 }
-
+                return Task.CompletedTask;
             }
         }
     }

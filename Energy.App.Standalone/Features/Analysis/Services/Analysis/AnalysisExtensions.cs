@@ -85,18 +85,6 @@ namespace Energy.App.Standalone.Features.Analysis.Services.Analysis
                 return header;
             }
 
-            // if (period == RelativePeriod.Historical)
-            // {
-            //     switch (duration)
-            //     {
-            //         case CalendarTerm.Week:
-            //             return $"Week Starting {startDate.eDateToMinimal()}";
-            //         case CalendarTerm.Month:
-            //             return startDate.ToString("M");
-            //         default:
-            //             throw new ArgumentOutOfRangeException(nameof(duration), duration, null);
-            //     }
-            // }
 
             header = period switch
             {

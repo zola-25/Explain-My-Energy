@@ -4,7 +4,8 @@
 @inject ILogger<EnergyTemperatureChart> Logger
 @if (_ready)
 {
-    <h1>Hi</h1>
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="eme-focus">@MeterType Meter Analysis</MudText>
+
     <div id="profile-chart-meter-@MeterGlobalId" style="width: 100%; height: 500px; max-width: 100%">
     </div>
 }
@@ -80,7 +81,7 @@
         return forecastChartReadings;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
@@ -138,7 +139,8 @@
             _latestReadingTime = latestReading.UtcTime;
 
 
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterChartProfile, temperatureIconPoints);
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid("ChartFunctions.setChart", $"profile-chart-meter-{MeterGlobalId}", meterChartProfile, temperatureIconPoints);
 
 
             _chartRendered = true;

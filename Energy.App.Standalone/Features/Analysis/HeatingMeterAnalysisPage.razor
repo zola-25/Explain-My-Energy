@@ -3,14 +3,14 @@
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-@if (_ready)
+@if (_parametersSet)
 {
     <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="true">
         <EnergyChart>
             <EnergyTemperatureChart MeterType="_meterType"></EnergyTemperatureChart>
         </EnergyChart>
         <Summary>
-            <PrimaryHeatSourceSummary MeterType="_meterType"></PrimaryHeatSourceSummary>
+            <PrimaryHeatSourceSummary  MeterType="_meterType"></PrimaryHeatSourceSummary>
         </Summary>
 
     </MeterAnalysisTemplate>
@@ -21,16 +21,14 @@
     public string MeterTypeName { get; set; }
 
     MeterType _meterType;
-    
-    bool _ready = false;
 
+    bool _parametersSet = false;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         _meterType = MeterTypeName.eStringToEnum<MeterType>();
-        _ready = true;
+        _parametersSet = true;
     }
-
 }
 

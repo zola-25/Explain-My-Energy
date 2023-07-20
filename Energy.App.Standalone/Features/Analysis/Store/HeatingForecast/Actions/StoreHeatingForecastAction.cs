@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
-using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 

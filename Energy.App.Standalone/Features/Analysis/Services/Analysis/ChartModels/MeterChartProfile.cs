@@ -1,4 +1,4 @@
-﻿namespace Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models
+﻿namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels
 {
     public class MeterChartProfile
     {
@@ -12,14 +12,9 @@
         public List<ChartReading> ChartReadings { get; set; }
         public List<ChartDailyForecastReading> ChartDailyForecastReadings { get; set; }
 
-        public long? HighlightStart {get; set; }
-        public long? HighlightEnd {get; set; }
+        public long? HighlightStart { get; set; }
+        public long? HighlightEnd { get; set; }
 
     }
 
-    public class MeterChartData
-    {
-        public MeterChartProfile MeterChartProfile { get; set; }
-        public List<TemperaturePoint> TemperaturePoints { get; set; }
-    }
 }

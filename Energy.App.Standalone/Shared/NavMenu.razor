@@ -3,7 +3,7 @@
 <MudPaper class="py-3" Elevation="0">
     <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
 
-        <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right">
+        <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right" RootStyle="width: inherit;">
             <MudNavLink Href="/Setup" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
                 Setup
                 @if (HouseholdSetupValid)
@@ -19,12 +19,12 @@
         </MudTooltip>
         <MudDivider></MudDivider>
 
-        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right">
+        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
             <MudNavLink Disabled="ElectricityDisabled" Class="menu-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsElectricity">Electricity</MeterNavLinkContent>
             </MudNavLink>
         </MudTooltip>
-        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right">
+        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
             <MudNavLink Disabled="GasDisabled" Class="menu-nav-item" Href="@GasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsGas">Gas</MeterNavLinkContent>
             </MudNavLink>

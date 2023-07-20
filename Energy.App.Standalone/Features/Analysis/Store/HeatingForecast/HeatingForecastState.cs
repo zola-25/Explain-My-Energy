@@ -1,9 +1,10 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
-using Energy.Shared;
+﻿using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
 using Fluxor.Persist.Storage;
 using System.Text.Json.Serialization;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast
 {
