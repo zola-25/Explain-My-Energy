@@ -40,7 +40,6 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" >
 		<Exec Condition="'$(Configuration)'=='Debug'" Command="npm run buildDev --prefix JS/" />
-		<Exec Condition="'$(Configuration)'=='Release'" Command="npm run buildProd --prefix JS/" />
 		
 	</Target>
 
