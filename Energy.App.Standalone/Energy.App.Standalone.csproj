@@ -34,6 +34,8 @@
 	</ItemGroup>
 
 	<PropertyGroup>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
 
