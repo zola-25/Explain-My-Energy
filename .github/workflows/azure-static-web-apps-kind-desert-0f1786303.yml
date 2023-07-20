@@ -27,6 +27,7 @@ jobs:
           pwd
           cd Energy.App.Standalone/JS
           npm install
+          npm run buildProd
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
