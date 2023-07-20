@@ -155,7 +155,7 @@
         }
     }
 
-    private async void OnHighlightRangeHandler(DateTime start, DateTime end)
+    private void OnHighlightRangeHandler(DateTime start, DateTime end)
     {
         try
         {
@@ -167,8 +167,8 @@
             long startTicks = start.eToUnixTicksNoOffset();
             long endTicks = end.eToUnixTicksNoOffset();
 
-
-            await JsRuntime.InvokeVoidAsync(
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid(
                 "ChartFunctions.highlightRange",
                 $"profile-chart-meter-{MeterGlobalId}",
                 startTicks,
@@ -180,7 +180,7 @@
         }
     }
 
-    private async void OnRemoveHighlightRangeHandler()
+    private void OnRemoveHighlightRangeHandler()
     {
         try
         {
@@ -188,8 +188,8 @@
             {
                 return;
             }
-
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
         }
         catch (Exception ex)
         {
@@ -197,7 +197,7 @@
         }
     }
 
-    private async void OnUseHistoricalForecastHandler(bool useHistoricalForecast)
+    private void OnUseHistoricalForecastHandler(bool useHistoricalForecast)
     {
         try
         {
@@ -209,7 +209,9 @@
             var chartForecastReadings = GetChartDailyForecastReadings(_latestReadingTime, forecastReadingsState);
 
             var degreeDifference = AnalysisOptions.Value[MeterType].DegreeDifference;
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries", $"profile-chart-meter-{MeterGlobalId}", chartForecastReadings, degreeDifference);
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+
+            jsInProcess.InvokeVoid("ChartFunctions.setForecastSeries", $"profile-chart-meter-{MeterGlobalId}", chartForecastReadings, degreeDifference);
         }
         catch (Exception ex)
         {
@@ -217,7 +219,7 @@
         }
     }
 
-    private async void OnDegreeDifferenceHandler(decimal degreeDifference)
+    private void OnDegreeDifferenceHandler(decimal degreeDifference)
     {
         try
         {
@@ -232,8 +234,9 @@
 
             var chartForecastReadings = GetChartDailyForecastReadings(_latestReadingTime, forecastReadingsState);
 
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
 
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setForecastSeries",
+            jsInProcess.InvokeVoid("ChartFunctions.setForecastSeries",
                     $"profile-chart-meter-{MeterGlobalId}",
                     chartForecastReadings, degreeDifference);
         }
@@ -243,7 +246,7 @@
         }
     }
 
-    private async void OnToggledCostChangedHandler(bool showCost)
+    private void OnToggledCostChangedHandler(bool showCost)
     {
         try
         {
@@ -251,7 +254,10 @@
             {
                 return;
             }
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
+
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+
+            jsInProcess.InvokeVoid("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
         }
         catch (Exception ex)
         {
@@ -262,7 +268,9 @@
     public async ValueTask DisposeAsync()
     {
         base.Dispose();
+
         await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
+        
     }
 
 }

@@ -1,8 +1,7 @@
 ﻿@page "/Meter/{MeterTypeName}"
-
 @inherits FluxorComponent
-@inject IDispatcher Dispatcher
 
+<ExtendedPageTitle>@MeterTypeName Analysis</ExtendedPageTitle>
 @if (_ready)
 {
     <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="false">
