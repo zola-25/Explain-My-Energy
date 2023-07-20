@@ -79,12 +79,13 @@ builder.Services.AddFluxor(options =>
 {
     options = options.ScanAssemblies(currentAssembly);
 
-    //options.UseReduxDevTools(devToolsOptions =>
-    //{
-    //    devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
-    //    devToolsOptions.UseSystemTextJson();
-    //    //devToolsOptions.EnableStackTrace();
-    //});
+    #if DEBUG
+    options.UseReduxDevTools(devToolsOptions =>
+    {
+        devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
+        devToolsOptions.UseSystemTextJson();
+    });
+    #endif
     options.UsePersist(persistMiddlewareOptions =>
     {
         persistMiddlewareOptions.UseInclusionApproach();

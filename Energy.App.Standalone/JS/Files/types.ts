@@ -1,5 +1,5 @@
-﻿import * as am5xy from "@amcharts/amcharts5/xy";
-import * as am5 from "@amcharts/amcharts5"; 
+﻿import { XYChart } from "@amcharts/amcharts5/xy";
+import { color, Color} from "@amcharts/amcharts5"; 
 export interface ChartReading {
     dateTicks: number;
     pencePerKWh: number;
@@ -45,7 +45,7 @@ export interface TemperaturePoint {
 }
 
 export interface ChartDetails {
-        chart: am5xy.XYChart,
+        chart: XYChart,
         start: number,
         end: number,
         latestReading: number,
@@ -59,12 +59,12 @@ export interface ChartDetails {
 
 export  class ChartDefaults {
     
-    public static consumptionColor: am5.Color = am5.color(0x594ae2)
-    public static costColor: am5.Color = am5.color(0x272c34)
-    public static costFill: am5.Color = am5.color(0x93969a)
-    public static whiteColor: am5.Color = am5.color(0xffffff)
-    public static blackColor: am5.Color = am5.color(0x000000)
-    public static highlightColor: am5.Color = am5.color(0xFFA726)
+    public static consumptionColor: Color = color(0x594ae2)
+    public static costColor: Color = color(0x272c34)
+    public static costFill: Color = color(0x93969a)
+    public static whiteColor: Color = color(0xffffff)
+    public static blackColor: Color = color(0x000000)
+    public static highlightColor: Color = color(0xFFA726)
     public static tariffLabelFormat: string = "[bold]£{valueY.formatNumber('#,###.00')}[/]\nTariff: [/]{tariffAppliesFrom.formatDate('MMM dt, yyyy')}[/]\nRate: {pencePerKWh}p/kWh[/]\nStanding Charge (daily): {dailyStandingCharge}p"
     public static tariffForecastLabelFormat: string = "[bold]Forecast: £{valueY.formatNumber('#,###.00')}[/]\nTariff: [/]{tariffAppliesFrom.formatDate('MMM dt, yyyy')}[/]\nRate: {pencePerKWh}p/kWh[/]\nStanding Charge (daily): {dailyStandingCharge}p"
 
