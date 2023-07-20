@@ -3,8 +3,15 @@
 @inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
 
-<MudText Align="Align.Left" Typo="Typo.h5" Class="m-3 fw-bolder">Weather Data Status</MudText>
-<MudTable Items="Enumerable.Range(0, 1)" T="int" Elevation="0" >
+<div class="d-flex justify-space-between align-items-baseline">
+    <MudPaper Class="d-flex m-3" Elevation="0">
+        <MudText Typo="Typo.h5" Class=" fw-bolder">Weather Data Status</MudText>
+    </MudPaper>
+    <MudPaper Class="d-flex m-3" Elevation="0">
+        <MudLink Href="https://open-meteo.com/" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
+    </MudPaper>
+</div>
+<MudTable Items="Enumerable.Range(0, 1)" T="int" Elevation="0">
     <HeaderContent>
         <MudTh Class="fw-bold">Historical Data</MudTh>
         <MudTh Class="fw-bold">Latest Reading</MudTh>
@@ -26,9 +33,9 @@
             <MudTd DataLabel="Latest">
                 @{
                     var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).
-                        OrderBy(c => c.UtcTime).
-                        Last().
-                        UtcTime;
+                    OrderBy(c => c.UtcTime).
+                    Last().
+                    UtcTime;
                 }
 
                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
@@ -49,16 +56,16 @@
             <MudTd DataLabel="Short-term">
                 @{
                     var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).
-                        OrderBy(c => c.UtcTime).
-                        ToList();
+                    OrderBy(c => c.UtcTime).
+                    ToList();
                 }
                 @forecastReadings.First().UtcTime.eDateToDowShortMonthYY() - @forecastReadings.Last().UtcTime.eDateToDowShortMonthYY()
             </MudTd>
             <MudTd DataLabel="Long-term">
                 @{
                     var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).
-                        OrderBy(c => c.UtcTime).
-                        ToList();
+                    OrderBy(c => c.UtcTime).
+                    ToList();
                 }
                 @climateReadings.First().UtcTime.eToString("dnn MMM yy", true) - @climateReadings.Last().UtcTime.eToString("dnn MMM yy", true)
 

@@ -2,9 +2,17 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JsRuntime
 @inject ILogger<EnergyTemperatureChart> Logger
+
+
+
 @if (_ready)
 {
-    <MudText Typo="Typo.h4" Align="Align.Center" Class="eme-focus">@MeterType Meter Analysis</MudText>
+    <div class="d-flex flex-column align-items-center">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="d-flex eme-focus">@MeterType Meter Analysis</MudText>
+        <MudPaper Class="d-flex" Elevation="0">
+            <MudLink Href="https://open-meteo.com/" Typo="Typo.body2" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
+        </MudPaper>
+    </div>
 
     <div id="profile-chart-meter-@MeterGlobalId" style="width: 100%; height: 500px; max-width: 100%">
     </div>

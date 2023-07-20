@@ -11,42 +11,58 @@
                 <MudText Class="fw-bolder" Typo="Typo.h5">Household Setup</MudText>
             </MudCardHeader>
             <MudCardContent>
-                <ObjectGraphDataAnnotationsValidator/>
-                <ValidationSummary/>
-                <div class="my-3">
+                <ObjectGraphDataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="my-3 d-flex align-items-baseline">
                     <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
                                    Placeholder="Select Move-in Date"
                                    Clearable="true"
                                    DateFormat="D"
                                    MaxDate="DateTime.Today"></MudDatePicker>
+
+                    <InfoTooltip>Your move in date ensures only energy data relevant to you is processed</InfoTooltip>
                 </div>
 
-                <div class="my-3">
+                <div class="my-3 d-flex align-items-baseline">
                     <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required
                                   Placeholder="IHD MAC ID"></MudTextField>
+                    <InfoTooltip>
+                        This is a 16 character code that uniquely identifies your Smart Meter. <br />
+                        It is sometimes called a GUID or EUI. It can usually be found on the back of the physical Smart Meter or within the batter case. <br />
+                        In some models it can be found by accessing the settings in the Smart Meter user interface
+                    </InfoTooltip>
                 </div>
-                <div class="my-3">
+                <div class="my-3 d-flex align-items-baseline">
                     <MudAutocomplete @bind-Value="_householdDetails.OutCode"
                                      For="@(() => _householdDetails.OutCode)"
                                      T="OutCode" CoerceText="true"
                                      Clearable="true"
-                                     Required
+                                              Required
                                      ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                      MinCharacters="2"
                                      OnClearButtonClick="ClearPostalArea"
                                      SearchFuncWithCancel="SearchOutCodes"></MudAutocomplete>
-
+                    <InfoTooltip>
+                        Your Postal Area is the first 4 characters of your postcode (or sometimes 3 in London). <br /> It's needed to retrieve weather data for your location, so we can forecast your energy usage with weather changes
+                    </InfoTooltip>
                 </div>
-                <MudText>What is your home's primary heating source?</MudText>
+                <div class="d-flex align-items-baseline">
+                    <MudText>What is your home's primary heating source?</MudText>
+                    <InfoTooltip>
+                        What do you use to heat your home? <br />
+                        In the UK, 80% of people use some form of Gas central heating
+                    </InfoTooltip>
+                </div>
                 <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
                     <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
                     <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
                 </MudRadioGroup>
+
             </MudCardContent>
-            <MudCardActions>
+            <MudCardActions Class="d-flex flex-column align-items-start ">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
 
-                <MudText Class="m-1" Color="Color.Success" hidden="@(!_submitSuccessful)">
+                <MudText Class="mt-3 fw-bold" Color="Color.Success"  hidden="@(!_submitSuccessful)">
                     @_saveResponseMessage
                 </MudText>
             </MudCardActions>

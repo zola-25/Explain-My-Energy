@@ -34,9 +34,11 @@
             }
             else
             {
-                <MudTooltip Text="@(!HouseholdState.Value.Saved ? "Configure Household to add a Meter" : "Add a new Meter")">
+                <MudTooltip Text="@(!HouseholdState.Value.Saved ? "Configure Household to add a Meter" : $"Add your {context.MeterType} Meter")">
                     <MudLink Disabled="@(!HouseholdState.Value.Saved)" Underline="Underline.None" Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")">
-                        <MudButton Disabled="@(!HouseholdState.Value.Saved)" Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Add</MudButton>
+                        <MudBadge Visible=@(HouseholdState.Value.Saved) Icon="@Icons.Material.Outlined.Add"  Color="Color.Success" Overlap="true">
+                            <MudButton Disabled="@(!HouseholdState.Value.Saved)" Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Add</MudButton>
+                        </MudBadge>
                     </MudLink>
                 </MudTooltip>
             }
