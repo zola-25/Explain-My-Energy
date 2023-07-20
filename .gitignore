@@ -41,6 +41,7 @@ bld/
 
 **/wwwroot/**/service-worker.published.js
 **/wwwroot/js/**
+!**/wwwroot/js/bundle.min.js
 **/wwwroot/**/appsettings*
 
 **/launchSettings.json

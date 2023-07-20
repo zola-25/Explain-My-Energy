@@ -7,9 +7,9 @@ module.exports = {
     mode: 'production',
     output: {
         filename: 'bundle.min.js',
-        path: path.resolve(__dirname, '../wwwroot/js')
+        path: path.resolve(__dirname, '../wwwroot/js'),
+        clean: true,
     },
-    devtool: "source-map",
     module: {
         rules: [
             {
@@ -21,7 +21,8 @@ module.exports = {
     },
     optimization: {
         minimize: true,
-        minimizer: [new TerserPlugin()]
+        minimizer: [new TerserPlugin({
+        })]
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
