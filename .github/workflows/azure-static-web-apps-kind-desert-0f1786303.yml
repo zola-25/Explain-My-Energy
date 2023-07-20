@@ -24,7 +24,8 @@ jobs:
           node-version: 18
       - name: npm Install
         run: |
-          cd JS
+          pwd
+          cd Energy.App.Standalone/JS
           npm install
       - name: Build And Deploy
         id: builddeploy
