@@ -223,27 +223,6 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
             }
         }
 
-        private class NotifyHouseholdUpdatedEffect : Effect<NotifyHouseholdUpdatedAction>
-        {
-            IState<HouseholdState> _householdState;
-            IState<HeatingForecastState> _heatingForecastState;
-
-            public NotifyHouseholdUpdatedEffect(IState<HouseholdState> householdState,
-                                                IState<HeatingForecastState> heatingForecastState)
-            {
-                _householdState = householdState;
-                _heatingForecastState = heatingForecastState;
-            }
-
-            public override Task HandleAsync(NotifyHouseholdUpdatedAction action, IDispatcher dispatcher)
-            {
-                if(_householdState.Value.PrimaryHeatSource != _heatingForecastState.Value.HeatingMeterType)
-                {
-                    dispatcher.Dispatch(new EnsureHeatingSetupAction(true, true));
-                }
-                return Task.CompletedTask;
-            }
-        }
     }
 
 

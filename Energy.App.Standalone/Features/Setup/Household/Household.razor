@@ -74,14 +74,8 @@
     {
         await base.OnInitializedAsync();
 
-        HouseholdState.StateChanged += async (sender, state) =>
-        {
-            SetHouseholdInputs();
-            await InvokeAsync(StateHasChanged);
-        };
-
         SetHouseholdInputs();
-        SubscribeToAction<NotifyHouseholdUpdatedAction>(ShowSuccessMessage);
+        SubscribeToAction<NotifyHouseholdSavedSuccess>(ShowSuccessMessage);
     }
 
     private void SetHouseholdInputs()
@@ -100,7 +94,7 @@
     }
 
 
-    private void ShowSuccessMessage(NotifyHouseholdUpdatedAction obj)
+    private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
         _submitSuccessful = true;
         _saveResponseMessage = "Household Details Saved";

@@ -37,7 +37,7 @@ public class DeleteElectricityAction
             dispatcher.Dispatch(new DeleteElectricityHistoricalForecastAction());
             if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity)
             {
-                dispatcher.Dispatch(new DeleteHeatingForecastAction());
+                dispatcher.Dispatch(new DeleteHeatingForecastAction(MeterType.Electricity));
             }
         }
     }

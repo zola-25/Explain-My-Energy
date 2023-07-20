@@ -1,9 +1,11 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
+using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
+using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
@@ -64,7 +66,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
         {
             private readonly IState<MeterSetupState> _meterSetupState;
             private readonly IState<ElectricityReadingsState> _electricityReadingsState;
-
+            private readonly IState<HouseholdState> _householdState;
             private readonly IEnergyImportValidation _energyImportValidation;
             private readonly ICostCalculator _costCalculator;
             private readonly IEnergyReadingService _energyReadingService;
@@ -75,7 +77,8 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                           IEnergyImportValidation energyImportValidation,
                           ICostCalculator costCalculator,
                           IEnergyReadingService energyReadingService,
-                          ILogger<EnsureElectricityReadingsLoadedEffect> logger)
+                          ILogger<EnsureElectricityReadingsLoadedEffect> logger,
+                          IState<HouseholdState> householdState)
             {
                 _meterSetupState = meterSetupState;
                 _electricityReadingsState = electricityReadingsState;
@@ -83,6 +86,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                 _costCalculator = costCalculator;
                 _energyReadingService = energyReadingService;
                 _logger = logger;
+                _householdState = householdState;
             }
 
             public override async Task HandleAsync(EnsureElectricityReadingsLoadedAction action, IDispatcher dispatcher)
@@ -170,14 +174,25 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                     }
 
 
-                    if (loadForecasts || fullReloadForecasts)
+                    if (valid && (loadForecasts || fullReloadForecasts))
                     {
                         var forecastCompletion = new TaskCompletionSource<(bool, string)>();
 
-                        dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(forceRefresh: fullReloadForecasts, forecastCompletion));
+                        dispatcher.Dispatch(new EnsureElectricityHistoricalForecastAction(
+                            forceRefresh: fullReloadForecasts, forecastCompletion));
                         
-                        
-                        await forecastCompletion.Task;
+                        var heatingForecastCompletion = new TaskCompletionSource<(bool, string)>();
+                        if (_householdState.Value.PrimaryHeatSource == MeterType.Electricity) {
+                            dispatcher.Dispatch(new EnsureHeatingSetupAction(
+                                forceReloadHeatingForecast: loadForecasts,
+                                forceReloadCoefficients: fullReloadForecasts,
+                                heatingForecastCompletion));
+                        } else
+                        {
+                            heatingForecastCompletion.SetResult((true, "Not required"));
+                        }
+
+                        await Task.WhenAll(forecastCompletion.Task, heatingForecastCompletion.Task);
                     }
 
                     dispatcher.Dispatch(new NotifyElectricityLoadingFinished(valid, message));

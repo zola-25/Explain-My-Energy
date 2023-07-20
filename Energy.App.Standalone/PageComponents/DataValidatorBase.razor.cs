@@ -100,11 +100,6 @@ namespace Energy.App.Standalone.PageComponents
             await Task.WhenAll(gasReadingsCompletion.Task, electricityReadingsCompletion.Task);
 
 
-            var heatingForecastCompletion = new TaskCompletionSource<(bool, string)>();
-
-            Dispatcher.Dispatch(new EnsureHeatingSetupAction(false,false,heatingForecastCompletion));
-
-            await heatingForecastCompletion.Task;
             
             await Task.Delay(1);
             StateHasChanged();

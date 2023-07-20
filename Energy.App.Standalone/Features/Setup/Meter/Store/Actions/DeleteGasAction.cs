@@ -36,7 +36,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
                 dispatcher.Dispatch(new DeleteGasHistoricalForecastAction());
                 if (_householdState.Value.PrimaryHeatSource == MeterType.Gas)
                 {
-                    dispatcher.Dispatch(new DeleteHeatingForecastAction());
+                    dispatcher.Dispatch(new DeleteHeatingForecastAction(MeterType.Gas));
                 }
 
             }

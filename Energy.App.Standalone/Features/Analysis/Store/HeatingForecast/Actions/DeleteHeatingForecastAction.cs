@@ -1,13 +1,21 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.DataLoading.Models;
 using System.Collections.Immutable;
 using Fluxor;
+using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
 {
     public class DeleteHeatingForecastAction
     {
-        [ReducerMethod(typeof(DeleteHeatingForecastAction))]
-        public static HeatingForecastState Reduce(HeatingForecastState state)
+        public MeterType HeatingMeterType {get; }
+
+        public DeleteHeatingForecastAction(MeterType heatingMeterType)
+        {
+            HeatingMeterType = heatingMeterType;
+        }
+
+        [ReducerMethod]
+        public static HeatingForecastState Reduce(HeatingForecastState state, DeleteHeatingForecastAction action)
         {
             return state with
             {
@@ -20,6 +28,9 @@ namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
                 ForecastsUpdatedWithReadingDate = DateTime.MinValue,
                 LoadingHeatingForecast = false,
                 LatestReadingDate = DateTime.MinValue,
+                HeatingMeterType = action.HeatingMeterType,
+                LoadingCoefficients = false,
+                
             };
         }
     }
