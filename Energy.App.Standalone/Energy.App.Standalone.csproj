@@ -33,13 +33,20 @@
 	  <Folder Include="wwwroot\js\" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Content Update="wwwroot\js\bundle.min.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
 
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" >
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Condition="'$(Configuration)'=='Debug'" Command="npm run buildDev --prefix JS/" />
 		
 	</Target>
