@@ -5,17 +5,27 @@
 
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
-        <MudPaper Elevation="2" Class="p-2 mt-2">
+        <MudPaper Elevation="2" Class="p-2 mt-3">
+            <MudText Typo="Typo.h4" Align="Align.Center">Welcome to Explain My Energy</MudText>
+
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2">
             <MudText Typo="Typo.h5" Class="m-4 fw-bolder">Setup Status</MudText>
 
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@HouseholdSeverity">@HouseholdStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@ElectricitySeverity">@ElectricityStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@GasSeverity">@GasStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">@ElectricityReadingsStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">@ElectricityHistoricalForecastStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@GasReadingsSeverity">@GasReadingsStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">@GasHistoricalForecastStatus</MudAlert>
-            <MudAlert Class="m-2" Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus</MudAlert>
+            <MudList Dense="true">
+                    <MudAlert  Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
+                <MudListItem>
+                    <MudAlert  Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert>
+                </MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasSeverity">Gas Meter: @GasStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">Electricity Readings: @ElectricityReadingsStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Electricity Forecast: @ElectricityHistoricalForecastStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasReadingsSeverity">Gas Readings: @GasReadingsStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Gas Forecast: @GasHistoricalForecastStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus</MudAlert></MudListItem>
+            </MudList>
         </MudPaper>
     </MudItem>
     <MudItem xs="12">
@@ -59,13 +69,13 @@
                 <RowTemplate>
                     <MudTd DataLabel="Meter Type">@context.MeterType</MudTd>
                     <MudTd DataLabel="Forecast Type">@(context.UseHistoricalForecast ? "Historical Moving Average" : "Temperature Dependent")</MudTd>
-                    <MudTd DataLabel="Calendar Term">@context.CalendarTerm</MudTd>
-                    <MudTd DataLabel="Highlight Set">@context.HighlightSet</MudTd>
-                    <MudTd DataLabel="Toggle Source">@context.ToggleSource</MudTd>
-                    <MudTd DataLabel="Highlight Start">@context.HighlightStart.eToString("ddd dnn MMM yyyy", true)</MudTd>
-                    <MudTd DataLabel="Highlight End">@context.HighlightEnd.eToString("ddd dnn MMM yyyy", true)</MudTd>
-                    <MudTd DataLabel="Show Cost">@context.ShowCost</MudTd>
-                    <MudTd DataLabel="Degree difference">@(context.DegreeDifference.ToString("+#;-#;0"))°C @(context.MeterType != HouseholdState.Value.PrimaryHeatSource ? "(N/A)" : "")</MudTd>
+                        <MudTd DataLabel="Calendar Term">@context.CalendarTerm</MudTd>
+                        <MudTd DataLabel="Highlight Set">@context.HighlightSet</MudTd>
+                        <MudTd DataLabel="Toggle Source">@context.ToggleSource</MudTd>
+                        <MudTd DataLabel="Highlight Start">@context.HighlightStart.eToString("ddd dnn MMM yyyy", true)</MudTd>
+                        <MudTd DataLabel="Highlight End">@context.HighlightEnd.eToString("ddd dnn MMM yyyy", true)</MudTd>
+                        <MudTd DataLabel="Show Cost">@context.ShowCost</MudTd>
+                        <MudTd DataLabel="Degree difference">@(context.DegreeDifference.ToString("+#;-#;0"))°C @(context.MeterType != HouseholdState.Value.PrimaryHeatSource ? "(N/A)" : "")</MudTd>
 
                     </RowTemplate>
                 </MudTable>
@@ -84,11 +94,11 @@
     [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
 
     public bool GasMeterSetupValid => MeterSetupState.Value[MeterType.Gas].SetupValid;
-    public string GasStatus => GasMeterSetupValid ? "Gas Meter Setup Valid" : "Gas Meter Setup Required";
+    public string GasStatus => GasMeterSetupValid ? "Setup Valid" : "Setup Required";
     public Severity GasSeverity => GasMeterSetupValid ? Severity.Success : Severity.Warning;
 
     public bool ElectricityMeterSetupValid => MeterSetupState.Value[MeterType.Electricity].SetupValid;
-    public string ElectricityStatus => ElectricityMeterSetupValid ? "Electricity Meter Setup Valid" : "Electricity Meter Setup Required";
+    public string ElectricityStatus => ElectricityMeterSetupValid ? "Setup Valid" : "Setup Required";
     public Severity ElectricitySeverity => ElectricityMeterSetupValid ? Severity.Success : Severity.Warning;
 
     [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
@@ -105,7 +115,7 @@
     {
         if (!ElectricityMeterSetupValid)
         {
-            return "Requires Electricity Meter Setup";
+            return "Requires Meter Setup";
         }
 
         if (ElectricityReadingsState.Value.CostedReadings.eIsNullOrEmpty())
@@ -117,7 +127,7 @@
             return $"Expecting at least 365 days of Electricity Meter costed readings calculated, current total: {ElectricityReadingsState.Value.CostedReadings.Count / 48} days)";
         }
 
-        return $"Electricity readings range: {ElectricityReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
+        return $"Range {ElectricityReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
     }
 
     public Severity ElectricityReadingsSeverity => ElectricityReadingsValid ? Severity.Success : Severity.Warning;
@@ -135,7 +145,7 @@
     {
         if (!GasMeterSetupValid)
         {
-            return "Gas readings require Gas Meter Setup";
+            return "Require Meter Setup";
         }
         if (GasReadingsState.Value.CostedReadings.eIsNullOrEmpty())
         {
@@ -147,7 +157,7 @@
             return $"Expecting at least 365 days of Gas Meter costed readings calculated, current total: {GasReadingsState.Value.CostedReadings.Count / 48} days";
         }
 
-        return $"Gas readings range: {GasReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {GasReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
+        return $"Range {GasReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {GasReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
     }
 
     public Severity GasReadingsSeverity => GasReadingsValid ? Severity.Success : Severity.Warning;
@@ -165,12 +175,12 @@
     {
         if (!GasMeterSetupValid)
         {
-            return "Gas Historical Forecasting requires Gas Meter Setup";
+            return "Requires Meter Setup";
         }
 
         if (!GasReadingsValid)
         {
-            return "Gas Historical Forecasting requires sufficient Gas Readings loaded";
+            return "Forecasting requires sufficient Gas Readings loaded";
         }
 
         if (HistoricalForecastState.Value[MeterType.Gas].eIsNullOrEmpty())
@@ -183,7 +193,7 @@
             return $"Expecting at least 180 historical forecast calculated, current total: {HistoricalForecastState.Value[MeterType.Gas].Count}";
         }
 
-        return $"Gas historical forecast range: {HistoricalForecastState.Value[MeterType.Gas].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Gas].Last().UtcTime.eToLongDateString()}";
+        return $"Range {HistoricalForecastState.Value[MeterType.Gas].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Gas].Last().UtcTime.eToLongDateString()}";
     }
 
     public Severity GasHistoricalForecastSeverity => GasHistoricalForecastValid ? Severity.Success : Severity.Warning;
@@ -200,12 +210,12 @@
     {
         if (!ElectricityMeterSetupValid)
         {
-            return "Electricity Historical Forecasting Requires Electricity Meter Setup";
+            return "Requires Meter Setup";
         }
 
         if (!ElectricityReadingsValid)
         {
-            return "Electricity Historical Forecasting requires sufficient Electricity Readings loaded";
+            return "Requires sufficient Electricity Readings loaded";
         }
 
         if (HistoricalForecastState.Value[MeterType.Electricity].eIsNullOrEmpty())
@@ -218,7 +228,7 @@
             return $"Expecting at least 180 historical forecast calculated, current total: {HistoricalForecastState.Value[MeterType.Electricity].Count}";
         }
 
-        return $"Electricity historical forecast range: {HistoricalForecastState.Value[MeterType.Electricity].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Electricity].Last().UtcTime.eToLongDateString()}";
+        return $"Range: {HistoricalForecastState.Value[MeterType.Electricity].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Electricity].Last().UtcTime.eToLongDateString()}";
     }
 
     public Severity ElectricityHistoricalForecastSeverity => ElectricityHistoricalForecastValid ? Severity.Success : Severity.Warning;
