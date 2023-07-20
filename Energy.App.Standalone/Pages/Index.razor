@@ -13,18 +13,15 @@
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2">
             <MudText Typo="Typo.h5" Class="m-4 fw-bolder">Setup Status</MudText>
-
             <MudList Dense="true">
-                    <MudAlert  Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
-                <MudListItem>
-                    <MudAlert  Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert>
-                </MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasSeverity">Gas Meter: @GasStatus</MudAlert></MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">Electricity Readings: @ElectricityReadingsStatus</MudAlert></MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Electricity Forecast: @ElectricityHistoricalForecastStatus</MudAlert></MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasReadingsSeverity">Gas Readings: @GasReadingsStatus</MudAlert></MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Gas Forecast: @GasHistoricalForecastStatus</MudAlert></MudListItem>
-                <MudListItem><MudAlert  Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasSeverity">Gas Meter: @GasStatus</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">Electricity Readings: @ElectricityReadingsStatus.Status</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Electricity Historical Forecast: @ElectricityHistoricalForecastStatus.Status</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasReadingsSeverity">Gas Readings: @GasReadingsStatus.Status</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Gas Historical Forecast: @GasHistoricalForecastStatus.Status</MudAlert></MudListItem>
+                <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus.Status</MudAlert></MudListItem>
             </MudList>
         </MudPaper>
     </MudItem>
@@ -84,10 +81,11 @@
     </MudGrid>
 
     @code {
+
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
 
     public bool HouseholdSetupValid => !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
-    public string HouseholdStatus => HouseholdSetupValid ? "Household Setup Valid" : "Household Setup Required";
+    public string HouseholdStatus => HouseholdSetupValid ? " Valid" : "Setup Required";
     public Severity HouseholdSeverity => HouseholdSetupValid ? Severity.Success : Severity.Warning;
 
 
@@ -103,135 +101,112 @@
 
     [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 
-
-    public bool ElectricityReadingsValid =>
-        ElectricityMeterSetupValid &&
-        ElectricityReadingsState.Value.CostedReadings.eIsNotNullOrEmpty()
-        && ElectricityReadingsState.Value.CostedReadings.Count >= 365 * 48;
-
-    public string ElectricityReadingsStatus => GetElectricityReadingsStatus();
-
-    string GetElectricityReadingsStatus()
-    {
-        if (!ElectricityMeterSetupValid)
-        {
-            return "Requires Meter Setup";
-        }
-
-        if (ElectricityReadingsState.Value.CostedReadings.eIsNullOrEmpty())
-        {
-            return "No costed reading calculated for Electricity Meter";
-        }
-        if (ElectricityReadingsState.Value.CostedReadings.Count < 365 * 48)
-        {
-            return $"Expecting at least 365 days of Electricity Meter costed readings calculated, current total: {ElectricityReadingsState.Value.CostedReadings.Count / 48} days)";
-        }
-
-        return $"Range {ElectricityReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {ElectricityReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
-    }
-
-    public Severity ElectricityReadingsSeverity => ElectricityReadingsValid ? Severity.Success : Severity.Warning;
-
     [Inject] IState<GasReadingsState> GasReadingsState { get; set; }
 
-    public bool GasReadingsValid =>
-            GasMeterSetupValid
-            && GasReadingsState.Value.CostedReadings.eIsNotNullOrEmpty()
-            && GasReadingsState.Value.CostedReadings.Count >= 365 * 48;
 
-    public string GasReadingsStatus => GetGasReadingsStatus();
+    public (bool Valid, string Status) ElectricityReadingsStatus => GetMeterReadingsStatus(MeterType.Electricity);
+    public (bool Valid, string Status) GasReadingsStatus => GetMeterReadingsStatus(MeterType.Gas);
 
-    string GetGasReadingsStatus()
+
+    private ImmutableList<CostedReading> GetCostedReadings(MeterType meterType)
     {
-        if (!GasMeterSetupValid)
+        switch (meterType)
         {
-            return "Require Meter Setup";
+            case MeterType.Electricity:
+                return ElectricityReadingsState.Value.CostedReadings;
+            case MeterType.Gas:
+                return GasReadingsState.Value.CostedReadings;
+            default:
+                throw new NotImplementedException();
         }
-        if (GasReadingsState.Value.CostedReadings.eIsNullOrEmpty())
-        {
-            return "No costed reading calculated for Gas Meter";
-        }
-
-        if (GasReadingsState.Value.CostedReadings.Count < 365 * 48)
-        {
-            return $"Expecting at least 365 days of Gas Meter costed readings calculated, current total: {GasReadingsState.Value.CostedReadings.Count / 48} days";
-        }
-
-        return $"Range {GasReadingsState.Value.CostedReadings.First().UtcTime.eToLongDateString()} to {GasReadingsState.Value.CostedReadings.Last().UtcTime.eToLongDateString()}";
     }
 
-    public Severity GasReadingsSeverity => GasReadingsValid ? Severity.Success : Severity.Warning;
+    private ImmutableList<BasicReading> GetBasicReadings(MeterType meterType)
+    {
+        switch (meterType)
+        {
+            case MeterType.Electricity:
+                return ElectricityReadingsState.Value.BasicReadings;
+            case MeterType.Gas:
+                return GasReadingsState.Value.BasicReadings;
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    (bool Valid, string Status) GetMeterReadingsStatus(MeterType meterType)
+    {
+        if (!MeterSetupState.Value[meterType].SetupValid)
+        {
+            return (false, "Requires Meter Setup");
+        }
+
+        var costedReadings = GetCostedReadings(meterType);
+
+        if (costedReadings.eIsNullOrEmpty())
+        {
+            return (false, "No costed reading calculated");
+        }
+
+        var first = costedReadings.First().UtcTime;
+        var last = costedReadings.Last().UtcTime;
+
+        string rangeText = $"Data available from {first.eDateToDowShortMonthYY()} to {last.eDateToDowShortMonthYY()}";
+
+        return (true, rangeText);
+    }
+
+    public Severity ElectricityReadingsSeverity => ElectricityReadingsStatus.Valid ? Severity.Success : Severity.Warning;
+
+
+    public Severity GasReadingsSeverity => GasReadingsStatus.Valid ? Severity.Success : Severity.Warning;
 
     [Inject] IState<HistoricalForecastState> HistoricalForecastState { get; set; }
 
-    public bool GasHistoricalForecastValid =>
-            GasMeterSetupValid && GasReadingsValid &&
-            HistoricalForecastState.Value[MeterType.Gas].eIsNotNullOrEmpty()
-            && HistoricalForecastState.Value[MeterType.Gas].Count >= 180;
+    public (bool Valid, string Status) GasHistoricalForecastStatus => GetHistoricalForecastStatus(MeterType.Gas);
 
-    public string GasHistoricalForecastStatus => GetGasHistoricalForecastStatus();
+    public Severity GasHistoricalForecastSeverity => GasHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
-    string GetGasHistoricalForecastStatus()
+    public (bool Valid, string Status) ElectricityHistoricalForecastStatus => GetHistoricalForecastStatus(MeterType.Electricity);
+
+    public Severity ElectricityHistoricalForecastSeverity => ElectricityHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
+
+
+    (bool Valid, string Status) GetHistoricalForecastStatus(MeterType meterType)
     {
-        if (!GasMeterSetupValid)
+        if (!MeterSetupState.Value[meterType].SetupValid)
         {
-            return "Requires Meter Setup";
+            return (false, "Requires Meter Setup");
         }
 
-        if (!GasReadingsValid)
+        var readings = GetBasicReadings(meterType);
+
+        if (readings.eIsNullOrEmpty())
         {
-            return "Forecasting requires sufficient Gas Readings loaded";
+            return (false, $"No {meterType} readings available");
         }
 
-        if (HistoricalForecastState.Value[MeterType.Gas].eIsNullOrEmpty())
+        if (readings.Count < 180 * 48)
         {
-            return "No historical forecast calculated for Gas Meter";
+            return (false, $@"Ideally require at least 180 days of historical readings for historical forecasting. 
+                                Currently first reading is {readings.First().UtcTime.eDateToDowShortMonthYY()}");
         }
 
-        if (HistoricalForecastState.Value[MeterType.Gas].Count < 180)
+        if (HistoricalForecastState.Value[meterType].eIsNullOrEmpty())
         {
-            return $"Expecting at least 180 historical forecast calculated, current total: {HistoricalForecastState.Value[MeterType.Gas].Count}";
+            return (false, $"No historical forecast calculated for {meterType} Meter");
         }
 
-        return $"Range {HistoricalForecastState.Value[MeterType.Gas].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Gas].Last().UtcTime.eToLongDateString()}";
+
+        return (true, $"From {HistoricalForecastState.Value[meterType].First().UtcTime.eDateToDowShortMonthYY()} to {HistoricalForecastState.Value[meterType].Last().UtcTime.eDateToDowShortMonthYY()}");
     }
 
-    public Severity GasHistoricalForecastSeverity => GasHistoricalForecastValid ? Severity.Success : Severity.Warning;
 
 
-    public bool ElectricityHistoricalForecastValid =>
-        ElectricityMeterSetupValid && ElectricityReadingsValid &&
-        HistoricalForecastState.Value[MeterType.Electricity].eIsNotNullOrEmpty()
-        && HistoricalForecastState.Value[MeterType.Electricity].Count >= 180;
 
-    public string ElectricityHistoricalForecastStatus => GetElectricityHistoricalForecastStatus();
 
-    string GetElectricityHistoricalForecastStatus()
-    {
-        if (!ElectricityMeterSetupValid)
-        {
-            return "Requires Meter Setup";
-        }
 
-        if (!ElectricityReadingsValid)
-        {
-            return "Requires sufficient Electricity Readings loaded";
-        }
 
-        if (HistoricalForecastState.Value[MeterType.Electricity].eIsNullOrEmpty())
-        {
-            return "No historical forecast calculated for Electricity Meter";
-        }
-
-        if (HistoricalForecastState.Value[MeterType.Electricity].Count < 180)
-        {
-            return $"Expecting at least 180 historical forecast calculated, current total: {HistoricalForecastState.Value[MeterType.Electricity].Count}";
-        }
-
-        return $"Range: {HistoricalForecastState.Value[MeterType.Electricity].First().UtcTime.eToLongDateString()} to {HistoricalForecastState.Value[MeterType.Electricity].Last().UtcTime.eToLongDateString()}";
-    }
-
-    public Severity ElectricityHistoricalForecastSeverity => ElectricityHistoricalForecastValid ? Severity.Success : Severity.Warning;
 
     [Inject] IState<AnalysisOptionsState> AnalysisOptions { get; set; }
 
@@ -239,95 +214,40 @@
 
     [Inject] IState<HeatingForecastState> HeatingForecastState { get; set; }
 
-    public bool HeatingForecastValid => GetHeatingForecastValid();
 
-    private bool GetHeatingForecastValid()
+    private (bool Valid, string Status) HeatingForecastStatus => GetHeatingForecastStatus();
+
+    private (bool Valid, string Status) GetHeatingForecastStatus()
     {
         var heatSourceMeterType = HouseholdState.Value.PrimaryHeatSource;
-        bool initialStateValid = false;
-        switch (heatSourceMeterType)
+
+        var readingsStatus = GetMeterReadingsStatus(heatSourceMeterType);
+
+        if (!readingsStatus.Valid)
         {
-            case MeterType.Gas:
-                initialStateValid = GasMeterSetupValid && GasReadingsValid;
-                break;
-            case MeterType.Electricity:
-                initialStateValid = ElectricityMeterSetupValid && ElectricityReadingsValid;
-                break;
-            default:
-                return false;
-        }
-
-        return initialStateValid
-            && HeatingForecastState.Value.SavedCoefficients
-            && HeatingForecastState.Value.ForecastWeatherReadings.eIsNotNullOrEmpty()
-            && HeatingForecastState.Value.ForecastDailyCosts.eIsNotNullOrEmpty()
-            && HeatingForecastState.Value.ForecastDailyCosts.Count >= 180;
-    }
-
-    private string HeatingForecastStatus => GetHeatingForecastStatus();
-
-    private string GetHeatingForecastStatus()
-    {
-        var heatSourceMeterType = HouseholdState.Value.PrimaryHeatSource;
-        switch (heatSourceMeterType)
-        {
-            case MeterType.Gas:
-                if (!GasMeterSetupValid)
-                {
-                    return "Requires Gas Meter Setup";
-                }
-
-                if (!GasReadingsValid)
-                {
-                    return "Requires sufficient Gas Readings loaded";
-                }
-                break;
-            case MeterType.Electricity:
-                if (!ElectricityMeterSetupValid)
-                {
-                    return "Requires Electricity Meter Setup";
-                }
-
-                if (!ElectricityReadingsValid)
-                {
-                    return "Requires sufficient Electricity Readings loaded";
-                }
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-
+            return (false, readingsStatus.Status);
         }
 
         if (!HeatingForecastState.Value.SavedCoefficients)
         {
-            return "Heating forecast coefficients not inititalized";
+            return (false, "Heating forecast coefficients not inititalized");
         }
 
         if (HeatingForecastState.Value.ForecastWeatherReadings.eIsNullOrEmpty())
         {
-            return "Forecast weather data not loaded";
+            return (false, "Forecast weather data not loaded");
         }
 
         if (HeatingForecastState.Value.ForecastDailyCosts.eIsNullOrEmpty())
         {
-            return "Forecast daily costs not loaded";
+            return (false, "Forecast daily costs not loaded");
         }
 
-        var daysForecast = HeatingForecastState.Value.ForecastDailyCosts.Count;
-        if (daysForecast < 180)
-        {
-            return $"Limited forecast readings, expect at least 180 days forecast, only found {daysForecast}";
-        }
+        return (true, $@"Heating forecast range: {HeatingForecastState.Value.ForecastDailyCosts.First().UtcTime.eDateToDowShortMonthYY()}
+                        to {HeatingForecastState.Value.ForecastDailyCosts.Last().UtcTime.eDateToDowShortMonthYY()}");
 
-        if (HeatingForecastValid)
-        {
-            return $@"Heating forecast range: {HeatingForecastState.Value.ForecastDailyCosts.First().UtcTime.eToLongDateString()}
-                        to {HeatingForecastState.Value.ForecastDailyCosts.Last().UtcTime.eToLongDateString()}";
-        }
-
-        throw new Exception("Heating forecast status not handled");
     }
 
-    public Severity HeatingForecastSeverity => HeatingForecastValid ? Severity.Success : Severity.Warning;
+    public Severity HeatingForecastSeverity => HeatingForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
 }

@@ -29,6 +29,7 @@ namespace Energy.App.Standalone.PageComponents
         [Inject]
         IState<HouseholdState> HouseholdState { get; set; }
 
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

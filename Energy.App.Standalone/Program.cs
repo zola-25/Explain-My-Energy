@@ -59,7 +59,6 @@ builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>()
 //builder.Services.AddTransient<IWeatherDataWorkerService, WeatherDataWorkerService>();
 builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
-
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
