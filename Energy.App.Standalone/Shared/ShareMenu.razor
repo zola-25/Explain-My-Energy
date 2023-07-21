@@ -1,0 +1,66 @@
+﻿@using System.Text.Encodings.Web;
+<MudMenu>
+    <ActivatorContent>
+        <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.IosShare" />
+    </ActivatorContent>
+    <ChildContent>
+        <MudMenuItem Class="d-flex py-0" Disabled="true" Style="pointer-events: none;">
+            <MudText Color="Color.Dark" Class="fw-bold" Align="Align.Left">
+                Share via
+            </MudText>
+        </MudMenuItem>
+
+        <MudMenuItem Disabled="_disabledDuringDevelopment"
+                     Href="@($"https://www.facebook.com/sharer/sharer.php?u={_encodedBaseUri}")" Target="_blank"
+                     Class="facebook-share"
+                     IconSize="Size.Large"
+                     Icon="@Icons.Custom.Brands.Facebook">
+            <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">Facebook</MudText>
+        </MudMenuItem>
+
+        <MudMenuItem Disabled="_disabledDuringDevelopment"
+                     Href="@($"https://www.linkedin.com/sharing/share-offsite/?url={_encodedBaseUri}")" Target="_blank"
+                     Class="linkedIn-share"
+                     IconSize="Size.Large"
+                     Icon="@Icons.Custom.Brands.LinkedIn">
+            <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">LinkedIn</MudText>
+        </MudMenuItem>
+        <MudMenuItem Disabled="_disabledDuringDevelopment"
+                     Href="@($"https://twitter.com/intent/tweet?url={_encodedBaseUri}&text={_encodedText}")" Target="_blank"
+                     Class="twitter-share"
+                     IconSize="Size.Large"
+                     Icon="@Icons.Custom.Brands.Twitter">
+            <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">Twitter</MudText>
+        </MudMenuItem>
+    </ChildContent>
+</MudMenu>
+<style>
+    .facebook-share .mud-list-item-icon {
+        color: #1877f2;
+        min-width: fit-content;
+    }
+
+    .twitter-share .mud-list-item-icon {
+        color: rgb(29, 155, 240);
+        min-width: fit-content;
+    }
+
+    .linkedIn-share .mud-list-item-icon {
+        color: #0a66c2;
+        min-width: fit-content;
+    }
+</style>
+@code {
+
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    bool _disabledDuringDevelopment = true;
+    string _encodedBaseUri;
+    string _encodedText;
+    protected override void OnInitialized()
+    {
+
+        _encodedBaseUri = UrlEncoder.Default.Encode(NavigationManager.BaseUri);
+        _encodedText = UrlEncoder.Default.Encode("Explain My Energy");
+    }
+}

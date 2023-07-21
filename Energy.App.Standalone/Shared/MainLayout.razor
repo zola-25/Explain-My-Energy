@@ -1,15 +1,19 @@
 ﻿@inherits LayoutComponentBase
-@inject IDispatcher Dispatcher
-
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="1" Class="d-flex flex-grow-1 gap-4">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <a href="/" style="text-decoration: none; color: inherit;"><MudText Typo="Typo.h5" Class="ml-3">Explain My Energy</MudText></a>
+        <a href="/" style="text-decoration: none; color: inherit;"><MudText Typo="Typo.h5" Class="ml-3" Style="width: max-content;">Explain My Energy</MudText></a>
         <MudSpacer />
+        <MudNavLink Class="menu-nav-item" Href="/About" ActiveClass="menu-nav-item-active" Match="NavLinkMatch.Prefix" Style="max-width: fit-content;">
+            <MudText Align="Align.Start" Typo="Typo.h6" >About</MudText>
+        </MudNavLink>
+        <MudTooltip Arrow="true" Placement="Placement.Bottom" ShowOnClick="false" ShowOnFocus="true" ShowOnHover="true" Text="Share this App!">
+            <ShareMenu />
+        </MudTooltip>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu></NavMenu>
@@ -23,10 +27,28 @@
     </MudMainContent>
 </MudLayout>
 
+<style>
 
+    .menu-nav-item {
+        border-radius: 30px;
+    }
+
+    .menu-nav-item .mud-nav-link-text {
+        margin: unset;
+    }
+    .menu-nav-item a {
+        text-decoration: none;
+    }
+
+    .menu-nav-item a:hover {
+        color: white;
+    }
+
+    .menu-nav-item-active {
+        background-color: var(--mud-palette-action-default-hover);
+    }
+</style>
 @code {
-
-
 
     bool _drawerOpen = true;
 

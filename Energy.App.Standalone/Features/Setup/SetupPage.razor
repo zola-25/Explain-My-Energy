@@ -1,4 +1,5 @@
 ﻿@page "/Setup"
+@using Blazored.LocalStorage;
 
 @inherits FluxorComponent
 
@@ -9,7 +10,19 @@
 
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
-            <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3 eme-focus">App Setup</MudText>
+        <div class="d-flex justify-content-end align-items-baseline">
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3 mx-auto eme-focus">App Setup</MudText>
+            <MudIconButton Class="m-0"
+                           ButtonType="ButtonType.Button"
+                           Size="Size.Small"
+                           Variant="Variant.Outlined"
+                           OnClick="WipeAllAsync"
+                           Color="Color.Error"
+                           Icon="@Icons.Material.Filled.DeleteForever"
+                           Title="Wipe all data">
+                Wipe All Data
+            </MudIconButton>
+        </div>
     </MudItem>
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
@@ -31,3 +44,71 @@
     </MudItem>
 </MudGrid>
 
+<MudMessageBox @ref="WipeAllDataBox" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        This will remove all user associated data,<br />
+        reset the application and return the user to the initial welcome screen
+        <br />
+        <br />
+        <strong>This cannot be undone</strong>
+        <br />
+        <br />
+
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Text" Class="ml-2" Color="Color.Error" Size="Size.Small">Delete</MudButton>
+    </YesButton>
+    <CancelButton>
+        <MudButton Variant="Variant.Text" Color="Color.Default" Size="Size.Small">Cancel</MudButton>
+    </CancelButton>
+</MudMessageBox>
+
+<MudPopover Open="@_showWipeError" Fixed="true" Class="px-4 pt-4">
+    <div class="d-flex flex-column">
+        <MudText>Error wiping all user data</MudText>
+        <MudButton OnClick="@ToggleErrorPopover" Class="ml-auto mb-1" Color="Color.Error">Close</MudButton>
+    </div>
+</MudPopover>
+
+
+@code {
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    ILogger<SetupPage> Logger { get; set; }
+
+    private MudMessageBox WipeAllDataBox { get; set; }
+
+    public void ToggleErrorPopover()
+    {
+        _showWipeError = !_showWipeError;
+    }
+    private bool _showWipeError = false;
+
+    private async void WipeAllAsync()
+    {
+        try
+        {
+            bool? result = await WipeAllDataBox.Show();
+            if (result == null || result == false)
+            {
+                return;
+            }
+            await LocalStorageService.ClearAsync();
+            NavigationManager.NavigateTo("/", new NavigationOptions()
+                {
+                    ForceLoad = true,
+                    ReplaceHistoryEntry = true
+                });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Exception while wiping all data");
+            _showWipeError = true;
+        }
+    }
+}

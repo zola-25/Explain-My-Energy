@@ -1,10 +1,10 @@
 ﻿@inherits FluxorComponent
 
-<MudPaper class="py-3" Elevation="0">
+<MudPaper Class="py-0" Elevation="0">
     <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
 
         <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Href="/Setup" Class="menu-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-nav-item">
+            <MudNavLink Href="/Setup" Class="navbar-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-navbar-item">
                 Setup
                 @if (HouseholdSetupValid)
                 {
@@ -20,12 +20,12 @@
         <MudDivider></MudDivider>
 
         <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Disabled="ElectricityDisabled" Class="menu-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-nav-item">
+            <MudNavLink Disabled="ElectricityDisabled" Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsElectricity">Electricity</MeterNavLinkContent>
             </MudNavLink>
         </MudTooltip>
         <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Disabled="GasDisabled" Class="menu-nav-item" Href="@GasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-nav-item">
+            <MudNavLink Disabled="GasDisabled" Class="navbar-nav-item" Href="@GasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-navbar-item">
                 <MeterNavLinkContent IsHeating="HeatingMeterIsGas">Gas</MeterNavLinkContent>
             </MudNavLink>
         </MudTooltip>
@@ -34,11 +34,11 @@
 
 <style>
     
-    .menu-nav-item a {
+    .navbar-nav-item a {
         text-decoration: none;
     }
 
-    .active-nav-item {
+    .active-navbar-item {
         background-color: lightgrey
     }
 </style>
