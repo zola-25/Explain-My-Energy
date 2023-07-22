@@ -1,0 +1,54 @@
+﻿@inherits FluxorComponent
+
+<MudText Align="Align.Left" Typo="Typo.h5" Class="m-3 fw-bolder">Analysis Options Status</MudText>
+<MudTable Items="AnalysisOptions.Value.All" Elevation="0">
+    <HeaderContent>
+        <MudTh Class="fw-bold">
+            Meter Type
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Forecast Type
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Calendar Term
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Highlight Set
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Highlight Toggle Source
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Highlight Start
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Highlight End
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Show Cost
+        </MudTh>
+        <MudTh Class="fw-bold">
+            Degree difference
+        </MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Meter Type">@context.MeterType</MudTd>
+        <MudTd DataLabel="Forecast Type">@(context.UseHistoricalForecast ? "Historical Moving Average" : "Temperature Dependent")</MudTd>
+            <MudTd DataLabel="Calendar Term">@context.CalendarTerm</MudTd>
+            <MudTd DataLabel="Highlight Set">@context.HighlightSet</MudTd>
+            <MudTd DataLabel="Toggle Source">@context.ToggleSource</MudTd>
+            <MudTd DataLabel="Highlight Start">@context.HighlightStart.eToString("ddd dnn MMM yyyy", true)</MudTd>
+            <MudTd DataLabel="Highlight End">@context.HighlightEnd.eToString("ddd dnn MMM yyyy", true)</MudTd>
+            <MudTd DataLabel="Show Cost">@context.ShowCost</MudTd>
+            <MudTd DataLabel="Degree difference">@(context.DegreeDifference.ToString("+#;-#;0"))°C @(context.MeterType != HouseholdState.Value.PrimaryHeatSource ? "(N/A)" : "")</MudTd>
+
+        </RowTemplate>
+    </MudTable>
+@code {
+
+    [Inject]
+    IState<HouseholdState> HouseholdState { get; set; }
+    
+    [Inject]
+    IState<AnalysisOptionsState> AnalysisOptions { get; set; }
+}

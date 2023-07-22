@@ -1,5 +1,4 @@
 ﻿@inherits FluxorComponent
-@inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
 
 @if (_readyToInteract)
@@ -62,7 +61,7 @@
             <MudCardActions Class="d-flex flex-column align-items-start ">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
 
-                <MudText Class="mt-3 fw-bold" Color="Color.Success"  hidden="@(!_submitSuccessful)">
+                <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
                     @_saveResponseMessage
                 </MudText>
             </MudCardActions>
@@ -71,27 +70,26 @@
 }
 @code {
 
-    private HouseholdDetails _householdDetails = new();
+    [Inject] IState<HouseholdState> HouseholdState { get; set; }
 
+    [Parameter] public EventCallback SaveSuccessfulCallback {get; set;}
 
-    private async Task<IEnumerable<OutCode>> SearchOutCodes(string inputString, CancellationToken ctx)
-    {
-        return await OutCodeLookup.SearchOutCodes(inputString, ctx);
-    }
-
-
+    HouseholdDetails _householdDetails = new();
 
     string _saveResponseMessage = string.Empty;
     bool _submitSuccessful;
 
     bool _readyToInteract;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await base.OnInitializedAsync();
+        base.OnInitialized();
+
 
         SetHouseholdInputs();
         SubscribeToAction<NotifyHouseholdSavedSuccess>(ShowSuccessMessage);
+
+        _readyToInteract = true;
     }
 
     private void SetHouseholdInputs()
@@ -103,17 +101,14 @@
                 OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
                 PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
             };
-
-
-        _readyToInteract = true;
-
     }
 
 
-    private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
+    private async void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
         _submitSuccessful = true;
         _saveResponseMessage = "Household Details Saved";
+        await SaveSuccessfulCallback.InvokeAsync();
     }
 
 
@@ -126,6 +121,10 @@
 
     }
 
+    private async Task<IEnumerable<OutCode>> SearchOutCodes(string inputString, CancellationToken ctx)
+    {
+        return await OutCodeLookup.SearchOutCodes(inputString, ctx);
+    }
 
     private void ClearPostalArea()
     {

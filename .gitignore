@@ -43,6 +43,7 @@ bld/
 **/wwwroot/js/**
 !**/wwwroot/js/bundle.min.js
 **/wwwroot/**/appsettings*
+**/wwwroot/temp/**
 
 **/launchSettings.json
 

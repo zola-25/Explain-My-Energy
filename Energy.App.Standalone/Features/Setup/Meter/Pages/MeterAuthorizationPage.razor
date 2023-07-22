@@ -36,17 +36,18 @@
                         <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
                         <MudText>Your meter data is now being loaded</MudText>
 
-                        <MudTooltip ShowOnHover="true" Text="Return to Setup to import your meter data">
+                        @if (!FromWizard)
+                        {
+                            <MudTooltip ShowOnHover="true" Text="Return to Setup">
 
-                            <MudButton OnClick="LoadDataAndReturnToSetup"
-                                       Color="Color.Primary"
-                                       ButtonType="ButtonType.Button"
-                                       Variant="Variant.Filled"
-                                       Size="Size.Small"
-                                       StartIcon="@Icons.Material.Filled.ArrowBack">Load Readings and Return to Setup</MudButton>
-                        </MudTooltip>
-
-                        @*<LoadingDataDisplay GlobalId="_meter.GlobalId"></LoadingDataDisplay>*@
+                                <MudButton OnClick="ReturnToSetup"
+                                           Color="Color.Primary"
+                                           ButtonType="ButtonType.Button"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           StartIcon="@Icons.Material.Filled.ArrowBack">Return to Setup</MudButton>
+                            </MudTooltip>
+                        }
                     </div>
                     <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
                         <p class="text-warning">Authorization Failed</p>
@@ -60,80 +61,3 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
-
-@code
-{
-    [Inject]
-    public IMeterAuthorizationCheck MeterAuthorizationCheck { get; set; }
-
-    [Parameter]
-    public string MeterTypeText { get; set; }
-
-    private string MpxnLabel => _meterType == MeterType.Gas ? "Gas MPRN" : "Electricity MPAN";
-
-    private string MoveInDateString => HouseholdState.Value.MoveInDate!.Value.ToString("d");
-
-    private bool AuthorizeSucceeded { get; set; }
-    private bool AuthorizeFailed { get; set; }
-
-    private string AuthorizeResponseMessage { get; set; }
-
-
-    private MeterType _meterType;
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _meterType = MeterTypeText.eStringToEnum<MeterType>();
-        await CheckAuthorization();
-    }
-
-    private void LoadDataAndReturnToSetup()
-    {
-
-        switch (_meterType)
-        {
-            case MeterType.Gas:
-                Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(true));
-                break;
-            case MeterType.Electricity:
-                Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(true));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        NavigationManager.NavigateTo("/Setup");
-
-    }
-
-    private async Task CheckAuthorization()
-    {
-        var response = await MeterAuthorizationCheck.TestAccess(_meterType, HouseholdState.Value.IhdMacId);
-        if (response.Success)
-        {
-            switch (_meterType)
-            {
-                case MeterType.Gas:
-                    Dispatcher.Dispatch(new AuthorizeGasAction());
-                    break;
-                case MeterType.Electricity:
-                    Dispatcher.Dispatch(new AuthorizeElectricityAction());
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            AuthorizeSucceeded = true;
-            AuthorizeFailed = false;
-        }
-        else
-        {
-            AuthorizeSucceeded = false;
-            AuthorizeFailed = true;
-            AuthorizeResponseMessage = response.FailureReason;
-        }
-    }
-
-}

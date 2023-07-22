@@ -10,9 +10,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Shared", "Energy.Shared\Energy.Shared.csproj", "{FC6B375C-B692-428E-892B-DF71584049F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Solution Items", "0. Solution Items", "{D3A012E3-8D35-4AD2-9650-F752BC1CA0AA}"
-	ProjectSection(SolutionItems) = preProject
-		MudTooltipSnippet.snippet = MudTooltipSnippet.snippet
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.n3rgyApi", "Energy.n3rgyApi\Energy.n3rgyApi.csproj", "{9FCA55BC-50B0-445B-B8D1-0C7DAB05DB52}"
 EndProject

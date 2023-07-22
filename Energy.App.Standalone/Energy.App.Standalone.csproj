@@ -29,15 +29,19 @@
 	</ItemGroup>
 
 
+	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
+	</Target>
+
 	<ItemGroup>
-	  <Folder Include="wwwroot\js\" />
+		<Folder Include="wwwroot\js\" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-	  <Content Update="wwwroot\js\bundle.min.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="wwwroot\js\bundle.min.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -48,7 +52,7 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Condition="'$(Configuration)'=='Debug'" Command="npm run buildDev --prefix JS/" />
-		
+
 	</Target>
 
 </Project>

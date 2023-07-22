@@ -425,6 +425,30 @@ public static class Extensions
     }
 
 
+    // Get the highest possible integer of a flags Enum
+    public static int eGetMaxFlagValue<T>(this T flags) where T : Enum
+    {
+        int max = 0;
+        foreach (T value in Enum.GetValues(flags.GetType()))
+        {
+            max |= Convert.ToInt32(value);
+        }
+        return max;
+    }
+
+    // Iterate through a Flags Enum to get a list of the individual flags that are set
+    public static IEnumerable<T> eGetFlags<T>(this T flags) where T : Enum
+    {
+        foreach (T value in Enum.GetValues(flags.GetType()))
+        {
+            if (flags.HasFlag(value))
+            {
+                yield return value;
+            }
+        }
+    }
+
+
 
     public static IEnumerable<T> eToIEnumerable<T>(this T[] items)
     {

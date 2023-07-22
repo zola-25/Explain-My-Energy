@@ -1,0 +1,217 @@
+﻿
+
+
+<div class="popover-container">
+    <div class="@(_open ? "popover-overlay" : "no-overlay")">@_open</div>
+
+    <MudPopover Open="_open"
+                Class="eme-popover"
+                OverflowBehavior="OverflowBehavior.FlipAlways"
+                AnchorOrigin="Origin.BottomCenter"
+                TransformOrigin="Origin.TopCenter"
+                RelativeWidth="true">
+
+
+        <MudPaper Elevation="2" Class="p-4">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="12">
+                    <div class="d-flex justify-content-end">
+                        <MudText Class="@((showHeader) ? "mx-auto fw-bold" : "mx-auto fw-bold eme-popover-header-hide")" Align="Align.Center" Typo="Typo.h5">@headerText</MudText>
+                        <MudIconButton Class="m-0" Icon="@Icons.Material.Filled.Close" OnClick="CloseModal"></MudIconButton>
+                    </div>
+                </MudItem>
+                <MudItem xs="12">
+                    @if (_showWelcomeFirst)
+                    {
+                        <WelcomeText OnNext="WelcomeTextOnNextClicked" OnClose="CloseModal"></WelcomeText>
+                    }
+                    else
+                    {
+                        @switch (_currentStage)
+                        {
+                            case SetupStage.NotSeenWelcomeScreenSplash:
+                                <WelcomeText OnNext="WelcomeTextOnNextClicked" ></WelcomeText>
+                                break;
+                            case SetupStage.HouseholdNotSetup:
+                                showHeader = false;
+                                <Household SaveSuccessfulCallback="OnSuccessfulCallback" />
+                                break;
+                            case SetupStage.GasMeterNotSetup:
+                                <AddGasMeterPage OnSuccessfulCallback="OnSuccessfulCallback" />
+
+                                break;
+                            case SetupStage.GasMeterNotAuthorized:
+                                <MeterAuthorizationPage MeterTypeText="@MeterType.Gas.ToString()" OnSuccessfulCallback="OnSuccessfulCallback" FromWizard="true" />
+
+                                break;
+                            case SetupStage.ElectricityMeterNotSetup:
+                                <AddElectricityMeterPage OnSuccessfulCallback="OnSuccessfulCallback" />
+                                break;
+                            case SetupStage.ElectricityMeterNotAuthorized:
+                                <MeterAuthorizationPage MeterTypeText="@MeterType.Electricity.ToString()" OnSuccessfulCallback="OnSuccessfulCallback" FromWizard="true" />
+                                break;
+                            case SetupStage.None:
+                                <div class="d-flex">
+                                    <MudAlert Severity="Severity.Success" Elevation="0" Class="eme-alert">Setup wizard completed</MudAlert>
+                                </div>
+                                <div class="d-flex">
+                                    <MudButton ButtonType="ButtonType.Button" OnClick="GoToAnalysis" Color="Color.Success">View Analysis</MudButton>
+                                </div>
+                                break;
+
+         !!         !!          default:
+                                Logger.LogError("Setup Stage should not be processed: {SetupStage}", _currentStage);
+                                break;
+                        }
+                    }
+                </MudItem>
+                <MudItem xs="12">
+                    <div class="d-flex justify-content-evenly">
+                        <MudButton hidden="@(_currentStage == SetupStage.None)" Disabled="_updateStageSuccess" ButtonType="ButtonType.Button" OnClick="GoToNextStage" Color="Color.Success">Next</MudButton>
+                        <MudButton hidden="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
+
+                    </div>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+
+    </MudPopover>
+
+</div>
+
+@code {
+
+    [Inject] ILogger<Modal> Logger { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] InMemoryStateContainer InMemoryStateContainer { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+
+    [Parameter] public SetupStage InitialSetupStages { get; set; }
+
+    List<SetupStage> _setupStages;
+    bool _open = false;
+
+    bool showHeader = true;
+    string headerText;
+
+    SetupStage _currentStage;
+    SetupStage _nextValidStage;
+    bool _updateStageSuccess = false;
+    bool _canSkipCurrentStage = true;
+
+
+    private Task WelcomeTextOnNextClicked()
+    {
+        InMemoryStateContainer.ClosedWelcome = true;
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        @if (InitialSetupStages == SetupStage.None)
+        {
+            Logger.LogInformation("All setup stages complete: {InitialSetupStages}", InitialSetupStages);
+        }
+        @if ((InitialSetupStages & SetupStage.NotSeenWelcomeScreenSplash) != 0)
+        {
+            headerText = "Welcome to Explain my Energy";
+            showHeader = true;
+        }
+
+        _setupStages = InitialSetupStages.eGetFlags().Where(c => c != SetupStage.None).ToList();
+
+        _currentStage = _setupStages.First();
+
+        SetSkipToNextValidStageValid();
+
+        _open = Open;
+
+        StateHasChanged();
+    }
+
+
+    void SetSkipToNextValidStageValid()
+    {
+
+        if (_currentStage == SetupStage.HouseholdNotSetup)
+        {
+            _canSkipCurrentStage = false;
+            _nextValidStage = _setupStages.Find(c => c > SetupStage.HouseholdNotSetup);
+            return;
+        }
+
+        if (_currentStage == SetupStage.None)
+        {
+            _canSkipCurrentStage = false;
+            _nextValidStage = _currentStage;
+            return;
+        }
+
+        var nextStage = _setupStages.Find(c => c > _currentStage);
+
+        if (_currentStage == SetupStage.GasMeterNotSetup || _currentStage == SetupStage.GasMeterNotAuthorized)
+        {
+            if (_setupStages.Exists(c => c == SetupStage.ElectricityMeterNotSetup))
+            {
+                _canSkipCurrentStage = true;
+                _nextValidStage = SetupStage.ElectricityMeterNotSetup;
+                return;
+            }
+
+            if (_setupStages.Exists(c => c == SetupStage.ElectricityMeterNotAuthorized))
+            {
+                _canSkipCurrentStage = true;
+                _nextValidStage = SetupStage.ElectricityMeterNotAuthorized;
+                return;
+            }
+        }
+        _nextValidStage = nextStage;
+        _canSkipCurrentStage = false;
+
+    }
+
+    void SkipToNextValidStage()
+    {
+        _currentStage = _nextValidStage;
+        SetSkipToNextValidStageValid();
+
+        StateHasChanged();
+    }
+
+    void GoToNextStage()
+    {
+        _setupStages.Remove(_currentStage);
+        _currentStage = _setupStages.FirstOrDefault();
+        _updateStageSuccess = false;
+        SetSkipToNextValidStageValid();
+
+        StateHasChanged();
+    }
+
+    public void OnSuccessfulCallback()
+    {
+        _updateStageSuccess = true;
+
+        StateHasChanged();
+    }
+
+    void GoToAnalysis()
+    {
+        _open = false;
+        OpenChanged.InvokeAsync(false);
+
+        NavigationManager.NavigateTo("/Analysis"); //TODO: Setup custom route
+    }
+
+    void CloseModal()
+    {
+        InMemoryStateContainer.ClosedWelcome = true;
+        _open = false;
+        OpenChanged.InvokeAsync(false);
+    }
+
+}

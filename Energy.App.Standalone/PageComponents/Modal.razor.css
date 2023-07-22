@@ -1,0 +1,28 @@
+
+.eme-popover {
+    position: fixed;
+    z-index: 1000;
+}
+
+.no-overlay {
+    display: none;
+}
+
+.eme-popover-header-hide {
+    visibility: hidden;
+}
+.popover-overlay {
+    position: fixed; /* Fix position to the top-left of the screen */
+    top: 0;
+    left: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 999; /* Above everything else */
+}
+
+.popover-container {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}

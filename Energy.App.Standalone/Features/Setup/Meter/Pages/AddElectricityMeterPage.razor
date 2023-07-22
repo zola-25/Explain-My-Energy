@@ -30,14 +30,13 @@
 
                         <DataAnnotationsValidator />
 
-                        <MudInput  For="@(() => ElectricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@ElectricityMeter.Mpxn" Placeholder="MPAN" Required></MudInput>
+                        <MudInput For="@(() => ElectricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@ElectricityMeter.Mpxn" Placeholder="MPAN" Required></MudInput>
 
                         <div id="national-grid-iframe-container" class="mt-5 @(!HideNationalGrid ? "toggled" : "")">
                             <p>Don't know your Electricity Meter's MPAN number?</p>
                             <p>Quickly find it via the <MudButton Size="Size.Small" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Bolt" Variant="Variant.Outlined" Color="Color.Default" @onclick="ToggleNationalGrid">National Grid</MudButton></p>
                             <iframe id="iframeNationalGrid" hidden="@HideNationalGrid"
-                                    src="https://supplier.nationalgrid.co.uk/"
-                                    ></iframe>
+                                    src="https://supplier.nationalgrid.co.uk/"></iframe>
                         </div>
 
 
@@ -71,11 +70,16 @@
     </MudGrid>
 
 
-    @code
-    {
+    @code {
+
+    [Inject]
+    ILogger<AddElectricityMeterPage> Logger { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    [Parameter]
+    public EventCallback OnSuccessfulCallback { get; set; }
 
     private Meter ElectricityMeter { get; set; }
 
@@ -112,22 +116,25 @@
 
 
 
-    private void HandleValidSubmit()
+    private async void HandleValidSubmit()
     {
-        if (_addingNotUpdating)
+        try
         {
-            Dispatcher.Dispatch(new AddElectricityAction(ElectricityMeter));
+            if (_addingNotUpdating)
+            {
+                Dispatcher.Dispatch(new AddElectricityAction(ElectricityMeter));
+            }
+            else
+            {
+                Dispatcher.Dispatch(new UpdateElectricityAction(ElectricityMeter));
+            }
+            _submitSuccessful = true;
+            await OnSuccessfulCallback.InvokeAsync();
         }
-        else
+        catch (Exception ex)
         {
-            Dispatcher.Dispatch(new UpdateElectricityAction(ElectricityMeter));
+            Logger.LogError(ex, "Error adding/updating electricity meter");
         }
-        ShowSuccessMessage();
-    }
-
-    private void ShowSuccessMessage()
-    {
-        _submitSuccessful = true;
     }
 
 }

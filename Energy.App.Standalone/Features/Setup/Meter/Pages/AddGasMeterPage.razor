@@ -30,7 +30,7 @@
 
                     </MudCardContent>
                     <MudCardActions Class="d-block">
-                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
                             <MudGrid Spacing="2" Class="mt-2" hidden=" @(!_submitSuccessful)">
                                 <MudItem>
@@ -60,9 +60,13 @@
 
     @code
     {
+    [Inject] ILogger<AddGasMeterPage> Logger { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    [Parameter]
+    public EventCallback OnSuccessfulCallback { get; set; }
 
     private Meter GasMeter { get; set; }
 
@@ -92,21 +96,25 @@
     }
 
 
-    private void HandleValidSubmit()
+    private async void HandleValidSubmit()
     {
-        if (_addingNotUpdating)
+        try
         {
-            Dispatcher.Dispatch(new AddGasAction(GasMeter));
-        }
-        else
+            if (_addingNotUpdating)
+            {
+                Dispatcher.Dispatch(new AddGasAction(GasMeter));
+            }
+            else
+            {
+                Dispatcher.Dispatch(new UpdateGasAction(GasMeter));
+            }
+            _submitSuccessful = true;
+            await OnSuccessfulCallback.InvokeAsync();
+        } 
+        catch (Exception ex)
         {
-            Dispatcher.Dispatch(new UpdateGasAction(GasMeter));
+            Logger.LogError(ex, "Error adding/updating gas meter");
         }
-        ShowSuccessMessage();
     }
 
-    private void ShowSuccessMessage()
-    {
-        _submitSuccessful = true;
-    }
 }
