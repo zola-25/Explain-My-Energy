@@ -49,7 +49,7 @@
             case SetupStage.GasMeterNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <AddGasMeterPage OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
+                        <AddGasMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
                     </SetupStepPage>
                     <ActionButtons>
                         <div class="d-flex justify-content-evenly">
@@ -83,7 +83,7 @@
             case SetupStage.ElectricityMeterNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <AddElectricityMeterPage OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
+                        <AddElectricityMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
 
                     </SetupStepPage>
                     <ActionButtons>

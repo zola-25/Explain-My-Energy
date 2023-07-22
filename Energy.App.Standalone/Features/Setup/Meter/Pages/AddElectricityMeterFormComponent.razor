@@ -1,0 +1,114 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+
+@if (_ready)
+{
+    <EditForm Model="@_electricityMeter" OnValidSubmit="@HandleValidSubmit">
+        <MudCard Elevation="0">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Add your Electricity Meter</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+
+
+                <DataAnnotationsValidator />
+
+                <MudInput For="@(() => _electricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@_electricityMeter.Mpxn" Placeholder="MPAN"
+                        Required></MudInput>
+
+                <div id="national-grid-iframe-container" class="mt-5 @(!_hideNationalGrid ? "toggled" : "")">
+                    <p>Don't know your Electricity Meter's MPAN number?</p>
+                    <p>Quickly find it via the <MudButton Size="Size.Small" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Bolt" Variant="Variant.Outlined" Color="Color.Default" @onclick="ToggleNationalGrid">National Grid</MudButton></p>
+                    <iframe id="iframeNationalGrid" hidden="@_hideNationalGrid"
+                            src="https://supplier.nationalgrid.co.uk/"></iframe>
+                </div>
+
+
+            </MudCardContent>
+            <MudCardActions Class="d-block">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+
+                    <MudGrid Spacing="2" Class="mt-2" hidden=" @(!_submitSuccessful)">
+                        <MudItem>
+
+                            <MudText Color="Color.Success">
+                                <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
+
+                                Electricity Meter Valid - proceed to authorize access to n3rgy.com?
+                            </MudText>
+                        </MudItem>
+
+                    </MudGrid>
+
+                </MudCardActions>
+            </MudCard>
+        </EditForm>
+}
+@code {
+    [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
+
+    [Inject] ILogger<AddElectricityMeterFormComponent> Logger { get; set; }
+
+    [Parameter] public EventCallback OnSuccessfulCallback { get; set; }
+
+
+    bool _hideNationalGrid = true;
+
+    Meter _electricityMeter;
+
+    bool _submitSuccessful;
+
+    bool _addingNotUpdating;
+
+    bool _ready = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        MapElectricityMeter();
+        
+    }
+
+    private void MapElectricityMeter()
+    {
+        var meterState = MeterSetupState.Value.ElectricityMeter;
+        if (meterState.InitialSetupValid)
+        {
+            _addingNotUpdating = false;
+        }
+        else
+        {
+            _addingNotUpdating = true;
+        }
+        _electricityMeter = meterState.eMapToMeterDto();
+        _ready = true;
+    }
+
+    private void ToggleNationalGrid()
+    {
+        _hideNationalGrid = !_hideNationalGrid;
+    }
+
+
+
+    private async void HandleValidSubmit()
+    {
+        try
+        {
+            if (_addingNotUpdating)
+            {
+                Dispatcher.Dispatch(new AddElectricityAction(_electricityMeter));
+            }
+            else
+            {
+                Dispatcher.Dispatch(new UpdateElectricityAction(_electricityMeter));
+            }
+            _submitSuccessful = true;
+            await OnSuccessfulCallback.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error adding/updating electricity meter");
+        }
+    }
+}
