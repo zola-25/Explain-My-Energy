@@ -66,7 +66,7 @@ namespace Energy.App.Standalone.Pages
             Ready = false;
             SetupStage = SetupStage.None;
 
-            SetupStage |= InMemoryStateContainer.ClosedWelcome ? 0 : SetupStage.NotSeenWelcomeScreenSplash;
+            SetupStage |= InMemoryStateContainer.WelcomeTermsAccepted ? 0 : SetupStage.NotSeenWelcomeScreenSplash;
 
             HouseholdSetupValid = !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
             HouseholdStatus = HouseholdSetupValid ? " Valid" : "Setup Required";
@@ -89,7 +89,7 @@ namespace Energy.App.Standalone.Pages
             SetupStage |= electricityMeterState.InitialSetupValid ? 0 : SetupStage.ElectricityMeterNotSetup;
             SetupStage |= electricityMeterState.Authorized ? 0 : SetupStage.ElectricityMeterNotAuthorized;
 
-            bool defaultOpenWizard =  ? false : (SetupStage & SetupStage.HouseholdNotSetup) != 0;
+            bool defaultOpenWizard = ( SetupStage & SetupStage.NotSeenWelcomeScreenSplash ) != 0;
             OpenWizard = OpenWizard || defaultOpenWizard;
             ElectricityMeterSetupValid = electricityMeterState.SetupValid;
             ElectricityStatus = ElectricityMeterSetupValid ? "Setup Valid" : "Setup Required";
@@ -167,10 +167,10 @@ namespace Energy.App.Standalone.Pages
         private (bool Valid, string Status) GetHeatingForecastStatus()
         {
             var heatSourceMeterType = HouseholdState.Value.PrimaryHeatSource;
-            var readingsStatus = GetMeterReadingsStatus(heatSourceMeterType);
-            if (!readingsStatus.Valid)
+            var (Valid, Status) = GetMeterReadingsStatus(heatSourceMeterType);
+            if (!Valid)
             {
-                return (false, readingsStatus.Status);
+                return (false, Status);
             }
 
             if (!HeatingForecastState.Value.SavedCoefficients)
@@ -194,28 +194,22 @@ namespace Energy.App.Standalone.Pages
 
         private ImmutableList<CostedReading> GetCostedReadings(MeterType meterType)
         {
-            switch (meterType)
+            return meterType switch
             {
-                case MeterType.Electricity:
-                    return ElectricityReadingsState.Value.CostedReadings;
-                case MeterType.Gas:
-                    return GasReadingsState.Value.CostedReadings;
-                default:
-                    throw new NotImplementedException();
-            }
+                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings,
+                MeterType.Gas => GasReadingsState.Value.CostedReadings,
+                _ => throw new NotImplementedException(),
+            };
         }
 
         private ImmutableList<BasicReading> GetBasicReadings(MeterType meterType)
         {
-            switch (meterType)
+            return meterType switch
             {
-                case MeterType.Electricity:
-                    return ElectricityReadingsState.Value.BasicReadings;
-                case MeterType.Gas:
-                    return GasReadingsState.Value.BasicReadings;
-                default:
-                    throw new NotImplementedException();
-            }
+                MeterType.Electricity => ElectricityReadingsState.Value.BasicReadings,
+                MeterType.Gas => GasReadingsState.Value.BasicReadings,
+                _ => throw new NotImplementedException(),
+            };
         }
 
         

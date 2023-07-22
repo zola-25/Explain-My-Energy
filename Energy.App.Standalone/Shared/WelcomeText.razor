@@ -1,68 +1,50 @@
 ﻿
-            <MudText Typo="Typo.body1" Align="Align.Start">
-                <strong>Explain my Energy</strong> is a tool to help you understand your existing energy bills and anticipate when and how much they might change.
-                <br />
-                <br />
+<MudText Typo="Typo.body1" Align="Align.Start">
+    <strong>Explain my Energy</strong> is a tool to help you understand your existing energy bills and anticipate when and how much they might change.
+    <br />
+    <br />
 
-                It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be working).
-                <br />
-                <br />
-                We use your historical energy usage, your energy tariff details and local weather data to show you:
-                <br />
-                <br />
-
-
-                1) How much your recent bills have been, and future energy bills will be
-                <br />
-
-                2) How much your spending changes as outside temperatures change  - and allowing you change the forecast to see it effects your bills.
-                <br />
-                <br />
-
-                And that's alongside powerful charting tools that allow you to see everything from granular hourly energy spikes, to whole seasonal energy costs, simply with a mouse scroll (or a swipe).
-                <br />
-                <br />
-                <br />
+    It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be working).
+    <br />
+    <br />
+    We use your historical energy usage, your energy tariff details and local weather data to show you:
+    <br />
+    <br />
 
 
-                We don't sell energy, we don't sell your data, we don't even store your data.<br />
-                We're using the latest web browser technology to bring you a tool that is fast, secure and private.<br />
-                All your data is stored and processed locally on your device; we don't even know it exists. <br />
+    1) How much your recent bills have been, and future energy bills will be
+    <br />
 
-                <br />
-                <br />
-                And that's just version 1.0. With AI becoming more mainstream, we'll be looking add more features that really tailor recommendations to you and your home.<br />
-                We're hoping you'll join us on this journey. If you have any comments or suggestions, please email us at <a href="mailto:TODO@TODO.com" />
+    2) How much your spending changes as outside temperatures change  - and allowing you change the forecast to see it effects your bills.
+    <br />
+    <br />
 
-                <br />
-                <br />
-                If you've landed on this page, it means the application is not yet set up - if this is your first time setting up, starting the setup wizard might be the best option.
-                <br />
-                <br />
-                Otherwise, feel free to explore the application and set up your home and meters manually.
+    And that's alongside powerful charting tools that allow you to see everything from granular hourly energy spikes, to whole seasonal energy costs, simply with a mouse scroll (or a swipe).
+    <br />
+    <br />
+    <br />
 
-            </MudText>
-        </MudItem>
-        <MudItem xs="12">
-            <div class="d-flex justify-content-evenly">
-            <MudButton Color="Color.Primary" OnClick="StartWizard">Setup Wizard</MudButton>
-            <MudButton Color="Color.Default" OnClick="Close">Close Window</MudButton>
-            </div>
-        </MudItem>
-    </MudGrid>
-</MudPaper>
+
+    We don't sell energy, we don't sell your data, we don't even store your data.<br />
+    We're using the latest web browser technology to bring you a tool that is fast, secure and private.<br />
+    All your data is stored and processed locally on your device; we don't even know it exists. <br />
+
+    <br />
+    <br />
+    And that's just version 1.0. With AI becoming more mainstream, we'll be looking add more features that really tailor recommendations to you and your home.<br />
+    We're hoping you'll join us on this journey. If you have any comments or suggestions, please email us at <a href="mailto:TODO@TODO.com" />
+
+    <br />
+    <br />
+    If you've landed on this page, it means the application is not yet set up - if this is your first time setting up, starting the setup wizard might be the best option.
+    <br />
+    <br />
+    Otherwise, feel free to explore the application and set up your home and meters manually.
+    <MudButton ButtonType="ButtonType.Button" OnClick="OnSuccessCallback">I have read Terms &amp; Conditions</MudButton>
+</MudText>
+
 
 @code {
-    [Parameter, EditorRequired] public EventCallback OnClose { get; set; }
-    [Parameter, EditorRequired] public EventCallback OnNext { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnSuccessCallback { get; set; }
 
-    private async Task Close()
-    {
-        await OnClose.InvokeAsync();
-    }
-
-    private async Task StartWizard()
-    {
-        await OnNext.InvokeAsync();
-    }
 }

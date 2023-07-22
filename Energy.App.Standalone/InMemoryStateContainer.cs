@@ -1,19 +1,26 @@
-﻿public class InMemoryStateContainer
-{
-    private bool closedWelcome;
+﻿namespace Energy.App.Standalone;
 
-    public bool ClosedWelcome
+public class InMemoryStateContainer
+{
+    private bool _welcomeTermsAccepted;
+
+    public bool WelcomeTermsAccepted
     {
-        get => closedWelcome;
+        get => _welcomeTermsAccepted;
         set
         {
-            closedWelcome = value;
-            
-            NotifyClosedWelcome(value);
+            if (_welcomeTermsAccepted == value)
+            {
+                return;
+            }
+
+            _welcomeTermsAccepted = value;
+
+            NotifyWelcomeTermsAcceptanceChange(value);
         }
     }
 
     public event Action<bool> OnChange;
 
-    private void NotifyClosedWelcome(bool closed) => OnChange?.Invoke(closed);
+    private void NotifyWelcomeTermsAcceptanceChange(bool closed) => OnChange?.Invoke(closed);
 }
