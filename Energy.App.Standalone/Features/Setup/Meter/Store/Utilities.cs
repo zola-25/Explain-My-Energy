@@ -20,7 +20,7 @@ public static class Utilities
             SetupValid = false,
             TariffDetails = ImmutableList<TariffDetailState>.Empty,
             InitialSetupValid = false,
-            ProblemMessage = null,
+            AuthorizeFailedMessage = null,
         };
     }
 

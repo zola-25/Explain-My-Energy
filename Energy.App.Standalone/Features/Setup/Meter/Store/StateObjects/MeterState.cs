@@ -19,5 +19,5 @@ public record MeterState
     public bool SetupValid { get; init; }
 
     public ImmutableList<TariffDetailState> TariffDetails { get; init; }
-    public string ProblemMessage { get; init; }
+    public string AuthorizeFailedMessage { get; init; }
 }

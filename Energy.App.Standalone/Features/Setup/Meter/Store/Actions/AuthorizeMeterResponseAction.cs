@@ -34,7 +34,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
                         AuthorizeFailed = !action.AuthorizeSuccess,
                         Authorizing = false,
                         SetupValid = action.AuthorizeSuccess && meterState.InitialSetupValid,
-                        ProblemMessage = action.FailureMessage
+                        AuthorizeFailedMessage = action.FailureMessage
                     }
                 },
                 MeterType.Gas => meterSetupState with
@@ -42,9 +42,10 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
                     GasMeter = meterState with
                     {
                         Authorized = action.AuthorizeSuccess,
+                        AuthorizeFailed = !action.AuthorizeSuccess,
                         Authorizing = false,
                         SetupValid = action.AuthorizeSuccess && meterState.InitialSetupValid,
-                        ProblemMessage = action.FailureMessage
+                        AuthorizeFailedMessage = action.FailureMessage
                     }
                 },
                 _ => throw new ArgumentException(nameof(action.MeterType)),

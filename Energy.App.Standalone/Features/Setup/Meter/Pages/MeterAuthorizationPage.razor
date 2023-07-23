@@ -5,13 +5,6 @@
 
 <ExtendedPageTitle>@MeterTypeText Authorization</ExtendedPageTitle>
 
-<MudOverlay @bind-Visible="_updatingReadings" DarkBackground="true" ZIndex="9">
-
-    <MudText Typo="Typo.h4">Loading new Energy Readings</MudText>
-    <div class="spinner"></div>
-
-</MudOverlay>
-
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
@@ -25,25 +18,14 @@
                                StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
                 </MudLink>
             </MudTooltip>
-            @if (_parametersSet)
+            @if (ParametersSet)
             {
                 <MeterAuthorizationFormComponent 
-                    @bind-ReadingsLoading="_updatingReadings" 
-                    MeterType="_meterType" OnSuccessfulCallback="OnSuccessfulCallback" />
+                    MeterType="MeterType" OnSuccessfulCallback="OnSuccessfulCallback" />
             }
         </MudPaper>
     </MudItem>
-    <MudItem xs="12">
-        <MudPaper Elevation="2" Class="p-2 mt-2">
-            @if (_processingResultsFinished)
-            {
-                <MudAlert Severity="@(_energyDataSuccess ? Severity.Success : Severity.Warning)">
-                    @(_resultMessages)
-                </MudAlert>
-            }
-        </MudPaper>
 
-    </MudItem>
 </MudGrid>
 
 @code {
@@ -51,35 +33,18 @@
     [Parameter, EditorRequired]
     public string MeterTypeText { get; set; }
 
-    bool _processingResultsFinished;
-    bool _energyDataSuccess;
-    string _resultMessages;
-    private Task OnSuccessfulCallback((bool meterAuthSuccess, bool energyDataProcessSuccess, string message) result)
+    private Task OnSuccessfulCallback(bool meterAuthSuccess)
     {
-        _energyDataSuccess = result.energyDataProcessSuccess;
-        _resultMessages = result.message;
-        _processingResultsFinished = true;
-        StateHasChanged();
         return Task.CompletedTask;
     }
 
-    bool _updatingReadings;
 
-
-    MeterType _meterType;
-    bool _parametersSet;
+    MeterType MeterType;
+    bool ParametersSet;
     protected override void OnParametersSet()
     {
-        _parametersSet = false;
-
-        _meterType = MeterTypeText switch
-        {
-            "Gas" => MeterType.Gas,
-            "Electricity" => MeterType.Electricity,
-            _ => throw new ArgumentException($"Invalid MeterTypeText: {MeterTypeText}")
-        };
-
-        _parametersSet = true;
+        MeterType = MeterTypeText.eStringToEnum<MeterType>();
+        ParametersSet = true;
     }
 
 }

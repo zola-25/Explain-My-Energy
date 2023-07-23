@@ -2,9 +2,10 @@
 
 
 <div class="popover-container">
-    <div class="@(_open ? "popover-overlay" : "no-overlay")">@_open</div>
+    <div class="@(_opened ? "popover-overlay" : "no-overlay")">@_opened</div>
 
-    <MudPopover Open="_open"
+    <MudPopover 
+                Open="_opened"
                 Class="eme-popover"
                 OverflowBehavior="OverflowBehavior.FlipAlways"
                 AnchorOrigin="Origin.BottomCenter"
@@ -19,14 +20,14 @@
                     <SetupStepPage>
                         <WelcomeText OnSuccessCallback="@(async
                             () =>
-                            {   _currentStageSuccess = true;
+                            {   _currentStageReadyToMoveNext = true;
                                 await WelcomeTextAcknowledged();
                             })">
                         </WelcomeText>
                     </SetupStepPage>
                     <ActionButtons>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Start Wizard</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Start Wizard</MudButton>
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
                     </ActionButtons>
@@ -35,11 +36,11 @@
             case SetupStage.HouseholdNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <Household SaveSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
+                        <Household SaveSuccessfulCallback="@(() => { _currentStageReadyToMoveNext = true; return Task.CompletedTask;})" />
                     </SetupStepPage>
                     <ActionButtons>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Next</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Next</MudButton>
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
                     </ActionButtons>
@@ -49,12 +50,12 @@
             case SetupStage.GasMeterNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <AddGasMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
+                        <AddGasMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageReadyToMoveNext = true; return Task.CompletedTask;})" />
                     </SetupStepPage>
                     <ActionButtons>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
-                            <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip to Electricity Meter</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
+                            <MudButton Disabled="@(!_canSkipCurrentStage || _currentStageReadyToMoveNext)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip to Electricity Meter</MudButton>
 
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
@@ -67,30 +68,16 @@
                     <SetupStepPage>
                         <MeterAuthorizationFormComponent 
                             MeterType="MeterType.Gas"
-                            OnSuccessfulCallback="@(((bool meterAuthSuccess, bool energyDataProcessSuccess, string message)result) =>
-                                                            {   
-                                                                _dataProcessingMessage = result.message;
-                                                                _currentStageSuccess = result.meterAuthSuccess;
-                                                                _dataProcessingResult = result.energyDataProcessSuccess;
-                                                                _showLoadingSpinner = false;
+                            OnSuccessfulCallback="@((bool meterAuthSuccess) => 
+                                                            {
+                                                                _currentStageReadyToMoveNext = meterAuthSuccess;
                                                                 return Task.CompletedTask;
-                                                            })"
-                            @bind-ReadingsLoading="_showLoadingSpinner" />
+                                                            })" />
                 </SetupStepPage>
                 <ActionButtons>
-                        <div class="eme-popover-processing-data-spinner" style="@(_showLoadingSpinner ? String.Empty : "display: none;")">
-                            <div class="spinner m-1"></div>
-                            <MudText Typo="Typo.body2" Class="m-1">
-                                Meter authorized, please wait while we process your data
-                            </MudText>
-                        </div>
-                        <div class="d-flex" style="@(_currentStageSuccess ? String.Empty : "display: none;")">
-                            <MudAlert Severity="@(_dataProcessingResult ? Severity.Success : Severity.Info)" 
-                            Variant="Variant.Outlined">@_dataProcessingMessage</MudAlert>
-                        </div>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
-                            <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
+                            <MudButton Disabled="@(!_canSkipCurrentStage || _currentStageReadyToMoveNext)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
 
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
@@ -100,13 +87,13 @@
             case SetupStage.ElectricityMeterNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <AddElectricityMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})" />
+                        <AddElectricityMeterFormComponent OnSuccessfulCallback="@(() => { _currentStageReadyToMoveNext = true; return Task.CompletedTask;})" />
 
                     </SetupStepPage>
                     <ActionButtons>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
-                            <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
+                            <MudButton Disabled="@(!_canSkipCurrentStage || _currentStageReadyToMoveNext)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
 
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
@@ -118,31 +105,17 @@
                     <SetupStepPage>
                         <MeterAuthorizationFormComponent 
                             MeterType="MeterType.Electricity"
-                            OnSuccessfulCallback="@(((bool meterAuthSuccess, bool energyDataProcessSuccess, string message)result) =>
-                                                            {   
-                                                                _dataProcessingMessage = result.message;
-                                                                _currentStageSuccess = result.meterAuthSuccess;
-                                                                _dataProcessingResult = result.energyDataProcessSuccess;
-                                                                _showLoadingSpinner = false;
+                            OnSuccessfulCallback="@((bool meterAuthSuccess) => 
+                                                            {
+                                                                _currentStageReadyToMoveNext = meterAuthSuccess;
                                                                 return Task.CompletedTask;
-                                                            })"
-                            @bind-ReadingLoadings="_showLoadingSpinner" />
+                                                            })" />
 
                     </SetupStepPage>
                     <ActionButtons>
-                        <div class="eme-popover-processing-data-spinner" style="@(_showLoadingSpinner ? String.Empty : "display: none;")">
-                            <div class="spinner m-1"></div>
-                            <MudText Typo="Typo.body2" Class="m-1">
-                                Meter authorized, please wait while we process your data
-                            </MudText>
-                        </div>
-                        <div class="d-flex" style="@(_currentStageSuccess ? String.Empty : "display: none;")">
-                            <MudAlert Severity="@(_dataProcessingResult ? Severity.Success : Severity.Info)" 
-                            Variant="Variant.Outlined">@_dataProcessingMessage</MudAlert>
-                        </div>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
-                            <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
+                            <MudButton Disabled="@(!_currentStageReadyToMoveNext)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
+                            <MudButton Disabled="@(!_canSkipCurrentStage || _currentStageReadyToMoveNext)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
 
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
@@ -187,22 +160,18 @@
     [Inject] InMemoryStateContainer InMemoryStateContainer { get; set; }
 
     [Parameter] public bool Open { get; set; }
-    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
 
 
     [Parameter] public SetupStage InitialSetupStages { get; set; }
 
     List<SetupStage> _setupStages;
-    bool _open = false;
+    bool _opened = false;
 
     SetupStage _currentStage;
     SetupStage _nextValidStage;
-    bool _currentStageSuccess = false;
+    bool _moveToNextStage = false;
+    bool _currentStageReadyToMoveNext = false;
     bool _canSkipCurrentStage = false;
-
-    bool _showLoadingSpinner = false;
-    string _dataProcessingMessage = String.Empty;
-    bool _dataProcessingResult = false;
 
     private Task WelcomeTextAcknowledged()
     {
@@ -212,6 +181,12 @@
 
     protected override void OnParametersSet()
     {
+        _opened = Open && !_closeModal;
+        @if(!_opened)
+        {
+            return;
+        }
+
         @if (InitialSetupStages == SetupStage.None)
         {
             Logger.LogInformation("All setup stages complete: {InitialSetupStages}", InitialSetupStages);
@@ -224,9 +199,7 @@
 
         SetSkipToNextValidStageValid();
 
-        _open = Open;
 
-        StateHasChanged();
     }
 
 
@@ -275,41 +248,41 @@
         _currentStage = _nextValidStage;
         SetSkipToNextValidStageValid();
 
-        StateHasChanged();
     }
 
     void GoToNextStage()
     {
         _setupStages.Remove(_currentStage);
         _currentStage = _setupStages.FirstOrDefault();
-        _currentStageSuccess = false;
+        _currentStageReadyToMoveNext = false;
+        _moveToNextStage = false;
         SetSkipToNextValidStageValid();
 
-        StateHasChanged();
     }
 
 
-    async void GoToAnalysis()
+    void GoToAnalysis()
     {
         try
         {
-            _open = false;
-            await OpenChanged.InvokeAsync(false);
+            _closeModal = true;
+            _opened = false;
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error closing modal");
         }
 
-        NavigationManager.NavigateTo("/Analysis"); //TODO: Setup custom route
+        NavigationManager.NavigateTo("/"); //TODO: Setup custom route
     }
 
-    async void CloseModal()
+    bool _closeModal;
+    void CloseModal()
     {
         try
         {
-            _open = false;
-            await OpenChanged.InvokeAsync(false);
+            _opened = false;
+            _closeModal = true;
         }
         catch (Exception ex)
         {

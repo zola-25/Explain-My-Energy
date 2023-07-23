@@ -19,33 +19,28 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
         public static MeterSetupState OnMeterAuthorizingReducer(MeterSetupState meterSetupState, AuthorizeMeterAction action)
         {
 
-            switch (action.MeterType)
+            return action.MeterType switch
             {
-                case MeterType.Electricity:
-                    return meterSetupState with
+                MeterType.Electricity => meterSetupState with
+                {
+                    ElectricityMeter = meterSetupState[action.MeterType] with
                     {
-                        ElectricityMeter = meterSetupState[action.MeterType] with
-                        {
-                            Authorizing = true,
-                            Authorized = false,
-                            SetupValid = false
-                        }
-                    };
-                case MeterType.Gas:
-                    return meterSetupState with
+                        Authorizing = true,
+                        Authorized = false,
+                        SetupValid = false
+                    }
+                },
+                MeterType.Gas => meterSetupState with
+                {
+                    GasMeter = meterSetupState[action.MeterType] with
                     {
-                        GasMeter = meterSetupState[action.MeterType] with
-                        {
-                            Authorizing = true,
-                            Authorized = false,
-                            SetupValid = false
-                        }
-                    };
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(action.MeterType), action.MeterType, null);
-
-            }
-
+                        Authorizing = true,
+                        Authorized = false,
+                        SetupValid = false
+                    }
+                },
+                _ => throw new ArgumentException(nameof(action.MeterType)),
+            };
         }
 
         private class AuthorizeMeterEffect : Effect<AuthorizeMeterAction>
