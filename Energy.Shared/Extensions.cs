@@ -3,6 +3,7 @@ using System.Text;
 
 namespace Energy.Shared
 {
+    #pragma warning disable IDE1006 // my extension method prefix convention is 'e'
     public static class Extensions
     {
         public static string eBuildQueryString(this Dictionary<string, string> queryParameters)
@@ -88,6 +89,7 @@ namespace Energy.Shared
             return formattedName;
         }
     }
+    #pragma warning restore IDE1006 // my extension method prefix convention is 'e'
 
 
 }

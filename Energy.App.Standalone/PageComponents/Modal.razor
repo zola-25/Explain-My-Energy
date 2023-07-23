@@ -65,20 +65,37 @@
             case SetupStage.GasMeterNotAuthorized:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <MeterAuthorizationPage MeterTypeText="@MeterType.Gas.ToString()"
-                                                OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})"
-                                                FromWizard="true" />
-                    </SetupStepPage>
-                    <ActionButtons>
+                        <MeterAuthorizationFormComponent 
+                            MeterType="MeterType.Gas"
+                            OnSuccessfulCallback="@(((bool meterAuthSuccess, bool energyDataProcessSuccess, string message)result) =>
+                                                            {   
+                                                                _dataProcessingMessage = result.message;
+                                                                _currentStageSuccess = result.meterAuthSuccess;
+                                                                _dataProcessingResult = result.energyDataProcessSuccess;
+                                                                _showLoadingSpinner = false;
+                                                                return Task.CompletedTask;
+                                                            })"
+                            @bind-ReadingsLoading="_showLoadingSpinner" />
+                </SetupStepPage>
+                <ActionButtons>
+                        <div class="eme-popover-processing-data-spinner" style="@(_showLoadingSpinner ? String.Empty : "display: none;")">
+                            <div class="spinner m-1"></div>
+                            <MudText Typo="Typo.body2" Class="m-1">
+                                Meter authorized, please wait while we process your data
+                            </MudText>
+                        </div>
+                        <div class="d-flex" style="@(_currentStageSuccess ? String.Empty : "display: none;")">
+                            <MudAlert Severity="@(_dataProcessingResult ? Severity.Success : Severity.Info)" 
+                            Variant="Variant.Outlined">@_dataProcessingMessage</MudAlert>
+                        </div>
                         <div class="d-flex justify-content-evenly">
-                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Next</MudButton>
+                            <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
                             <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
 
                             <MudButton Color="Color.Default" OnClick="CloseModal">Close</MudButton>
                         </div>
                     </ActionButtons>
                 </WizardStepTemplate>
-
                 break;
             case SetupStage.ElectricityMeterNotSetup:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
@@ -99,12 +116,30 @@
             case SetupStage.ElectricityMeterNotAuthorized:
                 <WizardStepTemplate CloseWizardCallback="CloseModal">
                     <SetupStepPage>
-                        <MeterAuthorizationPage MeterTypeText="@MeterType.Electricity.ToString()"
-                                                OnSuccessfulCallback="@(() => { _currentStageSuccess = true; return Task.CompletedTask;})"
-                                                FromWizard="true" />
+                        <MeterAuthorizationFormComponent 
+                            MeterType="MeterType.Electricity"
+                            OnSuccessfulCallback="@(((bool meterAuthSuccess, bool energyDataProcessSuccess, string message)result) =>
+                                                            {   
+                                                                _dataProcessingMessage = result.message;
+                                                                _currentStageSuccess = result.meterAuthSuccess;
+                                                                _dataProcessingResult = result.energyDataProcessSuccess;
+                                                                _showLoadingSpinner = false;
+                                                                return Task.CompletedTask;
+                                                            })"
+                            @bind-ReadingLoadings="_showLoadingSpinner" />
 
                     </SetupStepPage>
                     <ActionButtons>
+                        <div class="eme-popover-processing-data-spinner" style="@(_showLoadingSpinner ? String.Empty : "display: none;")">
+                            <div class="spinner m-1"></div>
+                            <MudText Typo="Typo.body2" Class="m-1">
+                                Meter authorized, please wait while we process your data
+                            </MudText>
+                        </div>
+                        <div class="d-flex" style="@(_currentStageSuccess ? String.Empty : "display: none;")">
+                            <MudAlert Severity="@(_dataProcessingResult ? Severity.Success : Severity.Info)" 
+                            Variant="Variant.Outlined">@_dataProcessingMessage</MudAlert>
+                        </div>
                         <div class="d-flex justify-content-evenly">
                             <MudButton Disabled="@(!_currentStageSuccess)" Color="Color.Primary" OnClick="GoToNextStage">Authorize</MudButton>
                             <MudButton Disabled="@(!_canSkipCurrentStage)" ButtonType="ButtonType.Button" OnClick="SkipToNextValidStage" Color="Color.Default">Skip</MudButton>
@@ -165,6 +200,9 @@
     bool _currentStageSuccess = false;
     bool _canSkipCurrentStage = false;
 
+    bool _showLoadingSpinner = false;
+    string _dataProcessingMessage = String.Empty;
+    bool _dataProcessingResult = false;
 
     private Task WelcomeTextAcknowledged()
     {
@@ -178,7 +216,7 @@
         {
             Logger.LogInformation("All setup stages complete: {InitialSetupStages}", InitialSetupStages);
         }
-        
+
 
         _setupStages = InitialSetupStages.eGetFlags().Where(c => c != SetupStage.None).ToList();
 
@@ -277,7 +315,7 @@
         {
             Logger.LogError(ex, "Error closing modal");
         }
-        
+
     }
 
 }

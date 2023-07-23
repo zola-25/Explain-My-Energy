@@ -13,11 +13,14 @@ public static class Utilities
         {
             GlobalId = Guid.Empty,
             Authorized = false,
+            Authorizing = false,
+            AuthorizeFailed = false,
             MeterType = meterType,
             Mpxn = null,
             SetupValid = false,
             TariffDetails = ImmutableList<TariffDetailState>.Empty,
             InitialSetupValid = false,
+            ProblemMessage = null,
         };
     }
 

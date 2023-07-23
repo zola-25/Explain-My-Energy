@@ -28,6 +28,7 @@ public record MeterSetupState
                 _ => throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null),
             };
         }
+        
     }
 
     public MeterSetupState()

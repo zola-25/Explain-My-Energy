@@ -1,4 +1,5 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
@@ -174,23 +175,27 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
 
                     if (valid && (loadForecasts || fullReloadForecasts))
                     {
-                        var forecastCompletion = new TaskCompletionSource<(bool, string)>();
+                        var historicalForecastCompletion = new TaskCompletionSource<(bool, string)>();
 
                         dispatcher.Dispatch(new EnsureGasHistoricalForecastAction(
-                            forceRefresh: fullReloadForecasts, forecastCompletion));
+                            forceRefresh: fullReloadForecasts, historicalForecastCompletion));
                         
                         var heatingForecastCompletion = new TaskCompletionSource<(bool, string)>();
-                        if (_householdState.Value.PrimaryHeatSource == meterType) {
+                        if (_householdState.Value.PrimaryHeatSource != meterType)
+                        {
+                            heatingForecastCompletion.SetResult((true, String.Empty));
+                        }
+                        else
+                        {
                             dispatcher.Dispatch(new EnsureHeatingSetupAction(
                                 forceReloadHeatingForecast: loadForecasts,
                                 forceReloadCoefficients: fullReloadForecasts,
                                 heatingForecastCompletion));
-                        } else
-                        {
-                            heatingForecastCompletion.SetResult((true, "Not required"));
                         }
+                        (bool, string)[] forecastResults = await Task.WhenAll(historicalForecastCompletion.Task, heatingForecastCompletion.Task);
 
-                        await Task.WhenAll(forecastCompletion.Task, heatingForecastCompletion.Task);
+                        valid = valid && forecastResults.All(c => c.Item1);
+                        message = String.Join(Environment.NewLine, message.eYield().Concat(forecastResults.Select(c => c.Item2)));
                     }
 
                     dispatcher.Dispatch(new NotifyGasLoadingFinished(valid, message));

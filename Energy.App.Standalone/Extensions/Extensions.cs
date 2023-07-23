@@ -448,7 +448,29 @@ public static class Extensions
         }
     }
 
+    public static IEnumerable<TSource> eDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    {
+        var seenKeys = new HashSet<TKey>();
+        foreach (var element in source)
+        {
+            if (seenKeys.Add(keySelector(element)))
+            {
+                yield return element;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Wraps this object instance into an IEnumerable&lt;T&gt;
+    /// consisting of a single item.
+    /// </summary>
+    /// <typeparam name="T"> Type of the object. </typeparam>
+    /// <param name="item"> The instance that will be wrapped. </param>
+    /// <returns> An IEnumerable&lt;T&gt; consisting of a single item. </returns>
+    public static IEnumerable<T> eYield<T>(this T item)
+    {
+        yield return item;
+    }
 
     public static IEnumerable<T> eToIEnumerable<T>(this T[] items)
     {

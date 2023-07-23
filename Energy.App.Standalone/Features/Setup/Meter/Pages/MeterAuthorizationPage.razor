@@ -1,63 +1,85 @@
 ﻿@page "/MeterAuthorization/{MeterTypeText}"
 
 @inherits FluxorComponent
-@inject IState<MeterSetupState> MeterSetupState
-@inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
-@inject NavigationManager NavigationManager
 
 <ExtendedPageTitle>@MeterTypeText Authorization</ExtendedPageTitle>
+
+<MudOverlay @bind-Visible="_updatingReadings" DarkBackground="true" ZIndex="9">
+
+    <MudText Typo="Typo.h4">Loading new Energy Readings</MudText>
+    <div class="spinner"></div>
+
+</MudOverlay>
 
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2 mt-2">
-
-            <MudCard Elevation="0">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">@_meterType.ToString() Meter Authorization</MudText>
-                    <MudAlert Severity="Severity.Info"></MudAlert>
-                </MudCardHeader>
-                <MudCardContent Style="height: auto;
-                                       min-height: 100%;">
-
-                    <div class="mb-1">
-                        <MudTextField Label="@MpxnLabel" Value="@MeterSetupState.Value[_meterType].Mpxn" ReadOnly="true"></MudTextField>
-                        <MudTextField Label='IHD MAC ID' Value="@HouseholdState.Value.IhdMacId" ReadOnly="true"></MudTextField>
-                        <MudTextField Label='Move-in Date' Value="@MoveInDateString" ReadOnly="true"></MudTextField>
-                    </div>
-                    <div class="mb-1">
-                        <MudButton @onclick="CheckAuthorization" Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
-                    </div>
-                    <iframe id="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" style="width: 100%; height: 1000px;" hidden="@AuthorizeSucceeded"></iframe>
-
-
-                    <div id="authorizationSuccess" class="mt-2" hidden="@(!MeterSetupState.Value[_meterType].Authorized)">
-
-                        <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
-                        <MudText>Your meter data is now being loaded</MudText>
-
-                        @if (!FromWizard)
-                        {
-                            <MudTooltip ShowOnHover="true" Text="Return to Setup">
-
-                                <MudButton OnClick="ReturnToSetup"
-                                           Color="Color.Primary"
-                                           ButtonType="ButtonType.Button"
-                                           Variant="Variant.Filled"
-                                           Size="Size.Small"
-                                           StartIcon="@Icons.Material.Filled.ArrowBack">Return to Setup</MudButton>
-                            </MudTooltip>
-                        }
-                    </div>
-                    <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
-                        <p class="text-warning">Authorization Failed</p>
-                        <p>We could not access your smart meter data - have you completed the authorization process with n3rgy?</p>
-                        <p>n3rgy responded with: @AuthorizeResponseMessage</p>
-                    </div>
-                </MudCardContent>
-                <MudCardActions>
-                </MudCardActions>
-            </MudCard>
+            <MudTooltip ShowOnHover="true" Text="Return to Setup">
+                <MudLink Underline="Underline.None"
+                         Href="@($"/Setup")">
+                    <MudButton Class="m-1" Color="Color.Primary"
+                               ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+                </MudLink>
+            </MudTooltip>
+            @if (_parametersSet)
+            {
+                <MeterAuthorizationFormComponent 
+                    @bind-ReadingsLoading="_updatingReadings" 
+                    MeterType="_meterType" OnSuccessfulCallback="OnSuccessfulCallback" />
+            }
         </MudPaper>
     </MudItem>
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-2 mt-2">
+            @if (_processingResultsFinished)
+            {
+                <MudAlert Severity="@(_energyDataSuccess ? Severity.Success : Severity.Warning)">
+                    @(_resultMessages)
+                </MudAlert>
+            }
+        </MudPaper>
+
+    </MudItem>
 </MudGrid>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string MeterTypeText { get; set; }
+
+    bool _processingResultsFinished;
+    bool _energyDataSuccess;
+    string _resultMessages;
+    private Task OnSuccessfulCallback((bool meterAuthSuccess, bool energyDataProcessSuccess, string message) result)
+    {
+        _energyDataSuccess = result.energyDataProcessSuccess;
+        _resultMessages = result.message;
+        _processingResultsFinished = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    bool _updatingReadings;
+
+
+    MeterType _meterType;
+    bool _parametersSet;
+    protected override void OnParametersSet()
+    {
+        _parametersSet = false;
+
+        _meterType = MeterTypeText switch
+        {
+            "Gas" => MeterType.Gas,
+            "Electricity" => MeterType.Electricity,
+            _ => throw new ArgumentException($"Invalid MeterTypeText: {MeterTypeText}")
+        };
+
+        _parametersSet = true;
+    }
+
+}
