@@ -1,0 +1,32 @@
+<StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
+    <SetupStepPage>
+        <Household  />
+    </SetupStepPage>
+    <ActionButtons>
+        <div class="d-flex justify-content-evenly">
+            <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
+            
+            <MudButton Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
+
+            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+        </div>
+    </ActionButtons>
+</StepTemplate>
+
+@code  {
+
+    [Inject] IState<HouseholdState> HouseholdState { get; set; }
+
+    bool CanMoveNext => HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
+
+    [Parameter, EditorRequired] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+
+
+}

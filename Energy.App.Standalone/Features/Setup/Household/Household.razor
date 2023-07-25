@@ -59,7 +59,7 @@
 
             </MudCardContent>
             <MudCardActions Class="d-flex flex-column align-items-start ">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">@_saveButtonText</MudButton>
 
                 <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
                     @_saveResponseMessage
@@ -80,6 +80,7 @@
     bool _submitSuccessful;
 
     bool _readyToInteract;
+    private string _saveButtonText;
 
     protected override void OnInitialized()
     {
@@ -101,6 +102,7 @@
                 OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
                 PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
             };
+        _saveButtonText = HouseholdState.Value.Saved ? "Update" : "Save";
     }
 
 

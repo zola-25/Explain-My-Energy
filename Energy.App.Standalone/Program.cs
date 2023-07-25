@@ -96,7 +96,7 @@ builder.Services.AddFluxor(options =>
 
 builder.Services.AddLogging(c =>
 {
-    c.SetMinimumLevel(LogLevel.Debug);
+    c.SetMinimumLevel(LogLevel.Information);
     
 });
 

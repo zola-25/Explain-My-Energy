@@ -1,4 +1,7 @@
-﻿
+﻿@using Energy.App.Standalone.Features.Setup.TermsAndConditions
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+
 <MudText Typo="Typo.body1" Align="Align.Start">
     <strong>Explain my Energy</strong> is a tool to help you understand your existing energy bills and anticipate when and how much they might change.
     <br />
@@ -40,11 +43,16 @@
     <br />
     <br />
     Otherwise, feel free to explore the application and set up your home and meters manually.
-    <MudButton ButtonType="ButtonType.Button" OnClick="OnSuccessCallback">I have read Terms &amp; Conditions</MudButton>
+    <MudButton ButtonType="ButtonType.Button" OnClick="OnTermsAccept">I have read Terms &amp; Conditions</MudButton>
 </MudText>
 
 
 @code {
-    [Parameter, EditorRequired] public EventCallback OnSuccessCallback { get; set; }
+
+
+    private void OnTermsAccept()
+    {
+        Dispatcher.Dispatch(new AcceptTermsAndConditionsAction(true));
+    }
 
 }

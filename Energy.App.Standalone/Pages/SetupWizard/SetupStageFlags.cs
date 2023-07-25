@@ -1,7 +1,7 @@
-﻿namespace Energy.App.Standalone.PageComponents
+﻿namespace Energy.App.Standalone.Pages.SetupWizard
 {
     [Flags]
-    public enum SetupStage
+    public enum SetupStageFlags
     {
         None = 0,
         NotSeenWelcomeScreenSplash = 1,

@@ -437,7 +437,7 @@ public static class Extensions
     }
 
     // Iterate through a Flags Enum to get a list of the individual flags that are set
-    public static IEnumerable<T> eGetFlags<T>(this T flags) where T : Enum
+    public static IEnumerable<T> eGetSetFlags<T>(this T flags) where T : Enum
     {
         foreach (T value in Enum.GetValues(flags.GetType()))
         {
@@ -446,6 +446,21 @@ public static class Extensions
                 yield return value;
             }
         }
+    }
+
+    // https://stackoverflow.com/a/23794784/3910619
+    public static IEnumerable<TEnum> eEnumValues<TEnum>()
+            where TEnum : struct, IComparable, IFormattable, IConvertible
+    {
+        var enumType = typeof(TEnum);
+
+        // Optional runtime check for completeness    
+        if (!enumType.IsEnum)
+        {
+            throw new ArgumentException();
+        }
+
+        return Enum.GetValues(enumType).Cast<TEnum>();
     }
 
     public static IEnumerable<TSource> eDistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)

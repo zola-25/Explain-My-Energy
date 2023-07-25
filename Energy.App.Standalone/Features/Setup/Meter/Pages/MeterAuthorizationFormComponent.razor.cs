@@ -1,5 +1,7 @@
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
@@ -12,13 +14,19 @@ using Microsoft.AspNetCore.Components.Web;
 namespace Energy.App.Standalone.Features.Setup.Meter.Pages;
 public partial class MeterAuthorizationFormComponent
 {
-    [Parameter, EditorRequired] public EventCallback<bool> OnSuccessfulCallback { get; set; }
+    [Parameter] public EventCallback<bool> OnSuccessfulCallback { get; set; }
     [Parameter, EditorRequired] public MeterType MeterType { get; set; }
+
+    [Inject] IState<GasReadingsState> GasReadingState { get; set; }
+    [Inject] IState<ElectricityReadingsState> ElectricityReadingState { get; set; }
+
 
     [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
 
     [Inject] ILogger<MeterAuthorizationFormComponent> Logger { get; set; }
+
+    bool ReadingsLoading => MeterType == MeterType.Gas ? GasReadingState.Value.Loading : ElectricityReadingState.Value.Loading;
 
     string MpxnLabel => MeterType == MeterType.Gas ? "Gas MPRN" : "Electricity MPAN";
 

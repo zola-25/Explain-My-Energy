@@ -21,6 +21,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity
         [property: JsonIgnore]
         public ImmutableList<CostedReading> CostedReadings { get; init; }
 
+        public DateTime LastCheckedForNewReadings { get; init; }
 
         public ElectricityReadingsState()
         {
@@ -28,6 +29,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity
             CostedReadings = ImmutableList<CostedReading>.Empty;
             BasicReadings = ImmutableList<BasicReading>.Empty;
             BasicReadingLastUpdated = DateTime.MinValue;
+            LastCheckedForNewReadings = DateTime.MinValue;
         }
     }
 

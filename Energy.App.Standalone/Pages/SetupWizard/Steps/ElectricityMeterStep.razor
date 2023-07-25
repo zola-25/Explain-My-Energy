@@ -1,0 +1,37 @@
+<StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
+    <SetupStepPage>
+        <AddElectricityMeterFormComponent  />
+
+    </SetupStepPage>
+    <ActionButtons>
+        <div class="d-flex justify-content-evenly">
+            <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Authorize</MudButton>
+            
+            <MudButton Style="@(CanMoveNext ? "display: none" : "")" Color="Color.Default" OnClick="SkipToDone">Skip</MudButton>
+
+
+            <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+
+            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+        </div>
+    </ActionButtons>
+</StepTemplate>
+
+@code {
+    [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
+
+    bool CanMoveNext => MeterSetupState.Value[MeterType.Electricity].InitialSetupValid;
+
+    [Parameter, EditorRequired] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback SkipToDone { get; set; }
+
+
+}

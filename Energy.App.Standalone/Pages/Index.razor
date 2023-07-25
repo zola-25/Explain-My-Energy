@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Energy.App.Standalone.Pages.SetupWizard
 
 <ExtendedPageTitle>Welcome</ExtendedPageTitle>
 
@@ -6,26 +7,23 @@
 @if (Ready)
 {
 
-
-
-
     <MudGrid Justify="Justify.Center">
         <MudItem xs="12">
-            <Modal InitialSetupStages="SetupStage" Open="OpenWizard">
-            </Modal>
+            <WizardModal @bind-Open="OpenWizard">
+            </WizardModal>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Elevation="0" Class="p-2 mt-3 d-flex justify-content-end align-items-baseline">
                 <MudText Typo="Typo.h4" Align="Align.Center" Class="mx-auto eme-focus">Welcome to Explain My Energy</MudText>
 
-                <MudIconButton Class="m-0"
-                               OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
-                        Size="Size.Small" 
-                        ButtonType="ButtonType.Button" 
-                        Variant="Variant.Outlined" 
-                        Color="Color.Info"
-                        Icon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudIconButton>
-                
+                <MudButton Class="m-0"
+                           OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
+                           Size="Size.Small"
+                           ButtonType="ButtonType.Button"
+                           Variant="Variant.Outlined"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudButton>
+
 
             </MudPaper>
         </MudItem>
@@ -33,16 +31,7 @@
         <MudItem xs="12">
             <MudPaper Elevation="2" Class="p-2">
                 <MudText Typo="Typo.h5" Class="m-4 fw-bolder">App Setup Status</MudText>
-                <MudList Dense="true">
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasSeverity">Gas Meter: @GasStatus</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">Electricity Readings: @ElectricityReadingsStatus.Status</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Electricity Historical Forecast: @ElectricityHistoricalForecastStatus.Status</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasReadingsSeverity">Gas Readings: @GasReadingsStatus.Status</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Gas Historical Forecast: @GasHistoricalForecastStatus.Status</MudAlert></MudListItem>
-                    <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus.Status</MudAlert></MudListItem>
-                </MudList>
+                <AppSetupStatus />
             </MudPaper>
         </MudItem>
         <MudItem xs="12">

@@ -22,9 +22,11 @@
 
             <div id="authorizationSuccess" class="mt-2" hidden="@(!AuthorizeSucceeded)">
 
-                <MudText Color="Color.Success" Typo="Typo.h5">Authorization Succeeded</MudText>
-                <MudText>Your meter data is now being loaded</MudText>
-
+                <MudText Color="Color.Success" Typo="Typo.h5">Authorized</MudText>
+                
+                @if (ReadingsLoading) {
+                    <MudText>Your @MeterType meter data is now being processed</MudText>
+                }
             </div>
 
             <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">

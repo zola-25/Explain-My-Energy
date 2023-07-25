@@ -5,6 +5,7 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
@@ -42,6 +43,15 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
             };
         }
 
+        [ReducerMethod(typeof(ElectricityUpdateLastReadingsCheckAction))]
+        public static ElectricityReadingsState UpdateLastReadingsCheckReducer(ElectricityReadingsState state)
+        {
+            return state with
+            {
+                LastCheckedForNewReadings = DateTime.UtcNow,
+            };
+        }
+
         [ReducerMethod]
         public static ElectricityReadingsState StoreReloadedReadingsAndCostsReducer(ElectricityReadingsState state, ElectricityStoreReloadedReadingsAndCostsAction action)
         {
@@ -50,6 +60,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                 BasicReadings = action.BasicReadings,
                 CostedReadings = action.CostedReadings,
                 BasicReadingLastUpdated = DateTime.UtcNow,
+                LastCheckedForNewReadings = DateTime.UtcNow,
             };
         }
 
@@ -95,12 +106,13 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                 var meterType = MeterType.Electricity;
                 var existingBasicReadings = _electricityReadingsState.Value.BasicReadings;
                 var existingCostedReadings = _electricityReadingsState.Value.CostedReadings;
+                var lastReadingsCheck = _electricityReadingsState.Value.LastCheckedForNewReadings;
 
                 var meterSetup = _meterSetupState.Value[meterType];
 
                 try
                 {
-                    var validationResult = _energyImportValidation.Validate(meterSetup, action.ForceReload, existingBasicReadings, existingCostedReadings);
+                    var validationResult = _energyImportValidation.Validate(meterSetup, action.ForceReload,lastReadingsCheck, existingBasicReadings, existingCostedReadings);
                     string message = String.Empty;
                     bool valid = false;
                     bool loadForecasts = false;
@@ -115,25 +127,37 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                             var lastBasicReading = existingBasicReadings.Last().UtcTime;
                             var newBasicReadings = await _energyReadingService.ImportFromDate(meterType, lastBasicReading.Date);
 
-                            var basicReadingsToUpdate = existingBasicReadings.ToList();
-                            if (newBasicReadings.Any())
+                            dispatcher.Dispatch(new  ElectricityUpdateLastReadingsCheckAction());
+
+                            bool anythingNew = newBasicReadings.Any() && newBasicReadings.Last().UtcTime > lastBasicReading;
+
+                            if (anythingNew)
                             {
+                                var basicReadingsToUpdate = existingBasicReadings.ToList();
+
                                 // just in case there is an overlap
                                 _ = basicReadingsToUpdate.RemoveAll(x => x.UtcTime >= newBasicReadings.First().UtcTime);
                                 basicReadingsToUpdate.AddRange(newBasicReadings);
 
                                 var newCostedReadings = CalculateCostedReadings(basicReadingsToUpdate, meterSetup.TariffDetails);
-                                dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(newBasicReadings.ToImmutableList(), newCostedReadings));
+                                dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(basicReadingsToUpdate.ToImmutableList(), newCostedReadings));
                                 
                                 fullReloadForecasts = true;
                                 message = $"{meterType} Readings: Updated {newBasicReadings.Count} readings";
 
                             }
+                            else if (validationResult.IncludeCosts)
+                            {
+                                var missingCostedReadings = CalculateCostedReadings(existingBasicReadings, meterSetup.TariffDetails);
+                                dispatcher.Dispatch(new ElectricityStoreReloadedCostsOnlyAction(missingCostedReadings));
+
+                                message = $"{meterType} Readings: Updated {missingCostedReadings.Count} cost readings only";
+                                loadForecasts = true;
+                            }
                             else
                             {
                                 message = $"{meterType} Readings: No new readings available";
                                 loadForecasts = true;
-    
                             }
                             valid = true;
                             break;

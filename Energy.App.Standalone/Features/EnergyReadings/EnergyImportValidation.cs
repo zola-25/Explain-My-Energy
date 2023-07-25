@@ -9,6 +9,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings
     public class EnergyImportValidationResult
     {
         public UpdateType UpdateType { get; init; }
+        public bool IncludeCosts { get; init; }
         public bool CanUpdate { get; init; }
         public string Message { get; init; }
     }
@@ -17,6 +18,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings
     {
         public EnergyImportValidationResult Validate(MeterState meterSetup,
                                                         bool forceReload,
+                                                        DateTime lastReadingsCheck,
                                                         ImmutableList<BasicReading> existingBasicReadings,
                                                         ImmutableList<CostedReading> existingCostedReadings)
         {
@@ -46,27 +48,33 @@ namespace Energy.App.Standalone.Features.EnergyReadings
                 return new EnergyImportValidationResult
                 {
                     UpdateType = UpdateType.FullReload,
+                    IncludeCosts = true,
                     CanUpdate = true,
                 };
             }
 
             var lastBasicReading = existingBasicReadings.Last().UtcTime;
+            bool updateCosts = existingCostedReadings.eIsNullOrEmpty()
+                               || existingCostedReadings.Last().UtcTime < lastBasicReading;
 
-            if (lastBasicReading < DateTime.UtcNow.Date.AddDays(-1))
+            var timeSinceLastReadingsCheck = DateTime.UtcNow - lastReadingsCheck;
+
+            if (lastBasicReading < DateTime.UtcNow.Date.AddDays(-1) && timeSinceLastReadingsCheck.TotalHours >= 6)
             {
                 return new EnergyImportValidationResult
                 {
                     UpdateType = UpdateType.Update,
+                    IncludeCosts = updateCosts,
                     CanUpdate = true,
                 };
             }
 
-            if (existingCostedReadings.eIsNullOrEmpty()
-                || existingCostedReadings.Last().UtcTime < lastBasicReading)
+            if (updateCosts)
             {
                 return new EnergyImportValidationResult
                 {
                     UpdateType = UpdateType.JustCosts,
+                    IncludeCosts = true,
                     CanUpdate = true,
                 };
             }
