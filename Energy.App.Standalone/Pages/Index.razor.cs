@@ -6,7 +6,7 @@ namespace Energy.App.Standalone.Pages
 {
     public partial class Index
     {
-        [Inject] IState<TermsAndConditions> TermsAndConditionsState { get; set; }
+        [Inject] IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
 
         bool Ready;
 

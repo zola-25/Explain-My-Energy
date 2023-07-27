@@ -3,9 +3,9 @@ using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.TermsAndConditions;
 
-[FeatureState(Name = nameof(TermsAndConditions))]
+[FeatureState(Name = nameof(TermsAndConditionsState))]
 [PersistState, PriorityLoad]
-public record TermsAndConditions
+public record TermsAndConditionsState
 {
     public bool Accepted { get; init; }
 }
@@ -21,7 +21,7 @@ public class AcceptTermsAndConditionsAction
     }
 
     [ReducerMethod]
-    public static TermsAndConditions Reduce(TermsAndConditions state, AcceptTermsAndConditionsAction action)
+    public static TermsAndConditionsState Reduce(TermsAndConditionsState state, AcceptTermsAndConditionsAction action)
     {
         return state with { Accepted = action.Accepted };
     }

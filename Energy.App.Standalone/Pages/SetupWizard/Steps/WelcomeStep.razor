@@ -17,7 +17,7 @@
 
     bool CanMoveNext => TermsAndConditions.Value.Accepted;
 
-    [Inject] IState<TermsAndConditions> TermsAndConditions { get; set; }
+    [Inject] IState<TermsAndConditionsState> TermsAndConditions { get; set; }
 
 
     [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }

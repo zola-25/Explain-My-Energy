@@ -21,10 +21,16 @@
     <MudMainContent>
         <MudContainer>
             <DataValidatorBase>
-            @Body
+                @Body
             </DataValidatorBase>
         </MudContainer>
     </MudMainContent>
+    <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-content-start" DisableGutters="true"  Bottom="true" Dense="true" Fixed="true" Elevation="1">
+        <MudNavLink Style="max-width: fit-content" Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
+        <MudNavLink Href="/TermsAndConditions">Terms and Conditions</MudNavLink>
+        <MudSpacer />
+        <MudNavLink Icon="@Icons.Custom.Brands.GitHub" Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
+    </MudAppBar>
 </MudLayout>
 
 <style>
