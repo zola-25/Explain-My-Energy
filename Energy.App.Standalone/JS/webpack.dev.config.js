@@ -1,7 +1,9 @@
-﻿
+﻿/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const path = require('path');
 const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
-
+const fs = require('fs');
 
 module.exports = {
     entry: './index.ts',
@@ -18,7 +20,14 @@ module.exports = {
     },
     plugins: [
         new LicenseWebpackPlugin({
-            addBanner: true
+            addBanner: true,
+            licenseFileOverrides: {
+                '@amcharts/amcharts5': 'LICENSE'
+            },
+            licenseTypeOverrides: {
+                '@amcharts/amcharts5': 'As specified in LICENSE file:\n'
+            }
+
         })
     ],
     resolve: {

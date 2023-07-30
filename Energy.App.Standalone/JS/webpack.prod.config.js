@@ -1,4 +1,5 @@
-﻿/*eslint no-undef: "error"*/
+﻿/* eslint-disable @typescript-eslint/no-var-requires */
+/*eslint no-undef: "error"*/
 /*eslint-env node*/
 
 const path = require("path");
@@ -27,8 +28,13 @@ module.exports = {
         new LicenseWebpackPlugin({
             
             addBanner: true,
-            renderBanner: (filename, modules) => {
-                console.log(modules);
+            licenseFileOverrides: {
+                '@amcharts/amcharts5': 'LICENSE'
+            },
+            licenseTypeOverrides: {
+                '@amcharts/amcharts5': 'As specified in LICENSE file:\n'
+            },
+            renderBanner: (filename) => {
                 return '/*! licenses are at ' + filename + '*/';
             }
         })

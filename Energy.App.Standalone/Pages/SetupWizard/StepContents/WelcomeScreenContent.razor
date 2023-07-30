@@ -2,7 +2,8 @@
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-<MudText Typo="Typo.body1" Align="Align.Start">
+<MudPaper Class="pa-3">
+<MudText Typo="Typo.body1" Align="Align.Start" >
     <p ><strong>Explain my Energy</strong> is a free, open-source tool to help you understand both your existing energy bills and your future energy costs and consumption.</p>
     <p >It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be working).</p>
     <p >The application uses your historical energy usage, your energy tariff details and local weather data to give you:</p>
@@ -55,7 +56,7 @@
     Otherwise, feel free to explore the application and set up your home and meters manually.
 </MudText>
 
-
+</MudPaper>
 @code {
 
     [Inject] IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
