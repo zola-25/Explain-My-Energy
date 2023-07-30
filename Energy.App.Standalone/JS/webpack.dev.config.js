@@ -1,10 +1,12 @@
-﻿const path = require('path');
+﻿
+const path = require('path');
+const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 
 
 module.exports = {
     entry: './index.ts',
     mode: 'development',
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     module: {
         rules: [
             {
@@ -14,6 +16,11 @@ module.exports = {
             },
         ],
     },
+    plugins: [
+        new LicenseWebpackPlugin({
+            addBanner: true
+        })
+    ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
@@ -21,5 +28,6 @@ module.exports = {
         filename: 'bundle.js',
         sourceMapFilename: 'bundle.js.map',
         path: path.resolve(__dirname, '../wwwroot/js'),
+        clean: true
     },
 };

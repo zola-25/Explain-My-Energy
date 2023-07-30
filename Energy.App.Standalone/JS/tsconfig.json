@@ -10,7 +10,7 @@
     "allowJs": true,
     "outDir": "../wwwroot/js"
   },
-  "files": ["index.ts", "./Files/chartCreation.ts", "./Files/types.ts"],
+  "files": ["index.ts", "./Files/chartCreation.ts", "./Files/types.ts", "./Files/energyOnlyChart.ts", "./Files/weatherIconChart.ts"],
   
   "exclude": [
     "node_modules",
