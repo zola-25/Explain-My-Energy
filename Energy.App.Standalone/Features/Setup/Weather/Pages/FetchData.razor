@@ -11,7 +11,7 @@
 <h1>Weather forecast</h1>
 
 
-<button class="btn btn-primary" @onclick="LoadWeatherData">Load Data</button>
+<MudButton Color="Color.Primary"  @onclick="LoadWeatherData">Load Data</MudButton>
 <input type="text" placeholder="Postal Area" @bind-value="@Outcode" />
 
 @if (WeatherState.Value.Loading)

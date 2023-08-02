@@ -2,13 +2,13 @@
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-import { ChartDailyForecastReading, ChartDefaults, ChartReading, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
+import { ChartDefaults, MeterChartProfile, ChartDetails } from "./types";
 
 export class EnergyOnlyChart {
 
     public create(divId: string, meterChartProfile: MeterChartProfile): ChartDetails {
         // Create root element
-        let root = am5.Root.new(divId);
+        let root = am5.Root.new(divId); 
         // Set themes
         root.setThemes([
             am5themes_Animated.new(root)
@@ -76,7 +76,7 @@ export class EnergyOnlyChart {
         }));
         let consumptionSeriesIndex = seriesIndex++;
 
-        consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        consumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("consumptionSeries.getTooltip() not set");
 
         consumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -131,7 +131,7 @@ export class EnergyOnlyChart {
         }));
         let costSeriesIndex = seriesIndex++;
 
-        costSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        costSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("costSeries.getTooltip() not set");
 
         costSeries.strokes.template.setAll({
             stroke: ChartDefaults.costColor,
@@ -163,7 +163,7 @@ export class EnergyOnlyChart {
 
         }));
 
-        forecastConsumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        forecastConsumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("forecastConsumptionSeries.getTooltip() not set");
 
 
         forecastConsumptionSeries.fills.template.setAll({
@@ -198,7 +198,7 @@ export class EnergyOnlyChart {
         }));
         let forecastCostSeriesIndex = seriesIndex++;
 
-        forecastCostSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        forecastCostSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("forecastCostSeries.getTooltip() not set");
 
         forecastCostSeries.fills.template.setAll({
             fill: ChartDefaults.costColor,
@@ -227,6 +227,7 @@ export class EnergyOnlyChart {
         }));
         cursor.lineY.set("visible", false);
 
+        consumptionSeries.hide()
 
 
         consumptionSeries.data.setAll(meterChartProfile.chartReadings);

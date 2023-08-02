@@ -2,7 +2,7 @@
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-import { ChartDailyForecastReading, ChartDefaults, ChartReading, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
+import { ChartDefaults, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
 
 export class WeatherIconChart {
 
@@ -24,6 +24,7 @@ export class WeatherIconChart {
         }));
 
 
+        
         //
         // // Create axes
         let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
@@ -75,7 +76,7 @@ export class WeatherIconChart {
         }));
         let consumptionSeriesIndex = seriesIndex++;
 
-        consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        consumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("getTooltip not found for consumption series");
 
         consumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -129,7 +130,7 @@ export class WeatherIconChart {
         }));
         let costSeriesIndex = seriesIndex++;
 
-        costSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        costSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("getTooltip not found for cost series");
 
 
         costSeries.strokes.template.setAll({
@@ -189,8 +190,13 @@ export class WeatherIconChart {
             }),
             groupDataWithOriginals: true,
             groupDataCallback: function (dataItem, interval) {
-                let group = dataItem.get("originals").map(c => c.get("valueY"));
-                const sum = group.reduce((a, b) => a + b, 0);
+                let group = dataItem.get("originals")?.map(c => c.get("valueY")) ?? [];
+                const sum = group.reduce((a, b) => (a ?? 0) + (b ?? 0), 0) ?? 0;
+
+                if(group.length === 0) {
+                    return;
+                }
+
                 const avg = (sum / group.length) || 0;
                 const roundAvg = Math.round(avg);
 
@@ -238,7 +244,7 @@ export class WeatherIconChart {
 
         }));
 
-        forecastConsumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        forecastConsumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("getTooltip not found for forecastConsumptionSeries");
 
 
         forecastConsumptionSeries.fills.template.setAll({
@@ -273,7 +279,7 @@ export class WeatherIconChart {
         }));
         let forecastCostSeriesIndex = seriesIndex++;
 
-        forecastCostSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        forecastCostSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("forecastCostSeries.getTooltip() not found");
 
         forecastCostSeries.fills.template.setAll({
             fill: ChartDefaults.costColor,
@@ -310,7 +316,7 @@ export class WeatherIconChart {
 
         weatherIconSeries.bullets.push(function (root, series, dataItem) {
 
-            let grouped = dataItem.get("originals") ? true : false;
+            // let grouped = dataItem.get("originals") ? true : false;
 
             return am5.Bullet.new(root, {
                 sprite: am5.Circle.new(root, {

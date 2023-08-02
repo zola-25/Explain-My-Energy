@@ -1,0 +1,35 @@
+{
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {}
+    
+    /* "overrides": [
+        {
+            "files": [
+                "./SourceTS/public-path.js"
+            ],
+            "globals": {
+                "__webpack_public_path__": "writable"
+            },
+            "extends": [
+                "eslint:recommended"
+            ],
+            "rules": {
+                "no-undef": "off",
+                "no-unused-vars": "off",
+                "no-global-assign": "off"
+            }
+        }
+    ] */
+
+} 

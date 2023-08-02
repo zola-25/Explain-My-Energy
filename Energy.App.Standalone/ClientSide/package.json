@@ -1,0 +1,77 @@
+{
+  "name": "explain-my-energy",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "buildDev": "webpack --config webpack.dev.config.cjs",
+    "buildHtmlDev": "webpack --config webpack.dev.html.config.js",
+    "buildProd": "webpack --config webpack.prod.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "@babel/preset-typescript": "^7.22.5",
+    "@types/gulp-babel": "^6.1.30",
+    "@types/gulp-rename": "^2.0.2",
+    "@types/gulp-terser": "^1.2.2",
+    "@types/node": "^20.4.5",
+    "@types/webpack": "^5.28.1",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "babelify": "^10.0.0",
+    "chokidar": "3.5.3",
+    "del": "^7.0.0",
+    "eslint": "^8.46.0",
+    "glob-parent": "6.0.2",
+    "glob-stream": "8.0.0",
+    "glob-watcher": "6.0.0",
+    "gulp": "4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-terser": "^2.1.0",
+    "html-webpack-plugin": "^5.5.3",
+    "license-webpack-plugin": "^4.0.2",
+    "removeNPMAbsolutePaths": "^3.0.1",
+    "terser-webpack-plugin": "^5.3.9",
+    "ts-loader": "^9.4.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "vinyl-buffer": "1.0.1",
+    "vinyl-fs": "4.0.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.4.1",
+    "@types/lodash": "^4.14.196",
+    "autoprefixer": "^10.4.14",
+    "core-js": "^3.32.0",
+    "lodash": "^4.17.21",
+    "tslib": "^2.6.1"
+  },
+  "overrides": {
+    "gulp": {
+      "glob-watcher": "6.0.0",
+      "vinyl-fs": "4.0.0"
+    },
+    "glob-watcher": {
+      "chokidar": "3.5.3"
+    },
+    "chokidar": {
+      "glob-parent": "6.0.2"
+    },
+    "vinyl-fs": {
+      "glob-stream": "8.0.0"
+    },
+    "glob-stream": {
+      "glob-parent": "6.0.2"
+    }
+  }
+}

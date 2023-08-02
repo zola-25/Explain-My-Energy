@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.check.json",
+  "compilerOptions": {
+    
+    "moduleResolution": "bundler",
+    "module": "CommonJS",
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "forceConsistentCasingInFileNames": true,
+
+    "jsxFactory": "h",
+    "target": "es5",
+
+    "declaration": true,
+    "declarationMap": true,
+    "skipLibCheck": false,
+    "sourceMap": true,
+    "outDir": "./TscCompiled",
+    "noEmitOnError": true,
+    "allowJs": true,
+    "checkJs": true,
+    "isolatedModules": true,
+    "rootDir": "."
+  },
+  "include": [
+    "./TscSource/**/*"
+  ],
+  "exclude": [
+    "../wwwroot/**/*",
+    "./node_modules/**/*"
+  ]
+}
