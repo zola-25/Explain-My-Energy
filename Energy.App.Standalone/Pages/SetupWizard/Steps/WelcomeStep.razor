@@ -7,10 +7,9 @@
         </WelcomeScreenContent>
     </SetupStepPage>
     <ActionButtons>
-        <div class="d-flex justify-content-center">
-            <MudButton Size="Size.Medium" Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Start Wizard</MudButton>
-            <MudButton Size="Size.Medium" Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-        </div>
+        <MudButton Size="Size.Medium" Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+
+        <MudButton Size="Size.Medium" Class="w-25" Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Start Wizard</MudButton>
     </ActionButtons>
 </StepTemplate>
 @code {

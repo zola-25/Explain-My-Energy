@@ -4,15 +4,15 @@
 
     </SetupStepPage>
     <ActionButtons>
-        <div class="d-flex justify-content-evenly">
-            <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
             
-            <MudButton Style="@(CanMoveNext ? "display: none" : "")" Color="Color.Default" OnClick="SkipToDone">Skip</MudButton>
 
+
+        <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
             <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+        <MudButton Style="@(CanMoveNext ? "display: none" : "")" Color="Color.Default" OnClick="SkipToDone">Skip</MudButton>
+            \
+        <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
 
-            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-        </div>
     </ActionButtons>
 </StepTemplate>
 

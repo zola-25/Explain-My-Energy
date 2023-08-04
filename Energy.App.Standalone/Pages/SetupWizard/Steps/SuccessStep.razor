@@ -13,14 +13,13 @@
         </MudGrid>
     </SetupStepPage>
     <ActionButtons>
-        <div class="d-flex justify-content-evenly">
-            <MudButton Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity</MudButton>
-            <MudButton Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas</MudButton>
+        <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
 
-            <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+        <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+        <MudButton Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity</MudButton>
+        <MudButton Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas</MudButton>
 
-            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-        </div>
+
     </ActionButtons>
 </StepTemplate>
 

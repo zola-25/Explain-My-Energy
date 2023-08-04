@@ -3,5 +3,9 @@ ul {
 }
 
     ul li {
-        margin: 1rem 0;
+        margin: 1rem 1rem;
+    }
+
+    p {
+        margin: 0.5rem 0;
     }

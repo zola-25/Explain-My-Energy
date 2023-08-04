@@ -3,13 +3,12 @@
         <Household  />
     </SetupStepPage>
     <ActionButtons>
-        <div class="d-flex justify-content-evenly">
-            <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
-            
-            <MudButton Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
 
-            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-        </div>
+        <MudButton Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
+        <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
+        
+        <MudButton Color="Color.Default" Class="me-0" OnClick="CloseWizardCallback">Close</MudButton>
+
     </ActionButtons>
 </StepTemplate>
 
