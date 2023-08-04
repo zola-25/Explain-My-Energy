@@ -11,7 +11,7 @@ module.exports = {
     entry: './index.ts',
     mode: 'production',
     output: {
-        filename: 'bundle.min.js',
+        filename: 'bundle.js',
         path: path.resolve(__dirname, '../wwwroot/js'),
         clean: true,
     },
@@ -26,7 +26,9 @@ module.exports = {
     },
     plugins: [
         new LicenseWebpackPlugin({
-            
+            skipChildCompilers: true,
+
+            outputFilename: 'licenses.txt',
             addBanner: true,
             licenseFileOverrides: {
                 '@amcharts/amcharts5': 'LICENSE'
@@ -41,8 +43,10 @@ module.exports = {
     ],
     optimization: {
         minimize: true,
+        
         minimizer: [new TerserPlugin({
             extractComments: false,
+            
             terserOptions: {
                 format: {
                     // Tell terser to remove all comments except for the banner added via LicenseWebpackPlugin.
@@ -54,8 +58,7 @@ module.exports = {
 
             },
             
-        }
-        )]
+        })],
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],

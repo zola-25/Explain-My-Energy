@@ -2,20 +2,20 @@
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-import { ChartDailyForecastReading, ChartDefaults, ChartReading, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
+import { ChartDefaults, MeterChartProfile,  ChartDetails } from "./types";
 
 export class EnergyOnlyChart {
 
     public create(divId: string, meterChartProfile: MeterChartProfile): ChartDetails {
         // Create root element
-        let root = am5.Root.new(divId);
+        const root = am5.Root.new(divId);
         // Set themes
         root.setThemes([
             am5themes_Animated.new(root)
         ]);
 
         // Create chart
-        let chart = root.container.children.push(am5xy.XYChart.new(root, {
+        const chart = root.container.children.push(am5xy.XYChart.new(root, {
             focusable: true,
             panX: true,
             panY: false,
@@ -26,7 +26,7 @@ export class EnergyOnlyChart {
 
         //
         // // Create axes
-        let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
             min: meterChartProfile.profileStart,
             max: meterChartProfile.profileEnd,
             groupData: true,
@@ -39,11 +39,11 @@ export class EnergyOnlyChart {
             tooltip: am5.Tooltip.new(root, {})
         }));
 
-        let yConsumptionAxisRenderer = am5xy.AxisRendererY.new(root, {
+        const yConsumptionAxisRenderer = am5xy.AxisRendererY.new(root, {
         })
         yConsumptionAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
 
-        let yConsumptionAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        const yConsumptionAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             ariaLabel: "kWh",
             renderer: yConsumptionAxisRenderer,
             visible: !meterChartProfile.showCost
@@ -60,7 +60,7 @@ export class EnergyOnlyChart {
         let seriesIndex = 0;
 
         // Add series
-        let consumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const consumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - Consumption`,
             xAxis: xAxis,
             yAxis: yConsumptionAxis,
@@ -74,7 +74,7 @@ export class EnergyOnlyChart {
             fill: ChartDefaults.consumptionColor,
             visible: !meterChartProfile.showCost,
         }));
-        let consumptionSeriesIndex = seriesIndex++;
+        const consumptionSeriesIndex = seriesIndex++;
 
         consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
 
@@ -93,11 +93,11 @@ export class EnergyOnlyChart {
 
 
 
-        let yCostAxisRenderer = am5xy.AxisRendererY.new(root, {
+        const yCostAxisRenderer = am5xy.AxisRendererY.new(root, {
         })
         yCostAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
 
-        let yCostAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        const yCostAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             ariaLabel: "Pounds",
             numberFormat: "'£'#",
             maxPrecision: 0,
@@ -115,7 +115,7 @@ export class EnergyOnlyChart {
             })
         );
 
-        let costSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const costSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - Cost`,
             xAxis: xAxis,
             yAxis: yCostAxis,
@@ -129,7 +129,7 @@ export class EnergyOnlyChart {
             visible: meterChartProfile.showCost,
             fill: ChartDefaults.costFill
         }));
-        let costSeriesIndex = seriesIndex++;
+        const costSeriesIndex = seriesIndex++;
 
         costSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
 
@@ -146,7 +146,7 @@ export class EnergyOnlyChart {
         })
 
 
-        let forecastConsumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const forecastConsumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - ForecastConsumption`,
             xAxis: xAxis,
             yAxis: yConsumptionAxis,
@@ -171,7 +171,7 @@ export class EnergyOnlyChart {
             fillOpacity: 0,
             visible: true,
         })
-        let forecastConsumptionSeriesIndex = seriesIndex++;
+        const forecastConsumptionSeriesIndex = seriesIndex++;
 
         forecastConsumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -180,7 +180,7 @@ export class EnergyOnlyChart {
         })
 
 
-        let forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - ForecastCost`,
             xAxis: xAxis,
             yAxis: yCostAxis,
@@ -196,7 +196,7 @@ export class EnergyOnlyChart {
             fill: ChartDefaults.costFill,
 
         }));
-        let forecastCostSeriesIndex = seriesIndex++;
+        const forecastCostSeriesIndex = seriesIndex++;
 
         forecastCostSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
 
@@ -222,7 +222,7 @@ export class EnergyOnlyChart {
 
         // Add cursor
         // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-        let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+        const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
             behavior: "zoomX"
         }));
         cursor.lineY.set("visible", false);
@@ -251,10 +251,10 @@ export class EnergyOnlyChart {
 
             if (meterChartProfile.highlightStart && meterChartProfile.highlightEnd) {
 
-                var startDate = new Date(meterChartProfile.highlightStart);
+                const startDate = new Date(meterChartProfile.highlightStart);
                 startDate.setDate(startDate.getDate() - 1);
 
-                var endDate = new Date(meterChartProfile.highlightEnd);
+                const endDate = new Date(meterChartProfile.highlightEnd);
                 endDate.setDate(endDate.getDate() + 1);
 
                 xAxis.zoomToDates(startDate, endDate);

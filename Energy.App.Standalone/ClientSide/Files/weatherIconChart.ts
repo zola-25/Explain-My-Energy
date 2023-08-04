@@ -2,20 +2,20 @@
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-import { ChartDailyForecastReading, ChartDefaults, ChartReading, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
+import { ChartDefaults, MeterChartProfile, TemperaturePoint, ChartDetails } from "./types";
 
 export class WeatherIconChart {
 
     public create(divId: string, meterChartProfile: MeterChartProfile, temperatureIconPoints: TemperaturePoint[]): ChartDetails {
         // Create root element
-        let root = am5.Root.new(divId);
+        const root = am5.Root.new(divId);
         // Set themes
         root.setThemes([
             am5themes_Animated.new(root)
         ]);
 
         // Create chart
-        let chart = root.container.children.push(am5xy.XYChart.new(root, {
+        const chart = root.container.children.push(am5xy.XYChart.new(root, {
             focusable: true,
             panX: true,
             panY: false,
@@ -26,7 +26,7 @@ export class WeatherIconChart {
 
         //
         // // Create axes
-        let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
             min: meterChartProfile.profileStart,
             max: meterChartProfile.profileEnd,
             groupData: true,
@@ -39,11 +39,11 @@ export class WeatherIconChart {
             tooltip: am5.Tooltip.new(root, {})
         }));
 
-        let yConsumptionAxisRenderer = am5xy.AxisRendererY.new(root, {
+        const yConsumptionAxisRenderer = am5xy.AxisRendererY.new(root, {
         })
         yConsumptionAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
 
-        let yConsumptionAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        const yConsumptionAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             ariaLabel: "kWh",
             renderer: yConsumptionAxisRenderer,
             visible: !meterChartProfile.showCost
@@ -59,7 +59,7 @@ export class WeatherIconChart {
 
         let seriesIndex = 0;
         // Add series
-        let consumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const consumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - Consumption`,
             xAxis: xAxis,
             yAxis: yConsumptionAxis,
@@ -73,7 +73,7 @@ export class WeatherIconChart {
             fill: ChartDefaults.consumptionColor,
             visible: !meterChartProfile.showCost
         }));
-        let consumptionSeriesIndex = seriesIndex++;
+        const consumptionSeriesIndex = seriesIndex++;
 
         consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
 
@@ -91,11 +91,11 @@ export class WeatherIconChart {
 
 
 
-        let yCostAxisRenderer = am5xy.AxisRendererY.new(root, {
+        const yCostAxisRenderer = am5xy.AxisRendererY.new(root, {
         })
         yCostAxisRenderer.grid.template.set("forceHidden", !meterChartProfile.showCost);
 
-        let yCostAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        const yCostAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             ariaLabel: "Pounds",
             numberFormat: "'£'#",
             maxPrecision: 0,
@@ -113,7 +113,7 @@ export class WeatherIconChart {
             })
         );
 
-        let costSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const costSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - Cost`,
             xAxis: xAxis,
             yAxis: yCostAxis,
@@ -127,7 +127,7 @@ export class WeatherIconChart {
             visible: meterChartProfile.showCost,
             fill: ChartDefaults.costFill
         }));
-        let costSeriesIndex = seriesIndex++;
+        const costSeriesIndex = seriesIndex++;
 
         costSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
 
@@ -146,21 +146,21 @@ export class WeatherIconChart {
 
 
 
-        let yTempRenderer = am5xy.AxisRendererY.new(root, {
+        const yTempRenderer = am5xy.AxisRendererY.new(root, {
             opposite: true
         });
         yTempRenderer.labels.template.set('visible', false)
         yTempRenderer.grid.template.set("forceHidden", true);
 
-        let yTemperatureAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        const yTemperatureAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
             extraMin: 0.05,
             extraMax: 0.05,
             renderer: yTempRenderer,
         }));
 
-        let xTempRenderer = am5xy.AxisRendererX.new(root, {})
+        const xTempRenderer = am5xy.AxisRendererX.new(root, {})
         xTempRenderer.labels.template.set('visible', false)
-        let xTempAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        const xTempAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
             min: meterChartProfile.profileStart,
             max: meterChartProfile.profileEnd,
             groupData: true,
@@ -176,7 +176,7 @@ export class WeatherIconChart {
         //xTempAxis.set("syncWithAxis", xAxis);
 
 
-        let weatherIconSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const weatherIconSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: "Weather Summary",
             xAxis: xTempAxis,
             yAxis: yTemperatureAxis,
@@ -188,8 +188,8 @@ export class WeatherIconChart {
                 labelText: "{summary}"
             }),
             groupDataWithOriginals: true,
-            groupDataCallback: function (dataItem, interval) {
-                let group = dataItem.get("originals").map(c => c.get("valueY"));
+            groupDataCallback: function (dataItem) {
+                const group = dataItem.get("originals").map(c => c.get("valueY"));
                 const sum = group.reduce((a, b) => a + b, 0);
                 const avg = (sum / group.length) || 0;
                 const roundAvg = Math.round(avg);
@@ -218,10 +218,10 @@ export class WeatherIconChart {
                 //}
             }
         }))
-        let weatherIconSeriesIndex = seriesIndex++;
+        const weatherIconSeriesIndex = seriesIndex++;
 
 
-        let forecastConsumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const forecastConsumptionSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - ForecastConsumption`,
             xAxis: xAxis,
             yAxis: yConsumptionAxis,
@@ -246,7 +246,7 @@ export class WeatherIconChart {
             fillOpacity: 0,
             visible: true,
         })
-        let forecastConsumptionSeriesIndex = seriesIndex++;
+        const forecastConsumptionSeriesIndex = seriesIndex++;
 
         forecastConsumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -255,7 +255,7 @@ export class WeatherIconChart {
         })
 
 
-        let forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
+        const forecastCostSeries = chart.series.push(am5xy.LineSeries.new(root, {
             name: `${meterChartProfile.globalId} - ForecastCost`,
             xAxis: xAxis,
             yAxis: yCostAxis,
@@ -271,7 +271,7 @@ export class WeatherIconChart {
             fill: ChartDefaults.costFill,
 
         }));
-        let forecastCostSeriesIndex = seriesIndex++;
+        const forecastCostSeriesIndex = seriesIndex++;
 
         forecastCostSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
 
@@ -288,29 +288,8 @@ export class WeatherIconChart {
         })
 
 
-        //iconSeries.bullets.push(function (root, series, dataItem) {
-        //    let grouped = dataItem.get("originals") ? true : false;
+        weatherIconSeries.bullets.push(function (root) {
 
-        //    let avgTemp = dataItem.get("valueY")
-
-        //    return am5.Bullet.new(root, {
-        //        sprite: am5.Picture.new(root, {
-        //            src: `/images/temperature/celsius${avgTemp}.svg`,
-        //            width: 25,
-        //            height: 25,
-        //            scale: grouped ? 1 : 0.8,
-        //            centerX: am5.p50,
-        //            centerY: am5.p50
-        //        })
-        //    })
-
-        //})
-
-
-
-        weatherIconSeries.bullets.push(function (root, series, dataItem) {
-
-            let grouped = dataItem.get("originals") ? true : false;
 
             return am5.Bullet.new(root, {
                 sprite: am5.Circle.new(root, {
@@ -323,7 +302,7 @@ export class WeatherIconChart {
             });
         });
 
-        weatherIconSeries.bullets.push(function (root, series, dataItem) {
+        weatherIconSeries.bullets.push(function (root) {
             return am5.Bullet.new(root, {
                 sprite: am5.Label.new(root, {
                     text: "{valueY}°",
@@ -347,7 +326,7 @@ export class WeatherIconChart {
 
         // Add cursor
         // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-        let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+        const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
             behavior: "zoomX"
         }));
         cursor.lineY.set("visible", false);
@@ -375,10 +354,10 @@ export class WeatherIconChart {
 
             if (meterChartProfile.highlightStart && meterChartProfile.highlightEnd) {
 
-                var startDate = new Date(meterChartProfile.highlightStart);
+                const startDate = new Date(meterChartProfile.highlightStart);
                 startDate.setDate(startDate.getDate() - 1);
 
-                var endDate = new Date(meterChartProfile.highlightEnd);
+                const endDate = new Date(meterChartProfile.highlightEnd);
                 endDate.setDate(endDate.getDate() + 1);
 
                 xAxis.zoomToDates(startDate, endDate);

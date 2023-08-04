@@ -1,9 +1,10 @@
-﻿import * as am5 from "@amcharts/amcharts5";
+﻿/* eslint-disable @typescript-eslint/no-namespace */
+import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import { ChartDailyForecastReading, ChartDetails, ChartReading, MeterChartProfile, TemperaturePoint } from "./types";
-import _ from "lodash"
-import { WeatherIconChart } from "./weatherIconChart";
+import _ from "lodash";
 import { EnergyOnlyChart } from "./energyOnlyChart";
+import { ChartDailyForecastReading, ChartDetails, MeterChartProfile, TemperaturePoint } from "./types";
+import { WeatherIconChart } from "./weatherIconChart";
 
 export namespace Charts {
 
@@ -73,15 +74,15 @@ export namespace Charts {
 
         public toggleCostSeries(divId: string, showCost: boolean): void {
 
-            let chartDetails = this.activeCharts[divId]
-            let chart = chartDetails.chart
-            let consumptionSeries = chart.series.getIndex(chartDetails.consumptionSeriesIndex)
-            let costSeries = chart.series.getIndex(chartDetails.costSeriesIndex)
-            let forecastConsumptionSeries = chart.series.getIndex(chartDetails.forecastConsumptionSeriesIndex)
-            let forecastCostSeries = chart.series.getIndex(chartDetails.forecastCostSeriesIndex)
+            const chartDetails = this.activeCharts[divId]
+            const chart = chartDetails.chart
+            const consumptionSeries = chart.series.getIndex(chartDetails.consumptionSeriesIndex)
+            const costSeries = chart.series.getIndex(chartDetails.costSeriesIndex)
+            const forecastConsumptionSeries = chart.series.getIndex(chartDetails.forecastConsumptionSeriesIndex)
+            const forecastCostSeries = chart.series.getIndex(chartDetails.forecastCostSeriesIndex)
 
-            let consumptionAxis = chart.yAxes.getIndex(0)
-            let costAxis = chart.yAxes.getIndex(1)
+            const consumptionAxis = chart.yAxes.getIndex(0)
+            const costAxis = chart.yAxes.getIndex(1)
 
             if (showCost) {
                 consumptionAxis.hide()
@@ -123,12 +124,12 @@ export namespace Charts {
         public setForecastSeries(divId: string, forecastChartReadings: ChartDailyForecastReading[], degreeDifference: number): void {
 
             console.log("degreeDifference: " + degreeDifference)
-            let chartDetails = this.activeCharts[divId]
-            let chart = chartDetails.chart
-            let latestReading = this.activeCharts[divId].latestReading
+            const chartDetails = this.activeCharts[divId]
+            const chart = chartDetails.chart
+            const latestReading = this.activeCharts[divId].latestReading
 
-            let forecastConsumptionSeries = chart.series.getIndex(chartDetails.forecastConsumptionSeriesIndex)
-            let forecastCostSeries = chart.series.getIndex(chartDetails.forecastCostSeriesIndex)
+            const forecastConsumptionSeries = chart.series.getIndex(chartDetails.forecastConsumptionSeriesIndex)
+            const forecastCostSeries = chart.series.getIndex(chartDetails.forecastCostSeriesIndex)
 
 
             forecastConsumptionSeries.data.setAll(forecastChartReadings)
@@ -138,7 +139,7 @@ export namespace Charts {
                 return;
             }
 
-            let weatherIconSeries = chart.series.getIndex(chartDetails.weatherIconSeriesIndex) as am5xy.LineSeries
+            const weatherIconSeries = chart.series.getIndex(chartDetails.weatherIconSeriesIndex) as am5xy.LineSeries
 
             const points = (weatherIconSeries.data.values as TemperaturePoint[])
 

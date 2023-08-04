@@ -416,3 +416,5 @@ FodyWeavers.xsd
 /.vscode
 /Energy.App.Standalone/JS/package-lock.json
 /Energy.Citations
+
+/Energy.App.Standalone/.vscode
