@@ -44,7 +44,11 @@
 
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
-    <script type="text/javascript" src="js/bundle.min.js"></script>
+    <% for (index in htmlWebpackPlugin.files.js) { %>
+
+        <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[index] %>"></script>
+         
+    <% } %>
 
 </body>
 

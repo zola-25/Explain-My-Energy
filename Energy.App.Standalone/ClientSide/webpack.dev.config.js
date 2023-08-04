@@ -41,8 +41,10 @@ module.exports = {
 
         }),
         new HtmlWebpackPlugin({
-            template: './index.html',
+            template: './HtmlTemplates/index_template.html',
             filename: '../index.html',
+            inject: false,
+            minify: false
         }), 
         
     ],
