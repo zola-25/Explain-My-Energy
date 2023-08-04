@@ -3,13 +3,13 @@
 @inherits FluxorComponent
 <StepTemplate HeaderText="Welcome to Explain my Energy" CloseWizardCallback="CloseWizardCallback">
     <SetupStepPage>
-        <WelcomeScreenContent >
+        <WelcomeScreenContent>
         </WelcomeScreenContent>
     </SetupStepPage>
     <ActionButtons>
-        <div class="d-flex justify-content-evenly">
-            <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Start Wizard</MudButton>
-            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+        <div class="d-flex justify-content-center">
+            <MudButton Size="Size.Medium" Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Start Wizard</MudButton>
+            <MudButton Size="Size.Medium" Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
         </div>
     </ActionButtons>
 </StepTemplate>

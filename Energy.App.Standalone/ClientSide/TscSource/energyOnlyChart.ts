@@ -1,15 +1,22 @@
-﻿
-import * as am5 from "@amcharts/amcharts5";
+﻿import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+<<<<<<<< HEAD:Energy.App.Standalone/ClientSide/Files/energyOnlyChart.ts
 import { ChartDefaults, MeterChartProfile,  ChartDetails } from "./types";
+========
+import { ChartDefaults, MeterChartProfile, ChartDetails } from "./types";
+>>>>>>>> ac4859cdd29d11a1e7534a4ca10671b163ca8e70:Energy.App.Standalone/ClientSide/TscSource/energyOnlyChart.ts
 
 export class EnergyOnlyChart {
 
     public create(divId: string, meterChartProfile: MeterChartProfile): ChartDetails {
         // Create root element
+<<<<<<<< HEAD:Energy.App.Standalone/ClientSide/Files/energyOnlyChart.ts
         const root = am5.Root.new(divId);
+========
+        let root = am5.Root.new(divId); 
+>>>>>>>> ac4859cdd29d11a1e7534a4ca10671b163ca8e70:Energy.App.Standalone/ClientSide/TscSource/energyOnlyChart.ts
         // Set themes
         root.setThemes([
             am5themes_Animated.new(root)
@@ -77,7 +84,7 @@ export class EnergyOnlyChart {
         }));
         const consumptionSeriesIndex = seriesIndex++;
 
-        consumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        consumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("consumptionSeries.getTooltip() not set");
 
         consumptionSeries.strokes.template.setAll({
             stroke: ChartDefaults.consumptionColor,
@@ -132,7 +139,7 @@ export class EnergyOnlyChart {
         }));
         const costSeriesIndex = seriesIndex++;
 
-        costSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        costSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("costSeries.getTooltip() not set");
 
         costSeries.strokes.template.setAll({
             stroke: ChartDefaults.costColor,
@@ -164,7 +171,7 @@ export class EnergyOnlyChart {
 
         }));
 
-        forecastConsumptionSeries.getTooltip().set("forceHidden", meterChartProfile.showCost);
+        forecastConsumptionSeries.getTooltip()?.set("forceHidden", meterChartProfile.showCost) ?? console.warn("forecastConsumptionSeries.getTooltip() not set");
 
 
         forecastConsumptionSeries.fills.template.setAll({
@@ -199,7 +206,7 @@ export class EnergyOnlyChart {
         }));
         const forecastCostSeriesIndex = seriesIndex++;
 
-        forecastCostSeries.getTooltip().set("forceHidden", !meterChartProfile.showCost);
+        forecastCostSeries.getTooltip()?.set("forceHidden", !meterChartProfile.showCost) ?? console.warn("forecastCostSeries.getTooltip() not set");
 
         forecastCostSeries.fills.template.setAll({
             fill: ChartDefaults.costColor,
@@ -228,6 +235,7 @@ export class EnergyOnlyChart {
         }));
         cursor.lineY.set("visible", false);
 
+        consumptionSeries.hide()
 
 
         consumptionSeries.data.setAll(meterChartProfile.chartReadings);

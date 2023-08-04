@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 
 <MudToolBar WrapContent="true" Class="justify-space-between">
-    <MudPaper Elevation="0" Class="m-2">
+    <MudPaper Elevation="0" Class="ma-2">
 
         <MudTooltip Placement="Placement.Top" Text="Chart kWh Consumption, or Costs with Tariff Details">
             <MudSwitch Checked="_costToggled"
@@ -17,7 +17,7 @@
     </MudPaper>
 
 
-    <MudPaper Elevation="0" Class="term-select-paper m-2" >
+    <MudPaper Elevation="0" Class="term-select-paper ma-2" >
         <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
             <MudSelect  Class="w-100"
@@ -38,7 +38,7 @@
 
     @if (IsPrimaryHeatingSource)
     {
-        <MudPaper Elevation="0" Class="m-2">
+        <MudPaper Elevation="0" Class="ma-2">
 
             <MudTooltip Placement="Placement.Top" Text="Forecast using Historical Moving Average, or the Temperature effect on your consumption. For warm weather periods, Historical Forecasts may be more accurate. For colder months, Temperature forecasts will show how your consumption increases as it gets colder.">
                 <MudSwitch Checked="_historicalForecastToggled"
@@ -52,7 +52,7 @@
             </MudTooltip>
         </MudPaper>
 
-        <MudPaper Elevation="0" Class="m-2">
+        <MudPaper Elevation="0" Class="ma-2">
             <MudTooltip Placement="Placement.Top" Text="If using Temperature Forecast, see how your consumption is effected by increasing or decreasing the daily forecast Temperature">
                 <MudNumericField Value="@_degreesDifference"
                                  TextChanged="DegreeDifferenceChange"

@@ -8,11 +8,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="JS\node_modules\**" />
-	  <Content Remove="JS\node_modules\**" />
-	  <EmbeddedResource Remove="JS\node_modules\**" />
-	  <None Remove="JS\node_modules\**" />
-	  <TypeScriptCompile Remove="JS\node_modules\**" />
+	<None Remove="ClientSide\**" />
+	  <None Remove="ClientSide\node_modules\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -42,7 +39,7 @@
 	</Target>
 
 	<ItemGroup>
-		<Folder Include="JS\scss\" />
+		<Folder Include="ClientSide\" />
 		<Folder Include="wwwroot\js\" />
 	</ItemGroup>
 

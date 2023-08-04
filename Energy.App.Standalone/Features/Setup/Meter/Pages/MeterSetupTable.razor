@@ -1,7 +1,7 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
 
-<MudPaper Class="m-3 " Elevation="0">
+<MudPaper Class="ma-3 " Elevation="0">
     <MudText Class="fw-bolder" Typo="Typo.h5">Meter Setup</MudText>
 </MudPaper>
 
@@ -30,7 +30,7 @@
 
             @if (context.Added)
             {
-                <MudButton Class="m-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
+                <MudButton Class="ma-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
             }
             else
             {
@@ -88,10 +88,10 @@
             {
                 @if (context.LatestReadingsDate != null)
                 {
-                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate()" Class="m-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate()" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
                                Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
                 }
-                <MudButton Class="m-1"  Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
+                <MudButton Class="ma-1"  Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
             }
 
         </MudTd>
