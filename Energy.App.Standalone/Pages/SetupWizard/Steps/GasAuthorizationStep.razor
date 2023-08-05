@@ -1,15 +1,42 @@
+@inherits FluxorComponent
 <StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
     <SetupStepPage>
-        <MeterAuthorizationFormComponent MeterType="MeterType.Gas" />
+        <MeterAuthorizationFormComponent MeterType="MeterType.Gas" FreshNavigation="true"/>
     </SetupStepPage>
     <ActionButtons>
-            
-            <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+        <div class="d-flex justify-end px-4">
 
-        <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-            <MudButton Style="@(CanMoveNext ? "display: none" : "")" Color="Color.Default" OnClick="SkipToElectricity">Skip to Electricity</MudButton>
+            <div class="mx-auto">
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    StartIcon="fa-solid fa-arrow-left"
+                    Color="Color.Default"
+                    OnClick="GoBackCallback">
+                    Back
+                </MudButton>
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    EndIcon="fa-solid fa-arrow-right"
+                    Color="Color.Default"
+                    Style="@(CanMoveNext ? "display: none" : "")"
+                    OnClick="SkipToElectricity">
+                    Skip to Electricity
+                </MudButton>
 
-        <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    EndIcon="fa-solid fa-arrow-right"
+                    Disabled="@(!CanMoveNext)"
+                    Color="Color.Success"
+                    OnClick="GoToNextStageCallback">
+                    Electricity
+                </MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
 
     </ActionButtons>
 </StepTemplate>

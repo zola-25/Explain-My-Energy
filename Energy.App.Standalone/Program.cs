@@ -52,8 +52,6 @@ builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>()
 
 builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
-builder.Services.AddSingleton<InMemoryStateContainer>();
-
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;

@@ -1,18 +1,21 @@
+@inherits FluxorComponent
 <StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
     <SetupStepPage>
-        <Household  />
+        <Household />
     </SetupStepPage>
     <ActionButtons>
+        <div class="d-flex justify-end px-4">
 
-        <MudButton Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
-        <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Next</MudButton>
-        
-        <MudButton Color="Color.Default" Class="me-0" OnClick="CloseWizardCallback">Close</MudButton>
-
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" EndIcon="fa-solid fa-arrow-right" Disabled="@(!CanMoveNext)" Color="Color.Success" OnClick="GoToNextStageCallback">Next</MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
     </ActionButtons>
 </StepTemplate>
 
-@code  {
+@code {
 
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
 

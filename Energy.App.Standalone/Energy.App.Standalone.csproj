@@ -8,8 +8,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	<None Remove="ClientSide\**" />
-	  <None Remove="ClientSide\node_modules\**" />
+		<None Remove="ClientSide\node_modules\**" />
+		<Content Include="ClientSide\HtmlTemplates\index_template.html" />
+		<None Include="ClientSide\webpack.dev.config.js" />
+		<None Include="ClientSide\webpack.prod.config.js" />
+		<None Include="wwwroot\css\fontawesome\webfonts\fa-brands-400.woff2" />
+		<None Include="wwwroot\css\fontawesome\webfonts\fa-regular-400.woff2" />
+		<None Include="wwwroot\css\fontawesome\webfonts\fa-solid-900.woff2" />
+		<None Include="wwwroot\css\fontawesome\webfonts\fa-v4compatibility.woff2" />
+		<Folder Include="wwwroot\js\" />
+
 	</ItemGroup>
 
 	<ItemGroup>
@@ -37,11 +45,6 @@
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
 	</Target>
-
-	<ItemGroup>
-		<Folder Include="ClientSide\" />
-		<Folder Include="wwwroot\js\" />
-	</ItemGroup>
 
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>

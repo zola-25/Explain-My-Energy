@@ -8,9 +8,12 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <a href="/" style="text-decoration: none; color: inherit;"><MudText Typo="Typo.h5" Class="ml-3" Style="width: max-content;">Explain My Energy</MudText></a>
         <MudSpacer />
+        <MudNavLink Icon="@Icons.Custom.Brands.GitHub" Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
+
         <MudNavLink Class="menu-nav-item" Href="/About" ActiveClass="menu-nav-item-active" Match="NavLinkMatch.Prefix" Style="max-width: fit-content;">
             <MudText Align="Align.Start" Typo="Typo.h6" >About</MudText>
         </MudNavLink>
+
         <MudTooltip Arrow="true" Placement="Placement.Bottom" ShowOnClick="false" ShowOnFocus="true" ShowOnHover="true" Text="Share this App!">
             <ShareMenu />
         </MudTooltip>
@@ -23,13 +26,15 @@
             <DataValidatorBase>
                 @Body
             </DataValidatorBase>
+            <br />
+            <br />
+            <br />
         </MudContainer>
     </MudMainContent>
     <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-content-start" DisableGutters="true"  Bottom="true" Dense="true" Fixed="true" Elevation="1">
-        <MudNavLink Style="max-width: fit-content" Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
-        <MudNavLink Href="/TermsAndConditions">Terms and Conditions</MudNavLink>
+        <MudNavLink Style="max-width: fit-content" Class="footer-nav-item" Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
+        <MudNavLink Class="footer-nav-item" Href="/TermsAndConditions">Terms and Conditions</MudNavLink>
         <MudSpacer />
-        <MudNavLink Icon="@Icons.Custom.Brands.GitHub" Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
     </MudAppBar>
 </MudLayout>
 
@@ -42,7 +47,17 @@
     .menu-nav-item .mud-nav-link-text {
         margin: unset;
     }
-    .menu-nav-item a {
+
+    .footer-nav-item a  {
+        text-decoration: none;
+    }
+
+.footer-nav-item a:hover :first-child {
+        color: grey;
+    text-decoration: underline
+    }
+
+    .menu-nav-item a  {
         text-decoration: none;
     }
 

@@ -27,9 +27,11 @@
         </MudMenuItem>
         <MudMenuItem Disabled="_disabledDuringDevelopment"
                      Href="@($"https://twitter.com/intent/tweet?url={_encodedBaseUri}&text={_encodedText}")" Target="_blank"
+                     
+                     IconColor="Color.Default"
                      Class="twitter-share"
                      IconSize="Size.Large"
-                     Icon="@Icons.Custom.Brands.Twitter">
+                     Icon="fa-brands fa-x-twitter">
             <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">Twitter</MudText>
         </MudMenuItem>
     </ChildContent>
@@ -41,7 +43,6 @@
     }
 
     .twitter-share .mud-list-item-icon {
-        color: rgb(29, 155, 240);
         min-width: fit-content;
     }
 

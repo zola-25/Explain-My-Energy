@@ -5,75 +5,73 @@
 
 <div class="popover-container">
     <div class="@(_opened ? "popover-overlay" : "no-overlay")">@_opened</div>
-    
-    @if(_opened) {
-    <MudPopover 
-                Open="_opened"
-                Class="eme-popover mt-3"
-                Fixed="false"
-                OverflowBehavior="OverflowBehavior.FlipAlways"
-                AnchorOrigin="Origin.BottomCenter"
-                TransformOrigin="Origin.TopCenter"
-                RelativeWidth="true">
+
+    @if (_opened)
+    {
+        <MudPopover Open="_opened"
+                    Class="eme-popover mt-3 mb-16"
+                    Fixed="true"
+                    OverflowBehavior="OverflowBehavior.FlipNever"
+                    AnchorOrigin="Origin.BottomCenter"
+                    TransformOrigin="Origin.TopCenter"
+                    RelativeWidth="true">
 
 
-        @switch (CurrentStage)
-        {
-            case SetupStage.WelcomeScreenSplash:
-                <WelcomeStep CloseWizardCallback="CloseModal" 
-                             GoToNextStageCallback="GoToNextStageCallback" />
-                break;
-            case SetupStage.Household:
-                <HouseholdStep BreadcrumbItems="BreadcrumbItems" 
-                     CloseWizardCallback="CloseModal" 
-                               GoBackCallback="GoToPreviousStageCallback" 
-                               GoToNextStageCallback="GoToNextStageCallback" />
+            @switch (CurrentStage)
+            {
+                case SetupStage.WelcomeScreenSplash:
+                    <WelcomeStep CloseWizardCallback="CloseModal"
+                                 GoToNextStageCallback="GoToNextStageCallback" />
+                    break;
+                case SetupStage.Household:
+                    <HouseholdStep BreadcrumbItems="BreadcrumbItems"
+                                   CloseWizardCallback="CloseModal"
+                                   GoBackCallback="GoToPreviousStageCallback"
+                                   GoToNextStageCallback="GoToNextStageCallback" />
 
-                break;
-            case SetupStage.GasMeter:
-                <GasMeterStep BreadcrumbItems="BreadcrumbItems" 
-                              CloseWizardCallback="CloseModal"
-                                  GoBackCallback="GoToPreviousStageCallback" 
-                              GoToNextStageCallback="GoToNextStageCallback" 
-                              SkipToElectricity="SkipToElectricityCallback" />
+                    break;
+                case SetupStage.GasMeter:
+                    <GasMeterStep BreadcrumbItems="BreadcrumbItems"
+                                  CloseWizardCallback="CloseModal"
+                                  GoBackCallback="GoToPreviousStageCallback"
+                                  GoToNextStageCallback="GoToNextStageCallback"
+                                  SkipToElectricity="SkipToElectricityCallback" />
 
-                break;
-            case SetupStage.GasMeterAuthorization:
-                <GasAuthorizationStep BreadcrumbItems="BreadcrumbItems" 
-                                      CloseWizardCallback="CloseModal"
-                                          GoBackCallback="GoToPreviousStageCallback" 
-                                      GoToNextStageCallback="GoToNextStageCallback" 
-                                      SkipToElectricity="SkipToElectricityCallback" />
-                break;
-            case SetupStage.ElectricityMeter:
-                <ElectricityMeterStep BreadcrumbItems="BreadcrumbItems"
-                                      CloseWizardCallback="CloseModal" 
-                                      GoBackCallback="GoToPreviousStageCallback"
-                                      GoToNextStageCallback="GoToNextStageCallback" 
-                                      SkipToDone="SkipToDone" />
-                break;
-            case SetupStage.ElectricityMeterAuthorization:
-                <ElectricityAuthorizationStep BreadcrumbItems="BreadcrumbItems" 
-                                              CloseWizardCallback="CloseModal"
+                    break;
+                case SetupStage.GasMeterAuthorization:
+                    <GasAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                          CloseWizardCallback="CloseModal"
+                                          GoBackCallback="GoToPreviousStageCallback"
+                                          GoToNextStageCallback="GoToNextStageCallback"
+                                          SkipToElectricity="SkipToElectricityCallback" />
+                    break;
+                case SetupStage.ElectricityMeter:
+                    <ElectricityMeterStep BreadcrumbItems="BreadcrumbItems"
+                                          CloseWizardCallback="CloseModal"
+                                          GoBackCallback="GoToPreviousStageCallback"
+                                          GoToNextStageCallback="GoToNextStageCallback"
+                                          SkipToDone="SkipToDone" />
+                    break;
+                case SetupStage.ElectricityMeterAuthorization:
+                    <ElectricityAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                                  CloseWizardCallback="CloseModal"
                                                   GoBackCallback="GoToPreviousStageCallback"
-                                              GoToNextStageCallback="GoToNextStageCallback" 
-                                              SkipToDone="SkipToDone" />
-                break;
-            case SetupStage.Done:
-                <SuccessStep 
-                    BreadcrumbItems="BreadcrumbItems"
-                    CloseWizardCallback="CloseModal" 
-                    GoBackCallback="GoToPreviousStageCallback"
-                    GoToNextStageCallback="GoToAnalysis" />
+                                                  GoToNextStageCallback="GoToNextStageCallback"
+                                                  SkipToDone="SkipToDone" />
+                    break;
+                case SetupStage.Done:
+                    <SuccessStep BreadcrumbItems="BreadcrumbItems"
+                                 CloseWizardCallback="CloseModal"
+                                 GoBackCallback="GoToPreviousStageCallback" />
 
 
-                break;
+                    break;
 
-            default:
-                Logger.LogError("Setup Stage not recognised: {SetupStage}", CurrentStage);
-                throw new ArgumentOutOfRangeException(nameof(CurrentStage), CurrentStage, "Setup Stage not recognised");
-        }
-    </MudPopover>
+                default:
+                    Logger.LogError("Setup Stage not recognised: {SetupStage}", CurrentStage);
+                    break;
+            }
+        </MudPopover>
     }
 </div>
 
@@ -82,7 +80,6 @@
 
     [Inject] ILogger<WizardModal> Logger { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
-    [Inject] InMemoryStateContainer InMemoryStateContainer { get; set; }
 
     [Inject] IState<TermsAndConditionsState> TermsAndConditions { get; set; }
 
@@ -100,7 +97,7 @@
 
     private List<BreadcrumbItem> BreadcrumbItems;
 
-    void GoToNextStageCallback ()
+    void GoToNextStageCallback()
     {
         if (!HasNextStage())
             return;
@@ -113,7 +110,7 @@
     private void SetBreadcrumbs()
     {
         int currentStageIndex = (int)CurrentStage + 1;
-        BreadcrumbItems = AllStages[0..currentStageIndex].Select((c,i) => 
+        BreadcrumbItems = AllStages[0..currentStageIndex].Select((c, i) =>
             new BreadcrumbItem(i == 0 ? String.Empty : c.eEnumToFormatted(), href: null)).
             ToList();
     }
@@ -148,51 +145,19 @@
     protected override void OnParametersSet()
     {
         _opened = Open;
-        @if(!_opened)
+        @if (!_opened)
         {
             return;
-        }
-
-        @if (InitialSetupStages == SetupStageFlags.None)
-        {
-            Logger.LogInformation("All setup stages complete: {InitialSetupStages}", InitialSetupStages);
         }
 
 
         AllStages = Extensions.eEnumValues<SetupStage>().ToArray();
 
-        if (TermsAndConditions.Value.Accepted)
-        {
-            CurrentStage = AllStages[1];
-        } else
-        {
-            CurrentStage = AllStages[0];
-        }
+        CurrentStage = TermsAndConditions.Value.WelcomeScreenSeenAndDismissed ? AllStages[1] : AllStages[0];
         SetBreadcrumbs();
 
     }
 
-
-
-
-    void GoToAnalysis()
-    {
-        try
-        {
-            _closeModal = true;
-            _opened = false;
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error closing modal");
-        }
-
-        NavigationManager.NavigateTo("/"); //TODO: Setup custom route
-    }
-
-    bool _closeModal;
-
-    
 
     private async Task CloseModal()
     {

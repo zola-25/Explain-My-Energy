@@ -6,7 +6,7 @@ using Fluxor;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions
 {
-    public partial class AuthorizeMeterAction
+    public class AuthorizeMeterAction
     {
         public MeterType MeterType { get; init; }
 

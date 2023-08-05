@@ -12,7 +12,7 @@
                 <MudText Class="fw-bold mx-auto" Style="@((HeaderText is null) ? "display: none" : "")"
                          Align="Align.Center"
                          Typo="Typo.h5">@HeaderText</MudText>
-                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
+                <MudIconButton Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
             </div>
         </MudItem>
         <MudItem xs="12">
@@ -20,9 +20,7 @@
 
         </MudItem>
         <MudItem xs="12">
-            <div class="d-flex justify-center">
             @ActionButtons
-            </div>
         </MudItem>
     </MudGrid>
 </MudPaper>

@@ -13,13 +13,16 @@
         </MudGrid>
     </SetupStepPage>
     <ActionButtons>
-        <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
 
-        <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
-        <MudButton Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity</MudButton>
-        <MudButton Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas</MudButton>
+        <div class="d-flex justify-end px-4">
 
-
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ElectricBolt" Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity Analysis</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.LocalFireDepartment" Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas Analysis</MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
     </ActionButtons>
 </StepTemplate>
 
@@ -29,8 +32,6 @@
 
 
     [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
-
-    [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
 
     [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
 

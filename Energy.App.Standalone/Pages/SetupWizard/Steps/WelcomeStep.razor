@@ -1,22 +1,40 @@
-﻿@using Energy.App.Standalone.Pages.SetupWizard.StepContents
-@using Energy.App.Standalone.Features.Setup.TermsAndConditions
+﻿@using Energy.App.Standalone.Features.Setup.TermsAndConditions
+@using Energy.App.Standalone.Pages.HtmlContentFiles
 @inherits FluxorComponent
-<StepTemplate HeaderText="Welcome to Explain my Energy" CloseWizardCallback="CloseWizardCallback">
+@inject IDispatcher Dispatcher
+<StepTemplate HeaderText="Welcome to Explain My Energy" CloseWizardCallback="OnExploreClick">
     <SetupStepPage>
         <WelcomeScreenContent>
         </WelcomeScreenContent>
     </SetupStepPage>
     <ActionButtons>
-        <MudButton Size="Size.Medium" Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
+        
+        <div class="d-flex justify-end px-4">
 
-        <MudButton Size="Size.Medium" Class="w-25" Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Start Wizard</MudButton>
+            <div
+                class="mx-auto">
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           EndIcon="fa-regular fa-thumbs-up"
+                           Color="Color.Info"
+                           OnClick="OnExploreClick">
+                    Okay! Let me explore
+                </MudButton>
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    EndIcon="fa-solid fa-wand-magic-sparkles"
+                    Color="Color.Success"
+                    OnClick="OnSetupWizardClick">
+                    Start Setup Wizard
+                </MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="OnExploreClick">Exit</MudButton>
+        </div>
+
     </ActionButtons>
 </StepTemplate>
 @code {
-
-    bool CanMoveNext => TermsAndConditions.Value.Accepted;
-
-    [Inject] IState<TermsAndConditionsState> TermsAndConditions { get; set; }
 
 
     [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
@@ -24,7 +42,16 @@
     [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
 
 
+    private async Task OnExploreClick()
+    {
+        Dispatcher.Dispatch(new HasSeenWelcomeScreenAction(true));
+        await CloseWizardCallback.InvokeAsync();
+    }
 
-
+    private async Task OnSetupWizardClick()
+    {
+        Dispatcher.Dispatch(new HasSeenWelcomeScreenAction(true));
+        await GoToNextStageCallback.InvokeAsync();
+    }
 
 }

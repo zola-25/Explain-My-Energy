@@ -7,23 +7,23 @@ namespace Energy.App.Standalone.Features.Setup.TermsAndConditions;
 [PersistState, PriorityLoad]
 public record TermsAndConditionsState
 {
-    public bool Accepted { get; init; }
+    public bool WelcomeScreenSeenAndDismissed { get; init; }
 }
 
 // create action class 
-public class AcceptTermsAndConditionsAction
+public class HasSeenWelcomeScreenAction
 {
-    public bool Accepted { get;  }
+    public bool Seen { get;  }
 
-    public AcceptTermsAndConditionsAction(bool accepted)
+    public HasSeenWelcomeScreenAction(bool seen)
     {
-        Accepted = accepted;
+        Seen = seen;
     }
 
     [ReducerMethod]
-    public static TermsAndConditionsState Reduce(TermsAndConditionsState state, AcceptTermsAndConditionsAction action)
+    public static TermsAndConditionsState Reduce(TermsAndConditionsState state, HasSeenWelcomeScreenAction action)
     {
-        return state with { Accepted = action.Accepted };
+        return state with { WelcomeScreenSeenAndDismissed = action.Seen };
     }
 
 }

@@ -1,16 +1,45 @@
+@inherits FluxorComponent
 <StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
     <SetupStepPage>
         <AddGasMeterFormComponent  />
     </SetupStepPage>
     <ActionButtons>
+        <div class="d-flex justify-end px-4">
 
+            <div class="mx-auto">
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    StartIcon="fa-solid fa-arrow-left"
+                    Color="Color.Default"
+                    OnClick="GoBackCallback">
+                    Back
+                </MudButton>
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    EndIcon="fa-solid fa-arrow-right"
+                    Color="Color.Default"
+                    Style="@(CanMoveNext ? "display: none" : "")"
+                    OnClick="SkipToElectricity">
+                    Skip to Electricity
+                </MudButton>
+
+                <MudButton
+                    Size="Size.Medium"
+                    Variant="Variant.Outlined"
+                    EndIcon="fa-solid fa-arrow-right"
+                    Disabled="@(!CanMoveNext)"
+                    Color="Color.Success"
+                    OnClick="GoToNextStageCallback">
+                    Authorize
+                </MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
             
-        <MudButton Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
-        <MudButton Style="@(CanMoveNext ? "display: none" : "")" Color="Color.Default" OnClick="SkipToElectricity">Skip to Electricity</MudButton>
 
-        <MudButton Disabled="@(!CanMoveNext)" Color="Color.Primary" OnClick="GoToNextStageCallback">Authorize</MudButton>
 
-            <MudButton Color="Color.Default" OnClick="CloseWizardCallback">Close</MudButton>
     </ActionButtons>
 </StepTemplate>
 

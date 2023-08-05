@@ -15,7 +15,7 @@ namespace Energy.App.Standalone.Pages
             Ready = false;
             base.OnParametersSet();
 
-            var termsAccepted = TermsAndConditionsState.Value.Accepted;
+            var termsAccepted = TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed;
             bool defaultOpenWizard = !termsAccepted;
             OpenWizard = OpenWizard || defaultOpenWizard;
 
