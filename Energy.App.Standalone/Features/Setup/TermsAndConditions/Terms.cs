@@ -25,5 +25,4 @@ public class HasSeenWelcomeScreenAction
     {
         return state with { WelcomeScreenSeenAndDismissed = action.Seen };
     }
-
 }

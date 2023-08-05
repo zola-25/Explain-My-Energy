@@ -63,7 +63,6 @@ public partial class MeterAuthorizationFormComponent
             {
                 await OnSuccessfulCallback.InvokeAsync(true);
             }
-
         }
         catch (Exception ex)
         {
