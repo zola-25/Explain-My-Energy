@@ -4,27 +4,30 @@
 #>
 
 param (
-    [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory.")]
-    [string]$outputPath
+    [Parameter(Mandatory = $True, HelpMessage = "The path to the .csproj to generate license the license html for" )]
+    [string]$parentProjectPath,
+
+    [Parameter(Mandatory = $False, HelpMessage = "The folder from which the script is located" )]
+    [string]$scriptDirectory = $(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory/ThirdPartyLicenses_nuget.html")]
+    [string]$generatedHtmlDocumentPath = (Join-Path $scriptDirectory "./ThirdPartyLicenses_nuget.html"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the temporary folder where the license generation will take place. Defaults to the script directory/NugetLicenseOutput")]
+    [string]$tempLicenseOutputFolder = (Join-Path $scriptDirectory "./NugetLicenseTempOutput"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the license override file. Defaults to the script directory/LicenseInfoOverride.json")]
+    [string]$licenseOverrideFile = (Join-Path $scriptDirectory "./LicenseInfoOverride.json"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the folder containting license plain spdx text files. Defaults to the script directory/SpdxLicensePlainTextFiles")]
+    [string]$licensePlainTextFolder = (Join-Path $scriptDirectory "./SpdxLicensePlainTextFiles")
+
 )
 
-$scriptDirectory = $PSScriptRoot
+Write-Host "Script directory: $scriptDirectory"
 
-if ([String]::IsNullOrWhiteSpace($outputPath)) {
-    $finalHtmlDocumentPath = Join-Path $scriptDirectory "ThirdPartyLicenses_nuget.html"
-}
-else {
-    $finalHtmlDocumentPath = Join-Path $outputPath "ThirdPartyLicenses_nuget.html"
-}
-
-$licensePlainTextFolder = Join-Path $scriptDirectory "./SpdxLicensePlainTextFiles"
-$licenseOverrideFile = Join-Path $scriptDirectory "./LicenseInfoOverride.json"
-$templicenseOutputFolder = Join-Path $scriptDirectory "./NugetLicenseOutput"
-
-$tempLicenseOverridePackageNamesFile = Join-Path $templicenseOutputFolder "LicenseOverridePackageNames.json"
 
 try {
-    $parentProjectPath = Join-Path $scriptDirectory "../../Energy.App.Standalone.csproj"
 
     Write-Host "Clearing NuGet caches"
     dotnet nuget locals all --clear
@@ -33,24 +36,23 @@ try {
     dotnet restore $parentProjectPath
 
     
-    if (Test-Path $templicenseOutputFolder
- ) {
-        Remove-Item -Recurse $templicenseOutputFolder
-     
+    if (Test-Path $tempLicenseOutputFolder) {
+        Remove-Item -Recurse $tempLicenseOutputFolder
     }
-    mkdir $templicenseOutputFolder
+    mkdir $tempLicenseOutputFolder
  
+    $tempPackageLicenseJsonFileOutput = Join-Path $tempLicenseOutputFolder "Licenses.json"
     
+    $tempLicenseOverridePackageNamesFile = Join-Path $templicenseOutputFolder "LicenseOverridePackageNames.json"
+
     Get-Content $licenseOverrideFile -Raw | ConvertFrom-Json -AsHashtable | Select-Object -ExpandProperty "PackageName" | ConvertTo-Json -AsArray | Set-Content -Path "$tempLicenseOverridePackageNamesFile"
 
     Start-Process -FilePath "dotnet-project-licenses" `
-        -ArgumentList "-i $parentProjectPath -u -t -o -j  --use-project-assets-json  --outfile .\Licenses.json --packages-filter $tempLicenseOverridePackageNamesFile --manual-package-information $licenseOverrideFile"  `
-        -WorkingDirectory $templicenseOutputFolder
-     -NoNewWindow -Wait
+        -ArgumentList "-i $parentProjectPath -u -t -o -j  --use-project-assets-json  --outfile $tempPackageLicenseJsonFileOutput --packages-filter $tempLicenseOverridePackageNamesFile --manual-package-information $licenseOverrideFile"  `
+        -WorkingDirectory $tempLicenseOutputFolder `
+        -NoNewWindow -Wait
 
-    $packageLicenceJsonFile = Join-Path $templicenseOutputFolder
- "Licenses.json"
-    $rawJson = Get-Content $packageLicenceJsonFile -Raw
+    $rawJson = Get-Content $tempPackageLicenseJsonFileOutput -Raw
     $packageInfos = ConvertFrom-Json $rawJson
 
     Add-Type -AssemblyName System.Web
@@ -86,7 +88,7 @@ try {
     }
 
     $sb.AppendLine("</div>")
-    $sb.ToString() | Set-Content -Path $finalHtmlDocumentPath
+    $sb.ToString() | Set-Content -Path $generatedHtmlDocumentPath
 
     $errorFound = $False
 
@@ -97,10 +99,9 @@ catch {
     $errorFound = $True
 }
 finally {
-    if (Test-Path $templicenseOutputFolder
- ) {
-        Remove-Item -Recurse $templicenseOutputFolder
-     
+    if (Test-Path $tempLicenseOutputFolder) 
+    {
+        Remove-Item -Recurse $tempLicenseOutputFolder
     }
 }
 

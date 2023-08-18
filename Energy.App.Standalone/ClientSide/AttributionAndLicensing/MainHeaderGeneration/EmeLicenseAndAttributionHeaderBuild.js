@@ -15,17 +15,15 @@ try {
 
     //console.log(process.argv);
     const args = parseArgs(process.argv.slice(2), {
-        string: "o"
+        string: ["o", "l", "t", "v"]
     });
     const outputFile = args.o;
-
-    /* const outputFile = "C:/Users/miket/Development/ExplainMyEnergy/Energy.App.Standalone/ClientSide/tempLicenseHtmlOutput/LicenseAndAttributionHeader.html" */
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-    const licenseFile = path.join(__dirname, "../../LICENSE");
+    const licenseFile = args.l;
+    const templateFile = args.t;
+    const version = args.v;
+    
     const licenseText = fs.readFileSync(licenseFile, "utf8");
 
-    const templateFile = path.join(__dirname, "./HtmlTemplates/EmeLicenseAndAttributionHeader.handlebars");
     const templateText = fs.readFileSync(templateFile, "utf8");
 
     const unsanitizedHtml = marked.parse(licenseText, {
@@ -37,12 +35,13 @@ try {
 
     let template = Handlebars.compile(templateText, {
         preventIndent: true,
-        strict: true
+        strict: true,
+        noEscape: true,
     });
 
     const inputArgs = {
         emeLicenseType: "Apache 2.0",
-        emeFullVersion: "0.1.0",
+        emeFullVersion: version,
         emeFullLicenseText: licenseHtml
     }
 

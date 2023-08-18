@@ -1,43 +1,55 @@
 
 param (
-    [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory.")]
-    [string]$outputPath
+    [Parameter(Mandatory = $True, HelpMessage = "The path to the .csproj to generate license the license html for" )]
+    [string]$parentProjectPath,
+
+    [Parameter(Mandatory = $True, HelpMessage = "The folder containing the projects packages.json" )]
+    [string]$clientSideRootPath,
+
+    [Parameter(Mandatory = $False, HelpMessage = "The folder from which the script is located" )]
+    [string]$scriptDirectory = $(Split-Path -Parent -Path $MyInvocation.MyCommand.Definition),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory/ThirdPartyLicenses_nuget.html")]
+    [string]$generatedHtmlDocumentPath = (Join-Path $scriptDirectory "./ThirdPartyLicenses_npm.html"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the temporary folder where the license generation will take place. Defaults to the script directory/NugetLicenseOutput")]
+    [string]$tempLicenseOutputFolder = (Join-Path $scriptDirectory "./NpmLicenseOutput"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the license customFormat JSON file. Defaults to the script directory/customFormatExample.json")]
+    [string]$customFormatFile = (Join-Path $scriptDirectory "./customFormatExample.json")
 )
-$scriptDirectory = $PSScriptRoot
 
-if ([String]::IsNullOrWhiteSpace($outputPath)) {
-    $finalHtmlDocumentPath = Join-Path $scriptDirectory "ThirdPartyLicenses_npm.html" 
-}
-else {
-    $finalHtmlDocumentPath = Join-Path $outputPath "ThirdPartyLicenses_npm.html" 
-}
-
-$customFormatFile = Join-Path $scriptDirectory "./customFormatExample.json" -Resolve
-
-$licenseCheckerWorkingDirectory = Join-Path  $scriptDirectory ".." -Resolve 
+$originalLocation = Get-Location
 
 try {
 
-    $licenseFolderPath = Join-Path $scriptDirectory "NpmLicenseOutput" 
-    
-    if (Test-Path $licenseFolderPath) {
-        Remove-Item -Recurse $licenseFolderPath
+    if (Test-Path $tempLicenseOutputFolder) {
+        Remove-Item -Recurse $tempLicenseOutputFolder
     }
-    mkdir $licenseFolderPath
+    mkdir $tempLicenseOutputFolder
     
-    $packageLicenceJsonFile = Join-Path $licenseFolderPath "./NpmLicenses.json" 
-    $licensePlainTextFolder = Join-Path $licenseFolderPath "./NpmLicensePlainTextFiles" 
+    $packageLicenceJsonFile = Join-Path $tempLicenseOutputFolder "./NpmLicenses.json" 
+    $licensePlainTextFolder = Join-Path $tempLicenseOutputFolder "./NpmLicensePlainTextFiles" 
     
     mkdir $licensePlainTextFolder
 
-    <# Start-Process -FilePath "node.exe license-checker-rseidelsohn" `
-        -ArgumentList "  --production --json --nopeer --excludePackagesStartingWith=""explain-my-energy"" --out $packageLicenceJsonFile   --relativeModulePath --relativeLicensePath --files $licensePlainTextFolder --customPath $customFormatFile --plainVertical" `
-        -WorkingDirectory $licenseCheckerWorkingDirectory -NoNewWindow -Wait
- #>
-    Set-Location $licenseCheckerWorkingDirectory
-    license-checker-rseidelsohn.ps1 --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" --out $packageLicenceJsonFile  --excludePrivatePackages --relativeModulePath --relativeLicensePath --files $licensePlainTextFolder --customPath $customFormatFile 
-    Set-Location $scriptDirectory
+    Invoke-Command -ScriptBlock {
+        Set-Location -Path $clientSideRootPath
+        license-checker-rseidelsohn --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" `
+            --out $packageLicenceJsonFile  --excludePrivatePackages --relativeModulePath --relativeLicensePath `
+            --files $licensePlainTextFolder --customPath $customFormatFile
+        Set-Location -Path $originalLocation
+    }
 
+    <# 
+    Start-Process -FilePath $nodePath `
+        -ArgumentList "$globalToolsPath/license-checker-rseidelsohn.cmd  --production --json --nopeer --excludePackagesStartingWith=""explain-my-energy"" --out $packageLicenceJsonFile   --relativeModulePath --relativeLicensePath --files $licensePlainTextFolder --customPath $customFormatFile " `
+        -WorkingDirectory $clientSideRootPath -NoNewWindow -Wait
+
+    license-checker-rseidelsohn --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" `
+    --out $packageLicenceJsonFile  --excludePrivatePackages --relativeModulePath --relativeLicensePath `
+    --start $clientSideRootPath --files $licensePlainTextFolder --customPath $customFormatFile  #>
+    
     $rawJson = Get-Content $packageLicenceJsonFile -Raw
     $packageInfos = ConvertFrom-Json $rawJson    
 
@@ -53,7 +65,7 @@ try {
         Write-Host "Processing package $($packageInfo.Name)"
 
         $packageDetails = $packageInfo.Value
-        $licenceTextFile = Join-Path $licenseFolderPath $packageDetails.licenseFile
+        $licenceTextFile = Join-Path $tempLicenseOutputFolder $packageDetails.licenseFile
         $licensePlainText = if (Test-Path $licenceTextFile) { 
             Get-Content $licenceTextFile -Raw 
         } 
@@ -135,7 +147,7 @@ try {
 
     $sb.AppendLine("</div>")
 
-    $sb.ToString() | Set-Content -Path $finalHtmlDocumentPath
+    $sb.ToString() | Set-Content -Path $generatedHtmlDocumentPath
 
     $errorFound = $False
 
@@ -146,9 +158,12 @@ catch {
     $errorFound = $True
 }
 finally {
-    if (Test-Path $licenseFolderPath) {
-        Remove-Item -Recurse $licenseFolderPath
+    Set-Location -Path $originalLocation
+
+    if (Test-Path $tempLicenseOutputFolder) {
+        Remove-Item -Recurse $tempLicenseOutputFolder
     }
+
 }
 
 if ($errorFound) {

@@ -2,18 +2,19 @@
 /*eslint no-undef: "error"*/
 /*eslint-env node*/
 
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
-const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { resolve as _resolve, dirname } from "path";
+import TerserPlugin from "terser-webpack-plugin";
+import { fileURLToPath } from 'url';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-module.exports = {
+export default {
     entry: './index.ts',
     mode: 'production',
     output: {
         filename: 'bundle.[contenthash].js',
-        path: path.resolve(__dirname, '../wwwroot/js'),
+        path: _resolve(__dirname, '../wwwroot/js'),
         
         clean: true,
     },
@@ -28,47 +29,26 @@ module.exports = {
         ],
     },
     plugins: [
-        new LicenseWebpackPlugin({
-            skipChildCompilers: true,
-
-            outputFilename: '../licenses.txt',
-            addBanner: true,
-            licenseFileOverrides: {
-                '@amcharts/amcharts5': 'LICENSE'
-            },
-            licenseTypeOverrides: {
-                '@amcharts/amcharts5': 'As specified in LICENSE file:\n'
-            },
-            renderBanner: (filename) => {
-                return '/*! licenses are at ' + filename + '*/';
-            }
-        }),
+        
         new HtmlWebpackPlugin({
             template: './HtmlTemplates/index_template.html',
             filename: '../index.html',
             inject: false,
             minify: false,
-               
-
         }), 
     ],
     optimization: {
         minimize: true,
         
         minimizer: [new TerserPlugin({
-            extractComments: false,
+            extractComments: "false",
             terserOptions: {
                 sourceMap: true,
                 format: {
-                    // Tell terser to remove all comments except for the banner added via LicenseWebpackPlugin.
-                    // This can be customized further to allow other types of comments to show up in the final js file as well.
                     // See the terser documentation for format.comments options for more details.
-                    comments: (astNode, comment) => comment.value.startsWith('! licenses are at ')
-                        
-                }
-
+                    comments: "some"
+                },
             },
-            
         })],
     },
     resolve: {

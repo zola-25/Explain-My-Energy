@@ -1,37 +1,68 @@
-$scriptDirectory = $PSScriptRoot
 
 try {
 
-    $nugetLicenseGenerator = Join-Path $scriptDirectory "LicenseGeneration\BuildPackageLicenseFile.ps1" 
-    $npmLicenseGenerator = Join-Path $scriptDirectory "NpmLicenseGeneration\BuildNodePackageLicenseFile.ps1" 
+    $respositoryRoot = & git rev-parse --show-toplevel
+    $mainApplicationProjectFolder = Join-Path $respositoryRoot "Energy.App.Standalone" -Resolve
+    $mainApplicationProjectFile = Join-Path $mainApplicationProjectFolder "Energy.App.Standalone.csproj" -Resolve
 
-    $tempOutputDir = Join-Path $scriptDirectory "tempLicenseHtmlOutput"
+    $clientSideRootPath = Join-Path $mainApplicationProjectFolder "ClientSide" -Resolve
+    $attributionAndLicensingFolder = Join-Path $clientSideRootPath "AttributionAndLicensing" -Resolve
 
-    $distributeFinalFilePath = Join-Path $scriptDirectory "../wwwroot/ThirdPartyAttributions.html"
-
-    $licenseAndAttributionHeaderFile = Join-Path $tempOutputDir "LicenseAndAttributionHeader.html"
+    $tempOutputDir = Join-Path $attributionAndLicensingFolder "tempLicenseHtmlOutput"
 
     if (Test-Path $tempOutputDir) {
         Remove-Item $tempOutputDir -Recurse -Force
     }
 
-    New-Item -ItemType Directory -Force -Path $tempOutputDir
+    New-Item -ItemType Directory -Force -Path $tempOutputDir 
 
-    $result = node .\EmeLicenseAndAttributionHeaderBuild.js -o 'C:/Users/miket/Development/ExplainMyEnergy/Energy.App.Standalone/ClientSide/tempLicenseHtmlOutput/LicenseAndAttributionHeader.html'
+    <# license and attribution header generation #>
+
+    $licenseAndAttributionHeaderOutputFile = Join-Path $tempOutputDir "LicenseAndAttributionHeader.html"
+    
+    $licenseAndAttibutionJsScript = Join-Path $attributionAndLicensingFolder "MainHeaderGeneration\EmeLicenseAndAttributionHeaderBuild.js" -Resolve
+    
+    $licenseTemplateFile = Join-Path $attributionAndLicensingFolder "MainHeaderGeneration\EmeLicenseAndAttributionHeader.handlebars" -Resolve
+    
+    $result = node $($licenseAndAttibutionJsScript) `
+        -o $licenseAndAttributionHeaderOutputFile `
+        -l $(Join-Path $respositoryRoot "LICENSE" -Resolve) `
+        -t $licenseTemplateFile `
+        -v "0.1.0"
 
     if ($result -ne "Success") {
         throw "Error generating license and attribution header"
     }
+
+    <# nuget html generation #>
+
+    $nugetLicenseGenerator = Join-Path $attributionAndLicensingFolder "NugetLicenseGeneration\BuildNugetPackageLicenseFile.ps1" -Resolve
     
-    &"$nugetLicenseGenerator" -outputPath $tempOutputDir
+    $nugetLicenseHtmlOutputFile = Join-Path $tempOutputDir "ThirdPartyLicenses_nuget.html" 
 
-    &"$npmLicenseGenerator" -outputPath $tempOutputDir
+    &"$nugetLicenseGenerator"  -parentProjectPath $mainApplicationProjectFile -generatedHtmlDocumentPath $nugetLicenseHtmlOutputFile
+    
+    <# npm html generation #>
 
+    $npmLicenseGenerator = Join-Path $attributionAndLicensingFolder "NpmLicenseGeneration\BuildNodePackageLicenseFile.ps1" -Resolve
 
-    $outputHtmlFiles = Get-ChildItem -Path $tempOutputDir -Filter *.html 
+    $npmLicenseHtmlOutputFile = Join-Path $tempOutputDir "ThirdPartyLicenses_npm.html" 
+
+    &"$npmLicenseGenerator" -parentProjectPath $tempOutputDir -clientSideRootPath $clientSideRootPath -generatedHtmlDocumentPath $npmLicenseHtmlOutputFile
+
+    <# Consolidation #>    
+    
+
+    $distributeFinalFilePath = Join-Path $mainApplicationProjectFolder "/wwwroot/AttributionsAndLicense.html"
+    
+    $outputHtmlFiles = @($licenseAndAttributionHeaderOutputFile, $nugetLicenseHtmlOutputFile, $npmLicenseHtmlOutputFile )
+
+    if(Test-Path $distributeFinalFilePath) {
+        Remove-Item $distributeFinalFilePath -Force
+    }
 
     foreach ($file in $outputHtmlFiles) {
-        $fileContent = Get-Content -Path $file.FullName
+        $fileContent = Get-Content -Path $file
         Add-Content  -Path $distributeFinalFilePath -Value $fileContent -Encoding utf8NoBOM
     }
     $errorFound = $False
@@ -40,7 +71,6 @@ catch {
     $errorFound = $true
 
     Write-Error $_.Exception.Message
-    exit 1
 }
 finally {
     if (Test-Path $tempOutputDir) {
