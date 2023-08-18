@@ -1,3 +1,8 @@
+<#
+
+.SYNOPSIS 
+#>
+
 param (
     [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory.")]
     [string]$outputPath
@@ -14,9 +19,9 @@ else {
 
 $licensePlainTextFolder = Join-Path $scriptDirectory "./SpdxLicensePlainTextFiles"
 $licenseOverrideFile = Join-Path $scriptDirectory "./LicenseInfoOverride.json"
-$licenseFolderPath = Join-Path $scriptDirectory "./NugetLicenseOutput"
+$templicenseOutputFolder = Join-Path $scriptDirectory "./NugetLicenseOutput"
 
-$tempLicenseOverridePackageNamesFile = Join-Path $licenseFolderPath "LicenseOverridePackageNames.json"
+$tempLicenseOverridePackageNamesFile = Join-Path $templicenseOutputFolder "LicenseOverridePackageNames.json"
 
 try {
     $parentProjectPath = Join-Path $scriptDirectory "../../Energy.App.Standalone.csproj"
@@ -28,18 +33,23 @@ try {
     dotnet restore $parentProjectPath
 
     
-    if (Test-Path $licenseFolderPath) {
-        Remove-Item -Recurse $licenseFolderPath
+    if (Test-Path $templicenseOutputFolder
+ ) {
+        Remove-Item -Recurse $templicenseOutputFolder
+     
     }
-    mkdir $licenseFolderPath
+    mkdir $templicenseOutputFolder
+ 
     
     Get-Content $licenseOverrideFile -Raw | ConvertFrom-Json -AsHashtable | Select-Object -ExpandProperty "PackageName" | ConvertTo-Json -AsArray | Set-Content -Path "$tempLicenseOverridePackageNamesFile"
 
     Start-Process -FilePath "dotnet-project-licenses" `
         -ArgumentList "-i $parentProjectPath -u -t -o -j  --use-project-assets-json  --outfile .\Licenses.json --packages-filter $tempLicenseOverridePackageNamesFile --manual-package-information $licenseOverrideFile"  `
-        -WorkingDirectory $licenseFolderPath -NoNewWindow -Wait
+        -WorkingDirectory $templicenseOutputFolder
+     -NoNewWindow -Wait
 
-    $packageLicenceJsonFile = Join-Path $licenseFolderPath "Licenses.json"
+    $packageLicenceJsonFile = Join-Path $templicenseOutputFolder
+ "Licenses.json"
     $rawJson = Get-Content $packageLicenceJsonFile -Raw
     $packageInfos = ConvertFrom-Json $rawJson
 
@@ -87,8 +97,10 @@ catch {
     $errorFound = $True
 }
 finally {
-    if (Test-Path $licenseFolderPath) {
-        Remove-Item -Recurse $licenseFolderPath
+    if (Test-Path $templicenseOutputFolder
+ ) {
+        Remove-Item -Recurse $templicenseOutputFolder
+     
     }
 }
 
