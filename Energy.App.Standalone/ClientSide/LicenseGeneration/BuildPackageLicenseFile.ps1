@@ -1,11 +1,22 @@
+param (
+    [Parameter(Mandatory = $False, HelpMessage = "The output path for the generated html document. Defaults to the script directory.")]
+    [string]$outputPath
+)
 
 $scriptDirectory = $PSScriptRoot
-$finalHtmlDocumentPath = Join-Path $scriptDirectory "ThirdPartyLicenses_dn_p_l.html"
-$licensePlainTextFolder = Join-Path $scriptDirectory "./LicenseTextFiles"
+
+if ([String]::IsNullOrWhiteSpace($outputPath)) {
+    $finalHtmlDocumentPath = Join-Path $scriptDirectory "ThirdPartyLicenses_nuget.html"
+}
+else {
+    $finalHtmlDocumentPath = Join-Path $outputPath "ThirdPartyLicenses_nuget.html"
+}
+
+$licensePlainTextFolder = Join-Path $scriptDirectory "./SpdxLicensePlainTextFiles"
 $licenseOverrideFile = Join-Path $scriptDirectory "./LicenseInfoOverride.json"
 $licenseFolderPath = Join-Path $scriptDirectory "./NugetLicenseOutput"
 
-$tempLicenseOverridePackageNamesFile  = Join-Path $licenseFolderPath "LicenseOverridePackageNames.json"
+$tempLicenseOverridePackageNamesFile = Join-Path $licenseFolderPath "LicenseOverridePackageNames.json"
 
 try {
     $parentProjectPath = Join-Path $scriptDirectory "../../Energy.App.Standalone.csproj"
@@ -36,23 +47,35 @@ try {
 
 
     $sb = New-Object -TypeName System.Text.StringBuilder
-    $sb.AppendLine("<h2>Third Party Licenses</h2>")
+    $sb.AppendLine("<div class=""eme--thirdparty--nuget--root"">")
+    $sb.AppendLine("<h1>Third Party Nuget Package Attribution &amp; Licenses</h1>")
+    $first = $True
 
     foreach ($packageInfo in $packageInfos) {
         $licenceTextFile = Join-Path $licensePlainTextFolder "$($packageInfo.LicenseType).txt"
         $licensePlainText = if (Test-Path $licenceTextFile) { Get-Content $licenceTextFile -Raw } else { throw "License text file not found: $licenceTextFile" }
         $licensePlainTextEncoded = [System.Web.HttpUtility]::HtmlEncode($licensePlainText)
 
-        $sb.AppendLine("<h3>$($packageInfo.PackageName) $($packageInfo.PackageVersion)</h3>")
-        $sb.AppendLine("<p><a href=""$($packageInfo.PackageUrl)"">$($packageInfo.PackageUrl)</a></p>")
-        $sb.AppendLine("<p>Authors: $($packageInfo.Authors -join ", ")</p>")
-        
-        $sb.AppendLine("<span>Copyright: <pre style=""display: inline;"">$($packageInfo.Copyright)</pre></span>")
-        $sb.AppendLine("<p>License: $($packageInfo.LicenseType) <a href=""$($packageInfo.LicenseUrl)"">$($packageInfo.LicenseUrl)</a></p>")
+        if (!$first) {
+            $sb.AppendLine("<hr>")
+            $first = $False
+        }
 
-        $sb.AppendLine("<pre>$licensePlainTextEncoded</pre>")
+        $sb.AppendLine("<div class=""eme--thirdparty--nuget--package--container"">")
+
+        $sb.AppendLine("<h2 class=""eme--thirdparty--nuget--package-name-version"">$($packageInfo.PackageName) $($packageInfo.PackageVersion)</h2>")
+        $sb.AppendLine("<p class=""eme--thirdparty--nuget--package-url""><a href=""$($packageInfo.PackageUrl)"">$($packageInfo.PackageUrl)</a></p>")
+        $sb.AppendLine("<p class=""eme--thirdparty--nuget--package-authors"">Authors: $($packageInfo.Authors -join ", ")</p>")
+        
+        $sb.AppendLine("<span class=""eme--thirdparty--nuget--package-copyright""><pre style=""display: inline;"">$($packageInfo.Copyright)</pre></span>")
+        $sb.AppendLine("<p class=""eme--thirdparty--nuget--license-type"">License: $($packageInfo.LicenseType) <a href=""$($packageInfo.LicenseUrl)"">$($packageInfo.LicenseUrl)</a></p>")
+
+        $sb.AppendLine("<pre class=""eme--thirdparty--nuget--license-text"">$licensePlainTextEncoded</pre>")
+        $sb.AppendLine("</div>")
+
     }
 
+    $sb.AppendLine("</div>")
     $sb.ToString() | Set-Content -Path $finalHtmlDocumentPath
 
     $errorFound = $False
