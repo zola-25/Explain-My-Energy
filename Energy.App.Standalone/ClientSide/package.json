@@ -41,8 +41,5 @@
   "dependencies": {
     "@amcharts/amcharts5": "^5.4.2",
     "lodash": "^4.17.21"
-  },
-  "files": [
-    "../../LICENSE"
-  ]
+  }
 }

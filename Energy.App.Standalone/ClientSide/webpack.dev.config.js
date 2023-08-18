@@ -1,17 +1,19 @@
 ﻿/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const path = require('path');
-const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { resolve as _resolve, dirname } from "path";
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export default {
     entry: './index.ts',
     mode: 'development',
     output: {
         filename: 'bundle.[contenthash].js',
         sourceMapFilename: '[file].map',
-        path: path.resolve(__dirname, '../wwwroot/js'),
+        path: _resolve(__dirname, '../wwwroot/js'),
         
         clean: true
     },
@@ -27,19 +29,7 @@ module.exports = {
         ],
     },
     plugins: [
-        new LicenseWebpackPlugin({
-            skipChildCompilers: true,
-            
-            outputFilename: 'licenses.txt',
-            addBanner: true,
-            licenseFileOverrides: {
-                '@amcharts/amcharts5': 'LICENSE'
-            },
-            licenseTypeOverrides: {
-                '@amcharts/amcharts5': 'As specified in LICENSE file:\n'
-            }
-
-        }),
+        
         new HtmlWebpackPlugin({
             template: './HtmlTemplates/index_template.html',
             filename: '../index.html',

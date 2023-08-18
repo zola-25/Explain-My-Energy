@@ -41,7 +41,7 @@ export default {
         minimize: true,
         
         minimizer: [new TerserPlugin({
-            extractComments: "false",
+            extractComments: false,
             terserOptions: {
                 sourceMap: true,
                 format: {

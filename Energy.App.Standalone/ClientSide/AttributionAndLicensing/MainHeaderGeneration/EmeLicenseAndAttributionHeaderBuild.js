@@ -4,9 +4,6 @@ import Handlebars from "handlebars";
 
 import fs from "fs";
 
-import path from "path";
-import { fileURLToPath } from 'url';
-
 import { marked } from "marked";
 import DOMPurify from "isomorphic-dompurify";
 import process from "process";
