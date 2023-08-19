@@ -2,73 +2,52 @@
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<div>
+    <MudLayout>
+        <MudAppBar Elevation="1" Class="">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <div class="w-fit-content">
+                <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy</MudText></MudNavLink>
+            </div>
+            <MudSpacer />
+            <div class="w-fit-content menu-nav-item git-hub">
+                <MudNavLink Icon="@Icons.Custom.Brands.GitHub" IconColor="Color.Inherit"  Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
+            </div>
 
-<MudLayout>
-    <MudAppBar Elevation="1" Class="d-flex flex-grow-1 gap-4">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <a href="/" style="text-decoration: none; color: inherit;"><MudText Typo="Typo.h5" Class="ml-3" Style="width: max-content;">Explain My Energy</MudText></a>
-        <MudSpacer />
-        <MudNavLink Icon="@Icons.Custom.Brands.GitHub" Class="menu-nav-item" IconColor="Color.Inherit" Href="https://github.com/zola-25/Explain-My-Energy" Style="max-width: fit-content"></MudNavLink>
+            <MudTooltip Arrow="true" Placement="Placement.Bottom" ShowOnClick="false" ShowOnFocus="true" ShowOnHover="true" Text="Share this App!">
+                <ShareMenu />
+            </MudTooltip>
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <NavMenu></NavMenu>
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer>
+                <DataValidatorBase>
+                    @Body
+                </DataValidatorBase>
+                <br />
+                <br />
+                <br />
+            </MudContainer>
+        </MudMainContent>
+        <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-start" DisableGutters="true" Bottom="true" Dense="true" Fixed="true" Elevation="1">
+            <div class="w-fit-content footer-nav-item">
+                <MudNavLink  Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
+            </div>
+            <div class="w-fit-content footer-nav-item">
+                <MudNavLink Href="/TermsAndConditions">Terms &amp; Conditions</MudNavLink>
+            </div>
+            <MudSpacer />
 
-        <MudNavLink Class="menu-nav-item" Href="/About" ActiveClass="menu-nav-item-active" Match="NavLinkMatch.Prefix" Style="max-width: fit-content;">
-            <MudText Align="Align.Start" Typo="Typo.h6" >About</MudText>
-        </MudNavLink>
+            <div class="w-fit-content footer-nav-item">
 
-        <MudTooltip Arrow="true" Placement="Placement.Bottom" ShowOnClick="false" ShowOnFocus="true" ShowOnHover="true" Text="Share this App!">
-            <ShareMenu />
-        </MudTooltip>
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu></NavMenu>
-    </MudDrawer>
-    <MudMainContent>
-        <MudContainer>
-            <DataValidatorBase>
-                @Body
-            </DataValidatorBase>
-            <br />
-            <br />
-            <br />
-        </MudContainer>
-    </MudMainContent>
-    <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-content-start" DisableGutters="true"  Bottom="true" Dense="true" Fixed="true" Elevation="1">
-        <MudNavLink Style="max-width: fit-content" Class="footer-nav-item" Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
-        <MudNavLink Class="footer-nav-item" Href="/TermsAndConditions">Terms and Conditions</MudNavLink>
-        <MudSpacer />
-    </MudAppBar>
-</MudLayout>
+                <MudNavLink  Href="/AttributionsAndLicense">Attributions &amp; Licensing</MudNavLink>
+            </div>
 
-<style>
-
-    .menu-nav-item {
-        border-radius: 30px;
-    }
-
-    .menu-nav-item .mud-nav-link-text {
-        margin: unset;
-    }
-
-    .footer-nav-item a  {
-        text-decoration: none;
-    }
-
-.footer-nav-item a:hover :first-child {
-        color: grey;
-    text-decoration: underline
-    }
-
-    .menu-nav-item a  {
-        text-decoration: none;
-    }
-
-    .menu-nav-item a:hover {
-        color: white;
-    }
-
-    .menu-nav-item-active {
-        background-color: var(--mud-palette-action-default-hover);
-    }
-</style>
+        </MudAppBar>
+    </MudLayout>
+</div>
 @code {
 
     bool _drawerOpen = true;
@@ -84,9 +63,13 @@
             {
                 Secondary = Colors.Orange.Lighten1,
                 SecondaryContrastText = Colors.Shades.White,
-                Tertiary = Colors.Orange.Darken4
-            }
+                Tertiary = Colors.Orange.Darken4,
+                HoverOpacity = 0.3,
+            },
+            Typography = new Typography
+            {
+                Default = { FontFamily = new[] { "Open Sans", "Helvetica", "sans-serif" } }
+            },
         };
-
 
 }

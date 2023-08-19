@@ -1,4 +1,28 @@
 /*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
+@font-face {
+    font-family: 'Open Sans';
+    src: url('OpenSans-Regular.woff2') format('woff2'),
+        url('OpenSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('OpenSans-Italic.woff2') format('woff2'),
+        url('OpenSans-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.fw-bolder {
+    font-weight: bolder !important;
+}
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -10,6 +34,10 @@ h1:focus {
 
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
+}
+
+.background-inherit {
+    background-color: inherit;
 }
 
 .invalid {

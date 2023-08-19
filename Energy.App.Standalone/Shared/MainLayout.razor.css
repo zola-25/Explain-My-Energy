@@ -1,4 +1,4 @@
-.page {
+/*.page {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -36,6 +36,57 @@ main {
         text-overflow: ellipsis;
     }
 
+.title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.fit-content ::deep {
+    max-width: fit-content;
+}
+
+    */
+.w-fit-content ::deep {
+    width: fit-content;
+}
+
+/*
+.footer-nav-item a ::deep {
+    text-decoration: none;
+}
+*/
+.footer-nav-item ::deep .mud-nav-link:hover .mud-nav-link-text {
+    text-decoration: underline;
+}
+
+
+.menu-nav-item.git-hub ::deep .mud-icon-root {
+    margin-left: 10px;
+}
+
+
+.menu-nav-item.git-hub ::deep .mud-nav-link {
+    border-radius: 50%;
+    padding: 12px 4px 12px;
+}
+
+.menu-nav-item .mud-nav-link-text ::deep {
+    margin: unset;
+}
+
+
+.menu-nav-item::deep a {
+    text-decoration: none;
+}
+
+.menu-nav-item::deep a:hover {
+    color: white;
+}
+
+.menu-nav-item-active::deep {
+    background-color: var(--mud-palette-action-default-hover);
+}
+/*
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;
@@ -79,3 +130,4 @@ main {
         padding-right: 1.5rem !important;
     }
 }
+*/

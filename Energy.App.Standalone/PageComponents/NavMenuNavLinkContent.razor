@@ -1,0 +1,17 @@
+﻿@if (!String.IsNullOrWhiteSpace(SuffixIcon))
+{
+    <MudPaper Elevation="0"  Class="d-flex background-inherit">
+        @ChildContent <MudIcon Color="@IconColor" Class="mud-nav-link-icon mud-nav-link-icon-default ml-3" Icon="@SuffixIcon"></MudIcon>
+    </MudPaper>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter, EditorRequired] public string SuffixIcon { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Color IconColor { get; set; }
+
+}

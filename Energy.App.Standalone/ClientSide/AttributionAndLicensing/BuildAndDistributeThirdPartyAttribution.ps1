@@ -69,8 +69,11 @@ try {
 }
 catch {
     $errorFound = $true
-
     Write-Error $_.Exception.Message
+
+    if(Test-Path $distributeFinalFilePath) {
+        Remove-Item $distributeFinalFilePath -Force
+    }
 }
 finally {
     if (Test-Path $tempOutputDir) {
