@@ -11,9 +11,9 @@
         </MudPaper>
         <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
 
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound">@DurationAnalysis.PeriodCostPounds.eToMoneyFormat()</MudChip>
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon">@DurationAnalysis.PeriodConsumptionKWh kWh</MudChip>
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica" Label="true">@DurationAnalysis.PeriodCo2 kgCO<sub>2</sub></MudChip>
+            <MudChip Class="info-chip" Icon="@Icons.Material.Filled.CurrencyPound">@DurationAnalysis.PeriodCostPounds.eToMoneyFormat()</MudChip>
+            <MudChip Class="info-chip" Icon="@_consumptionIcon">@DurationAnalysis.PeriodConsumptionKWh kWh</MudChip>
+            <MudChip Class="info-chip" Icon="@Icons.Material.Filled.SouthAmerica" Label="true">@DurationAnalysis.PeriodCo2 kgCO<sub>2</sub></MudChip>
 
         </MudPaper>
         @if (PrimaryHeatSource)
@@ -21,6 +21,7 @@
             <MudDivider DividerType="DividerType.Middle"></MudDivider>
             <MudPaper Class="my-2 d-flex justify-center" Elevation="0">
 
+                @* TODO *@
                 <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@_temperatureText</MudChip>
 
             </MudPaper>

@@ -17,6 +17,8 @@
 		<None Include="wwwroot\css\fontawesome\webfonts\fa-regular-400.woff2" />
 		<None Include="wwwroot\css\fontawesome\webfonts\fa-solid-900.woff2" />
 		<None Include="wwwroot\css\fontawesome\webfonts\fa-v4compatibility.woff2" />
+		<None Include="wwwroot\css\**" />
+		
 		<Folder Include="wwwroot\js\" />
 
 	</ItemGroup>
@@ -43,6 +45,7 @@
 	</ItemGroup>
 
 
+
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
 	</Target>
@@ -51,6 +54,8 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
+
+	<ProjectExtensions><VisualStudio><UserProperties shared_4json_1json__JsonSchema="{" /></VisualStudio></ProjectExtensions>
 
 
 </Project>

@@ -15,8 +15,8 @@
                 <strong>To Date</strong>
             </MudText>
             <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
-                <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound">@CurrentPeriodAnalysisToDate.PeriodCostPounds.eToMoneyFormat()</MudChip>
-                <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica">@CurrentPeriodAnalysisToDate.PeriodCo2 kgCO<sub>2</sub></MudChip>
+                <MudChip Class="info-chip" Icon="@Icons.Material.Filled.CurrencyPound">@CurrentPeriodAnalysisToDate.PeriodCostPounds.eToMoneyFormat()</MudChip>
+                <MudChip Class="info-chip" Icon="@Icons.Material.Filled.SouthAmerica">@CurrentPeriodAnalysisToDate.PeriodCo2 kgCO<sub>2</sub></MudChip>
             </MudPaper>
         }
         <MudText Class="ml-1" Typo="Typo.caption">
@@ -25,16 +25,16 @@
 
         <MudPaper Class="d-flex justify-start flex-wrap" Elevation="0">
 
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.CurrencyPound">@CurrentPeriodForecastAnalysis.ForecastCostPounds.eToMoneyFormat()</MudChip>
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@_consumptionIcon">@CurrentPeriodForecastAnalysis.ForecastConsumption kWh</MudChip>
-            <MudChip Style="pointer-events: none; background-color: transparent;" Icon="@Icons.Material.Filled.SouthAmerica">@CurrentPeriodForecastAnalysis.ForecastCo2 kgCO<sub>2</sub></MudChip>
+            <MudChip Class="info-chip" Icon="@Icons.Material.Filled.CurrencyPound">@CurrentPeriodForecastAnalysis.ForecastCostPounds.eToMoneyFormat()</MudChip>
+            <MudChip Class="info-chip" Icon="@_consumptionIcon">@CurrentPeriodForecastAnalysis.ForecastConsumption kWh</MudChip>
+            <MudChip Class="info-chip" Icon="@Icons.Material.Filled.SouthAmerica">@CurrentPeriodForecastAnalysis.ForecastCo2 kgCO<sub>2</sub></MudChip>
         </MudPaper>
 
         @if (PrimaryHeatSource)
         {
             <MudDivider DividerType="DividerType.Middle"></MudDivider>
             <MudPaper Class="my-2 d-flex justify-center" Elevation="0">
-
+                @* TODO *@
                 <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@CurrentPeriodForecastAnalysis.TemperatureRange.TemperatureColourStyle">@_temperatureText</MudChip>
 
             </MudPaper>

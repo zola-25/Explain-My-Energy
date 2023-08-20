@@ -17,7 +17,7 @@
     </MudPaper>
 
 
-    <MudPaper Elevation="0" Class="term-select-paper ma-2" >
+    <MudPaper Elevation="0" Class="term-mud-select-min-width ma-2">
         <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
             <MudSelect  Class="w-100"
@@ -73,15 +73,6 @@
     }
 </MudToolBar>
 
-<style>
-    .right-align-input input {
-        text-align: right;
-    }
-
-    .term-select-paper .mud-select {
-        min-width: 100px;
-    }
-</style>
 @code {
 
     [Parameter, EditorRequired] public bool IsPrimaryHeatingSource { get; set; }

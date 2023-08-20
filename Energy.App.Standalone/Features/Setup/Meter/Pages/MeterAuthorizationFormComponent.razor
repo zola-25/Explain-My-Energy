@@ -5,11 +5,11 @@
 
 @if (ParametersSet)
 {
-    <MudCard id="authorization-scroll-top" Elevation="0" Style="height: fit-content; overflow: auto;">
+    <MudCard id="authorization-scroll-top" Elevation="0" Class="h-fit-content over-auto">
         <MudCardHeader>
             <MudText Typo="Typo.h6">@MeterType Meter Authorization</MudText>
         </MudCardHeader>
-        <MudCardContent Style="height: 100%;">
+        <MudCardContent Class="h-100">
 
             <div class="mb-1">
 
@@ -61,7 +61,7 @@
                 <p>n3rgy responded with: @AuthorizeFailedMessage</p>
             </div>
             
-            <iframe id="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" class="my-3" style="width: 100%; height: calc(80vh - 100px); border: 1px solid black;" hidden="@AuthorizeSucceeded"></iframe>
+            <iframe id="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" class="n3rgy-iframe" hidden="@AuthorizeSucceeded"></iframe>
         </MudCardContent>
         
     </MudCard>

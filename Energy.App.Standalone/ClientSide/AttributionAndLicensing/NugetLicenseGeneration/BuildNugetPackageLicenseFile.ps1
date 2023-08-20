@@ -79,7 +79,7 @@ try {
         $sb.AppendLine("<p class=""eme--thirdparty--nuget--package-url""><a href=""$($packageInfo.PackageUrl)"">$($packageInfo.PackageUrl)</a></p>")
         $sb.AppendLine("<p class=""eme--thirdparty--nuget--package-authors"">Authors: $($packageInfo.Authors -join ", ")</p>")
         
-        $sb.AppendLine("<span class=""eme--thirdparty--nuget--package-copyright""><pre style=""display: inline;"">$($packageInfo.Copyright)</pre></span>")
+        $sb.AppendLine("<span class=""eme--thirdparty--nuget--package-copyright""><pre><code>$($packageInfo.Copyright)</code></pre></span>")
         $sb.AppendLine("<p class=""eme--thirdparty--nuget--license-type"">License: $($packageInfo.LicenseType) <a href=""$($packageInfo.LicenseUrl)"">$($packageInfo.LicenseUrl)</a></p>")
 
         $sb.AppendLine("<pre class=""eme--thirdparty--nuget--license-text"">$licensePlainTextEncoded</pre>")
