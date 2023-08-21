@@ -1,17 +1,19 @@
 ﻿@using System.Text.Encodings.Web;
-<MudMenu>
+<MudMenu >
     <ActivatorContent>
         <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.IosShare" />
     </ActivatorContent>
     <ChildContent>
-        <MudMenuItem Class="d-flex py-0" Disabled="true" Style="pointer-events: none;">
+    <div class="share-menu">
+        <MudMenuItem Class="d-flex py-0 pointer-events-none" Disabled="true">
             <MudText Color="Color.Dark" Class="fw-bold" Align="Align.Left">
                 Share via
             </MudText>
         </MudMenuItem>
 
         <MudMenuItem Disabled="_disabledDuringDevelopment"
-                     Href="@($"https://www.facebook.com/sharer/sharer.php?u={_encodedBaseUri}")" Target="_blank"
+                     Href="@($"https://www.facebook.com/sharer/sharer.php?u={_encodedBaseUri}")" 
+                     Target="_blank"
                      Class="facebook-share"
                      IconSize="Size.Large"
                      Icon="@Icons.Custom.Brands.Facebook">
@@ -19,43 +21,30 @@
         </MudMenuItem>
 
         <MudMenuItem Disabled="_disabledDuringDevelopment"
-                     Href="@($"https://www.linkedin.com/sharing/share-offsite/?url={_encodedBaseUri}")" Target="_blank"
+                     Href="@($"https://www.linkedin.com/sharing/share-offsite/?url={_encodedBaseUri}")" 
+                     Target="_blank"
                      Class="linkedIn-share"
                      IconSize="Size.Large"
                      Icon="@Icons.Custom.Brands.LinkedIn">
             <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">LinkedIn</MudText>
         </MudMenuItem>
         <MudMenuItem Disabled="_disabledDuringDevelopment"
-                     Href="@($"https://twitter.com/intent/tweet?url={_encodedBaseUri}&text={_encodedText}")" Target="_blank"
-                     
+                     Href="@($"https://twitter.com/intent/tweet?url={_encodedBaseUri}&text={_encodedText}")" 
+                     Target="_blank"
                      IconColor="Color.Default"
                      Class="twitter-share"
                      IconSize="Size.Large"
                      Icon="fa-brands fa-x-twitter">
             <MudText Color="@Color.Dark" Class="mx-2" Typo="Typo.body1">Twitter</MudText>
         </MudMenuItem>
+        </div>
     </ChildContent>
 </MudMenu>
-<style>
-    .facebook-share .mud-list-item-icon {
-        color: #1877f2;
-        min-width: fit-content;
-    }
-
-    .twitter-share .mud-list-item-icon {
-        min-width: fit-content;
-    }
-
-    .linkedIn-share .mud-list-item-icon {
-        color: #0a66c2;
-        min-width: fit-content;
-    }
-</style>
 @code {
 
     [Inject] NavigationManager NavigationManager { get; set; }
 
-    bool _disabledDuringDevelopment = true;
+    bool _disabledDuringDevelopment = false;
     string _encodedBaseUri;
     string _encodedText;
     protected override void OnInitialized()

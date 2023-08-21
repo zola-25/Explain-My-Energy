@@ -1,6 +1,6 @@
 {
-  "name": "Energy.App.Standalone",
-  "short_name": "Energy.App.Standalone",
+  "name": "Explain My Energy",
+  "short_name": "emeApp",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

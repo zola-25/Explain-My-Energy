@@ -55,7 +55,6 @@
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
 
-	<ProjectExtensions><VisualStudio><UserProperties shared_4json_1json__JsonSchema="{" /></VisualStudio></ProjectExtensions>
 
 
 </Project>

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watchSass": "sass --watch ../wwwroot/css/app.scss ../wwwroot/css/app.css",
+    "singleCompileSass": "sass Sass/:../wwwroot/css/",
+    "watchSass": "sass --watch Sass/:../wwwroot/css/",
     "buildDev": "webpack --config webpack.dev.config.js",
     "buildProd": "webpack --config webpack.prod.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title> {{emeAppName}} - License &amp; Attributions</title>
+    <link href="{{emeAttribsCssDistPath}}" rel="stylesheet" />
+
+</head>
 <div class="eme--license-attribution-header--root">
     <h1>License &amp; Attributions</h1>
     <p>This file contains:</p>
@@ -8,19 +15,26 @@
         <li>The Web APIs that make this app possible</li>
         <li>Attribution &amp; License information for third-party software packages used by this application</li>
     </ul>
-
+    <div>
+        <p>
+        <h4><strong>Diclaimer</strong></h4> This file includes links to repositories of the packages when this
+        application was last released. Please be aware that, especially in the case of npm (node) packages, that
+        packages within the npm ecosystem and software supply chain, have been demonstrated to be vulnerable to
+        repository hijacking. This application was built with appropriate security checks on all its dependencies, and
+        these verified dependencies (where necessary) have been embedded in the application. However, the integrity of
+        these dependencies' original
+        source code repositories may have changed since the application was last tested and released. So please be
+        mindful
+        if you do choose to browse directly to these repositories. For more information, see this article from
+        thehackernews.com <a
+            href="https://thehackernews.com/2023/02/researchers-hijack-popular-npm-package.html">thehackernews.com/2023/02/researchers-hijack-popular-npm-package</a>
+        and npm's offical documentaion on the subject at <a
+            href="https://docs.npmjs.com/threats-and-mitigations">docs.npmjs.com/threats-and-mitigations</a></li>
+        </p>
+    </div>
     <h2 class="eme--name">Explain My Energy</h2>
     <h3 class="eme--version">version {{emeFullVersion}}</h3>
     <div class="eme--api-attribution--root">
-        <style>
-            .eme--api-attribution-detail {
-                margin-left: 1em;
-            }
-
-            .eme--api-attribution-detail p {
-                margin: 0.3em 0;
-            }
-        </style>
         <h4><strong>This app wouldn't function without the following APIs:</strong></h4>
         <ul>
             <li>

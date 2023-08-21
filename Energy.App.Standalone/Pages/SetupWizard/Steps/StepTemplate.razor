@@ -9,7 +9,7 @@
                     </ItemTemplate>
                 </MudBreadcrumbs>
 
-                <MudText Class="fw-bold mx-auto" Style="@((HeaderText is null) ? "display: none" : "")"
+                <MudText Class="@((HeaderText is null) ? "d-none" : "fw-bold mx-auto")"
                          Align="Align.Center"
                          Typo="Typo.h5">@HeaderText</MudText>
                 <MudIconButton Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>

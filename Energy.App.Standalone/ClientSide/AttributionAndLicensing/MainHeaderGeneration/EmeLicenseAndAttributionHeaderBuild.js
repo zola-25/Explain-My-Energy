@@ -12,11 +12,12 @@ try {
 
     //console.log(process.argv);
     const args = parseArgs(process.argv.slice(2), {
-        string: ["o", "l", "t", "v"]
+        string: ["o", "l", "t", "v", "c"]
     });
     const outputFile = args.o;
     const licenseFile = args.l;
     const templateFile = args.t;
+    const attribsCssDistPath = args.c;
     const version = args.v;
     
     const licenseText = fs.readFileSync(licenseFile, "utf8");
@@ -37,6 +38,8 @@ try {
     });
 
     const inputArgs = {
+        emeAttribsCssDistPath: attribsCssDistPath,
+        emeAppName: "Explain My Energy",
         emeLicenseType: "Apache 2.0",
         emeFullVersion: version,
         emeFullLicenseText: licenseHtml

@@ -98,8 +98,8 @@ try {
             
         }
 
-        $licensePlainTextEncoded = $licenseContent | ConvertFrom-Markdown | Select-Object Html | ForEach-Object { $_.Html }
-        
+        $licensePlainTextEncoded = $licenseContent | ConvertFrom-Markdown | Select-Object Html | ForEach-Object { [System.Web.HttpUtility]::HtmlEncode($_.Html) }
+
         if (!$first) {
             $sb.AppendLine("<hr>")
             $first = $False

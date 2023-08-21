@@ -2,7 +2,25 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
-      "/css/*"
+      "/css/*",
+      "/js/*",
+      "/img/*",
+      "/manifest.json"
     ]
-  }
+  },
+  "routes": [
+    
+    {
+      "route": "/AttributionsAndLicense.html",
+      "redirect": "/AttributionsAndLicense",
+      "statusCode": 303
+    }
+  ],
+  "globalHeaders": {
+    "Content-Security-Policy": "base-uri 'self'; default-src 'self'; img-src 'self'; object-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self'; upgrade-insecure-requests;"
+  },
+  "trailingSlash": "never"
+
+  
+  
 }

@@ -24,11 +24,14 @@ try {
     
     $licenseTemplateFile = Join-Path $attributionAndLicensingFolder "MainHeaderGeneration\EmeLicenseAndAttributionHeader.handlebars" -Resolve
     
+    $attribsCssDistPath = Join-Path $mainApplicationProjectFolder "wwwroot\css\attribs.css" -Resolve
+
     $result = node $($licenseAndAttibutionJsScript) `
         -o $licenseAndAttributionHeaderOutputFile `
         -l $(Join-Path $respositoryRoot "LICENSE" -Resolve) `
         -t $licenseTemplateFile `
-        -v "0.1.0"
+        -v "0.1.0" `
+        -c $attribsCssDistPath
 
     if ($result -ne "Success") {
         throw "Error generating license and attribution header"
@@ -65,6 +68,7 @@ try {
         $fileContent = Get-Content -Path $file
         Add-Content  -Path $distributeFinalFilePath -Value $fileContent -Encoding utf8NoBOM
     }
+
     $errorFound = $False
 }
 catch {
