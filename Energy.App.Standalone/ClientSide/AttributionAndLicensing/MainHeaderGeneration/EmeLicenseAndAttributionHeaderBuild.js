@@ -13,7 +13,7 @@ try {
     //console.log(process.argv);
     const args = parseArgs(process.argv.slice(2), {
         string: ["o", "l", "t", "v", "c"]
-    });
+    }); 
     const outputFile = args.o;
     const licenseFile = args.l;
     const templateFile = args.t;

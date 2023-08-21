@@ -9,17 +9,16 @@
 
 	<ItemGroup>
 		<None Remove="ClientSide\node_modules\**" />
+		<None Include="ClientSide\.eslintrc.json" />
 		<None Include="ClientSide\HtmlTemplates\index_template.html" />
 		<None Include="ClientSide\AttributionAndLicensing\**" />
+		<Content Remove="ClientSide\.eslintrc.json" />
+		<Content Remove="ClientSide\package.json" />
+		<Content Remove="ClientSide\tsconfig.json" />
+		<None Include="ClientSide\package.json" />
 		<None Include="ClientSide\webpack.dev.config.js" />
 		<None Include="ClientSide\webpack.prod.config.js" />
-		<None Include="wwwroot\css\fontawesome\webfonts\fa-brands-400.woff2" />
-		<None Include="wwwroot\css\fontawesome\webfonts\fa-regular-400.woff2" />
-		<None Include="wwwroot\css\fontawesome\webfonts\fa-solid-900.woff2" />
-		<None Include="wwwroot\css\fontawesome\webfonts\fa-v4compatibility.woff2" />
-		<None Include="wwwroot\css\**" />
-		
-		<Folder Include="wwwroot\js\" />
+
 
 	</ItemGroup>
 
@@ -44,15 +43,25 @@
 		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
 	</ItemGroup>
 
-
-
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
+	</Target>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="npm run singleCompileSass" WorkingDirectory="ClientSide" />
+		<Exec Command="echo 'Hello, world!'" />
+	</Target>
+
+	<Target Name="MyCustomTarget" AfterTargets="Build">
+
 	</Target>
 
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+		<IncludeSymbols Condition="'$(Configuration)'=='Debug'">False</IncludeSymbols>
+		<SymbolPackageFormat Condition="'$(Configuration)'=='Debug'">snupkg</SymbolPackageFormat>
+		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 	</PropertyGroup>
 
 
