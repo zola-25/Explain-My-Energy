@@ -7,19 +7,12 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
+
 	<ItemGroup>
-		<None Remove="ClientSide\node_modules\**" />
-		<None Include="ClientSide\.eslintrc.json" />
-		<None Include="ClientSide\HtmlTemplates\index_template.html" />
-		<None Include="ClientSide\AttributionAndLicensing\**" />
-		<Content Remove="ClientSide\.eslintrc.json" />
-		<Content Remove="ClientSide\package.json" />
-		<Content Remove="ClientSide\tsconfig.json" />
-		<None Include="ClientSide\package.json" />
-		<None Include="ClientSide\webpack.dev.config.js" />
-		<None Include="ClientSide\webpack.prod.config.js" />
-
-
+	  <Compile Remove="ClientSide\node_modules\**" />
+	  <Content Remove="ClientSide\node_modules\**" />
+	  <EmbeddedResource Remove="ClientSide\node_modules\**" />
+	  <None Remove="ClientSide\node_modules\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,9 +45,6 @@
 		<Exec Command="echo 'Hello, world!'" />
 	</Target>
 
-	<Target Name="MyCustomTarget" AfterTargets="Build">
-
-	</Target>
 
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
