@@ -11,11 +11,11 @@
     "checkJs": false,
     "outDir": "./"
   },
-  "files": ["index.ts", "./Files/chartCreation.ts", "./Files/types.ts", "./Files/energyOnlyChart.ts", "./Files/weatherIconChart.ts"],
+  "files": [ "ClientSide/index.ts", "ClientSide/Files/chartCreation.ts", "ClientSide/Files/types.ts", "ClientSide/Files/energyOnlyChart.ts", "ClientSide/Files/weatherIconChart.ts" ],
   
   "exclude": [
-    "**/node_modules/**",
-    "../wwwroot"
+    "wwwroot/**",
+    "node_modules/**"
 
   ]
 }

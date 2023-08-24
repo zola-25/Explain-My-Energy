@@ -2,12 +2,12 @@
   "name": "explain-my-energy",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "ClientSide/index.js",
   "scripts": {
-    "singleCompileSass": "sass Sass/:../wwwroot/css/",
-    "watchSass": "sass --watch Sass/:../wwwroot/css/",
-    "buildDev": "webpack --config webpack.dev.config.js",
-    "buildProd": "webpack --config webpack.prod.config.js",
+    "singleCompileSass": "sass ClientSide/Sass/:wwwroot/css/",
+    "watchSass": "sass --watch ClientSide/Sass/:wwwroot/css/",
+    "buildDev": "webpack --config ClientSide/webpack.dev.config.js",
+    "buildProd": "webpack --config ClientSide/webpack.prod.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "grunt-contrib-clean": "^2.0.1",
     "grunt-contrib-concat": "^2.1.0",
     "grunt-contrib-watch": "^1.1.0",
+    "grunt-webpack": "^6.0.0",
     "handlebars": "^4.7.8",
     "html-webpack-plugin": "^5.5.3",
     "isomorphic-dompurify": "^1.8.0",

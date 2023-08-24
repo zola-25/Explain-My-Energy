@@ -9,8 +9,11 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+console.log("__dirname resolves: " + __dirname);
+
+
 export default {
-    entry: './index.ts',
+    entry: './ClientSide/index.ts',
     mode: 'production',
     output: {
         filename: 'bundle.[contenthash].js',
@@ -31,7 +34,7 @@ export default {
     plugins: [
         
         new HtmlWebpackPlugin({
-            template: './HtmlTemplates/index_template.html',
+            template: _resolve(__dirname,'HtmlTemplates/index_template.html'),
             filename: '../index.html',
             inject: false,
             minify: false,
