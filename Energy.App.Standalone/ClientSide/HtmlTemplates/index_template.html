@@ -21,7 +21,6 @@
 
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 
-    <link href="css/app.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -46,11 +45,6 @@
 
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
-    <% for (index in htmlWebpackPlugin.files.js) { %>
-
-        <script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[index] %>"></script>
-         
-    <% } %>
 
 </body>
 
