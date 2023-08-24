@@ -1,0 +1,10 @@
+
+$fa-font-path: "./webfonts";
+
+// importing core styling file
+@import "./scss/fontawesome.scss";
+
+// our project needs Classic Solid, Brands, and Sharp Solid
+@import "./scss/solid.scss";
+@import "./scss/brands.scss";
+@import "./scss/sharp-solid.scss";
