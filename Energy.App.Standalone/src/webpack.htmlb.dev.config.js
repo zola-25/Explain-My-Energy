@@ -1,7 +1,7 @@
 ﻿/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { resolve as _resolve, dirname } from "path";
+import { resolve as _resolve, dirname, } from "path";
 import { fileURLToPath } from 'url';
 import * as sass from 'sass'
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin'
@@ -12,10 +12,6 @@ console.log("__dirname resolves: " + __dirname);
 
 export default {
     resolve: {
-        alias: {
-            '@fontawesome-css': path.join(__dirname, 'css-precompiled/fontawesome/css'), // => add alias to the font directory
-          },
-      
         extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
@@ -61,10 +57,10 @@ export default {
                 ]
             },
             js: {
-                filename: 'js/[name].[contenthash].js',
+                filename: 'js/[name].[contenthash:8].js',
             },
             css: {
-                filename: 'css/[name].[contenthash].css',
+                filename: 'css/[name].[contenthash:8].css',
             }
             // OR define many templates manually
         }),
@@ -101,15 +97,15 @@ export default {
                 type: 'asset/resource',
                 include: _resolve(__dirname, 'scss/app/fonts/'),
                 generator: {
-                    filename: 'fonts/[name][ext]',
+                    filename: 'fonts/[name].[contenthash:8][ext]',
                 },
             },
             {
-                test: /\.(woff2|woff)$/,
+                test: /\.(woff2|woff|ttf)$/,
                 type: 'asset/resource',
                 include: _resolve(__dirname, 'scss/fontawesome/webfonts/'),
                 generator: {
-                    filename: 'webfonts/[name][ext]',
+                    filename: 'webfonts/[name].[contenthash:8][ext]',
                 },
             }
         ],
