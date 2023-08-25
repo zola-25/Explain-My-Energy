@@ -1,8 +1,8 @@
 {
-    "og-title": "Explain My Energy",
-    "og-image": "https://www.explainmyenergy.net/images/DecemberWeather.png",
-    "og-description": "Understand your energy consumption and how Weather changes and Tariff increases will affect your bills",
-    "og-url": "https://www.explainmyenergy.net/",
-    "og-type": "website",
-    "og-head-prefix": "og: http://ogp.me/ns#"
+    "ogTitle": "Explain My Energy",
+    "ogImage": "https://www.explainmyenergy.net/images/DecemberWeather.png",
+    "ogDescription": "Understand your energy consumption and how Weather changes and Tariff increases will affect your bills",
+    "ogUrl": "https://www.explainmyenergy.net/",
+    "ogType": "website",
+    "ogHeadPrefix": "og: http://ogp.me/ns#"
   }
