@@ -1,10 +1,11 @@
 ﻿/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-import { resolve as _resolve, dirname, } from "path";
+import { resolve as _resolve, dirname, posix } from "path";
 import { fileURLToPath } from 'url';
 import * as sass from 'sass'
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin'
+import CopyPlugin from 'copy-webpack-plugin'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -31,12 +32,12 @@ export default {
                     {
                         tag: 'link',
                         attributes: ['href'],
-                        filter:  ({ value }) => {
-                            if(value.startsWith('_content') ||
+                        filter: ({ value }) => {
+                            if (value.startsWith('_content') ||
                                 value.startsWith('_framework') ||
-                                value.startsWith('Energy.App.Standalone')){
-                                    return false;
-                                }
+                                value.startsWith('Energy.App.Standalone')) {
+                                return false;
+                            }
                             return true;
 
                         }
@@ -45,11 +46,11 @@ export default {
                         tag: 'script',
                         attributes: ['src'],
                         filter: ({ value }) => {
-                            if(value.startsWith('_content') ||
+                            if (value.startsWith('_content') ||
                                 value.startsWith('_framework') ||
-                                value.startsWith('Energy.App.Standalone')){
-                                    return false;
-                                }
+                                value.startsWith('Energy.App.Standalone')) {
+                                return false;
+                            }
                             return true;
 
                         }
@@ -64,7 +65,14 @@ export default {
             }
             // OR define many templates manually
         }),
-
+        new CopyPlugin({
+            patterns: [{
+                from: posix.join(_resolve(__dirname, 'images/favicons/').replace(/\\/g, '/'), '*.png'),
+                to: "[name][ext]",
+                
+            }
+            ]
+        })
 
     ],
     mode: 'development',
@@ -98,7 +106,7 @@ export default {
                 include: _resolve(__dirname, 'scss/app/fonts/'),
                 generator: {
                     filename: 'fonts/[name].[contenthash:8][ext]',
-                },
+                }
             },
             {
                 test: /\.(woff2|woff|ttf)$/,
@@ -106,11 +114,21 @@ export default {
                 include: _resolve(__dirname, 'scss/fontawesome/webfonts/'),
                 generator: {
                     filename: 'webfonts/[name].[contenthash:8][ext]',
-                },
+                }
+            },
+            {
+                test: /\.(ico|png|svg)$/,
+                type: 'asset/resource',
+                include: _resolve(__dirname, 'images/favicons/'),
+
+                generator: {
+                    filename: '[name][ext]',
+
+                }
             }
         ],
     },
 
-    
+
 
 };
