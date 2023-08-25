@@ -21,7 +21,7 @@ export default {
             outputPath: _resolve(__dirname, '../wwwroot'),
             entry: {
                 index: _resolve(__dirname, 'views/index_template.html'),
-
+                data: _resolve(__dirname, 'data/globalDataDev.json'),
             },
             loaderOptions: {
                 sources: [
@@ -67,9 +67,12 @@ export default {
         }),
         new CopyPlugin({
             patterns: [{
-                from: posix.join(_resolve(__dirname, 'images/favicons/').replace(/\\/g, '/'), '*.png'),
+                from: posix.join(_resolve(__dirname, 'favicons/').replace(/\\/g, '/'), '*.png'),
                 to: "[name][ext]",
-                
+            },
+            {
+                from: posix.join(_resolve(__dirname, 'images/').replace(/\\/g, '/')),
+                to: "images/",
             }
             ]
         })
@@ -119,7 +122,7 @@ export default {
             {
                 test: /\.(ico|png|svg)$/,
                 type: 'asset/resource',
-                include: _resolve(__dirname, 'images/favicons/'),
+                include: _resolve(__dirname, 'favicons/'),
 
                 generator: {
                     filename: '[name][ext]',
