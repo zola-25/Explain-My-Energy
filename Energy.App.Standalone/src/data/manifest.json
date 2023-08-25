@@ -1,4 +1,7 @@
 {
+  "lang": "en",
+  "dir": "ltr",
+  "id": "https://explainmyenergy.net",
   "name": "Explain My Energy",
   "short_name": "emeApp",
   "start_url": "./",

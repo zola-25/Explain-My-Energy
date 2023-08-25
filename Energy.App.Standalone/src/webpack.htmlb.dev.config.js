@@ -137,6 +137,15 @@ export default {
                     filename: '[name][ext]',
 
                 }
+            },
+            {
+                test: /\.(json)$/,
+                type: 'asset/resource',
+                include: [_resolve(__dirname, 'data/manifest.json')],
+
+                generator: {
+                    filename: '[name][ext]',
+                }
             }
         ],
     },
