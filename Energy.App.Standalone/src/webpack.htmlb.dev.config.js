@@ -20,14 +20,16 @@ export default {
             // define a relative or absolute path to entry templates
             outputPath: _resolve(__dirname, '../wwwroot'),
             entry: {
-                index: _resolve(__dirname, 'views/index_template.ejs'),
-                data: _resolve(__dirname, 'data/globalDataDev.json'),
+                index: {
+                    import: _resolve(__dirname, 'views/index_template.ejs'),
+                    data: _resolve(__dirname, 'data/globalDataDev.json'),
+                }
             },
             preprocessor: 'ejs',
             preprocessorOptions: {
                 async: false,
                 root: _resolve(__dirname, 'views'),
-                views: [_resolve(__dirname, 'views') ]
+                views: [_resolve(__dirname, 'views')]
             },
             loaderOptions: {
 
