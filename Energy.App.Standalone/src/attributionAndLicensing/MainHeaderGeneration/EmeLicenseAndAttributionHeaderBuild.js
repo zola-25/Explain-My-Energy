@@ -7,19 +7,29 @@ import fs from "fs";
 import { marked } from "marked";
 import DOMPurify from "isomorphic-dompurify";
 import process from "process";
+import { resolve as _resolve, dirname, posix } from "path";
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+console.log("__dirname resolves: " + __dirname);
 
 try {
 
     //console.log(process.argv);
     const args = parseArgs(process.argv.slice(2), {
-        string: ["o", "l", "t", "v", "c"]
+        string: ["o"]
     }); 
     const outputFile = args.o;
-    const licenseFile = args.l;
-    const templateFile = args.t;
-    const attribsCssPath = args.c;
-    const version = args.v;
+
+    const templateFile = _resolve(__dirname, 'EmeLicenseAndAttributionHeaderTemplate.hbs');
     
+    const attribsCssPath = process.env.npm_config_attribsCssPath;
+    const version = process.env.npm_package_version;
+    const fullApplicationName = process.env.npm_config_fullApplicationName;
+    const licenseType = process.env.npm_package_license;
+    const licenseFile = process.env.npm_config_licenseFile;
+
     const licenseText = fs.readFileSync(licenseFile, "utf8");
 
     const templateText = fs.readFileSync(templateFile, "utf8");
@@ -39,8 +49,8 @@ try {
 
     const inputArgs = {
         emeAttribsCssPath: attribsCssPath,
-        emeAppName: "Explain My Energy",
-        emeLicenseType: "Apache 2.0",
+        emeAppName: fullApplicationName,
+        emeLicenseType: licenseType,
         emeFullVersion: version,
         emeFullLicenseText: licenseHtml
     }
@@ -49,10 +59,11 @@ try {
 
     fs.writeFileSync(outputFile, outputHtml, "utf8");
 
+    console.log("Success")
 }
 catch (error) {
     console.error(error);
+    process.exitCode = 1;
 }
 
-console.log("Success")
 

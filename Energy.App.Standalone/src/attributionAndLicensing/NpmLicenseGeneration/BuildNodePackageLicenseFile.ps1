@@ -107,16 +107,9 @@ try {
 
         $sb.AppendLine("<div class=""eme--thirdparty--npm--package--container"">")
 
-        $sb.AppendLine("<h2 class=""eme--thirdparty--npm--package-name-version"">$($packageDetails.name) $($packageDetails.version)</h2>")
+        $sb.AppendLine("<h2 class=""eme--thirdparty--npm--package-name"">$($packageDetails.name)</h2>")
         
 
-        if (-not [String]::IsNullOrWhiteSpace($packageDetails.repository)) { 
-            $sb.AppendLine("<p class=""eme--thirdparty--npm--package-repository""><a href=""$($packageDetails.repository)"">$($packageDetails.repository)</a></p>") 
-        }
-        
-        if (-not [String]::IsNullOrWhiteSpace($packageDetails.publisher)) { 
-            $sb.AppendLine("<p class=""eme--thirdparty--npm--package-authors"">Authors: $($packageDetails.publisher)</p>") 
-        }
 
         ## does the license text contain a copyright text or symbol?
         $lowerCaseLicenseContent = $licenseContent.ToLower()

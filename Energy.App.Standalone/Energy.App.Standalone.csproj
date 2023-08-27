@@ -7,6 +7,9 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
+	<PropertyGroup>
+  		<Version>1.0.0</Version>
+	</PropertyGroup>
 
 	<ItemGroup>
 	  <None Include="node_modules\**" />
@@ -47,9 +50,6 @@
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
-		<IncludeSymbols Condition="'$(Configuration)'=='Debug'">False</IncludeSymbols>
-		<SymbolPackageFormat Condition="'$(Configuration)'=='Debug'">snupkg</SymbolPackageFormat>
-		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 	</PropertyGroup>
 
 

@@ -1,0 +1,15 @@
+<div class="eme--thirdparty--nuget--root">
+    <h2>Third Party Nuget Package Attribution &amp; Licenses</h2>
+    {{#each packageInfos}}
+    <div class="eme--thirdparty--nuget--package--container">
+        <h3 class="eme--thirdparty--nuget--package-name">{{PackageName}}</h3>
+        <span class="eme--thirdparty--nuget--package-copyright">
+            <pre><code>{{Copyright}}</code></pre>
+        </span>
+        <p class="eme--thirdparty--nuget--license-type">License: {{LicenseType}}</p>
+        <pre class="eme--thirdparty--nuget--license-text"><code>{{LicenseTextEncodedToInsert}}</code></pre>
+    </div>
+    <hr />
+    {{/each}}
+
+</div>
