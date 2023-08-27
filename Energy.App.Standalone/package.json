@@ -6,6 +6,7 @@
   "scripts": {
     "singleCompileSass": "sass ClientSide/Sass/:wwwroot/css/",
     "watchSass": "sass --watch ClientSide/Sass/:wwwroot/css/",
+    "buildPowershell": "pwsh -File src/attributionAndLicensing/BuildAndDistributeThirdPartyAttribution.ps1 -finalOutputPath src/views/AttributionAndLicensing.html -attribsCssPath '..scss/app/attribs.scss'",
     "buildDev": "webpack --config ClientSide/webpack.dev.config.js",
     "buildHtmlBundleDev": "webpack --config src/webpack.htmlb.dev.config.js",
     "buildProd": "webpack --config ClientSide/webpack.prod.config.js",

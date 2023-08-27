@@ -16,8 +16,12 @@ param (
     [Parameter(Mandatory = $False, HelpMessage = "The path to the temporary folder where the license generation will take place. Defaults to the script directory/NugetLicenseOutput")]
     [string]$tempLicenseOutputFolder = (Join-Path $scriptDirectory "./NugetLicenseTempOutput"),
 
-    [Parameter(Mandatory = $False, HelpMessage = "The path to the license override file. Defaults to the script directory/LicenseInfoOverride.json")]
-    [string]$licenseOverrideFile = (Join-Path $scriptDirectory "./LicenseInfoOverride.json"),
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the license info override file, which overrides all license info for a package. Defaults to the script directory/LicenseInfoOverride.json")]
+    [string]$licenseInfoOverrideFile = (Join-Path $scriptDirectory "./LicenseInfoOverride.json"),
+
+    [Parameter(Mandatory = $False, HelpMessage = "The path to the license URL to license type override file. Defaults to the script directory/LicenseUrlToLicenseTypeOverride.json")]
+    [string]$licenseUrlToLicenseTypeOverrideFile = (Join-Path $scriptDirectory "./LicenseUrlToLicenseTypeOverride.json"),
+
 
     [Parameter(Mandatory = $False, HelpMessage = "The path to the folder containting license plain spdx text files. Defaults to the script directory/SpdxLicensePlainTextFiles")]
     [string]$licensePlainTextFolder = (Join-Path $scriptDirectory "./SpdxLicensePlainTextFiles")
@@ -45,10 +49,10 @@ try {
     
     $tempLicenseOverridePackageNamesFile = Join-Path $templicenseOutputFolder "LicenseOverridePackageNames.json"
 
-    Get-Content $licenseOverrideFile -Raw | ConvertFrom-Json -AsHashtable | Select-Object -ExpandProperty "PackageName" | ConvertTo-Json -AsArray | Set-Content -Path "$tempLicenseOverridePackageNamesFile"
+    Get-Content $licenseInfoOverrideFile -Raw | ConvertFrom-Json -AsHashtable | Select-Object -ExpandProperty "PackageName" | ConvertTo-Json -AsArray | Set-Content -Path "$tempLicenseOverridePackageNamesFile"
 
     Start-Process -FilePath "dotnet-project-licenses" `
-        -ArgumentList "-i $parentProjectPath -u -t -o -j  --use-project-assets-json  --outfile $tempPackageLicenseJsonFileOutput --packages-filter $tempLicenseOverridePackageNamesFile --manual-package-information $licenseOverrideFile"  `
+        -ArgumentList "-i $parentProjectPath -u -t -o -j  --use-project-assets-json  --outfile $tempPackageLicenseJsonFileOutput --packages-filter $tempLicenseOverridePackageNamesFile --manual-package-information $licenseInfoOverrideFile --licenseurl-to-license-mappings $licenseUrlToLicenseTypeOverrideFile"  `
         -WorkingDirectory $tempLicenseOutputFolder `
         -NoNewWindow -Wait
 

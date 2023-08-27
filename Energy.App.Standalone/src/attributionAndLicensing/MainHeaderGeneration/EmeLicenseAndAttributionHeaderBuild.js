@@ -17,7 +17,7 @@ try {
     const outputFile = args.o;
     const licenseFile = args.l;
     const templateFile = args.t;
-    const attribsCssDistPath = args.c;
+    const attribsCssPath = args.c;
     const version = args.v;
     
     const licenseText = fs.readFileSync(licenseFile, "utf8");
@@ -38,7 +38,7 @@ try {
     });
 
     const inputArgs = {
-        emeAttribsCssDistPath: attribsCssDistPath,
+        emeAttribsCssPath: attribsCssPath,
         emeAppName: "Explain My Energy",
         emeLicenseType: "Apache 2.0",
         emeFullVersion: version,
