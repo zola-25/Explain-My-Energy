@@ -6,7 +6,7 @@ import { hideBin } from 'yargs/helpers';
 import he from 'he';
 import DOMPurify from "isomorphic-dompurify";
 import Handlebars from "handlebars";
-import marked from 'marked';
+import { marked } from 'marked';
 
 
 const argv = yargs(hideBin(process.argv))
@@ -17,7 +17,7 @@ const argv = yargs(hideBin(process.argv))
 }).option('generatedHtmlDocumentPath', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the generated html document. Defaults to the script directory/NpmCredits.html',
+    describe: 'The path to the generated html document. Defaults to the script directory/NpmCreditsPartial.html',
 }).option('tempLicenseOutputFolder', {
     type: 'string',
     demandOption: false,
@@ -29,7 +29,7 @@ const argv = yargs(hideBin(process.argv))
 }).option('npmCreditsTemplateFile', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the npm credits template file. Defaults to the script directory/NugetCreditsPartialTemplate.hbs',
+    describe: 'The path to the npm credits template file. Defaults to the script directory/NpmCreditsPartialTemplate.hbs',
 }).argv;
 
 const scriptDirectory = path.dirname(process.argv[1]);
@@ -68,13 +68,14 @@ try {
     const rawJson = fs.readFileSync(packageLicenceJsonFile, 'utf8');
     const packageInfos = JSON.parse(rawJson);
 
-    const licenseHashRegEx = /(?<header>^#+\s+licen[sc]es?\s*)(?<license>.+?(?=#+|$))/gims;
-    const licenseUnderlineHeaderRegEx = /(?<header>^\s*licen[sc]es?.*\n[=-]+\n)(?<license>.+?(?==+|-{2,}|$))/gims;
-
+    const licenseHashRegEx = /(?<header>^#+\s+licen[sc]es?\s*)(?<license>.+?(?=#+|$(?![\r\n])))/gims
+    const licenseUnderlineHeaderRegEx = /(?<header>^\s*licen[sc]es?.*\n[=-]+\n)(?<license>.+?(?==+|-{2,}|$(?![\r\n])))/gims
+    
     const encodedPackageInfosWithLicenseText = [];
 
-    for (const [packageName, packageDetails] of Object.entries(packageInfos)) {
+    for (const [packageNameAndVersion, packageDetails] of Object.entries(packageInfos)) {
 
+        const packageName = packageDetails.name;
         console.log("Processing package", packageName);
 
         const licenceTextFile = path.join(tempLicenseOutputFolder, packageDetails.licenseFile);
@@ -86,12 +87,12 @@ try {
             
         let licenseContent;
 
-        const hashResultRegEx = licensePlainText.match(licenseHashRegEx);
+        const hashResultRegEx = licenseHashRegEx.exec(licensePlainText)
 
         if (hashResultRegEx && hashResultRegEx.groups) {
             licenseContent = hashResultRegEx.groups.license;
         } else {
-            const underlineResultRegEx = licensePlainText.match(licenseUnderlineHeaderRegEx);
+            const underlineResultRegEx = licenseUnderlineHeaderRegEx.exec(licensePlainText)
 
             if (underlineResultRegEx && underlineResultRegEx.groups) {
                 licenseContent = underlineResultRegEx.groups.license;
@@ -127,11 +128,11 @@ try {
         
 
         if (!packageDetails.licenses.trim()) {
-            throw new Error(`License is null or whitespace for package ${packageName}`);
+            throw new Error(`License is null or whitespace for package ${packageNameAndVersion}`);
         }
 
         if (packageDetails.licenses.split(",").length > 1) {
-            throw new Error(`Multiple licenses found for package ${packageName}`);
+            throw new Error(`Multiple licenses found for package ${packageNameAndVersion}`);
         }
 
         const licenseTypeEncoded = he.encode(packageDetails.licenses.trim(), { strict: true });
