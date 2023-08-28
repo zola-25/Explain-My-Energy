@@ -3,10 +3,13 @@
     {{#each packageInfos}}
     <div class="eme--thirdparty--nuget--package--container">
         <h3 class="eme--thirdparty--nuget--package-name">{{PackageName}}</h3>
+        <p class="eme--thirdparty--nuget--package-authors">{{ Authors }}</p>
+        <h5>Copyright</h5>
         <span class="eme--thirdparty--nuget--package-copyright">
             <pre><code>{{Copyright}}</code></pre>
         </span>
-        <p class="eme--thirdparty--nuget--license-type">License: {{LicenseType}}</p>
+        <h4>License</h4>
+        <p class="eme--thirdparty--nuget--license-type">{{LicenseType}}</p>
         <pre class="eme--thirdparty--nuget--license-text"><code>{{LicenseTextEncodedToInsert}}</code></pre>
     </div>
     <hr />
