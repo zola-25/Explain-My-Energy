@@ -98,7 +98,7 @@ try {
 
     $npmLicenseHtmlOutputFile = Join-Path $tempOutputDir "ThirdPartyLicenses_npm.html" 
 
-    &"$npmLicenseGenerator" -parentProjectPath $tempOutputDir -clientSideRootPath $clientSideRootPath -generatedHtmlDocumentPath $npmLicenseHtmlOutputFile
+    &"$npmLicenseGenerator" -clientSideRootPath $clientSideRootPath -generatedHtmlDocumentPath $npmLicenseHtmlOutputFile
 
     <# Consolidation #>    
     

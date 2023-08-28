@@ -1,7 +1,5 @@
 
 param (
-    [Parameter(Mandatory = $True, HelpMessage = "The path to the .csproj to generate license the license html for" )]
-    [string]$parentProjectPath,
 
     [Parameter(Mandatory = $True, HelpMessage = "The folder containing the projects packages.json" )]
     [string]$clientSideRootPath,
@@ -41,14 +39,6 @@ try {
         Set-Location -Path $originalLocation
     }
 
-    <# 
-    Start-Process -FilePath $nodePath `
-        -ArgumentList "$globalToolsPath/license-checker-rseidelsohn.cmd  --production --json --nopeer --excludePackagesStartingWith=""explain-my-energy"" --out $packageLicenceJsonFile   --relativeModulePath --relativeLicensePath --files $licensePlainTextFolder --customPath $customFormatFile " `
-        -WorkingDirectory $clientSideRootPath -NoNewWindow -Wait
-
-    license-checker-rseidelsohn --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" `
-    --out $packageLicenceJsonFile  --excludePrivatePackages --relativeModulePath --relativeLicensePath `
-    --start $clientSideRootPath --files $licensePlainTextFolder --customPath $customFormatFile  #>
     
     $rawJson = Get-Content $packageLicenceJsonFile -Raw
     $packageInfos = ConvertFrom-Json $rawJson    
@@ -113,7 +103,7 @@ try {
 
         ## does the license text contain a copyright text or symbol?
         $lowerCaseLicenseContent = $licenseContent.ToLower()
-        $licenseHasCopyrightText = $lowerCaseLicenseContent.Contains("copyright") -or $licenseContent.Contains("copy right")
+        $licenseHasCopyrightText = $lowerCaseLicenseContent.Contains("copyright") -or $lowerCaseLicenseContent.Contains("copy right")
 
         $licenseHasCopyrightSymbol = $licenseContent.Contains("©") -or $licenseContent.Contains("Ⓒ") `
             -or $licenseContent.Contains("&copy;") -or $licenseContent.Contains("&COPY;") `
@@ -162,5 +152,4 @@ finally {
 if ($errorFound) {
     exit 1
 }
-exit 0
 

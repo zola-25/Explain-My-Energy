@@ -30,7 +30,7 @@ const argv = yargs(hideBin(process.argv))
     }).option('generatedHtmlDocumentPath', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the generated html document. Defaults to the script directory/NugetCredits.html',
+        describe: 'The path to the generated html document. Defaults to the script directory/NugetCreditsPartial.html',
     }).option('tempLicenseOutputFolder', {
         type: 'string',
         demandOption: false,
@@ -48,8 +48,8 @@ console.log(`Script directory: ${scriptDirectory}`);
 const licenseInfoOverrideFile = argv.licenseInfoOverrideFile ? argv.licenseInfoOverrideFile : path.join(scriptDirectory, './LicenseInfoOverride.json');
 const licenseUrlToLicenseTypeOverrideFile = argv.licenseUrlToLicenseTypeOverrideFile ? argv.licenseUrlToLicenseTypeOverrideFile : path.join(scriptDirectory, './LicenseUrlToLicenseTypeOverride.json');
 const licensePlainTextFolder = argv.licensePlainTextFolder ? argv.licensePlainTextFolder : path.join(scriptDirectory, './SpdxLicensePlainTextFiles');
-const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NugetCredits.html');
-const nugetCreditsTemplateFile = argv.nugetCreditsTemplateFile ? argv.nugetCreditsTemplateFile : path.join(scriptDirectory, './NugetCreditsPartial.hbs');
+const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NugetCreditsPartial.html');
+const nugetCreditsTemplateFile = argv.nugetCreditsTemplateFile ? argv.nugetCreditsTemplateFile : path.join(scriptDirectory, './NugetCreditsPartialTemplate.hbs');
 const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseOutputFolder : path.join(scriptDirectory, './NugetLicenseTempOutput');
 
 const parentProjectPath = path.resolve(argv.parentProjectPath);
@@ -119,9 +119,9 @@ try {
 
 
 } catch (error) {
+    console.error(error);
     console.error(error.message);
     console.error(error.stack);
-
     process.exitCode = 1;
 
 } finally {

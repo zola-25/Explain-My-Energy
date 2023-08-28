@@ -1,0 +1,19 @@
+<div class="eme--thirdparty--npm--root">
+    <h2>Third Party Package Attribution &amp; Licenses</h2>
+    {{#each packageInfos}}
+    <div class="eme--thirdparty--npm--package--container">
+        <h3 class="eme--thirdparty--npm--package-name">{{PackageName}}</h3>
+        {{#if HasSeparateCopyright}}
+        <h5>Copyright</h5>
+        <span class="eme--thirdparty--npm--package-copyright">
+            <pre><code>{{Copyright}}</code></pre>
+        </span>
+        {{/if}}
+        <h4>License</h4>
+        <p class="eme--thirdparty--npm--license-type">{{LicenseType}}</p>
+        <pre class="eme--thirdparty--npm--license-text"><code>{{LicenseTextEncodedToInsert}}</code></pre>
+    </div>
+    <hr />
+    {{/each}}
+
+</div>
