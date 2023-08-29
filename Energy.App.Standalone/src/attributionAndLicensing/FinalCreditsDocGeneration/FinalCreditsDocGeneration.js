@@ -10,7 +10,7 @@ import process from "process";
 import { resolve as _resolve, dirname, basename, join, relative } from "path";
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs';
-import appInfoConfig from "../../appInfoConfig";
+import appInfoConfig from "../../appInfoConfig.js";
 
 const argv = yargs(hideBin(process.argv))
     .option('projectRootPath',
@@ -57,29 +57,29 @@ const argv = yargs(hideBin(process.argv))
 const finalGeneratedCreditsHtmlDocPath = _resolve(argv.finalGeneratedCreditsHtmlDocPath);
 
 try {
-
+    
     const scriptName = basename(process.argv[1]);
     const scriptDirectory = dirname(process.argv[1]);
-    console.log(`${scriptName} Script directory: ${scriptDirectory}`);
+    console.log(`Running ${scriptName}, in script directory: ${scriptDirectory}`);
+
     
+
     const finalCreditsDocGenerationTemplate = argv.finalCreditsDocGenerationTemplate ? argv.finalCreditsDocGenerationTemplate : join(scriptDirectory, 'FinalCreditsDocGenerationTemplate.hbs');
 
     const projectRootPath = _resolve(argv.projectRootPath);
+
+    const finalHtmlDocPathFromRoot = relative(projectRootPath, finalGeneratedCreditsHtmlDocPath);
+    console.log('Checking if existing final credits file: %s', finalHtmlDocPathFromRoot);
+    if (fs.existsSync(finalGeneratedCreditsHtmlDocPath)) {
+
+        console.log('Removing existing final credits file: %s', finalHtmlDocPathFromRoot);
+        fs.rmSync(finalGeneratedCreditsHtmlDocPath);
+    }
+
+
     const viewsFolder = argv.viewsFolder ? argv.viewsFolder : join(projectRootPath, 'src/views');
     const nugetCreditPartialHtmlFile = argv.nugetCreditPartialHtml ? argv.nugetCreditPartialHtml : join(viewsFolder, 'NugetCreditsPartial.html');
     const npmCreditsPartialHtmlFile = argv.npmCreditsPartialHtml ? argv.npmCreditsPartialHtml : join(viewsFolder, 'NpmCreditsPartial.html');
-
-    
-
-    const licenseFile = appInfoConfig.resolvedLicenseFilePath;
-
-    const licenseText = fs.readFileSync(licenseFile, "utf8");
-    const unsanitizedLicenseHtml = marked.parse(licenseText, {
-        gfm: true,
-        breaks: true,
-    });
-
-    const sanitizedLicenseHtml = DOMPurify.sanitize(unsanitizedLicenseHtml);
 
     const nugetCreditPartialHtml = fs.readFileSync(nugetCreditPartialHtmlFile, "utf8");
     const npmCreditsPartialHtml = fs.readFileSync(npmCreditsPartialHtmlFile, "utf8");
@@ -92,29 +92,35 @@ try {
     let template = Handlebars.compile(finalCreditsDocGenerationTemplateText, {
         preventIndent: true,
         strict: true,
+        
+    });
+    const licenseFile = appInfoConfig.resolvedLicenseFilePath;
+
+    const licenseText = fs.readFileSync(licenseFile, "utf8");
+    const unsanitizedLicenseHtml = marked.parse(licenseText, {
+        gfm: true,
+        breaks: true,
     });
 
+    const sanitizedLicenseHtml = DOMPurify.sanitize(unsanitizedLicenseHtml, { USE_PROFILES: { html: true }  });
+
+    const sanitizedFullApplicationName = DOMPurify.sanitize(appInfoConfig.fullApplicationName, { USE_PROFILES: { html: true }  });
+    const sanitizedLicenseType = DOMPurify.sanitize(appInfoConfig.licenseType, { USE_PROFILES: { html: true }  });
+    const sanitizedVersion = DOMPurify.sanitize(appInfoConfig.version, { USE_PROFILES: { html: true }  });
+
     const inputArgs = {
-        emeAppName: appInfoConfig.fullApplicationName,
-        emeLicenseType: appInfoConfig.licenseType,
-        emeFullVersion: appInfoConfig.version,
+        emeCreditsAndLicensesCss: appInfoConfig.creditsAndLicensesCss,
+        emeAppName: sanitizedFullApplicationName,
+        emeLicenseType: sanitizedLicenseType,
+        emeFullVersion: sanitizedVersion,
         emeFullLicenseText: sanitizedLicenseHtml
     }
 
     const finalGeneratedCreditsDocHtml = template(inputArgs);
 
-    const sanitizedFinalGeneratedCreditsDocHtml = DOMPurify.sanitize(finalGeneratedCreditsDocHtml, { html: true });
+    fs.writeFileSync(finalGeneratedCreditsHtmlDocPath, finalGeneratedCreditsDocHtml, "utf8");
 
-    console.log('Final credits file check: DOMPurify removed %d elements.', DOMPurify.removed.length)
-
-    if (DOMPurify.removed.length > 0) {
-        console.log('Elements removed:  %s', JSON.stringify(DOMPurify.removed));
-    }
-
-    fs.writeFileSync(finalGeneratedCreditsHtmlDocPath, sanitizedFinalGeneratedCreditsDocHtml, "utf8");
-
-    const docOutputPath = relative(projectRootPath, finalGeneratedCreditsHtmlDocPath);
-    console.log("Success - final credits file written to: %s", docOutputPath);
+    console.log("Success - final credits file written to: %s", finalHtmlDocPathFromRoot);
 }
 catch (error) {
     process.exitCode = 1;

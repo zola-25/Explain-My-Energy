@@ -1,62 +1,59 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title> {{emeAppName}} - License &amp; Attributions</title>
-    <link href="../scss/app/attribs.scss" rel="stylesheet" />
+    <title> {{emeAppName}} - Credits, Attributions &amp; Licenses </title>
 
+    <link href="{{{emeCreditsAndLicensesCss}}}" rel="stylesheet" />
 </head>
 
 <body>
     <div class="eme--license-attribution-header--root">
-        <h1>License &amp; Attributions</h1>
-        <p>This file contains:</p>
+        <h1>{{emeAppName}} - Credits, Attributions &amp; Licenses </h1>
 
-        <ul>
-            <li>The Version, License &amp; Copyright details for the Explain My Energy application and source code</li>
-            <li>The Web APIs that make this app possible</li>
-            <li>Attribution &amp; License information for third-party software packages used by this application</li>
-        </ul>
 
-        <h2 class="eme--name">Explain My Energy</h2>
-        <h3 class="eme--version">version {{emeFullVersion}}</h3>
+        <h2 class="eme--name">{{emeAppName}} v{{emeFullVersion}}</h2>
         <div class="eme--api-attribution--root">
             <h4><strong>This app wouldn't function without the following APIs:</strong></h4>
             <ul>
                 <li>
-                    <p>The free consumer API from made available by n3rgy @ <a
+                    <p>The free consumer API from made available by n3rgy at <a
                             href="https://www.n3rgy.com/consumer/">n3rgy
                             Consumer Portal</a></p>
                 </li>
                 <li>
-                    <p>Open-Meteo, an amazing and comprehensive weather API service @ <a
+                    <p>Open-Meteo, an amazing and comprehensive weather API service at <a
                             href="https://open-meteo.com">open-meteo.com</a></p>
                     <div class="eme--api-attribution-detail">
-                        <p>Open-Meteo API Data is Licensed under the <code>CC-BY-4.0</code> <a
-                                href="https://creativecommons.org/licenses/by/4.0/legalcode">CC Attribution 4.0
-                                International</a></p>
+                        <p>Open-Meteo API Data is Licensed under the <strong>Creative Commons Attribution 4.0
+                                International Public License (CC-BY-4.0)</strong>, a copy is available here @ <a
+                                href="https://creativecommons.org/licenses/by/4.0/legalcode">creativecommons.org</a></p>
                     </div>
                 </li>
                 <li>
-                    <p><a href="https://postcodes.io">postcodes.io</a>, a great Open Data API for resolving UK
-                        postcodes.
-                        postcodes.io is licensed under <a
-                            href="https://github.com/ideal-postcodes/postcodes.io/blob/master/LICENSE">MIT</a> </p>
+                    <p>postcodes.io, a great Open Data API for resolving UK
+                        postcodes. Find it here at <a href="https://postcodes.io">postcodes.io</a>.
+                        The postcodes.io API is licensed under the <strong>MIT License</strong>, a copy is available
+                        here at their repository here <a
+                            href="https://github.com/ideal-postcodes/postcodes.io/blob/master/LICENSE">github.com/ideal-postcodes/postcodes.io</a>
+                    </p>
                     <div class="eme--api-attribution-detail">
 
-                        <p>Great Britain Postcode Data is licensed under the <code>Open Government License</code> <a
+                        <p>Great Britain Postcode Data is licensed under the <strong>Open Government License</strong>
+                            available at <a
                                 href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open
                                 Government Licence v3.0</a></p>
                         <p>Northern Ireland Postcode Data (postcodes beginning with BT) is used non-commerically, as
                             such
-                            also subject to the <code>Open Government License</code> <a
+                            also subject to the <strong>Open Government License</strong> available at <a
                                 href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open
                                 Government Licence v3.0</a></p>
                         <p>Contains Ordnance Survey data &copy; Crown copyright and database right 2023</p>
                         <p>Contains Royal Mail data &copy; Royal Mail copyright and database right 2023</p>
                         <p>Contains National Statistics data &copy; Crown copyright and database right 2023</p>
                         <p>Contains NRS data &copy; Crown copyright and database right 2023 </p>
-                        <p>More information on Open Data Licensing for postcodes.io can be found <a
+                        <p>More information on Open Data Licensing for postcodes.io can be found at <a
                                 href="https://ideal-postcodes.co.uk/guides/onspd-licensing">ideal-postcodes.co.uk/guides/onspd-licensing</a>
                         </p>
                     </div>
@@ -64,7 +61,7 @@
             </ul>
         </div>
         <h4>Explain My Energy is licensed <span class="eme--license-type">{{emeLicenseType}}</span>:</h4>
-        <pre class="eme--license-text">{{emeFullLicenseText}}</pre>
+        <pre class="eme--license-text">{{{emeFullLicenseText}}}</pre>
 
 
     </div>

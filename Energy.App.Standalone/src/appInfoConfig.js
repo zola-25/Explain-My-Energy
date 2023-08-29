@@ -1,16 +1,21 @@
 import path from 'path'
-import {license, description,version,config} from '../package.json'
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 
+const appInfo = require('../package.json')
+
+const { license, description, version, config } = appInfo
 const {fullApplicationName, licenseFilePath} = config
 
-const resolvedLicenseFilePath = path.resolve("..", licenseFilePath)
+const resolvedLicenseFilePath = path.resolve(licenseFilePath)
 
 const appInfoConfig = {
-    fullApplicationName,
+    creditsAndLicensesCss: '../scss/app/attribs.scss',
+    fullApplicationName: fullApplicationName,
     licenseType: license,
-    description,
-    version,
-    resolvedLicenseFilePath
+    description: description,
+    version: version,
+    resolvedLicenseFilePath: resolvedLicenseFilePath
 }
 
 

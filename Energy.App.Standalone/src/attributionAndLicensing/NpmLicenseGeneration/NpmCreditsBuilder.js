@@ -34,25 +34,30 @@ const argv = yargs(hideBin(process.argv))
     describe: 'The path to the npm credits template file. Defaults to the current script directory/NpmCreditsPartialTemplate.hbs',
 }).argv;
 
+const originalLocation = process.cwd();
+
 const scriptDirectory = path.dirname(process.argv[1]);
 console.log(`Script directory: ${scriptDirectory}`); 
 
 const packagesJsonFolder = path.resolve(argv.packagesJsonFolder);
 
 const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NpmCreditsPartial.html');
-const customFormatFile = argv.customFormatFile ? argv.customFormatFile : path.join(scriptDirectory, './customFormatExample.json');
 const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseOutputFolder : path.join(scriptDirectory, './NpmLicenseOutput');
 const npmCreditsTemplateFile = argv.npmCreditsTemplateFile ? argv.npmCreditsTemplateFile : path.join(scriptDirectory, './NpmCreditsPartialTemplate.hbs');
 
-const originalLocation = process.cwd();
 
 try {
+
+    if(fs.existsSync(generatedHtmlDocumentPath)){
+        fs.rmSync(generatedHtmlDocumentPath);
+    }
 
     if (fs.existsSync(tempLicenseOutputFolder)) {
         fs.rmSync(tempLicenseOutputFolder, { recursive: true });
     }
     fs.mkdirSync(tempLicenseOutputFolder);
 
+    const customFormatFile = argv.customFormatFile ? argv.customFormatFile : path.join(scriptDirectory, './customFormatExample.json');
 
     const packageLicenceJsonFile = path.join(tempLicenseOutputFolder, './NpmLicenses.json');
     const licensePlainTextFolder = path.join(tempLicenseOutputFolder, './NpmLicensePlainTextFiles');
