@@ -10,7 +10,7 @@ import process from "process";
 import { resolve as _resolve, dirname, basename, join, relative } from "path";
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs';
-
+import appInfoConfig from "../../appInfoConfig";
 
 const argv = yargs(hideBin(process.argv))
     .option('projectRootPath',
@@ -52,25 +52,26 @@ const argv = yargs(hideBin(process.argv))
         })
     .argv;
 
-const scriptName = basename(process.argv[1]);
-const scriptDirectory = dirname(process.argv[1]);
-console.log(`${scriptName} Script directory: ${scriptDirectory}`);
+
 
 const finalGeneratedCreditsHtmlDocPath = _resolve(argv.finalGeneratedCreditsHtmlDocPath);
-const finalCreditsDocGenerationTemplate = argv.finalCreditsDocGenerationTemplate ? argv.finalCreditsDocGenerationTemplate : join(scriptDirectory, 'FinalCreditsDocGenerationTemplate.hbs');
-
-const projectRootPath = _resolve(argv.projectRootPath);
-const viewsFolder = argv.viewsFolder ? argv.viewsFolder : join(projectRootPath, 'src/views');
-const nugetCreditPartialHtmlFile = argv.nugetCreditPartialHtml ? argv.nugetCreditPartialHtml : join(viewsFolder, 'NugetCreditsPartial.html');
-const npmCreditsPartialHtmlFile = argv.npmCreditsPartialHtml ? argv.npmCreditsPartialHtml : join(viewsFolder, 'NpmCreditsPartial.html');
 
 try {
 
-    const attribsCssPath = process.env.npm_package_config_attribsCssPath;
-    const appVersion = process.env.npm_package_version;
-    const fullApplicationName = process.env.npm_package_config_fullApplicationName;
-    const licenseType = process.env.npm_package_license;
-    const licenseFile = _resolve(process.env.npm_package_config_licenseFile);
+    const scriptName = basename(process.argv[1]);
+    const scriptDirectory = dirname(process.argv[1]);
+    console.log(`${scriptName} Script directory: ${scriptDirectory}`);
+    
+    const finalCreditsDocGenerationTemplate = argv.finalCreditsDocGenerationTemplate ? argv.finalCreditsDocGenerationTemplate : join(scriptDirectory, 'FinalCreditsDocGenerationTemplate.hbs');
+
+    const projectRootPath = _resolve(argv.projectRootPath);
+    const viewsFolder = argv.viewsFolder ? argv.viewsFolder : join(projectRootPath, 'src/views');
+    const nugetCreditPartialHtmlFile = argv.nugetCreditPartialHtml ? argv.nugetCreditPartialHtml : join(viewsFolder, 'NugetCreditsPartial.html');
+    const npmCreditsPartialHtmlFile = argv.npmCreditsPartialHtml ? argv.npmCreditsPartialHtml : join(viewsFolder, 'NpmCreditsPartial.html');
+
+    
+
+    const licenseFile = appInfoConfig.resolvedLicenseFilePath;
 
     const licenseText = fs.readFileSync(licenseFile, "utf8");
     const unsanitizedLicenseHtml = marked.parse(licenseText, {
@@ -88,19 +89,15 @@ try {
 
     const finalCreditsDocGenerationTemplateText = fs.readFileSync(finalCreditsDocGenerationTemplate, "utf8");
 
-
-
     let template = Handlebars.compile(finalCreditsDocGenerationTemplateText, {
         preventIndent: true,
         strict: true,
-        noEscape: true,
     });
 
     const inputArgs = {
-        emeAttribsCssPath: attribsCssPath,
-        emeAppName: fullApplicationName,
-        emeLicenseType: licenseType,
-        emeFullVersion: appVersion,
+        emeAppName: appInfoConfig.fullApplicationName,
+        emeLicenseType: appInfoConfig.licenseType,
+        emeFullVersion: appInfoConfig.version,
         emeFullLicenseText: sanitizedLicenseHtml
     }
 
@@ -120,8 +117,9 @@ try {
     console.log("Success - final credits file written to: %s", docOutputPath);
 }
 catch (error) {
-    console.error(error);
     process.exitCode = 1;
-}
+    console.error(error);
+    console.error(error.message);
 
+}
 
