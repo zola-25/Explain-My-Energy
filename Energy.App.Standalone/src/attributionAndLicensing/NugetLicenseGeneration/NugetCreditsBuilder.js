@@ -10,7 +10,7 @@ import DOMPurify from "isomorphic-dompurify";
 import Handlebars from "handlebars";
 
 const argv = yargs(hideBin(process.argv))
-    .option('parentProjectPath', {
+    .option('projectCsprojPath', {
         type: 'string',
         demandOption: true,
         describe: 'The path to the .csproj to generate license the license html for',
@@ -54,14 +54,14 @@ const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generate
 const nugetCreditsTemplateFile = argv.nugetCreditsTemplateFile ? argv.nugetCreditsTemplateFile : path.join(scriptDirectory, './NugetCreditsPartialTemplate.hbs');
 const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseOutputFolder : path.join(scriptDirectory, './NugetLicenseTempOutput');
 
-const parentProjectPath = path.resolve(argv.parentProjectPath);
+const projectCsprojPath = path.resolve(argv.projectCsprojPath);
 
 try {
     console.log('Clearing NuGet caches');
     execSync('dotnet nuget locals all --clear');
 
     console.log('Restoring project packages');
-    execSync(`dotnet restore ${parentProjectPath}`);
+    execSync(`dotnet restore ${projectCsprojPath}`);
 
     if (fs.existsSync(tempLicenseOutputFolder)) {
         fs.rmSync(tempLicenseOutputFolder, { recursive: true });
@@ -75,7 +75,7 @@ try {
 
     fs.writeFileSync(tempLicenseOverridePackageNamesFile, JSON.stringify(licenseInfoOverrideParsed.map(c => c.PackageName)), 'utf8');
 
-    execSync(`dotnet-project-licenses -i ${parentProjectPath} -u -t -o -j  --use-project-assets-json  --outfile ${tempPackageLicenseJsonFileOutput} --packages-filter ${tempLicenseOverridePackageNamesFile} --manual-package-information ${licenseInfoOverrideFile} --licenseurl-to-license-mappings ${licenseUrlToLicenseTypeOverrideFile}`, { cwd: tempLicenseOutputFolder });
+    execSync(`dotnet-project-licenses -i ${projectCsprojPath} -u -t -o -j  --use-project-assets-json  --outfile ${tempPackageLicenseJsonFileOutput} --packages-filter ${tempLicenseOverridePackageNamesFile} --manual-package-information ${licenseInfoOverrideFile} --licenseurl-to-license-mappings ${licenseUrlToLicenseTypeOverrideFile}`, { cwd: tempLicenseOutputFolder });
 
     const parsedPackageInfos = JSON.parse(fs.readFileSync(tempPackageLicenseJsonFileOutput, 'utf8'));
 

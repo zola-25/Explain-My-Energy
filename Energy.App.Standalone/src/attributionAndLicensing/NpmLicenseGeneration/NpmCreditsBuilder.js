@@ -12,7 +12,7 @@ import { marked } from 'marked';
 
 
 const argv = yargs(hideBin(process.argv))
-.option('clientSideRootPath', {    
+.option('packagesJsonFolder', {    
     type: 'string',
     demandOption: true,
     describe: 'The folder containing the projects packages.json file',
@@ -37,7 +37,7 @@ const argv = yargs(hideBin(process.argv))
 const scriptDirectory = path.dirname(process.argv[1]);
 console.log(`Script directory: ${scriptDirectory}`); 
 
-const clientSideRootPath = path.resolve(argv.clientSideRootPath);
+const packagesJsonFolder = path.resolve(argv.packagesJsonFolder);
 
 const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NpmCreditsPartial.html');
 const customFormatFile = argv.customFormatFile ? argv.customFormatFile : path.join(scriptDirectory, './customFormatExample.json');
@@ -59,7 +59,7 @@ try {
 
     fs.mkdirSync(licensePlainTextFolder);
 
-    process.chdir(clientSideRootPath);
+    process.chdir(packagesJsonFolder);
 
     execSync(`license-checker-rseidelsohn --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" \
             --out ${packageLicenceJsonFile} --excludePrivatePackages --relativeModulePath --relativeLicensePath \

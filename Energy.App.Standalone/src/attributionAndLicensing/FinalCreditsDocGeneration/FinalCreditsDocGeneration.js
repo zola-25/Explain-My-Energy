@@ -13,42 +13,43 @@ import yargs from 'yargs';
 
 
 const argv = yargs(hideBin(process.argv))
+    .option('projectRootPath',
+        {
+            type: 'string',
+            demandOption: true,
+            describe: 'The path to the application root folder.',
+        })
     .option('finalGeneratedCreditsHtmlDocPath',
-    {
-        type: 'string',
-        demandOption: true,
-        describe: 'The path to the final generated credits html document.',
-    })
-    .option('projectRootPath', 
-    {
-        type: 'string',
-        demandOption: true,
-        describe: 'The path to the application root folder.',
-    })
+        {
+            type: 'string',
+            demandOption: true,
+            describe: 'The path to the final generated credits html document.',
+        })
+
     .option('finalCreditsDocGenerationTemplate',
-    {
-        type: 'string',
-        demandOption: false,
-        describe: 'The path to the final credits consolidate template. Defaults to the current script directory/FinalCreditsDocGenerationTemplate.hbs',
-    })
-    .option('nugetCreditPartialHtml', 
-    {
-        type: 'string',
-        demandOption: false,
-        describe: 'The path to the nuget credit partial html. Defaults to project root/src/views/NugetCreditsPartial.html',
-    })
-    .option('npmCreditsPartialHtml', 
-    {
-        type: 'string',
-        demandOption: false,
-        describe: 'The path to the npm credit partial html. Defaults to project root/src/views/NpmCreditsPartial.html',
-    })
-    .option('viewsFolder', 
-    {
-        type: 'string',
-        demandOption: false,
-        describe: 'The path to the views folder. Defaults to project root/src/views',
-    })
+        {
+            type: 'string',
+            demandOption: false,
+            describe: 'The path to the final credits consolidate template. Defaults to the current script directory/FinalCreditsDocGenerationTemplate.hbs',
+        })
+    .option('nugetCreditPartialHtml',
+        {
+            type: 'string',
+            demandOption: false,
+            describe: 'The path to the nuget credit partial html. Defaults to project root/src/views/NugetCreditsPartial.html',
+        })
+    .option('npmCreditsPartialHtml',
+        {
+            type: 'string',
+            demandOption: false,
+            describe: 'The path to the npm credit partial html. Defaults to project root/src/views/NpmCreditsPartial.html',
+        })
+    .option('viewsFolder',
+        {
+            type: 'string',
+            demandOption: false,
+            describe: 'The path to the views folder. Defaults to project root/src/views',
+        })
     .argv;
 
 const scriptName = basename(process.argv[1]);
