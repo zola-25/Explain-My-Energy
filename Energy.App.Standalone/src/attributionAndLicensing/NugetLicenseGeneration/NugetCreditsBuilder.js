@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -16,29 +18,29 @@ const argv = yargs(hideBin(process.argv))
     .option('licenseInfoOverrideFile', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the license info override file, which overrides all license info for a package. Defaults to the script directory/LicenseInfoOverride.json',
+        describe: 'The path to the license info override file, which overrides all license info for a package. Defaults to the current script directory/LicenseInfoOverride.json',
 
     })
     .option('licenseUrlToLicenseTypeOverrideFile', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the license url to license type override file, which overrides the license type for a given license url. Defaults to the script directory/NugetLicenseUrlToLicenseTypeOverride.json',
+        describe: 'The path to the license url to license type override file, which overrides the license type for a given license url. Defaults to the current script directory/NugetLicenseUrlToLicenseTypeOverride.json',
     }).option('licensePlainTextFolder', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the folder containing the plain text spdx license files. Defaults to the script directory/SpdxLicensePlainTextFiles',
+        describe: 'The path to the folder containing the plain text spdx license files. Defaults to the current script directory/SpdxLicensePlainTextFiles',
     }).option('generatedHtmlDocumentPath', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the generated html document. Defaults to the script directory/NugetCreditsPartial.html',
+        describe: 'The path to the generated html document. Defaults to the current script directory/NugetCreditsPartial.html',
     }).option('tempLicenseOutputFolder', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the script directory/NugetLicenseTempOutput',
+        describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the current script directory/NugetLicenseTempOutput',
     }).option('nugetCreditsTemplateFile', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the nuget credits template file. Defaults to the script directory/NugetCreditsPartialTemplate.hbs',
+        describe: 'The path to the nuget credits template file. Defaults to the current script directory/NugetCreditsPartialTemplate.hbs',
     }).argv;
 
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -17,19 +19,19 @@ const argv = yargs(hideBin(process.argv))
 }).option('generatedHtmlDocumentPath', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the generated html document. Defaults to the script directory/NpmCreditsPartial.html',
+    describe: 'The path to the generated html document. Defaults to the current script directory/NpmCreditsPartial.html',
 }).option('tempLicenseOutputFolder', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the script directory/NpmLicenseOutput',
+    describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the current script directory/NpmLicenseOutput',
 }).option('customFormatFile', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the license customFormat JSON file. Defaults to the script directory/customFormatExample.json',
+    describe: 'The path to the license customFormat JSON file. Defaults to the current script directory/customFormatExample.json',
 }).option('npmCreditsTemplateFile', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the npm credits template file. Defaults to the script directory/NpmCreditsPartialTemplate.hbs',
+    describe: 'The path to the npm credits template file. Defaults to the current script directory/NpmCreditsPartialTemplate.hbs',
 }).argv;
 
 const scriptDirectory = path.dirname(process.argv[1]);
