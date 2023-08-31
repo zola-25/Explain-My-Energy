@@ -16,10 +16,10 @@ const argv = yargs(hideBin(process.argv))
     type: 'string',
     demandOption: true,
     describe: 'The folder containing the projects packages.json file',
-}).option('generatedHtmlDocumentPath', {
+}).option('htmlFragmentToGenerateFilePath', {
     type: 'string',
     demandOption: false,
-    describe: 'The path to the generated html document. Defaults to the current script directory/NpmCreditsPartial.html',
+    describe: 'The path to the generated html document. Defaults to the project root/src/attributionAndLicensing/generatedPartials/NpmCreditsPartial.html',
 }).option('tempLicenseOutputFolder', {
     type: 'string',
     demandOption: false,
@@ -32,30 +32,42 @@ const argv = yargs(hideBin(process.argv))
     type: 'string',
     demandOption: false,
     describe: 'The path to the npm credits template file. Defaults to the current script directory/NpmCreditsPartialTemplate.hbs',
+}).
+option('generatedPartialsFolder',{
+    type: 'string',
+    demandOption: false,
+    describe: 'The path to the generated partials folder. Defaults to project root/src/attributionAndLicensing/generatedPartials',
 }).argv;
 
 const originalLocation = process.cwd();
 
+const scriptName = path.basename(process.argv[1]);
 const scriptDirectory = path.dirname(process.argv[1]);
-console.log(`Script directory: ${scriptDirectory}`); 
+console.log(`Running ${scriptName}, in script directory: ${scriptDirectory}`);
 
 const packagesJsonFolder = path.resolve(argv.packagesJsonFolder);
+    
+const generatedPartialsFolder = argv.generatedPartialsFolder ? argv.generatedPartialsFolder : path.resolve(packagesJsonFolder, 'src/attributionAndLicensing/generatedPartials');
+const htmlFragmentToGenerateFilePath = argv.htmlFragmentToGenerateFilePath ? argv.htmlFragmentToGenerateFilePath : path.join(generatedPartialsFolder, './NpmCreditsPartial.html');
 
-const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NpmCreditsPartial.html');
 const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseOutputFolder : path.join(scriptDirectory, './NpmLicenseOutput');
-const npmCreditsTemplateFile = argv.npmCreditsTemplateFile ? argv.npmCreditsTemplateFile : path.join(scriptDirectory, './NpmCreditsPartialTemplate.hbs');
 
 
 try {
 
-    if(fs.existsSync(generatedHtmlDocumentPath)){
-        fs.rmSync(generatedHtmlDocumentPath);
+
+
+    if(fs.existsSync(htmlFragmentToGenerateFilePath)){
+        fs.rmSync(htmlFragmentToGenerateFilePath);
     }
 
     if (fs.existsSync(tempLicenseOutputFolder)) {
         fs.rmSync(tempLicenseOutputFolder, { recursive: true });
     }
     fs.mkdirSync(tempLicenseOutputFolder);
+
+    
+    const npmCreditsTemplateFile = argv.npmCreditsTemplateFile ? argv.npmCreditsTemplateFile : path.join(scriptDirectory, './NpmCreditsPartialTemplate.hbs');
 
     const customFormatFile = argv.customFormatFile ? argv.customFormatFile : path.join(scriptDirectory, './customFormatExample.json');
 
@@ -174,7 +186,7 @@ try {
         console.log('Elements removed:  %s', JSON.stringify(DOMPurify.removed));
     }
 
-    fs.writeFileSync(generatedHtmlDocumentPath, htmlSanitized, 'utf8');
+    fs.writeFileSync(htmlFragmentToGenerateFilePath, htmlSanitized, 'utf8');
 
 
 

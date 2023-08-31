@@ -36,20 +36,21 @@ const argv = yargs(hideBin(process.argv))
         {
             type: 'string',
             demandOption: false,
-            describe: 'The path to the nuget credit partial html. Defaults to project root/src/views/NugetCreditsPartial.html',
+            describe: 'The path to the nuget credit partial html. Defaults to project root/src/attributionAndLicensing/generatedPartials/NugetCreditsPartial.html',
         })
     .option('npmCreditsPartialHtml',
         {
             type: 'string',
             demandOption: false,
-            describe: 'The path to the npm credit partial html. Defaults to project root/src/views/NpmCreditsPartial.html',
+            describe: 'The path to the npm credit partial html. Defaults to project root/src/attributionAndLicensing/generatedPartials/NpmCreditsPartial.html',
         })
-    .option('viewsFolder',
+    .option('generatedPartialsFolder',
         {
             type: 'string',
             demandOption: false,
-            describe: 'The path to the views folder. Defaults to project root/src/views',
+            describe: 'The path to the generated partials folder. Defaults to project root/src/attributionAndLicensing/generatedPartials',
         })
+    
     .argv;
 
 
@@ -63,6 +64,8 @@ try {
     console.log(`Running ${scriptName}, in script directory: ${scriptDirectory}`);
 
     
+    const generatedPartialsFolder = argv.generatedPartialsFolder ? argv.generatedPartialsFolder : join(scriptDirectory, '../generatedPartials');
+
 
     const finalCreditsDocGenerationTemplate = argv.finalCreditsDocGenerationTemplate ? argv.finalCreditsDocGenerationTemplate : join(scriptDirectory, 'FinalCreditsDocGenerationTemplate.hbs');
 
@@ -77,9 +80,8 @@ try {
     }
 
 
-    const viewsFolder = argv.viewsFolder ? argv.viewsFolder : join(projectRootPath, 'src/views');
-    const nugetCreditPartialHtmlFile = argv.nugetCreditPartialHtml ? argv.nugetCreditPartialHtml : join(viewsFolder, 'NugetCreditsPartial.html');
-    const npmCreditsPartialHtmlFile = argv.npmCreditsPartialHtml ? argv.npmCreditsPartialHtml : join(viewsFolder, 'NpmCreditsPartial.html');
+    const nugetCreditPartialHtmlFile = argv.nugetCreditPartialHtml ? argv.nugetCreditPartialHtml : join(generatedPartialsFolder, 'NugetCreditsPartial.html');
+    const npmCreditsPartialHtmlFile = argv.npmCreditsPartialHtml ? argv.npmCreditsPartialHtml : join(generatedPartialsFolder, 'NpmCreditsPartial.html');
 
     const nugetCreditPartialHtml = fs.readFileSync(nugetCreditPartialHtmlFile, "utf8");
     const npmCreditsPartialHtml = fs.readFileSync(npmCreditsPartialHtmlFile, "utf8");

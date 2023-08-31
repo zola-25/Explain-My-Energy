@@ -32,7 +32,12 @@ const argv = yargs(hideBin(process.argv))
     }).option('generatedHtmlDocumentPath', {
         type: 'string',
         demandOption: false,
-        describe: 'The path to the generated html document. Defaults to the current script directory/NugetCreditsPartial.html',
+        describe: 'The path to the generated html document. Defaults to the current generatedPartialsFolder/NugetCreditsPartial.html',
+    }).
+    option('generatedPartialsFolder',{
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the generated partials folder. Defaults to project root/src/attributionAndLicensing/generatedPartials',
     }).option('tempLicenseOutputFolder', {
         type: 'string',
         demandOption: false,
@@ -45,18 +50,24 @@ const argv = yargs(hideBin(process.argv))
 
 
 const scriptDirectory = path.dirname(process.argv[1]);
-console.log(`Script directory: ${scriptDirectory}`);
+const scriptName = path.basename(process.argv[1]);
 
-const licenseInfoOverrideFile = argv.licenseInfoOverrideFile ? argv.licenseInfoOverrideFile : path.join(scriptDirectory, './LicenseInfoOverride.json');
-const licenseUrlToLicenseTypeOverrideFile = argv.licenseUrlToLicenseTypeOverrideFile ? argv.licenseUrlToLicenseTypeOverrideFile : path.join(scriptDirectory, './LicenseUrlToLicenseTypeOverride.json');
-const licensePlainTextFolder = argv.licensePlainTextFolder ? argv.licensePlainTextFolder : path.join(scriptDirectory, './SpdxLicensePlainTextFiles');
-const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(scriptDirectory, './NugetCreditsPartial.html');
-const nugetCreditsTemplateFile = argv.nugetCreditsTemplateFile ? argv.nugetCreditsTemplateFile : path.join(scriptDirectory, './NugetCreditsPartialTemplate.hbs');
+console.log(`Running ${scriptName} in Script directory: ${scriptDirectory}`);
+
 const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseOutputFolder : path.join(scriptDirectory, './NugetLicenseTempOutput');
 
 const projectCsprojPath = path.resolve(argv.projectCsprojPath);
+const generatedPartialsFolder = argv.generatedPartialsFolder ? argv.generatedPartialsFolder : path.resolve(projectCsprojPath, 'src/attributionAndLicensing/generatedPartials');
+const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(generatedPartialsFolder, 'NugetCreditsPartial.html');
 
 try {
+
+    const licenseInfoOverrideFile = argv.licenseInfoOverrideFile ? argv.licenseInfoOverrideFile : path.join(scriptDirectory, './LicenseInfoOverride.json');
+    const licenseUrlToLicenseTypeOverrideFile = argv.licenseUrlToLicenseTypeOverrideFile ? argv.licenseUrlToLicenseTypeOverrideFile : path.join(scriptDirectory, './LicenseUrlToLicenseTypeOverride.json');
+    const licensePlainTextFolder = argv.licensePlainTextFolder ? argv.licensePlainTextFolder : path.join(scriptDirectory, './SpdxLicensePlainTextFiles');
+    const nugetCreditsTemplateFile = argv.nugetCreditsTemplateFile ? argv.nugetCreditsTemplateFile : path.join(scriptDirectory, './NugetCreditsPartialTemplate.hbs');
+
+
     console.log('Clearing NuGet caches');
     execSync('dotnet nuget locals all --clear');
 
