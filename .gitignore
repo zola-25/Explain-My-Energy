@@ -419,3 +419,4 @@ FodyWeavers.xsd
 
 /Energy.App.Standalone/.vscode/*
 /.history
+/Energy.App.Standalone/wwwroot

@@ -1,10 +1,9 @@
 import { execSync } from 'child_process';
-import { createRequire } from 'node:module';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { dirname, _resolve as resolve} from 'path';
+import { dirname,  resolve as _resolve } from 'path';
 import webpack from 'webpack';
-import clearDirectory from './clearDirectory.js';
+import { clearDirectory } from './clearDirectory.js';
 import  webpackDevConfig from './webpack.htmlb.dev.config.js';
 import webpackProdConfig from './webpack.htmlb.prod.config.js';
 
@@ -21,11 +20,18 @@ const argv = yargs(hideBin(process.argv))
 
         })
         .conflicts('development', 'production')
-        .demandOption(['development', 'production'], 'Please provide at least one mode')
     .argv;
 
 
 try {
+
+    console.log(argv);
+
+    if (!argv.production && !argv.development) {
+        console.error('Error: Please provide at least one mode');
+        throw new Error('Missing mode');
+    }
+    
     const scriptDirectory = dirname(process.argv[1]);
 
     execSync('node ./src/attributionAndLicensing/GenerateCreditsDoc.js', { stdio: 'inherit' });
@@ -36,9 +42,9 @@ try {
 
     let webpackConfig;
 
-    if (process.argv.production) {
+    if (argv.production) {
         webpackConfig = webpackProdConfig;
-    } else if (process.argv.development) {
+    } else if (argv.development) {
         webpackConfig = webpackDevConfig;
     } else {
         throw new Error('No mode specified');
