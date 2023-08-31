@@ -78,7 +78,7 @@ try {
 
     process.chdir(packagesJsonFolder);
 
-    execSync(`license-checker-rseidelsohn --production --json --nopeer --excludePackagesStartingWith="explain-my-energy" \
+    execSync(`license-checker-rseidelsohn --production --json --nopeer --direct --excludePackagesStartingWith="explain-my-energy" \
             --out ${packageLicenceJsonFile} --excludePrivatePackages --relativeModulePath --relativeLicensePath \
             --files ${licensePlainTextFolder} --customPath ${customFormatFile}`);
 
