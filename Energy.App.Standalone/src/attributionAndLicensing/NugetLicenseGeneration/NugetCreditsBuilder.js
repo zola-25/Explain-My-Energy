@@ -29,7 +29,7 @@ const argv = yargs(hideBin(process.argv))
         type: 'string',
         demandOption: false,
         describe: 'The path to the folder containing the plain text spdx license files. Defaults to the current script directory/SpdxLicensePlainTextFiles',
-    }).option('generatedHtmlDocumentPath', {
+    }).option('htmlFragmentToGenerateFilePath', {
         type: 'string',
         demandOption: false,
         describe: 'The path to the generated html document. Defaults to the current generatedPartialsFolder/NugetCreditsPartial.html',
@@ -58,7 +58,7 @@ const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseO
 
 const projectCsprojPath = path.resolve(argv.projectCsprojPath);
 const generatedPartialsFolder = argv.generatedPartialsFolder ? argv.generatedPartialsFolder : path.resolve(projectCsprojPath, 'src/attributionAndLicensing/generatedPartials');
-const generatedHtmlDocumentPath = argv.generatedHtmlDocumentPath ? argv.generatedHtmlDocumentPath : path.join(generatedPartialsFolder, 'NugetCreditsPartial.html');
+const htmlFragmentToGenerateFilePath = argv.htmlFragmentToGenerateFilePath ? argv.htmlFragmentToGenerateFilePath : path.join(generatedPartialsFolder, 'NugetCreditsPartial.html');
 
 try {
 
@@ -128,7 +128,7 @@ try {
         console.log('Elements removed:  %s', JSON.stringify(DOMPurify.removed));
     }
 
-    fs.writeFileSync(generatedHtmlDocumentPath, htmlSanitized, 'utf8');
+    fs.writeFileSync(htmlFragmentToGenerateFilePath, htmlSanitized, 'utf8');
 
 
 } catch (error) {

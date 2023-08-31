@@ -7,7 +7,7 @@
     "watchSass": "sass --watch ClientSide/Sass/:wwwroot/css/",
     "buildPowershell": "pwsh -File src/attributionAndLicensing/BuildAndDistributeThirdPartyAttribution.ps1 -finalOutputPath src/views/AttributionAndLicensing.html -attribsCssPath '..scss/app/attribs.scss'",
     
-    "buildCreditsDoc": "node scr/attributionAndLicensing/GenerateCreditsDoc.js",
+    "buildCreditsDoc": "node src/attributionAndLicensing/GenerateCreditsDoc.js",
     
     "buildNpmCredits": "node src/attributionAndLicensing/NpmLicenseGeneration/NpmCreditsBuilder.js --packagesJsonFolder . --generatedHtmlDocumentPath src/views/NpmCreditsPartial.html",
     "buildFinalCreditsDoc": "node src/attributionAndLicensing/FinalCreditsDocGeneration/FinalCreditsDocGeneration.js --projectRootPath . --finalGeneratedCreditsHtmlDocPath src/views/Credits.html",

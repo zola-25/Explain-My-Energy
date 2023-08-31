@@ -16,8 +16,8 @@ const appInfoConfig = {
     description: description,
     version: version,
     resolvedLicenseFilePath: resolvedLicenseFilePath,
-    projectRootPath: path.resolve('..'),
-    generatedPartialsOutputDirectory: path.resolve('./attributionAndLicensing/generatedPartials'),
+    projectRootPath: path.resolve('.'),
+    generatedPartialsOutputDirectory: path.resolve('./src/attributionAndLicensing/generatedPartials'),
 }
 
 

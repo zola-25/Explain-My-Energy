@@ -23,6 +23,10 @@ export default {
                 index: {
                     import: _resolve(__dirname, 'views/index_template.ejs'),
                     data: _resolve(__dirname, 'data/globalDataDev.json'),
+                },
+                credits: {
+                    import: _resolve(__dirname, 'views/Credits.html'),
+
                 }
             },
             preprocessor: 'ejs',
