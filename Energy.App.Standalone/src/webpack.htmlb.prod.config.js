@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import * as sass from 'sass'
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
+import TerserPlugin from "terser-webpack-plugin";
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -91,11 +93,14 @@ export default {
         })
 
     ],
-    mode: 'development',
-    devtool: 'source-map',
+    mode: 'production',
+    devtool: 'hidden-source-map',
     output: {
         path: _resolve(__dirname, '../wwwroot'),
         publicPath: '/',
+        clean: {
+            keep: /temp/
+        }
     },
     module: {
         rules: [
@@ -154,7 +159,13 @@ export default {
             }
         ],
     },
-
-
-
+    optimization: { 
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            extractComments: "some",
+            terserOptions: {
+                sourceMap: true,
+            },
+        })]
+    }
 };
