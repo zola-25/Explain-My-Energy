@@ -11,7 +11,7 @@
     "checkJs": false,
     "outDir": "./"
   },
-  "files": [ "ClientSide/index.ts", "ClientSide/Files/chartCreation.ts", "ClientSide/Files/types.ts", "ClientSide/Files/energyOnlyChart.ts", "ClientSide/Files/weatherIconChart.ts" ],
+  "files": [ "src/ts/index.ts", "src/ts/Files/chartCreation.ts", "src/ts/Files/types.ts", "src/ts/Files/energyOnlyChart.ts", "src/ts/Files/weatherIconChart.ts" ],
   
   "exclude": [
     "wwwroot/**",
