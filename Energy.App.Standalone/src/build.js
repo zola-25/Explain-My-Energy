@@ -24,7 +24,11 @@ const argv = yargs(hideBin(process.argv))
             description: 'Run in development mode',
 
         })
-        .conflicts('development', 'staging', 'production')
+        .conflicts({
+            development: ['staging', 'production'],
+            staging: ['development', 'production'],
+            production: ['development', 'staging']
+        })
     .argv;
 
 

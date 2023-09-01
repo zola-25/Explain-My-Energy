@@ -18,7 +18,7 @@ export default function (appEnv) {
 
     console.log("__dirname resolves: " + __dirname);
 
-    return productionConfig = {
+    const productionConfig = {
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
         },
@@ -174,4 +174,6 @@ export default function (appEnv) {
             })]
         }
     };
+
+    return productionConfig;
 }
