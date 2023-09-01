@@ -73,6 +73,8 @@ try {
 
     console.log('Restoring project packages');
     execSync(`dotnet restore ${projectCsprojPath}`);
+    execSync('dotnet tool restore');
+
 
     if (fs.existsSync(tempLicenseOutputFolder)) {
         fs.rmSync(tempLicenseOutputFolder, { recursive: true });
@@ -86,7 +88,7 @@ try {
 
     fs.writeFileSync(tempLicenseOverridePackageNamesFile, JSON.stringify(licenseInfoOverrideParsed.map(c => c.PackageName)), 'utf8');
 
-    execSync(`dotnet-project-licenses -i ${projectCsprojPath} -u -t -o -j  --use-project-assets-json  --outfile ${tempPackageLicenseJsonFileOutput} --packages-filter ${tempLicenseOverridePackageNamesFile} --manual-package-information ${licenseInfoOverrideFile} --licenseurl-to-license-mappings ${licenseUrlToLicenseTypeOverrideFile}`, { cwd: tempLicenseOutputFolder });
+    execSync(`dotnet dotnet-project-licenses -i ${projectCsprojPath} -u -t -o -j  --use-project-assets-json  --outfile ${tempPackageLicenseJsonFileOutput} --packages-filter ${tempLicenseOverridePackageNamesFile} --manual-package-information ${licenseInfoOverrideFile} --licenseurl-to-license-mappings ${licenseUrlToLicenseTypeOverrideFile}`, { cwd: tempLicenseOutputFolder });
 
     const parsedPackageInfos = JSON.parse(fs.readFileSync(tempPackageLicenseJsonFileOutput, 'utf8'));
 
