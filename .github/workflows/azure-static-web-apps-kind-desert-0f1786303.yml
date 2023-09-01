@@ -56,7 +56,7 @@ jobs:
 
       - name: Publish .NET app
         working-directory: ./Energy.App.Standalone
-        run: dotnet publish -c Release -o ./published
+        run: dotnet publish -c Release 
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -70,9 +70,9 @@ jobs:
           skip_app_build: true 
           app_location: "/Energy.App.Standalone" # App source code path
           skip_api_build: true
-          output_location: "published" # Built app content directory - optional
+          output_location: "wwwroot" # Built app content directory - optional
           production_branch: "master"
-          config_file_location: "./Energy.App.Standalone/staticwebapp.config.json" # App configuration file path - optional
+          config_file_location: "./Energy.App.Standalone" # App configuration file path - optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
