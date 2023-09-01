@@ -69,6 +69,9 @@ jobs:
           output_location: "wwwroot" # Built app content directory - optional
           production_branch: "master"
           config_file_location: "./Energy.App.Standalone" # App configuration file path - optional
+        env: 
+          PLATFORM_NAME: "dotnet"
+          DISABLE_NODEJS_BUILD: "true"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
