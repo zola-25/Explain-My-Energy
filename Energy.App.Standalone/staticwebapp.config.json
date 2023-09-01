@@ -15,7 +15,7 @@
     {
       "route": "/Credits.html",
       "redirect": "/Credits",
-      "statusCode": 303
+      "statusCode": 301
     }
   ],
   "globalHeaders": {
