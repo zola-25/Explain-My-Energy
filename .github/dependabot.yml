@@ -10,13 +10,15 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      update-types: ["version-update:semver-patch"]
+      - dependency-name: "*" 
+        update-types: ["version-update:semver-patch"]
       
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/Energy.App.Standalone" # Location of package manifests
     schedule:
       interval: "weekly"
     ignore:
-      update-types: ["version-update:semver-patch"]
+      - dependency-name: "*" 
+        update-types: ["version-update:semver-patch"]
   
     
