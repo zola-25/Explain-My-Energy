@@ -13,6 +13,7 @@
 
 	<ItemGroup>
 	  <None Include="node_modules\**" />
+	  <None Include="staticwebapp.config.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,12 +39,6 @@
 
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
-	</Target>
-
-	
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="npm run singleCompileSass" WorkingDirectory="ClientSide" />
-		<Exec Command="echo 'Hello, world!'" />
 	</Target>
 
 
