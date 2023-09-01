@@ -54,9 +54,6 @@ jobs:
       - name: Test .NET dependencies
         run: dotnet test
 
-      - name: Publish .NET app
-        working-directory: ./Energy.App.Standalone
-        run: dotnet publish -c Release 
 
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -67,9 +64,8 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          skip_app_build: true 
           app_location: "/Energy.App.Standalone" # App source code path
-          skip_api_build: true
+          api_location: "Api"
           output_location: "wwwroot" # Built app content directory - optional
           production_branch: "master"
           config_file_location: "./Energy.App.Standalone" # App configuration file path - optional
