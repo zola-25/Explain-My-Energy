@@ -2,11 +2,11 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
-      "/css/**/*",
-      "/js/**/*",
-      "/images/**/*",
-      "/fonts/**/*",
-      "/webfonts/**/*",
+      "/css/*",
+      "/js/*",
+      "/images/*",
+      "/fonts/*",
+      "/webfonts/*",
       "/manifest.json"
     ]
   },
