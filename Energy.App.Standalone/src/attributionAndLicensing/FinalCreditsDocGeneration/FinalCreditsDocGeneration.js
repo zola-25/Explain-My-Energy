@@ -96,7 +96,10 @@ try {
         strict: true,
         
     });
-    const licenseFile = appInfoConfig.resolvedLicenseFilePath;
+
+    const APP_ENV = process.env.APP_ENV;
+    const appInfoEnvConfig = appInfoConfig(APP_ENV);
+    const licenseFile = appInfoEnvConfig.resolvedLicenseFilePath;
 
     const licenseText = fs.readFileSync(licenseFile, "utf8");
     const unsanitizedLicenseHtml = marked.parse(licenseText, {
@@ -106,12 +109,12 @@ try {
 
     const sanitizedLicenseHtml = DOMPurify.sanitize(unsanitizedLicenseHtml, { USE_PROFILES: { html: true }  });
 
-    const sanitizedFullApplicationName = DOMPurify.sanitize(appInfoConfig.fullApplicationName, { USE_PROFILES: { html: true }  });
-    const sanitizedLicenseType = DOMPurify.sanitize(appInfoConfig.licenseType, { USE_PROFILES: { html: true }  });
-    const sanitizedVersion = DOMPurify.sanitize(appInfoConfig.version, { USE_PROFILES: { html: true }  });
+    const sanitizedFullApplicationName = DOMPurify.sanitize(appInfoEnvConfig.fullApplicationName, { USE_PROFILES: { html: true }  });
+    const sanitizedLicenseType = DOMPurify.sanitize(appInfoEnvConfig.licenseType, { USE_PROFILES: { html: true }  });
+    const sanitizedVersion = DOMPurify.sanitize(appInfoEnvConfig.version, { USE_PROFILES: { html: true }  });
 
     const inputArgs = {
-        emeCreditsAndLicensesCss: appInfoConfig.creditsAndLicensesCss,
+        emeCreditsAndLicensesCss: appInfoEnvConfig.creditsAndLicensesCss,
         emeAppName: sanitizedFullApplicationName,
         emeLicenseType: sanitizedLicenseType,
         emeFullVersion: sanitizedVersion,

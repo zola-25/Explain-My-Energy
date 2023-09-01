@@ -4,7 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import appInfoConfig from '../appInfoConfig.js';
 
-const { projectRootPath, generatedPartialsOutputDirectory } = appInfoConfig;
+const APP_ENV = process.env.APP_ENV;
+
+const { projectRootPath, generatedPartialsOutputDirectory } = appInfoConfig(APP_ENV);
 const generatedPartialsFolder = path.resolve(generatedPartialsOutputDirectory)
 const generatedCreditsViewsPath = path.resolve(projectRootPath, 'src/views/Credits.html')
 
@@ -26,15 +28,15 @@ try {
 
     console.log('Generating Nuget credits partial')
     execSync(`node src/attributionAndLicensing/NugetLicenseGeneration/NugetCreditsBuilder.js --projectCsprojPath ${projectCsprojPath} --htmlFragmentToGenerateFilePath ${generatedPartialsFolder}/NugetCreditsPartial.html`,
-        { stdio: 'inherit' });
+        { stdio: 'inherit', env: process.env });
 
     console.log('Generating Npm credits partial')
     execSync(`node src/attributionAndLicensing/NpmLicenseGeneration/NpmCreditsBuilder.js --packagesJsonFolder ${projectRootPath} --htmlFragmentToGenerateFilePath ${generatedPartialsFolder}/NpmCreditsPartial.html`,
-        { stdio: 'inherit' });
+        { stdio: 'inherit', env: process.env });
 
     console.log('Generating final credits file')
     execSync(`node src/attributionAndLicensing/FinalCreditsDocGeneration/FinalCreditsDocGeneration.js --projectRootPath ${projectRootPath} --finalGeneratedCreditsHtmlDocPath ${generatedPartialsFolder}/Credits.html`,
-        { stdio: 'inherit' });
+        { stdio: 'inherit', env: process.env });
 
     
 

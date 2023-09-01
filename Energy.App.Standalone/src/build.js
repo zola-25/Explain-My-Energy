@@ -36,10 +36,20 @@ try {
         console.error('Error: Please provide at least one mode');
         throw new Error('Missing mode');
     }
+
+    if( argv.production) {
+        process.env.APP_ENV = 'production';
+    } else if (argv.staging) {
+        process.env.APP_ENV = 'staging';
+    } else if (argv.development) {
+        process.env.APP_ENV = 'development';
+    } else {
+        throw new Error('No mode specified');
+    }
     
     const scriptDirectory = dirname(process.argv[1]);
 
-    execSync('node ./src/attributionAndLicensing/GenerateCreditsDoc.js', { stdio: 'inherit' });
+    execSync('node ./src/attributionAndLicensing/GenerateCreditsDoc.js', { stdio: 'inherit', env: process.env});
 
     const wwwrootPath = _resolve(scriptDirectory, '../wwwroot');
 

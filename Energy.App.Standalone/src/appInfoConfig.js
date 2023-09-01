@@ -19,7 +19,7 @@ export default function (appEnv) {
         ogType: 'website',
         ogHeadPrefix: 'og: http://ogp.me/ns#',
     }
-    
+
     let headerData;
     if (appEnv === 'development') {
         headerData = {
@@ -50,7 +50,7 @@ export default function (appEnv) {
 
     const resolvedLicenseFilePath = path.resolve(licenseFilePath)
 
-    return appInfoConfig = {
+    const appInfoConfig = {
         creditsAndLicensesCss: '../scss/app/attribs.scss',
         fullApplicationName: fullApplicationName,
         licenseType: license,
@@ -61,4 +61,5 @@ export default function (appEnv) {
         generatedPartialsOutputDirectory: path.resolve('./src/attributionAndLicensing/generatedPartials'),
         headerData: headerData
     }
+    return appInfoConfig;
 }
