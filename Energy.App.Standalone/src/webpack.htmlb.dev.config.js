@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url';
 import * as sass from 'sass'
 import HtmlBundlerPlugin from 'html-bundler-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
+import appInfoConfig from "./appInfoConfig.js";
+
+const envAppInfoConfig = appInfoConfig('development');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +25,7 @@ export default {
             entry: {
                 index: {
                     import: _resolve(__dirname, 'views/index_template.ejs'),
-                    data: _resolve(__dirname, 'data/globalDataDev.json'),
+                    data: envAppInfoConfig.headerData,
                 },
                 Credits: {
                     import: _resolve(__dirname, 'views/Credits.html'),

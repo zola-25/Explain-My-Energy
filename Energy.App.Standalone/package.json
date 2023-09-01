@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Understand your energy consumption and carbon emissions, and forecast your future energy costs based on seasonal changes and tariff increases",
   "scripts": { 
+    "build": "node src/build.js",
     "buildDev": "node src/build.js --development",
     "buildProd": "node src/build.js --production",
     "buildCreditsDoc": "node src/attributionAndLicensing/GenerateCreditsDoc.js",

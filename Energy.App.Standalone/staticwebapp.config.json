@@ -11,8 +11,8 @@
   "routes": [
     
     {
-      "route": "/AttributionsAndLicense.html",
-      "redirect": "/AttributionsAndLicense",
+      "route": "/Credits.html",
+      "redirect": "/Credits",
       "statusCode": 303
     }
   ],

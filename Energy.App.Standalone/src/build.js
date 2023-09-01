@@ -14,12 +14,17 @@ const argv = yargs(hideBin(process.argv))
             type: 'boolean',
             describe: 'Run in production mode',
         })
+        .option('staging',
+        {
+            type: 'boolean',
+            describe: 'Run in staging mode',
+        })
         .option('development',{
             type: 'boolean',
             description: 'Run in development mode',
 
         })
-        .conflicts('development', 'production')
+        .conflicts('development', 'staging', 'production')
     .argv;
 
 
@@ -27,7 +32,7 @@ try {
 
     console.log(argv);
 
-    if (!argv.production && !argv.development) {
+    if (!argv.production && !argv.development && !argv.staging) {
         console.error('Error: Please provide at least one mode');
         throw new Error('Missing mode');
     }
@@ -43,7 +48,9 @@ try {
     let webpackConfig;
 
     if (argv.production) {
-        webpackConfig = webpackProdConfig;
+        webpackConfig = webpackProdConfig('production');
+    } else if (argv.staging) {
+        webpackConfig = webpackProdConfig('staging');
     } else if (argv.development) {
         webpackConfig = webpackDevConfig;
     } else {
