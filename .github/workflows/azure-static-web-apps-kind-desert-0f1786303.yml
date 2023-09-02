@@ -74,6 +74,13 @@ jobs:
           DISABLE_NODEJS_BUILD: "true"
           ###### End of Repository/Build Configurations ######
 
+      - name: Save artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: site-artifact-$((RANDOM))
+          path: /bin/staticsites/**/app/
+          if-no-files-found: error
+
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
