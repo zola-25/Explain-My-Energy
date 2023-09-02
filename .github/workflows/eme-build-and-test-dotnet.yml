@@ -1,0 +1,42 @@
+name: Azure Static Web .NET Core Build and Test
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - staging
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+env:
+  DOTNET_VERSION: '7.0.400' # The .NET SDK version to use
+      
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: build-and-test-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore and Build
+        working-directory: ./
+        run: |
+          dotnet restore
+          dotnet build --no-restore --configuration Release
+
+      - name: Test .NET dependencies
+        run: dotnet test --no-build --verbosity normal
+
