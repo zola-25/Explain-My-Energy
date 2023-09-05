@@ -1,0 +1,94 @@
+name: Unit Tests and Checks
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - staging
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - staging
+      - main
+
+env:
+  DOTNET_VERSION: '7.0.400' # The .NET SDK version to use
+  NODE_VERSION: '18' # The node version to use
+      
+
+jobs:
+  unit-tests:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Unit-Test-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      checks: write
+      contents: read
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore and Build
+        working-directory: ./
+        run: |
+          dotnet restore
+          dotnet build --no-restore --configuration Release
+
+      - name: Test .NET dependencies
+        continue-on-error: true
+        id: dotnet-tests
+        run: |
+          dotnet test Energy.Test --no-build --configuration Release --logger:"trx;LogFileName=TestResults.trx"
+          echo "::set-output name=dotnet-tests-result::$?" 
+
+      - name: Test Report
+        uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
+        if: success() || failure()
+        with:
+          name: Test Results ${{matrix.os}}
+          path: Energy.Test/TestResults/TestResults.trx
+          reporter: dotnet-trx
+      
+      - name: SetupNode
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./Energy.App.Standalone/package-lock.json
+      
+      - name: Install npm dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm ci
+      
+      - name: Test front-end dependencies
+        continue-on-error: true
+        id: frontend-tests
+        working-directory: ./Energy.App.Standalone
+        run: |
+          npm run test
+          echo "::set-output name=frontend-tests-result::$?"
+
+      - name: Test Report
+        uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
+        if: success() || failure()
+        with:
+          name: Frontend Test Report
+          path: Energy.App.Standalone/testResults/clientDeploymentTestResults.json
+          reporter: mocha-json
+      
+      - name: Check Results
+        run: |
+          if [ "${{ steps.dotnet-tests.outputs.dotnet-tests-result }}" != "0" ] || [ "${{ steps.frontend-tests.outputs.frontend-tests-result }}" != "0" ]; then
+            exit 1
+          fi
+
+
