@@ -31,7 +31,9 @@ environments.forEach((environment) => {
 
     before(`${environment} build client side`, function () {
 
-      clearDirectory(outputDirectory, 'temp');
+      if (fs.existsSync(outputDirectory)) {
+        clearDirectory(outputDirectory, 'temp');
+      }
       this.timeout(1000 * 60 * 2);
 
       execSync(`node ./src/build.js --${environment}`, { stdio: 'inherit' });
@@ -46,7 +48,9 @@ environments.forEach((environment) => {
 
     after(`${environment} cleanup client side`, function () {
 
-      clearDirectory(outputDirectory, 'temp');
+      if (fs.existsSync(outputDirectory)) {
+        clearDirectory(outputDirectory, 'temp');
+      }
 
       indexHtmlContents = null;
       creditsHtmlContents = null;

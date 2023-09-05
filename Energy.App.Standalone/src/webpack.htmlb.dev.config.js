@@ -99,6 +99,9 @@ export default {
     output: {
         path: _resolve(__dirname, '../wwwroot'),
         publicPath: '/',
+        clean: {
+            keep: /temp/
+        }
     },
     module: {
         rules: [

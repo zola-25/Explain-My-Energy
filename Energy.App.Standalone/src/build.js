@@ -3,6 +3,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { dirname,  resolve as _resolve } from 'path';
 import webpack from 'webpack';
+import fs from 'fs';
 import { clearDirectory } from './clearDirectory.js';
 import  webpackDevConfig from './webpack.htmlb.dev.config.js';
 import webpackProdConfig from './webpack.htmlb.prod.config.js';
@@ -57,8 +58,10 @@ try {
 
     const wwwrootPath = _resolve(scriptDirectory, '../wwwroot');
 
-    clearDirectory(wwwrootPath, 'temp');
-
+    if(fs.existsSync(wwwrootPath)) {
+        clearDirectory(wwwrootPath, 'temp');
+    }
+    
     let webpackConfig;
 
     if (argv.production) {
