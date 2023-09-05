@@ -33,7 +33,7 @@
     "@types/node": "^20.4.10",
     "@types/webpack": "^5.28.1",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
-    "@typescript-eslint/parser": "^6.3.0",
+    "@typescript-eslint/parser": "^6.6.0",
     "async-exit-hook": "^2.0.1",
     "autoprefixer": "^10.4.15",
     "chai": "^4.3.8",
