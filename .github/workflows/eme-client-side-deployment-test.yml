@@ -16,6 +16,9 @@ jobs:
   test_client_side_deployment:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
     name: Test Client Side Deployment
     steps:
       - name: Checkout

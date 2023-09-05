@@ -1,15 +1,15 @@
-name: Staging Build and Test
+name: Dotnet Build and Test
 
 on:
   push:
     branches:
-      - master
+      - main
       - dev
       - staging
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
-      - master
+      - main
 
 env:
   DOTNET_VERSION: '7.0.400' # The .NET SDK version to use
