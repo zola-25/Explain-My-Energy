@@ -9,12 +9,12 @@ import { resolve as _resolve } from 'path';
 const scriptDirectory = 'src/test';
 
 const creditsDocPath = _resolve(scriptDirectory, '../views/Credits.html');
+const environments = ['development', 'staging', 'production'];
 
-describe('buildCreditsDoc', function () {
+environments.forEach((environment) => {
 
-  const environments = ['development', 'staging', 'production'];
+  describe('buildCreditsDoc', function () {
 
-  environments.forEach((environment) => {
 
     let creditsDocHtml;
     before(`clear and build Credits.html for ${environment}`, function () {

@@ -7,7 +7,7 @@
     "buildDev": "node src/build.js --development",
     "buildProd": "node src/build.js --production",
     "buildCreditsDoc": "node src/attributionAndLicensing/GenerateCreditsDoc.js",
-    "test": "cross-env XUNIT_FILE=xunit.xml cross-env LOG_XUNIT=true mocha -R xunit-file --recursive --grep '.*' src/test"
+    "test": "mocha -R JSON --reporter-option output=testResults/clientDeploymentTestResults.json --recursive --grep '.*' src/test"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   "private": true,
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/chai": "^4.3.6",
     "@types/dompurify": "^3.0.2",
     "@types/glob": "^8.1.0",
     "@types/node": "^20.4.10",

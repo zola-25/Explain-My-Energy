@@ -3,114 +3,104 @@ import { describe, it, after, before } from 'mocha';
 import 'chai/register-should.js';
 import { load } from 'cheerio';
 import { execSync } from 'child_process';
-import { resolve as _resolve } from 'path';
+import { resolve as _resolve, extname } from 'path';
 import { clearDirectory } from '../clearDirectory.js';
-import glob from 'glob';
+import { globSync } from 'glob';
 
 const scriptDirectory = 'src/test';
 
 const outputDirectory = _resolve(scriptDirectory, '../../wwwroot');
 
-describe('buildClientSide', function () {
+const environments = ['development', 'staging', 'production'];
+//const environments = ['development'];
 
-  const indexHtmlPath = _resolve(outputDirectory, 'index.html');
-  const ClientsHtmlPath = _resolve(outputDirectory, 'Clients.html');
+environments.forEach((environment) => {
 
-  const environments = ['development', 'staging', 'production'];
+  describe('buildClientSide', function () {
 
-  environments.forEach((environment) => {
+    const indexHtmlPath = _resolve(outputDirectory, 'index.html');
+    const CreditsHtmlPath = _resolve(outputDirectory, 'Credits.html');
+
+
 
     let indexHtmlContents;
-    let clientsHtmlContents;
+    let creditsHtmlContents;
 
     let $index;
-    let $clients;
+    let $credits;
 
-    before('build client side', function () {
+    before(`${environment} build client side`, function () {
 
       clearDirectory(outputDirectory, 'temp');
       this.timeout(1000 * 60 * 2);
 
-      execSync(`node ./src/build.js --${environment}`, { stdio: 'inherit', env: process.env });
+      execSync(`node ./src/build.js --${environment}`, { stdio: 'inherit' });
 
       indexHtmlContents = fs.readFileSync(indexHtmlPath, "utf8");
-      clientsHtmlContents = fs.readFileSync(ClientsHtmlPath, "utf8");
+      creditsHtmlContents = fs.readFileSync(CreditsHtmlPath, "utf8");
 
       $index = load(indexHtmlContents);
-      $clients = load(clientsHtmlContents);
+      $credits = load(creditsHtmlContents);
 
     });
 
-    after('cleanup client side', function () {
+    after(`${environment} cleanup client side`, function () {
 
       clearDirectory(outputDirectory, 'temp');
 
       indexHtmlContents = null;
-      clientsHtmlContents = null;
+      creditsHtmlContents = null;
 
       $index = null;
-      $clients = null;
+      $credits = null;
 
     });
 
-    it('should have css files', function () {
+    it(`${environment} should have css files`, function () {
 
       const cssDir = _resolve(outputDirectory, 'css');
       const cssFilePrefixesToCheck = ['app', 'app-fontawesome', 'attribs'];
 
 
-      glob.glob('*.css',{ cwd: cssDir}, function (err, files) {
+      const files = globSync('*.css', { cwd: cssDir })
+      files.length.should.be.equal(3);
 
-        if (err) {
-          throw err;
+      files.forEach((file) => {
+        const parts = file.split('.');
+        const filePrefix = parts[0];
+        const fileSuffix = parts[parts.length - 1]
+        cssFilePrefixesToCheck.should.include(filePrefix);
+
+        fileSuffix.should.equal('css');
+
+        if (filePrefix === 'app') {
+          $index(`link[href="/css/${file}"]`).toArray().length.should.equal(1);
+        } else if (filePrefix === 'app-fontawesome') {
+          $index(`link[href="/css/${file}"]`).toArray().length.should.equal(1);
+        } else if (filePrefix === 'attribs') {
+          $credits(`link[href="/css/${file}"]`).toArray().length.should.equal(1);
         }
 
-        files.length.should.be.greaterThan(0);
-        files.forEach((file) => {
-          const parts = file.split('.');
-          const filePrefix = parts[0];
-          const fileSuffix = parts[parts.length - 1]
-          cssFilePrefixesToCheck.should.include(filePrefix);
-
-          if (fileSuffix === 'map') {
-
-            return;
-          }
-
-          if (filePrefix === 'app') {
-            $index(`link[href="css/${file}"]`).toArray().length.should.equal(1);
-          } else if (filePrefix === 'app-fontawesome') {
-            $index(`link[href="css/${file}"]`).toArray().length.should.equal(1);
-          } else if (filePrefix === 'attribs') {
-            $clients(`link[href="css/${file}"]`).toArray().length.should.equal(1);
-          }
-
-        });
-
-
       });
+
     });
 
-    it('should have one js file', function () {
+    it(`${environment} should have one js file`, function () {
 
       const jsDir = _resolve(outputDirectory, 'js');
 
-      glob.glob('*.js', {cwd: jsDir}, function (err, files) {
+      const files = globSync('*.js', { cwd: jsDir })
 
-        if (err) {
-          throw err;
-        }
 
-        files.length.should.equal(1);
-        files.forEach((file) => {
+      files.length.should.equal(1);
+      files.forEach((file) => {
 
-          $index(`script[src="js/${file}"]`).toArray().length.should.equal(1);
-        });
+        $index(`script[src="/js/${file}"]`).toArray().length.should.equal(1);
       });
 
     });
 
-    it('should have noindex for robots if not production', function () {
+    it(`${environment} should have noindex for robots if not production`, function () {
 
       if (environment === 'production') {
         $index('meta[name="robots"]').attr('content').should.equal('index, follow');
@@ -119,59 +109,45 @@ describe('buildClientSide', function () {
       }
     });
 
-    it('should have some fonts in fonts/ directory', function () {
+    it(`${environment} should have some fonts in fonts/ directory`, function () {
 
       const fontsDir = _resolve(outputDirectory, 'fonts');
 
-      glob.glob(['*.woff2', '*.woff'], {cwd: fontsDir}, function (err, files) {
+      const files = globSync(['*.woff2', '*.woff'], { cwd: fontsDir });
 
-        if (err) {
-          throw err;
-        }
+      files.map((file) => { return file.startsWith('OpenSans-') }).length.should.equal(4);
 
-        files.all((file) => { file.startsWith('OpenSans-') }).should.be.true;
+      files.length.should.be.equal(4);
 
-        files.length.should.be.equal(4);
 
-      });
     });
 
-    it('should have an image in images/ directory', function () {
+    it(`${environment} should have an image in images/ directory`, function () {
 
       const imagesDir = _resolve(outputDirectory, 'images');
 
-      glob.glob(['*.png'], {cwd: imagesDir}, function (err, files) {
+      const files = globSync(['*.png'], { cwd: imagesDir })
 
-        if (err) {
-          throw err;
-        }
+      files.length.should.be.equal(1);
+      $index(`meta[property="og:image"]`).attr('content').should.match(/DecemberWeather\.png/);
 
-        files.length.should.be.equal(1);
-        $index(`meta [property="og:image"]`).attr('content').should.endWith('DecemberWeather.png');
-      });
     });
 
-    it('should have an ico favicon, an apple-touch-icon, and a manifest.json', function () {
+    it(`${environment} should have an ico favicon, an apple-touch-icon, and a manifest.json`, function () {
 
       const faviconsDir = _resolve(outputDirectory);
 
-      glob.glob(['*.ico', '*.png'], {cwd: faviconsDir}, function (err, files) {
+      const files = globSync(['*.ico', '*.png'], { cwd: faviconsDir })
 
-        if(err)
-        {
-          throw err;
-        }
+      files.filter((file) => { return extname(file) === '.png' }).length.should.equal(5);
 
-        files.one((file) => { file === 'favicon.ico' }).should.be.true;
-        files.one((file) => { file === 'apple-touch-icon.png' }).should.be.true;
+      files.filter((file) => { return file === 'favicon.ico' }).length.should.equal(1);
+      files.filter((file) => { return file === 'apple-touch-icon.png' }).length.should.equal(1);
 
-        $index(`link[rel="icon"][href="/favicon.ico"]`).toArray().length.should.equal(1);
-        $index(`link[rel="apple-touch-icon"][href="/apple-touch-icon.png"]`).toArray().length.should.equal(1);
+      $index(`link[rel="icon"][href="/favicon.ico"]`).toArray().length.should.equal(1);
+      $index(`link[rel="apple-touch-icon"][href="/apple-touch-icon.png"]`).toArray().length.should.equal(1);
 
-
-      });
-
-      outputDirectory.should.have.files(['manifest.json']);
+      fs.readdirSync(outputDirectory).should.include('manifest.json');
       $index(`link[rel="manifest"][href="/manifest.json"]`).toArray().length.should.equal(1);
 
     });

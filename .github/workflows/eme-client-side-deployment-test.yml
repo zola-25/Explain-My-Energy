@@ -1,0 +1,50 @@
+name: Client Side Test Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - staging
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+    
+
+jobs:
+  test_client_side_deployment:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Test Client Side Deployment
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: SetupNode
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ./Energy.App.Standalone/package-lock.json
+      
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.400'
+
+      - name: Install npm dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm ci
+      
+      - name: Test client-side dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm run test
+      
+      - name: Test Report
+        uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
+        if: success() || failure()
+        with:
+          name: Client Side Deployment Test Report
+          path: Energy.App.Standalone/testResults/clientDeploymentTestResults.json
+          reporter: mocha-json
