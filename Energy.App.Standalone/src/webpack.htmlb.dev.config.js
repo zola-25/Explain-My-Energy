@@ -89,6 +89,10 @@ export default {
             {
                 from: posix.join(_resolve(__dirname, 'images/').replace(/\\/g, '/')),
                 to: "images/",
+            },
+            {
+                from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.json').replace(/\\/g, '/')),
+                to: "[name][ext]"
             }
             ]
         })
