@@ -6,10 +6,10 @@ import { execSync } from 'child_process';
 import { resolve as _resolve } from 'path';
 
 
+const environments = process.env.npm_config_environments ? process.env.npm_config_environments.split(",") : ['development', 'staging', 'production'];
 const scriptDirectory = 'src/test';
 
 const creditsDocPath = _resolve(scriptDirectory, '../views/Credits.html');
-const environments = ['development', 'staging', 'production'];
 
 environments.forEach((environment) => {
 

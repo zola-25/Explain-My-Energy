@@ -11,8 +11,7 @@ const scriptDirectory = 'src/test';
 
 const outputDirectory = _resolve(scriptDirectory, '../../wwwroot');
 
-const environments = ['development', 'staging', 'production'];
-//const environments = ['development'];
+const environments = process.env.npm_config_environments ? process.env.npm_config_environments.split(",") : ['development', 'staging', 'production'];
 
 environments.forEach((environment) => {
 
