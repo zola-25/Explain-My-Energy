@@ -28,6 +28,9 @@ jobs:
     call-unit-tests:
         name: Staging Deployment - Unit Tests and Checks
         uses: ./.github/workflows/eme-reusable-unit-tests-and-checks.yml
+        permissions:
+            checks: write
+            contents: read
         with:
             os: ubuntu-latest
             frontendEnv: staging
