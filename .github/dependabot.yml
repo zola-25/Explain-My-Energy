@@ -9,6 +9,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    target-branch: "staging"
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
@@ -17,8 +18,15 @@ updates:
     directory: "/Energy.App.Standalone" # Location of package manifests
     schedule:
       interval: "weekly"
+    target-branch: "staging"
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
-  
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "staging"
+    
     
