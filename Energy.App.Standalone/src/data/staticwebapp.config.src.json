@@ -19,7 +19,7 @@
     }
   ],
   "globalHeaders": {
-    "Content-Security-Policy": "base-uri 'self'; default-src 'self'; img-src 'self'; object-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-eval'; font-src 'self'; upgrade-insecure-requests;"
+    "Content-Security-Policy": "base-uri 'self'; default-src 'self'; img-src 'self'; object-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self'; upgrade-insecure-requests;"
   },
   "trailingSlash": "never"
 

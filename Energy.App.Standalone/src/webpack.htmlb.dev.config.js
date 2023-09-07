@@ -91,8 +91,8 @@ export default {
                 to: "images/",
             },
             {
-                from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.json').replace(/\\/g, '/')),
-                to: "[name][ext]"
+                from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.src.json').replace(/\\/g, '/')),
+                to: "staticwebapp.config.json"
             }
             ]
         })

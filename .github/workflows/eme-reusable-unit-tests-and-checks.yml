@@ -84,7 +84,7 @@ jobs:
         id: frontend-tests
         working-directory: ./Energy.App.Standalone
         run: |
-          npm run test -- --environments ${{inputs.frontendEnv}}
+          npm test --environments=${{inputs.frontendEnv}}
           echo "::set-output name=frontend-tests-result::$?"
         shell: bash
       
@@ -93,8 +93,8 @@ jobs:
         if: success() || failure()
         with:
           name: Frontend Test Report ${{inputs.frontendEnv}}
-          path: Energy.App.Standalone/testResults/clientDeploymentTestResults.json
-          reporter: mocha-json
+          path: Energy.App.Standalone/testResults/clientDeploymentTestResults.xml
+          reporter: java-junit
       
       - name: Check Results
         run: |

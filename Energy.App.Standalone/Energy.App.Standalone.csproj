@@ -11,10 +11,7 @@
   		<Version>1.0.0</Version>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <None Include="node_modules\**" />
-	  <None Include="staticwebapp.config.json" />
-	</ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="Fluxor" Version="5.9.0" />
@@ -36,6 +33,7 @@
 		<ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
 		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
 	</ItemGroup>
+
 
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
