@@ -14,7 +14,7 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
-name: 'eme_pr_$(Build.DefinitionName)_fromBr-$(SourceBranchName)_on-$(Date:yyyyMMdd)_BID-$(Build.BuildId)_r-$(Rev:r)'
+name: 'eme_$(Build.DefinitionName)_fromBr-$(SourceBranchName)_on-$(Date:yyyyMMdd)_BID-$(Build.BuildId)_r-$(Rev:r)'
 
 variables:
   buildConfiguration: 'Release'
@@ -23,7 +23,7 @@ variables:
   frontendEnv: 'staging'
 
 jobs:
-  - job: unit-test-and-checks
+  - job: test_with_clientside_checks
     workspace:
       clean: all
     steps:
