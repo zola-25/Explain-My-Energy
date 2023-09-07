@@ -37,6 +37,9 @@ jobs:
     permissions:
       checks: write
       contents: read
+    defaults:
+      run:
+        shell: bash  
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,7 +61,6 @@ jobs:
         run: |
           dotnet test Energy.Test --no-build --configuration Release --logger:"trx;LogFileName=TestResults.trx"
           echo "::set-output name=dotnet-tests-result::$?" 
-        shell: bash
 
       - name: Test Report
         uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
@@ -86,7 +88,6 @@ jobs:
         run: |
           npm test --environments=${{inputs.frontendEnv}}
           echo "::set-output name=frontend-tests-result::$?"
-        shell: bash
       
       - name: Frontent Test Report 
         uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
