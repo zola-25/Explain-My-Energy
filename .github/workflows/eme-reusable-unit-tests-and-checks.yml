@@ -100,16 +100,16 @@ jobs:
       
       - name: Report Results and Checks
         run: |
-          echo "## Test Results for ${{ inputs.os }} - ${{inputs.frontendEnv}}" >> "${GITHIB_STEP_SUMMARY}"
-          echo "- dotnet v${{env.DOTNET_VERSION}}" >> "${GITHIB_STEP_SUMMARY}"
-          echo "- node v${{env.NODE_VERSION}}" >> "${GITHIB_STEP_SUMMARY}"
-          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> "${GITHIB_STEP_SUMMARY}"
-          echo "### frontend-tests result: ${{ steps.frontend-tests.outcome }}" >> "${GITHIB_STEP_SUMMARY}"
+          echo "## Test Results for ${{ inputs.os }} - ${{inputs.frontendEnv}}" >> $GITHIB_STEP_SUMMARY
+          echo "- dotnet v${{env.DOTNET_VERSION}}" >> $GITHIB_STEP_SUMMARY
+          echo "- node v${{env.NODE_VERSION}}" >> $GITHIB_STEP_SUMMARY
+          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> "$GITHIB_STEP_SUMMARY
+          echo "### frontend-tests result: ${{ steps.frontend-tests.outcome }}" >> $GITHIB_STEP_SUMMARY
 
           if [[ "${{ steps.dotnet-tests.outcome }}" == "success" && "${{ steps.frontend-tests.outcome }}" == "success" ]]; then
-            echo " - All tests passed" >> "${GITHIB_STEP_SUMMARY}"
+            echo " - All tests passed" >> $GITHIB_STEP_SUMMARY
           else
-            echo " - Failed tests" >> "${GITHIB_STEP_SUMMARY}"
+            echo " - Failed tests" >> $GITHIB_STEP_SUMMARY
             exit 1
           fi
 
