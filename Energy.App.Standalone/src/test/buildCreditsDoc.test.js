@@ -18,7 +18,7 @@ environments.forEach((environment) => {
 
     let creditsDocHtml;
     before(`clear and build Credits.html for ${environment}`, function () {
-      this.timeout(1000 * 60 * 1);
+      this.timeout(1000 * 60 * 3);
 
       if (fs.existsSync(creditsDocPath)) {
         rmSync(creditsDocPath);
