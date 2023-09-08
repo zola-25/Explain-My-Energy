@@ -9,104 +9,104 @@ using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+#pragma warning disable IDE0058
 
-namespace Energy.App.Standalone.PageComponents
+namespace Energy.App.Standalone.PageComponents;
+
+public partial class DataValidatorBase : FluxorComponent
 {
-    public partial class DataValidatorBase : FluxorComponent
+    [Inject]
+    private IDispatcher Dispatcher { get; set; }
+
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public string UpdateStatus { get; private set; }
+
+
+    public bool AppLoading;
+
+    [Inject]
+    IState<HouseholdState> HouseholdState { get; set; }
+
+
+    protected override void Dispose(bool disposing)
     {
-        [Inject]
-        private IDispatcher Dispatcher { get; set; }
+        base.Dispose(disposing);
+    }
 
+    protected override async Task OnInitializedAsync()
+    {
+        AppLoading = true;
+        this.eLogToConsole(nameof(OnInitializedAsync));
 
-        [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        UpdateStatus = "Loading data...";
+        await Task.Delay(1);
+        StateHasChanged();
 
-        public string UpdateStatus { get; private set; }
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
 
-
-        public bool AppLoading;
-
-        [Inject]
-        IState<HouseholdState> HouseholdState { get; set; }
-
-
-        protected override void Dispose(bool disposing)
+        SubscribeToAction<NotifyWeatherLoadingFinished>((action) =>
         {
-            base.Dispose(disposing);
-        }
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
 
-        protected override async Task OnInitializedAsync()
+        SubscribeToAction<NotifyGasLoadingFinished>((action) =>
         {
-            AppLoading = true;
-            this.eLogToConsole(nameof(OnInitializedAsync));
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
 
-            UpdateStatus = "Loading data...";
-            await Task.Delay(1);
-            StateHasChanged();
+        });
 
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        SubscribeToAction<NotifyElectricityLoadingFinished>((action) =>
+        {
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
 
-            SubscribeToAction<NotifyWeatherLoadingFinished>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-            });
+        SubscribeToAction<NotifyHeatingSetupFinishedAction>((action) =>
+        {
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
 
-            SubscribeToAction<NotifyGasLoadingFinished>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
 
-            });
+        SubscribeToAction<NotifyHeatingForecastFinishedAction>((action) =>
+        {
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
 
-            SubscribeToAction<NotifyElectricityLoadingFinished>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-            });
+        SubscribeToAction<NotifyElectricityForecastResult>((action) =>
+        {
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
+        SubscribeToAction<NotifyGasForecastResult>((action) =>
+        {
+            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        });
 
-            SubscribeToAction<NotifyHeatingSetupFinishedAction>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-
-            });
-
-            SubscribeToAction<NotifyHeatingForecastFinishedAction>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-            });
-
-            SubscribeToAction<NotifyElectricityForecastResult>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-            });
-            SubscribeToAction<NotifyGasForecastResult>((action) =>
-            {
-                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-            });
-
-            var weatherReadingCompletion = new TaskCompletionSource<(bool, string)>();
-            Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
-            await weatherReadingCompletion.Task;
+        var weatherReadingCompletion = new TaskCompletionSource<(bool, string)>();
+        Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
+        await weatherReadingCompletion.Task;
 
 
-            UpdateStatus = "Loading energy readings...";
-            await Task.Delay(1);
-            StateHasChanged();
+        UpdateStatus = "Loading energy readings...";
+        await Task.Delay(1);
+        StateHasChanged();
 
-            var gasReadingsCompletion = new TaskCompletionSource<(bool, string)>();
-            var electricityReadingsCompletion = new TaskCompletionSource<(bool, string)>();
+        var gasReadingsCompletion = new TaskCompletionSource<(bool, string)>();
+        var electricityReadingsCompletion = new TaskCompletionSource<(bool, string)>();
 
-            Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
+        Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasReadingsCompletion));
 
-            Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityReadingsCompletion));
+        Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityReadingsCompletion));
 
-            await Task.WhenAll(gasReadingsCompletion.Task, electricityReadingsCompletion.Task);
+        await Task.WhenAll(gasReadingsCompletion.Task, electricityReadingsCompletion.Task);
 
 
             
-            await Task.Delay(1);
-            StateHasChanged();
-            UpdateStatus = "Ready";
+        await Task.Delay(1);
+        StateHasChanged();
+        UpdateStatus = "Ready";
 
-            AppLoading = false;
-        }
+        AppLoading = false;
     }
 }

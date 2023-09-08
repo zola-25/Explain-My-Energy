@@ -1,0 +1,26 @@
+name: PR Tests and Checks
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - main
+
+jobs:
+  call-unit-tests:
+    if: (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Unit-Test-${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        frontendEnv: [development, staging, production]
+    uses: ./.github/workflows/eme-reusable-unit-tests-and-checks.yml
+    permissions:
+      checks: write
+      contents: read
+    with:
+      os: ${{matrix.os}}
+      frontendEnv: ${{matrix.frontendEnv}}
+      DotNetVersion: ${{ '7.0.400' }}
+      NodeVersion: ${{ '18.x' }}
+    

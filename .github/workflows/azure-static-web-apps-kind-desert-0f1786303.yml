@@ -3,11 +3,7 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches:
-      - master
-  pull_request:
-    types: [closed]
-    branches:
-      - master
+      - main
 
 jobs:
   build_and_deploy_job:
@@ -15,14 +11,44 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: SetupNode
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - name: Build And Deploy
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ./Energy.App.Standalone/package-lock.json
+      
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.400'
+
+      - name: Install npm dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm ci
+
+      - name: Build client-side dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm run build -- --${{ env.MODE }}
+        env:
+          MODE: ${{ github.ref == 'refs/heads/master' && 'production' || (github.ref == 'refs/heads/staging' && 'staging' || 'development') }}
+
+      - name: Test client-side dependencies
+        working-directory: ./Energy.App.Standalone
+        run: npm run test
+
+      - name: Install .NET dependencies
+        working-directory: ./Energy.App.Standalone
+        run: dotnet restore
+
+      - name: Test .NET dependencies
+        run: dotnet test
+
+
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -32,8 +58,13 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "/Energy.App.Standalone" # App source code path
-          skip_api_build: true
+          api_location: "Api"
           output_location: "wwwroot" # Built app content directory - optional
+          production_branch: "master"
+          config_file_location: "./Energy.App.Standalone" # App configuration file path - optional
+        env: 
+          PLATFORM_NAME: "dotnet"
+          DISABLE_NODEJS_BUILD: "true"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
@@ -47,3 +78,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_KIND_DESERT_0F1786303 }}
           action: "close"
+          app_location: "/Energy.App.Standalone" # App source code path

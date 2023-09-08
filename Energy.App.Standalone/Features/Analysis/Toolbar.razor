@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 
 <MudToolBar WrapContent="true" Class="justify-space-between">
-    <MudPaper Elevation="0" Class="m-2">
+    <MudPaper Elevation="0" Class="ma-2">
 
         <MudTooltip Placement="Placement.Top" Text="Chart kWh Consumption, or Costs with Tariff Details">
             <MudSwitch Checked="_costToggled"
@@ -17,10 +17,10 @@
     </MudPaper>
 
 
-    <MudPaper Elevation="0" Class="term-select-paper m-2" >
+    <MudPaper Elevation="0" Class="term-mud-select-min-width ma-2">
         <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
-            <MudSelect  Class="w-100"
+            <MudSelect  Class="w-100percent"
                        Value="_calendarTerm"
                        ValueChanged="TermChanged"
                        Label="Change Term"
@@ -38,7 +38,7 @@
 
     @if (IsPrimaryHeatingSource)
     {
-        <MudPaper Elevation="0" Class="m-2">
+        <MudPaper Elevation="0" Class="ma-2">
 
             <MudTooltip Placement="Placement.Top" Text="Forecast using Historical Moving Average, or the Temperature effect on your consumption. For warm weather periods, Historical Forecasts may be more accurate. For colder months, Temperature forecasts will show how your consumption increases as it gets colder.">
                 <MudSwitch Checked="_historicalForecastToggled"
@@ -52,7 +52,7 @@
             </MudTooltip>
         </MudPaper>
 
-        <MudPaper Elevation="0" Class="m-2">
+        <MudPaper Elevation="0" Class="ma-2">
             <MudTooltip Placement="Placement.Top" Text="If using Temperature Forecast, see how your consumption is effected by increasing or decreasing the daily forecast Temperature">
                 <MudNumericField Value="@_degreesDifference"
                                  TextChanged="DegreeDifferenceChange"
@@ -61,8 +61,7 @@
                                  Min="-50"
                                  Format="+#;-#;0"
                                  AdornmentAriaLabel="Degrees Celsius"
-                                 Class="right-align-input"
-                                 Style="width: 150px;"
+                                 Class="right-align-input w-150px"
                                  T="decimal"
                                  Label="Adjust Forecast" Variant="Variant.Text"
                                  Step="1"
@@ -73,15 +72,6 @@
     }
 </MudToolBar>
 
-<style>
-    .right-align-input input {
-        text-align: right;
-    }
-
-    .term-select-paper .mud-select {
-        min-width: 100px;
-    }
-</style>
 @code {
 
     [Parameter, EditorRequired] public bool IsPrimaryHeatingSource { get; set; }

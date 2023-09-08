@@ -1,0 +1,28 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/css/*",
+      "/js/*",
+      "/images/*",
+      "/fonts/*",
+      "/webfonts/*",
+      "/manifest.json"
+    ]
+  },
+  "routes": [
+    
+    {
+      "route": "/Credits.html",
+      "redirect": "/Credits",
+      "statusCode": 301
+    }
+  ],
+  "globalHeaders": {
+    "Content-Security-Policy": "base-uri 'self'; default-src 'self'; img-src 'self'; object-src 'none'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self'; upgrade-insecure-requests;"
+  },
+  "trailingSlash": "never"
+
+  
+  
+}

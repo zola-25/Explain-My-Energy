@@ -1,0 +1,44 @@
+{
+    "root": true,
+    "extends": [
+        "eslint:recommended"
+    ],
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 9,
+        "sourceType": "module"
+    },
+
+
+    "overrides": [
+        {
+            "env": {
+                "browser": true,
+                "commonjs": true,
+                "es6": true
+            },
+            "files": [ "**/*.ts, **/*.tsx" ],
+
+            "extends": [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/eslint-recommended",
+                "plugin:@typescript-eslint/recommended"
+            ],
+            "parser": "@typescript-eslint/parser",
+            "parserOptions": {
+                "ecmaVersion": 6,
+                "project": "./tsconfig.json"
+            },
+            "plugins": [
+                "@typescript-eslint"
+            ],
+            "rules": {
+                "ignorePatterns": [ 1 ]
+            }
+        }
+    ]
+}
+ 

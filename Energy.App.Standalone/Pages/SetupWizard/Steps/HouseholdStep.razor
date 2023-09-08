@@ -1,0 +1,34 @@
+@inherits FluxorComponent
+<StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
+    <SetupStepPage>
+        <Household />
+    </SetupStepPage>
+    <ActionButtons>
+        <div class="d-flex justify-end px-4">
+
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" EndIcon="fa-solid fa-arrow-right" Disabled="@(!CanMoveNext)" Color="Color.Success" OnClick="GoToNextStageCallback">Next</MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
+    </ActionButtons>
+</StepTemplate>
+
+@code {
+
+    [Inject] IState<HouseholdState> HouseholdState { get; set; }
+
+    bool CanMoveNext => HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
+
+    [Parameter, EditorRequired] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+
+
+}

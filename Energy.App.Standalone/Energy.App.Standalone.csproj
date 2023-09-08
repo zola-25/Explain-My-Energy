@@ -7,18 +7,24 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
+	<PropertyGroup>
+  		<Version>1.0.0</Version>
+	</PropertyGroup>
+
+
+
 	<ItemGroup>
 		<PackageReference Include="Fluxor" Version="5.9.0" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.0" />
 		<PackageReference Include="Fluxor.Persist" Version="2.5.3" />
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.DataAnnotations.Validation" Version="3.2.0-rc1.20223.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.9" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="7.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.10" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 		<PackageReference Include="MudBlazor" Version="6.9.0" />
-		<PackageReference Condition="'$(Configuration)'=='Debug'" Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" />
+		<PackageReference Condition="'$(Configuration)'=='Debug'" Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.9.0" PrivateAssets="all" />
 	</ItemGroup>
 
 
@@ -33,16 +39,6 @@
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
 	</Target>
 
-	<ItemGroup>
-		<Folder Include="wwwroot\js\" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<Content Update="wwwroot\js\bundle.min.js">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
 
 	<PropertyGroup>
 		<PublishTrimmed>false</PublishTrimmed>
@@ -50,9 +46,5 @@
 	</PropertyGroup>
 
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Condition="'$(Configuration)'=='Debug'" Command="npm run buildDev --prefix JS/" />
-
-	</Target>
 
 </Project>

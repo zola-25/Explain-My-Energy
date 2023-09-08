@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Shared", "Energy.Shared\Energy.Shared.csproj", "{FC6B375C-B692-428E-892B-DF71584049F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Solution Items", "0. Solution Items", "{D3A012E3-8D35-4AD2-9650-F752BC1CA0AA}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.n3rgyApi", "Energy.n3rgyApi\Energy.n3rgyApi.csproj", "{9FCA55BC-50B0-445B-B8D1-0C7DAB05DB52}"
 EndProject
@@ -20,6 +23,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Test", "3. Test", "{6D421CD0-9BBF-4CF0-A8B4-F5E8B6A3FDFF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Test", "Energy.Test\Energy.Test.csproj", "{7693E9B3-C3A7-4A16-A665-4316E566FFE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3295319-D156-406D-BCE0-1546AF247D29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

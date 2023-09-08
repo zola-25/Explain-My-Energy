@@ -20,12 +20,15 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Gas
         public ImmutableList<CostedReading> CostedReadings { get; init; }
         public DateTime LastUpdated { get; init; }
 
+        public DateTime LastCheckedForNewReadings { get; init; }
+
         public GasReadingsState()
         {
             Loading = false;
             CostedReadings = ImmutableList<CostedReading>.Empty;
             BasicReadings = ImmutableList<BasicReading>.Empty;
             LastUpdated = DateTime.MinValue;
+            LastCheckedForNewReadings = DateTime.MinValue;
         }
     }
 }

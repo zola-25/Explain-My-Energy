@@ -3,45 +3,42 @@
 <MudPaper Class="py-0" Elevation="0">
     <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
 
-        <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Href="/Setup" Class="navbar-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-navbar-item">
-                Setup
+        <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right" RootClass="w-Inherit">
+
+            <MudNavLink Href="/Setup"  Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-navbar-item">
+
                 @if (HouseholdSetupValid)
                 {
-                    <MudIcon Color="@Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
+                    <NavMenuNavLinkContent IconColor="Color.Success" SuffixIcon="@Icons.Material.Filled.Check">Setup</NavMenuNavLinkContent>
                 }
                 else
                 {
-                    <MudIcon Color="@Color.Warning" Icon="@Icons.Material.Filled.Settings"></MudIcon>
+                    <NavMenuNavLinkContent IconColor="Color.Warning" SuffixIcon="@Icons.Material.Filled.Settings">Setup</NavMenuNavLinkContent>
                 }
-
             </MudNavLink>
+
         </MudTooltip>
         <MudDivider></MudDivider>
 
-        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Disabled="ElectricityDisabled" Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
-                <MeterNavLinkContent IsHeating="HeatingMeterIsElectricity">Electricity</MeterNavLinkContent>
+        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
+            <MudNavLink Disabled="ElectricityDisabled"  Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
+                <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsElectricity ? Icons.Material.Filled.LocalFireDepartment : "")">Electricity</NavMenuNavLinkContent>
             </MudNavLink>
         </MudTooltip>
-        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootStyle="width: inherit;">
-            <MudNavLink Disabled="GasDisabled" Class="navbar-nav-item" Href="@GasHref" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalFireDepartment" ActiveClass="active-navbar-item">
-                <MeterNavLinkContent IsHeating="HeatingMeterIsGas">Gas</MeterNavLinkContent>
+        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
+            <MudNavLink 
+                    Disabled="GasDisabled" 
+                    Class="navbar-nav-item" 
+                    Href="@GasHref" 
+                    Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.LocalFireDepartment" 
+                    ActiveClass="active-navbar-item">
+                <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsGas ? Icons.Material.Filled.LocalFireDepartment : "")">Gas</NavMenuNavLinkContent>
+
             </MudNavLink>
         </MudTooltip>
     </MudNavMenu>
 </MudPaper>
-
-<style>
-    
-    .navbar-nav-item a {
-        text-decoration: none;
-    }
-
-    .active-navbar-item {
-        background-color: lightgrey
-    }
-</style>
 
 @code {
 

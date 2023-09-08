@@ -1,0 +1,59 @@
+@inherits FluxorComponent
+<StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
+    <SetupStepPage>
+        <MeterAuthorizationFormComponent MeterType="MeterType.Electricity" FreshNavigation="true" />
+
+    </SetupStepPage>
+    <ActionButtons>
+        <div class="d-flex justify-end px-4">
+
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           StartIcon="fa-solid fa-arrow-left"
+                           Color="Color.Default"
+                           OnClick="GoBackCallback">
+                    Back
+                </MudButton>
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           EndIcon="fa-solid fa-arrow-right"
+                           Color="Color.Default"
+                           Class="@(CanMoveNext ? "d-none" : "")"
+                           OnClick="SkipToDone">
+                    Skip
+                </MudButton>
+
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           EndIcon="fa-solid fa-arrow-right"
+                           Disabled="@(!CanMoveNext)"
+                           Color="Color.Success"
+                           OnClick="GoToNextStageCallback">
+                    Next
+                </MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
+
+    </ActionButtons>
+</StepTemplate>
+
+@code {
+    [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
+
+    bool CanMoveNext => MeterSetupState.Value[MeterType.Electricity].Authorized;
+
+    [Parameter, EditorRequired] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoToNextStageCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback SkipToDone { get; set; }
+
+
+}

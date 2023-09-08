@@ -1,0 +1,77 @@
+﻿@implements IAsyncDisposable
+<div
+    class="d-flex justify-end align-end">
+    
+    @ChildContent
+    
+
+    <MudTooltip
+        Inline="true"
+        Placement="Placement.Top">
+        <TooltipContent>
+            <MudText
+                Typo="Typo.body2">@copyToClipboardTooltip</MudText>
+        </TooltipContent>
+        <ChildContent>
+            <MudIconButton
+                Icon="@copyToClipboardIcon"
+                Size="Size.Small"
+                OnClick="CopyToClipboardClick"
+                Variant="Variant.Filled"/>
+        </ChildContent>
+    </MudTooltip>
+</div>
+@code {
+
+    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; }
+
+    [Parameter, EditorRequired] public string CopyString { get; set; } 
+
+    [Inject] IJSRuntime JS { get; set; }
+    [Inject] ILogger<CopyToClipboardTextField> Logger { get; set; }
+
+
+    string copyToClipboardIcon = Icons.Material.Filled.ContentCopy;
+    string copyToClipboardTooltip = "Copy to Clipboard";
+
+    private IJSObjectReference module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./PageComponents/CopyToClipboardTextField.razor.js");
+        }
+    }
+
+    private async Task CopyToClipboardClick()
+    {
+        try
+        {
+            bool copied = await module.InvokeAsync<bool>("copyToClipboard", CopyString);
+
+            if (copied)
+            {
+                copyToClipboardIcon = Icons.Material.Filled.CheckCircle;
+                copyToClipboardTooltip = "Copied";
+                StateHasChanged();
+                await Task.Delay(5000);
+                copyToClipboardIcon = Icons.Material.Filled.ContentCopy;
+                copyToClipboardTooltip = "Copy to Clipboard";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error when copying input field");
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

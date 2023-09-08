@@ -1,0 +1,91 @@
+﻿@using Energy.App.Standalone.Pages.HtmlContentFiles
+
+<MudPaper Class="pa-5">
+    <MudText Typo="Typo.body1" Align="Align.Start">
+        <div class="welcome-screen-content">
+            <p><strong>Explain My Energy</strong> is a free, open-source tool to help you understand both your existing
+                energy bills and your future energy costs and consumption.</p>
+            <p>It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be
+                working).</p>
+            <p>The application uses your historical energy usage, your energy tariff details and local weather data to
+                give you:</p>
+            <ul class="ml-3">
+                <li>Detailed breakdowns of your historical, current and future energy costs and consumption</li>
+                <li>How much your costs change with weather changes - change the forecast, and see how much your energy
+                    usage spikes (or drops) </li>
+                <li>Powerful charting tools that allow you to see everything from granular hourly energy spikes, to
+                    whole seasonal energy costs, simply with a mouse scroll (or a swipe)</li>
+            </ul>
+
+            <br />
+
+            <p><strong>Explain My Energy</strong> doesn't sell energy; doesn't sell your data; it doesn't collect your
+                data.</p>
+            <p>There is no sign up, no login, no cookies, no tracking, no ads.</p>
+            <p>It uses the latest web browser technology to store and process everything on your device. </p>
+
+            <p>This is an initial <strong>beta version</strong> of the application. Feedback is much appreciated and
+                will help determine whether the app provides enough value to warrant maintaining and developing further.
+            </p>
+            <p> Advancements in AI offer interesting possibilities - tailored energy advice unique to each individual
+                and their home, for example.</p>
+            <p>So please feel free to email me at <a
+                    href="mailto:explainmyenergy@solores-software.net">explainmyenergy@solores-software.net</a> with any
+                problems, comments or suggestions.</p>
+
+            <p><strong>Explain My Energy's</strong> Terms &amp; Conditions can be viewed here: <MudLink
+                    OnClick="ShowTermsDialog">Terms &amp; Conditions</MudLink>
+            </p>
+            <p>By using this application, you acknowledge that you agree to these terms.</p>
+            <p>The Privacy Policy is also available here: <MudLink OnClick="ShowPrivacyDialog">Privacy Policy</MudLink>
+            </p>
+        </div>
+
+        <MudDialog @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
+
+            <DialogContent>
+                <TermsAndConditionsContents />
+            </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default" OnClick="CloseTermsDialog">
+                    Close</MudButton>
+            </DialogActions>
+        </MudDialog>
+
+        <MudDialog @bind-IsVisible="PrivacyDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
+
+            <DialogContent>
+                <PrivacyPolicyContents />
+            </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default"
+                    OnClick="ClosePrivacyDialog">Close</MudButton>
+            </DialogActions>
+        </MudDialog>
+
+
+        <br />
+        <br />
+        Otherwise, feel free to explore the application and set up your home and meters manually.
+    </MudText>
+
+</MudPaper>
+@code {
+
+
+    bool TermsDialogVisible;
+    void CloseTermsDialog() => TermsDialogVisible = false;
+    void ShowTermsDialog() => TermsDialogVisible = true;
+
+    private DialogOptions DialogOptions = new()
+        {
+            MaxWidth = MaxWidth.Medium,
+            CloseOnEscapeKey = true,
+            CloseButton = true
+        };
+
+    bool PrivacyDialogVisible;
+    void ClosePrivacyDialog() => PrivacyDialogVisible = false;
+    void ShowPrivacyDialog() => PrivacyDialogVisible = true;
+
+}

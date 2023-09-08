@@ -19,6 +19,7 @@ namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
                 BasicReadings = ImmutableList<BasicReading>.Empty,
                 Loading = false,
                 BasicReadingLastUpdated = DateTime.MinValue,
+                LastCheckedForNewReadings = DateTime.MinValue
             };
         }}
 

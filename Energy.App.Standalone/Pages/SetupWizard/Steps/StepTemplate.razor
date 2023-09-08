@@ -1,0 +1,41 @@
+﻿
+<MudPaper Elevation="2" Class="p-4">
+    <MudGrid Justify="Justify.Center">
+        <MudItem  xs="12">
+            <div class="d-flex justify-space-between">
+                <MudBreadcrumbs Items="BreadcrumbItems" MaxItems="4"  Separator=">">
+                    <ItemTemplate Context="item">
+                        <MudText Typo="Typo.h6">@item.Text</MudText>
+                    </ItemTemplate>
+                </MudBreadcrumbs>
+
+                <MudText Class="@((HeaderText is null) ? "d-none" : "fw-bold mx-auto")"
+                         Align="Align.Center"
+                         Typo="Typo.h5">@HeaderText</MudText>
+                <MudIconButton Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            @SetupStepPage
+
+        </MudItem>
+        <MudItem xs="12">
+            @ActionButtons
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+@code {
+
+    [Parameter] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+    [Parameter] public string HeaderText { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment SetupStepPage { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment ActionButtons { get; set; }
+
+    [Parameter] public RenderFragment HeaderContent { get; set; }
+
+}

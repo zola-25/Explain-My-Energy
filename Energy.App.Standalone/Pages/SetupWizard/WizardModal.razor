@@ -1,0 +1,180 @@
+﻿@using Energy.App.Standalone.Pages.SetupWizard.Steps
+@using Extensions = Energy.App.Standalone.Extensions.Extensions;
+@using Energy.App.Standalone.Features.Setup.TermsAndConditions
+
+
+<div class="popover-container">
+    <div class="@(_opened ? "popover-overlay" : "no-overlay")">@_opened</div>
+
+    @if (_opened)
+    {
+        <MudPopover Open="_opened"
+                    Class="eme-popover mt-3 mb-16"
+                    Fixed="true"
+                    OverflowBehavior="OverflowBehavior.FlipNever"
+                    AnchorOrigin="Origin.BottomCenter"
+                    TransformOrigin="Origin.TopCenter"
+                    RelativeWidth="true">
+
+
+            @switch (CurrentStage)
+            {
+                case SetupStage.WelcomeScreenSplash:
+                    <WelcomeStep CloseWizardCallback="CloseModal"
+                                 GoToNextStageCallback="GoToNextStageCallback" />
+                    break;
+                case SetupStage.Household:
+                    <HouseholdStep BreadcrumbItems="BreadcrumbItems"
+                                   CloseWizardCallback="CloseModal"
+                                   GoBackCallback="GoToPreviousStageCallback"
+                                   GoToNextStageCallback="GoToNextStageCallback" />
+
+                    break;
+                case SetupStage.GasMeter:
+                    <GasMeterStep BreadcrumbItems="BreadcrumbItems"
+                                  CloseWizardCallback="CloseModal"
+                                  GoBackCallback="GoToPreviousStageCallback"
+                                  GoToNextStageCallback="GoToNextStageCallback"
+                                  SkipToElectricity="SkipToElectricityCallback" />
+
+                    break;
+                case SetupStage.GasMeterAuthorization:
+                    <GasAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                          CloseWizardCallback="CloseModal"
+                                          GoBackCallback="GoToPreviousStageCallback"
+                                          GoToNextStageCallback="GoToNextStageCallback"
+                                          SkipToElectricity="SkipToElectricityCallback" />
+                    break;
+                case SetupStage.ElectricityMeter:
+                    <ElectricityMeterStep BreadcrumbItems="BreadcrumbItems"
+                                          CloseWizardCallback="CloseModal"
+                                          GoBackCallback="GoToPreviousStageCallback"
+                                          GoToNextStageCallback="GoToNextStageCallback"
+                                          SkipToDone="SkipToDone" />
+                    break;
+                case SetupStage.ElectricityMeterAuthorization:
+                    <ElectricityAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                                  CloseWizardCallback="CloseModal"
+                                                  GoBackCallback="GoToPreviousStageCallback"
+                                                  GoToNextStageCallback="GoToNextStageCallback"
+                                                  SkipToDone="SkipToDone" />
+                    break;
+                case SetupStage.Done:
+                    <SuccessStep BreadcrumbItems="BreadcrumbItems"
+                                 CloseWizardCallback="CloseModal"
+                                 GoBackCallback="GoToPreviousStageCallback" />
+
+
+                    break;
+
+                default:
+                    Logger.LogError("Setup Stage not recognised: {SetupStage}", CurrentStage);
+                    break;
+            }
+        </MudPopover>
+    }
+</div>
+
+@code {
+
+
+    [Inject] ILogger<WizardModal> Logger { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [Inject] IState<TermsAndConditionsState> TermsAndConditions { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    [Parameter] public SetupStageFlags InitialSetupStages { get; set; }
+
+    SetupStage[] AllStages;
+
+    bool _opened = false;
+
+    SetupStage CurrentStage;
+
+    private List<BreadcrumbItem> BreadcrumbItems;
+
+    void GoToNextStageCallback()
+    {
+        if (!HasNextStage())
+            return;
+        int currentStageInt = (int)CurrentStage;
+        CurrentStage = AllStages[currentStageInt + 1];
+
+        SetBreadcrumbs();
+    }
+
+    private void SetBreadcrumbs()
+    {
+        int currentStageIndex = (int)CurrentStage + 1;
+        BreadcrumbItems = AllStages[0..currentStageIndex].Select((c, i) =>
+            new BreadcrumbItem(i == 0 ? String.Empty : c.eEnumToFormatted(), href: null)).
+            ToList();
+    }
+
+    private void GoToPreviousStageCallback()
+    {
+        int currentStageInt = (int)CurrentStage;
+        CurrentStage = AllStages[currentStageInt - 1];
+        SetBreadcrumbs();
+
+    }
+
+    private void SkipToElectricityCallback()
+    {
+        CurrentStage = SetupStage.ElectricityMeter;
+        SetBreadcrumbs();
+
+    }
+
+    private void SkipToDone()
+    {
+        CurrentStage = SetupStage.Done;
+        SetBreadcrumbs();
+
+    }
+
+    bool HasNextStage()
+    {
+        return CurrentStage < AllStages[^1];
+    }
+
+    protected override void OnParametersSet()
+    {
+        _opened = Open;
+        @if (!_opened)
+        {
+            return;
+        }
+
+
+        AllStages = Extensions.eEnumValues<SetupStage>().ToArray();
+
+        CurrentStage = TermsAndConditions.Value.WelcomeScreenSeenAndDismissed ? AllStages[1] : AllStages[0];
+        SetBreadcrumbs();
+
+    }
+
+
+    private async Task CloseModal()
+    {
+        try
+        {
+            _opened = false;
+            await OpenChanged.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+
+            Logger.LogError(ex, "Error closing modal");
+        }
+
+    }
+
+
+}
+
+

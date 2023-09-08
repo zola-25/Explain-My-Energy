@@ -12,17 +12,19 @@
             <MudCardContent>
                 <ObjectGraphDataAnnotationsValidator />
                 <ValidationSummary />
-                <div class="my-3 d-flex align-items-baseline">
+                <div class="my-3 d-flex align-baseline">
                     <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
                                    Placeholder="Select Move-in Date"
+                                   FixDay="1"
+                                   OpenTo="OpenTo.Year"
                                    Clearable="true"
-                                   DateFormat="D"
+                                   DateFormat="MMMM yyyy"
                                    MaxDate="DateTime.Today"></MudDatePicker>
 
                     <InfoTooltip>Your move in date ensures only energy data relevant to you is processed</InfoTooltip>
                 </div>
 
-                <div class="my-3 d-flex align-items-baseline">
+                <div class="my-3 d-flex align-baseline">
                     <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required
                                   Placeholder="IHD MAC ID"></MudTextField>
                     <InfoTooltip>
@@ -31,7 +33,7 @@
                         In some models it can be found by accessing the settings in the Smart Meter user interface
                     </InfoTooltip>
                 </div>
-                <div class="my-3 d-flex align-items-baseline">
+                <div class="my-3 d-flex align-baseline">
                     <MudAutocomplete @bind-Value="_householdDetails.OutCode"
                                      For="@(() => _householdDetails.OutCode)"
                                      T="OutCode" CoerceText="true"
@@ -45,7 +47,7 @@
                         Your Postal Area is the first 4 characters of your postcode (or sometimes 3 in London). <br /> It's needed to retrieve weather data for your location, so we can forecast your energy usage with weather changes
                     </InfoTooltip>
                 </div>
-                <div class="d-flex align-items-baseline">
+                <div class="d-flex align-baseline">
                     <MudText>What is your home's primary heating source?</MudText>
                     <InfoTooltip>
                         What do you use to heat your home? <br />
@@ -58,8 +60,8 @@
                 </MudRadioGroup>
 
             </MudCardContent>
-            <MudCardActions Class="d-flex flex-column align-items-start ">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">Save</MudButton>
+            <MudCardActions Class="d-flex flex-column align-start ">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">@_saveButtonText</MudButton>
 
                 <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
                     @_saveResponseMessage
@@ -80,6 +82,7 @@
     bool _submitSuccessful;
 
     bool _readyToInteract;
+    private string _saveButtonText;
 
     protected override void OnInitialized()
     {
@@ -101,6 +104,7 @@
                 OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
                 PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
             };
+        _saveButtonText = HouseholdState.Value.Saved ? "Update" : "Save";
     }
 
 

@@ -1,0 +1,12 @@
+[
+  {
+    "PackageName": "Fluxor.Persist",
+    "PackageVersion": "2.5.3",
+    "PackageUrl": "https://github.com/Tailslide/fluxor-persist",
+    "Copyright": "Copyright (c) 2021 Tailslide",
+    "Authors": [ "Greg Pringle" ],
+    "Description": "Persists fluxor packages",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseType": "MIT"
+  }
+]

@@ -1,0 +1,82 @@
+<StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
+    <SetupStepPage>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="p-2 mt-2">
+                    <MudAlert Severity="Severity.Success" Elevation="0" Class="eme-alert">Setup wizard completed</MudAlert>
+
+                    <AppSetupStatus 
+                        HistoricalAnalysisValidCallback="HistoricalAnalysisValidCallback"
+                        HeatingAnalysisValidCallback="HeatingAnalysisValidCallback"></AppSetupStatus>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </SetupStepPage>
+    <ActionButtons>
+
+        <div class="d-flex justify-end px-4">
+
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ElectricBolt" Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity Analysis</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.LocalFireDepartment" Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas Analysis</MudButton>
+            </div>
+            <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
+        </div>
+    </ActionButtons>
+</StepTemplate>
+
+@code {
+
+    [Parameter, EditorRequired] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
+
+
+    [Parameter, EditorRequired] public EventCallback CloseWizardCallback { get; set; }
+
+    [Parameter, EditorRequired] public EventCallback GoBackCallback { get; set; }
+
+    bool GasValid;
+    string GasNavLink;
+    bool ElectricityValid;
+    string ElectricityNavLink;
+
+
+    private void HeatingAnalysisValidCallback(object sender, (MeterType meterType, bool valid) response)
+    {
+        switch (response.meterType)
+        {
+            case MeterType.Gas:
+                GasValid = response.valid;
+                GasNavLink = "/HeatingMeter/Gas";
+                break;
+            case MeterType.Electricity:
+                ElectricityValid = response.valid;
+                ElectricityNavLink = "/HeatingMeter/Electricity";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+
+        }
+        StateHasChanged();
+    }
+
+
+
+    private void HistoricalAnalysisValidCallback(object sender, (MeterType meterType, bool valid) response)
+    {
+        switch (response.meterType)
+        {
+            case MeterType.Gas:
+                GasValid = response.valid;
+                GasNavLink = "/Meter/Gas";
+                return;
+            case MeterType.Electricity:
+                ElectricityValid = response.valid;
+                ElectricityNavLink = "/Meter/Electricity";
+                return;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+}

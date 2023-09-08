@@ -23,9 +23,9 @@
     <MudPaper Elevation="0" Class="p-0">
         @if (!_tariffDetail.IsHourOfDayFixed)
         {
-            <MudText Style="margin-left: 10px;" Typo="Typo.caption">Hourly Rates*</MudText>
+            <MudText Class="ml-3" Typo="Typo.caption">Hourly Rates*</MudText>
 
-            <MudSimpleTable Dense="true" FixedHeader="true" Style="height: 400px;" Square="true" Outlined="true" Striped="true" Elevation="0" Class="">
+            <MudSimpleTable Dense="true" FixedHeader="true"  Square="true" Outlined="true" Striped="true" Elevation="0" Class="h-400px">
                 <thead>
                     <MudTr>
                         <MudTh>Hour</MudTh>
@@ -49,7 +49,7 @@
 
     <MudPaper Elevation="0" Class="d-flex justify-end">
         <MudSpacer></MudSpacer>
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="m-2">@_buttonText</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ma-2">@_buttonText</MudButton>
     </MudPaper>
 </EditForm>
 

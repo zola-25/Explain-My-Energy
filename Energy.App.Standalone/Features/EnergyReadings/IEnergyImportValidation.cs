@@ -7,6 +7,6 @@ namespace Energy.App.Standalone.Features.EnergyReadings
 {
     public interface IEnergyImportValidation
     {
-        EnergyImportValidationResult Validate(MeterState meterSetup, bool forceReload, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
+        EnergyImportValidationResult Validate(MeterState meterSetup, bool forceReload, DateTime lastReadingsCheck, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
     }
 }
