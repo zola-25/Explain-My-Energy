@@ -103,7 +103,7 @@ jobs:
           echo "## Test Results for ${{ inputs.os }} - ${{inputs.frontendEnv}}" >> $GITHUB_STEP_SUMMARY
           echo "- dotnet v${{env.DOTNET_VERSION}}" >> $GITHUB_STEP_SUMMARY
           echo "- node v${{env.NODE_VERSION}}" >> $GITHUB_STEP_SUMMARY
-          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> "$GITHUB_STEP_SUMMARY
+          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> $GITHUB_STEP_SUMMARY
           echo "### frontend-tests result: ${{ steps.frontend-tests.outcome }}" >> $GITHUB_STEP_SUMMARY
 
           if [[ "${{ steps.dotnet-tests.outcome }}" == "success" && "${{ steps.frontend-tests.outcome }}" == "success" ]]; then
