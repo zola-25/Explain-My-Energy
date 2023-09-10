@@ -28,7 +28,6 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@actions/core": "^1.10.0",
-    "@azure/static-web-apps-cli": "^1.1.4",
     "@types/chai": "^4.3.6",
     "@types/dompurify": "^3.0.2",
     "@types/glob": "^8.1.0",
