@@ -4,7 +4,7 @@
   "id": "https://explainmyenergy.net",
   "name": "Explain My Energy",
   "short_name": "emeApp",
-  "start_url": "./",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#03173d",

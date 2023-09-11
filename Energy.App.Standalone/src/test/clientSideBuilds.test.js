@@ -103,10 +103,10 @@ environments.forEach((environment) => {
 
     });
 
-    it(`${environment} should have noindex for robots if not production`, function () {
+    it(`${environment} should have noindex for robots for now, regardless of environment`, function () {
 
       if (environment === 'production') {
-        $index('meta[name="robots"]').attr('content').should.equal('index, follow');
+        $index('meta[name="robots"]').attr('content').should.equal('noindex, nofollow');
       } else {
         $index('meta[name="robots"]').attr('content').should.equal('noindex, nofollow');
       }
@@ -151,7 +151,7 @@ environments.forEach((environment) => {
       $index(`link[rel="apple-touch-icon"][href="/apple-touch-icon.png"]`).toArray().length.should.equal(1);
 
       fs.readdirSync(outputDirectory).should.include('manifest.json');
-      $index(`link[rel="manifest"][href="/manifest.json"]`).toArray().length.should.equal(1);
+      $index(`link[rel="manifest"][href="manifest.json"]`).toArray().length.should.equal(1);
 
     });
 
