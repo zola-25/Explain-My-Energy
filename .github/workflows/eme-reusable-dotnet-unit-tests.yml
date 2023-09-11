@@ -1,0 +1,76 @@
+name: Resusable Dotnet Unit Tests
+
+on:
+  workflow_call:
+    inputs: 
+      os:
+        description: 'The OS to run the tests on'
+        required: true
+        type: string
+        default: 'ubuntu-latest'
+      DotNetVersion:
+        description: 'The .NET SDK version to use'
+        required: true
+        type: string
+        default: '7.0.400'
+      
+
+env:
+  DOTNET_VERSION: ${{inputs.DotNetVersion}} # The .NET SDK version to use
+      
+
+jobs:
+  dotnet-unit-tests:
+    name: Dotnet-Unit-Tests-${{inputs.os}}
+    runs-on: ${{ inputs.os }}
+    permissions:
+      checks: write
+      contents: read
+    defaults:
+      run:
+        shell: bash  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+          lfs: false
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore and Build
+        working-directory: ./
+        run: |
+          dotnet restore
+          dotnet build --no-restore --configuration Release
+
+      - name: Test .NET dependencies
+        continue-on-error: true
+        id: dotnet-tests
+        run: |
+          dotnet test Energy.Test --no-build --configuration Release --logger:"trx;LogFileName=TestResults.trx" --verbosity normal
+
+      - name: Test Report
+        uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
+        if: success() || failure()
+        with:
+          name: Test Results ${{inputs.os}}
+          path: Energy.Test/TestResults/TestResults.trx
+          reporter: dotnet-trx
+      
+      - name: Report Results and Checks
+        run: |
+          echo "## Dotnet Test Results for ${{ inputs.os }}" >> $GITHUB_STEP_SUMMARY
+          echo "- dotnet v${{env.DOTNET_VERSION}}" >> $GITHUB_STEP_SUMMARY
+          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ steps.dotnet-tests.outcome }}" == "success" ]]; then
+            echo " - All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo " - Failed tests" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+

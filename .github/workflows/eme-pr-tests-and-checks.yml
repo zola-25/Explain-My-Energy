@@ -7,14 +7,27 @@ on:
       - main
 
 jobs:
-  call-unit-tests:
+  call-dotnet-unit-tests:
     if: (github.event_name == 'pull_request' && github.event.action != 'closed')
-    name: Unit-Test-${{matrix.os}}
+    name: Dotnet-Unit-Test-${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    uses: ./.github/workflows/eme-reusable-dotnet-unit-tests.yml
+    permissions:
+      checks: write
+      contents: read
+    with:
+      os: ${{matrix.os}}
+      DotNetVersion: ${{ '7.0.400' }}
+
+  call-frontend-checks-test:
+    name: Frontend-Checks-Test-${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         frontendEnv: [development, staging, production]
-    uses: ./.github/workflows/eme-reusable-unit-tests-and-checks.yml
+    uses: ./.github/workflows/eme-reusable-frontend-setup-checks.yml
     permissions:
       checks: write
       contents: read
@@ -23,4 +36,27 @@ jobs:
       frontendEnv: ${{matrix.frontendEnv}}
       DotNetVersion: ${{ '7.0.400' }}
       NodeVersion: ${{ '18.x' }}
-    
+
+  results-check:
+    if: ${{ success() || failure() }}
+    runs-on: ubuntu-latest
+    name: Final Results
+    needs: [call-dotnet-unit-tests, call-frontend-checks-test]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: |
+          echo "## Final results" >> $GITHUB_STEP_SUMMARY 
+
+          dotnet_test_result="${{ needs.call-dotnet-unit-tests.result }}"
+          frontend_test_result="${{ needs.call-frontend-checks-test.result }}"
+
+          echo "- Dotnet Test Result: $dotnet_test_result" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend Test Result: $frontend_test_result" >> $GITHUB_STEP_SUMMARY
+
+          if [[ $dotnet_test_result == "success" && $frontend_test_result == "success"  ]]; then
+            exit 0
+          else
+            exit 1
+          fi

@@ -1,4 +1,4 @@
-name: Resusable Unit Tests and Checks
+name: Resusable Frontend Setup Checks
 
 on:
   workflow_call:
@@ -31,8 +31,8 @@ env:
       
 
 jobs:
-  unit-tests:
-    name: Unit-Tests-and-Checks-${{inputs.os}}-${{inputs.frontendEnv}}
+  frontend-setup-checks:
+    name: Frontend-Setup-Checks-${{inputs.os}}-${{inputs.frontendEnv}}
     runs-on: ${{ inputs.os }}
     permissions:
       checks: write
@@ -52,26 +52,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore and Build
+      - name: Restore for .NET dependencies required for client setup tests
         working-directory: ./
         run: |
           dotnet restore
-          dotnet build --no-restore --configuration Release
 
-      - name: Test .NET dependencies
-        continue-on-error: true
-        id: dotnet-tests
-        run: |
-          dotnet test Energy.Test --no-build --configuration Release --logger:"trx;LogFileName=TestResults.trx" --verbosity normal
-
-      - name: Test Report
-        uses: dorny/test-reporter@c9b3d0e2bd2a4e96aaf424dbaa31c46b42318226
-        if: success() || failure()
-        with:
-          name: Test Results ${{inputs.os}}
-          path: Energy.Test/TestResults/TestResults.trx
-          reporter: dotnet-trx
-      
       - name: SetupNode
         uses: actions/setup-node@v3
         with:
@@ -100,13 +85,12 @@ jobs:
       
       - name: Report Results and Checks
         run: |
-          echo "## Test Results for ${{ inputs.os }} - ${{inputs.frontendEnv}}" >> $GITHUB_STEP_SUMMARY
+          echo "## Frontend Setup Check Results for ${{ inputs.os }} - ${{inputs.frontendEnv}}" >> $GITHUB_STEP_SUMMARY
           echo "- dotnet v${{env.DOTNET_VERSION}}" >> $GITHUB_STEP_SUMMARY
           echo "- node v${{env.NODE_VERSION}}" >> $GITHUB_STEP_SUMMARY
-          echo "### dotnet-tests result: ${{ steps.dotnet-tests.outcome }}" >> $GITHUB_STEP_SUMMARY
           echo "### frontend-tests result: ${{ steps.frontend-tests.outcome }}" >> $GITHUB_STEP_SUMMARY
 
-          if [[ "${{ steps.dotnet-tests.outcome }}" == "success" && "${{ steps.frontend-tests.outcome }}" == "success" ]]; then
+          if [[ "${{ steps.frontend-tests.outcome }}" == "success" ]]; then
             echo " - All tests passed" >> $GITHUB_STEP_SUMMARY
           else
             echo " - Failed tests" >> $GITHUB_STEP_SUMMARY
