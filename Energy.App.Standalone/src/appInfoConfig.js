@@ -40,7 +40,7 @@ export default function (appEnv) {
             ...defaultHeaderData,
             ogUrl: 'https://explainmyenergy.net',
             ogImage: 'https://explainmyenergy.net/images/DecemberWeather.png',
-            robotsContent: 'index, follow'
+            robotsContent: 'noindex, nofollow'
         }
     } else {
         throw new Error('No APP_ENV environment variable set');

@@ -51,7 +51,8 @@ export default {
                         filter: ({ value }) => {
                             if (value.startsWith('_content') ||
                                 value.startsWith('_framework') ||
-                                value.startsWith('Energy.App.Standalone')) {
+                                value.startsWith('Energy.App.Standalone') ||
+                                value.startsWith('manifest.json')) {
                                 return false;
                             }
                             return true;
@@ -91,8 +92,16 @@ export default {
                 to: "images/",
             },
             {
-                from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.src.json').replace(/\\/g, '/')),
+                from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.dev.json').replace(/\\/g, '/')),
                 to: "staticwebapp.config.json"
+            },
+            {
+                from: posix.join( _resolve(__dirname, 'data/manifest.json').replace(/\\/g, '/')),
+                to: "[name][ext]"
+            },
+            {
+                from: posix.join( _resolve(__dirname, 'data/robots.disallow.txt').replace(/\\/g, '/')),
+                to: "robots.txt"
             }
             ]
         })
@@ -151,15 +160,6 @@ export default {
                 generator: {
                     filename: '[name][ext]',
 
-                }
-            },
-            {
-                test: /\.(json)$/,
-                type: 'asset/resource',
-                include: [_resolve(__dirname, 'data/manifest.json')],
-
-                generator: {
-                    filename: '[name][ext]',
                 }
             }
         ],
