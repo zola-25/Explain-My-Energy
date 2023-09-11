@@ -13,7 +13,11 @@ updates:
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
-      
+    groups:
+      nuget:
+        update-types: 
+          - "minor"
+          
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/Energy.App.Standalone" # Location of package manifests
     schedule:
@@ -22,11 +26,15 @@ updates:
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
+    groups:
+      npm:
+        update-types: 
+          - "minor"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     target-branch: "staging"
-    
+
     
