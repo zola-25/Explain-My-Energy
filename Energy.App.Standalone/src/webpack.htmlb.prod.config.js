@@ -56,7 +56,7 @@ export default function (appEnv) {
                                 if (value.startsWith('_content') ||
                                     value.startsWith('_framework') ||
                                     value.startsWith('Energy.App.Standalone') ||
-                                    value.startsWith('manifest.json')) {
+                                    value.startsWith('manifest.webmanifest')) {
                                     return false;
                                 }
                                 return true;
@@ -100,7 +100,7 @@ export default function (appEnv) {
                     to: "staticwebapp.config.json"
                 },
                 {
-                    from: posix.join( _resolve(__dirname, 'data/manifest.json').replace(/\\/g, '/')),
+                    from: posix.join( _resolve(__dirname, 'data/manifest.webmanifest').replace(/\\/g, '/')),
                     to: "[name][ext]"
                 },
                 {
