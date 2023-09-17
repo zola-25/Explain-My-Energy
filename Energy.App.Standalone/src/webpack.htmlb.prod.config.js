@@ -11,12 +11,45 @@ import appInfoConfig from "./appInfoConfig.js";
 
 
 
-export default function (appEnv) {
+export default function (appEnv, appDemo) {
 
     const envAppInfoConfig = appInfoConfig(appEnv);
     const __dirname = dirname(fileURLToPath(import.meta.url));
 
     console.log("__dirname resolves: " + __dirname);
+
+    const copyPatterns = [{
+        from: posix.join(_resolve(__dirname, 'favicons/').replace(/\\/g, '/'), '*.png'),
+        to: "[name][ext]",
+    },
+    {
+        from: posix.join(_resolve(__dirname, 'images/').replace(/\\/g, '/')),
+        to: "images/",
+    },
+    {
+        from: posix.join(_resolve(__dirname, 'data/staticwebapp.config.prod.json').replace(/\\/g, '/')),
+        to: "staticwebapp.config.json"
+    },
+    {
+        from: posix.join(_resolve(__dirname, 'data/manifest.webmanifest').replace(/\\/g, '/')),
+        to: "[name][ext]"
+    },
+    {
+        from: posix.join(_resolve(__dirname, 'data/robots.disallow.txt').replace(/\\/g, '/')),
+        to: "robots.txt",
+    },
+    ];
+    if (appDemo) {
+        copyPatterns.push(
+            {
+                from: posix.join(_resolve(__dirname, 'data/appsettings.json').replace(/\\/g, '/')),
+                to: "appsettings.json"
+            },
+            {
+                from: posix.join(_resolve(__dirname, 'data/demo/').replace(/\\/g, '/')),
+                to: "demo/"
+            })
+    }
 
     const productionConfig = {
         resolve: {
@@ -87,27 +120,7 @@ export default function (appEnv) {
                 // OR define many templates manually
             }),
             new CopyPlugin({
-                patterns: [{
-                    from: posix.join(_resolve(__dirname, 'favicons/').replace(/\\/g, '/'), '*.png'),
-                    to: "[name][ext]",
-                },
-                {
-                    from: posix.join(_resolve(__dirname, 'images/').replace(/\\/g, '/')),
-                    to: "images/",
-                },
-                {
-                    from: posix.join( _resolve(__dirname, 'data/staticwebapp.config.prod.json').replace(/\\/g, '/')),
-                    to: "staticwebapp.config.json"
-                },
-                {
-                    from: posix.join( _resolve(__dirname, 'data/manifest.webmanifest').replace(/\\/g, '/')),
-                    to: "[name][ext]"
-                },
-                {
-                    from: posix.join( _resolve(__dirname, 'data/robots.disallow.txt').replace(/\\/g, '/')),
-                    to: "robots.txt"
-                }
-                ]
+                patterns: copyPatterns
             })
 
         ],

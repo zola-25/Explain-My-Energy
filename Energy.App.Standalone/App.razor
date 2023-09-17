@@ -1,5 +1,8 @@
-﻿@using Fluxor.Persist.Middleware;
+﻿@using Energy.App.Standalone.FluxorPersist;
+@using Fluxor.Persist.Middleware;
 @inherits FluxorComponent
+@inject IConfiguration Configuration
+@inject SetDefaultLocalState SetDefaultLocalState
 
 <Fluxor.Blazor.Web.StoreInitializer />
 
@@ -16,13 +19,24 @@
     </NotFound>
 </Router>
 @code {
+
+    bool _demoSetup = false;
     protected override void OnInitialized()
     {
+        _demoSetup = ConfigurationHelper.IsDemoSetup;
+        Console.WriteLine("Demo Setup: " + _demoSetup);
+
+        if (_demoSetup)
+        {
+            SetDefaultLocalState.ClearAllData();    
+        }
+
         SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
             Console.WriteLine($"**** State rehydrated ****");
             StateHasChanged();
         });
+
     }
 
 }

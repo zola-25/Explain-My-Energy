@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using Energy.App.Standalone;
+using Energy.App.Standalone.Data;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Data.Weather;
@@ -14,6 +15,7 @@ using Energy.WeatherReadings;
 using Fluxor;
 using Fluxor.Persist.Middleware;
 using Fluxor.Persist.Storage;
+using MathNet.Numerics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
@@ -23,6 +25,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+
+
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddWeatherDataService();
@@ -30,6 +34,7 @@ builder.Services.AddN3rgyServices();
 
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
 builder.Services.AddTransient<IEnergyReadingRetriever, EnergyReadingRetriever>();
+
 
 builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
@@ -46,9 +51,9 @@ builder.Services.AddTransient<ITermDateRanges, TermDateRanges>();
 builder.Services.AddTransient<ICostCalculator, CostCalculator>();
 builder.Services.AddTransient<ICostedReadingsToDailyAggregator, CostedReadingsToDailyAggregator>();
 builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMovingAverage>();
-builder.Services.AddTransient<IHistoricalForecastValidation,HistoricalForecastValidation>();
+builder.Services.AddTransient<IHistoricalForecastValidation, HistoricalForecastValidation>();
 
-builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();   
+builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();
 
 builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
@@ -68,7 +73,9 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddBlazoredLocalStorage(config =>
     {
         config.JsonSerializerOptions.WriteIndented = false;
+
     }
+
 );
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
 builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
@@ -78,24 +85,52 @@ System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
     options = options.ScanAssemblies(currentAssembly);
+    options = options.AddMiddleware<SetupMiddleware>();
 
-    #if DEBUG
+#if DEBUG
     options.UseReduxDevTools(devToolsOptions =>
     {
         devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
         devToolsOptions.UseSystemTextJson();
     });
-    #endif
+#endif
     options.UsePersist(persistMiddlewareOptions =>
     {
         persistMiddlewareOptions.UseInclusionApproach();
     });
 });
 
+
 builder.Services.AddLogging(c =>
 {
     c.SetMinimumLevel(LogLevel.Information);
-    
+
 });
 
-await builder.Build().RunAsync();
+builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+
+builder.Services.AddScoped<SetDefaultLocalState>();
+
+
+ConfigurationHelper.Initialize(builder.Configuration);
+
+
+
+var host = builder.Services.;
+
+await host.Services.GetRequiredService<SetDefaultLocalState>().LoadDefaultsIfDemo();
+
+await host.RunAsync();
+
+public static class ConfigurationHelper
+{
+    public static IConfiguration Configuration {get; private set; }
+    public static bool IsDemoSetup {get; private set; }
+
+    public static void Initialize(IConfiguration configuration)
+    {
+        Configuration = configuration;
+        var hasDemoSet = bool.TryParse(Configuration["App:UseDemoSetup"], out bool useDemoSetup);
+        IsDemoSetup = hasDemoSet && useDemoSetup;
+    }
+}

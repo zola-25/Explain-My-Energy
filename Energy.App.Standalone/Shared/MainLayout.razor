@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject IConfiguration Configuration
+
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -7,7 +9,7 @@
         <MudAppBar Elevation="1" Class="">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
             <div class="w-fit-content">
-                <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy</MudText></MudNavLink>
+                <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy @(_demoNote) @(_demoNote2)</MudText></MudNavLink>
             </div>
             <MudSpacer />
             <div class="w-fit-content menu-nav-item git-hub">
@@ -48,7 +50,7 @@
         </MudAppBar>
     </MudLayout>
 </div>
-@code {
+    @code {
 
     bool _drawerOpen = true;
 
@@ -71,5 +73,15 @@
                 Default = { FontFamily = new[] { "Open Sans", "Helvetica", "sans-serif" } }
             },
         };
+
+    string _demoNote = "";
+    string _demoNote2 = "";
+
+    protected override void OnInitialized() {
+        _demoNote = Configuration["App:UseDemoSetup"] == "True" ? "Demo" : "";
+    }
+
+
+
 
 }

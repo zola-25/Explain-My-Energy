@@ -1,10 +1,11 @@
-﻿using Energy.Shared;
+﻿using Energy.App.Standalone.FluxorPersist;
+using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
 
 namespace Energy.App.Standalone.Features.Setup.Household
 {
-    [FeatureState(Name = nameof(HouseholdState))]
+    [FeatureState(Name = nameof(HouseholdState), CreateInitialStateMethodName = nameof(GetInitialState))]
     [PersistState, PriorityLoad]
     public record HouseholdState
     {
@@ -17,17 +18,29 @@ namespace Energy.App.Standalone.Features.Setup.Household
 
         public MeterType PrimaryHeatSource { get; init; }
 
-        public HouseholdState()
-        {
-            OutCodeCharacters = null;
-            IhdMacId = null;
-            Invalid = false;
-            MoveInDate = null;
-            PrimaryHeatSource = MeterType.Gas;
-            Saved = false;
+        public static HouseholdState GetInitialState() {
+            return CreateUtilities.Create();
         }
     }
 
+    public static class CreateUtilities {
+        public static HouseholdState Create() {
+            
+            if(ConfigurationHelper.IsDemoSetup) 
+            {
+                return SetDefaultLocalState.HouseholdState;
+            }
+            
+            return new HouseholdState() {
+                Saved = false,
+                Invalid = false,
+                MoveInDate = null,
+                IhdMacId = null,
+                OutCodeCharacters = null,
+                PrimaryHeatSource = MeterType.Gas
+            };
+        }
 
+    }
 
 }
