@@ -9,7 +9,8 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Validation;
 using Energy.App.Standalone.Features.EnergyReadings;
-using Energy.App.Standalone.FluxorPersist;
+using Energy.App.Standalone.Services;
+using Energy.App.Standalone.Services.FluxorPersist;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
 using Fluxor;
@@ -85,7 +86,6 @@ System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options =>
 {
     options = options.ScanAssemblies(currentAssembly);
-    options = options.AddMiddleware<SetupMiddleware>();
 
 #if DEBUG
     options.UseReduxDevTools(devToolsOptions =>
@@ -107,20 +107,18 @@ builder.Services.AddLogging(c =>
 
 });
 
+builder.Services.AddSingleton<AppConfig>();
+
 builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
-builder.Services.AddScoped<SetDefaultLocalState>();
+builder.Services.AddScoped<ISetDefaultLocalState, SetDefaultLocalState>();
 
 
 ConfigurationHelper.Initialize(builder.Configuration);
 
 
 
-var host = builder.Services.;
-
-await host.Services.GetRequiredService<SetDefaultLocalState>().LoadDefaultsIfDemo();
-
-await host.RunAsync();
+await builder.Build().RunAsync();
 
 public static class ConfigurationHelper
 {

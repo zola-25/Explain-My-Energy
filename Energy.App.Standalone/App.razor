@@ -1,8 +1,7 @@
-﻿@using Energy.App.Standalone.FluxorPersist;
-@using Fluxor.Persist.Middleware;
+﻿@using Fluxor.Persist.Middleware;
 @inherits FluxorComponent
-@inject IConfiguration Configuration
-@inject SetDefaultLocalState SetDefaultLocalState
+@inject ISetDefaultLocalState DefaultLocalState
+@inject IDispatcher Dispatcher
 
 <Fluxor.Blazor.Web.StoreInitializer />
 
@@ -18,18 +17,16 @@
         </LayoutView>
     </NotFound>
 </Router>
+
 @code {
 
+
     bool _demoSetup = false;
+
     protected override void OnInitialized()
     {
-        _demoSetup = ConfigurationHelper.IsDemoSetup;
         Console.WriteLine("Demo Setup: " + _demoSetup);
 
-        if (_demoSetup)
-        {
-            SetDefaultLocalState.ClearAllData();    
-        }
 
         SubscribeToAction<InitializePersistMiddlewareResultSuccessAction>(result =>
         {
@@ -37,6 +34,48 @@
             StateHasChanged();
         });
 
+    }
+
+    private bool _firstRender = true;
+
+    // // Overridden to provide an async method that is run before any rendering
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        // Apply the supplied Parameters to the Conponent
+        // Must do this first
+        parameters.SetParameterProperties(this);
+
+            // Run the Pre Render code
+        @if (_firstRender)
+        {
+            await this.PreFirstRenderAsync();
+            _firstRender = false;
+        }
+
+        // Run the base SetParametersAsync providing it with an empty ParameterView
+        // We have already applied the parameters and then may already be stale
+        // This runs the normal lifecycle methods
+        await base.SetParametersAsync(ParameterView.Empty);
+    }
+
+    public async Task PreFirstRenderAsync()
+    {
+        // Your async code goes here
+        // You can run sync code too if you wish
+        await DefaultLocalState.LoadDefaultsIfDemo();
+        _demoSetup = DefaultLocalState.IsDemoMode;
+
+        if (!_demoSetup){
+            return;
+        }
+
+        Dispatcher.Dispatch(new PreloadHouseholdStateAction(DefaultLocalState.HouseholdState));
+
+        Dispatcher.Dispatch(new PreloadMeterSetupStateAction(DefaultLocalState.MeterSetupState));
+
+        Dispatcher.Dispatch(new PreloadGasReadingsAction(DefaultLocalState.GasReadingsState));
+
+        Dispatcher.Dispatch(new PreloadElectricityReadingsAction(DefaultLocalState.ElectricityReadingsState));
     }
 
 }

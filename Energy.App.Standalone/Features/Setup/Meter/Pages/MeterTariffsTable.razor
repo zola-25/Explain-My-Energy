@@ -1,12 +1,12 @@
-﻿
-@inject IDispatcher Dispatcher
+﻿@inject IDispatcher Dispatcher
+@inject AppConfig AppConfig
 
 @inherits FluxorComponent
 
 <MudTooltip ShowOnHover="true" Text="Return to Setup">
-    <MudLink  Underline="Underline.None"
+    <MudLink Underline="Underline.None"
              Href="@($"/Setup")">
-        <MudButton Class="ma-1"  Color="Color.Primary"
+        <MudButton Class="ma-1" Color="Color.Primary"
                    ButtonType="ButtonType.Button"
                    Variant="Variant.Filled"
                    Size="Size.Small"
@@ -22,25 +22,26 @@
             </MudStack>
             <MudSpacer />
             <MudIconButton OnClick="OnAddNewTariffClick"
-                       ButtonType="ButtonType.Button"
-                       Color="Color.Primary"
-                       Variant="Variant.Filled"
-                       Class="rounded-circle"
-                       Icon="@Icons.Material.Filled.Add"
-                       Title="Add Updated Tariff"></MudIconButton>
+                           Disabled="@AppConfig.IsDemoMode"
+                           ButtonType="ButtonType.Button"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"
+                           Class="rounded-circle"
+                           Icon="@Icons.Material.Filled.Add"
+                           Title="Add Updated Tariff"></MudIconButton>
         </ToolBarContent>
-    <HeaderContent>
-        <MudTh></MudTh>
+        <HeaderContent>
+            <MudTh></MudTh>
 
-        <MudTh>Tariff Type</MudTh>
-        <MudTh>Applies From</MudTh>
-        <MudTh>Unit Rate (p/kWh)</MudTh>
-        <MudTh>Daily Standing Charge (p/Day)</MudTh>
-        <MudTh></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>
-            @if (!context.IsHourOfDayFixed)
+            <MudTh>Tariff Type</MudTh>
+            <MudTh>Applies From</MudTh>
+            <MudTh>Unit Rate (p/kWh)</MudTh>
+            <MudTh>Daily Standing Charge (p/Day)</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @if (!context.IsHourOfDayFixed)
             {
                 <MudButton Variant="Variant.Outlined"
                            Size="Size.Small"
@@ -68,6 +69,7 @@
         <MudTd DataLabel="Edit">
             <MudButton Variant="Variant.Outlined"
                        Size="Size.Small"
+                       Disabled="@AppConfig.IsDemoMode"
                        OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
         </MudTd>
 
@@ -85,8 +87,8 @@
                         </MudCardHeader>
                         <MudCardContent Class="pa-0">
                             <MudTable Items="@context.HourOfDayPrices"
-                                  Context="hourOfDayContext">
-                                
+                                      Context="hourOfDayContext">
+
                                 <HeaderContent>
                                     <MudTh>Hour of Day (24hr)</MudTh>
                                     <MudTh>Unit Rate (p/kWh)</MudTh>
@@ -135,7 +137,7 @@
 
     TariffDetail _addEditTariffDetail;
 
-    
+
 
     private record TariffDetailRow
     {
@@ -225,7 +227,7 @@
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        } 
+        }
         else
         {
             switch (MeterType)
@@ -245,7 +247,7 @@
         SetTariffDetailRows();
         _addEditTariffDetail = null;
         _showEditDialogue = false;
-        
+
         return Task.CompletedTask;
     }
 
