@@ -8,6 +8,9 @@ namespace Energy.App.Standalone.Pages
     {
         [Inject] IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
 
+        [Inject] NavigationManager NavManager {get;set; }
+        
+
         bool Ready;
 
         protected override void OnParametersSet()
@@ -20,6 +23,15 @@ namespace Energy.App.Standalone.Pages
             OpenWizard = OpenWizard || defaultOpenWizard;
 
             Ready = true;
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (firstRender && AppStatus.IsDemoMode && !AppStatus.HadAutoRedirect)
+            {
+                AppStatus.SetHadAutoRedirect();
+                NavManager.NavigateTo("/HeatingMeter/Gas");
+            }
         }
     }
 }

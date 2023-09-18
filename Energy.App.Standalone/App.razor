@@ -1,7 +1,9 @@
-﻿@using Fluxor.Persist.Middleware;
+﻿@using Energy.App.Standalone.Features.Setup.TermsAndConditions;
+@using Fluxor.Persist.Middleware;
 @inherits FluxorComponent
 @inject ISetDefaultLocalState DefaultLocalState
 @inject IDispatcher Dispatcher
+@inject NavigationManager NavManager
 
 <Fluxor.Blazor.Web.StoreInitializer />
 
@@ -35,6 +37,8 @@
         });
 
     }
+
+    
 
     private bool _firstRender = true;
 
@@ -76,6 +80,8 @@
         Dispatcher.Dispatch(new PreloadGasReadingsAction(DefaultLocalState.GasReadingsState));
 
         Dispatcher.Dispatch(new PreloadElectricityReadingsAction(DefaultLocalState.ElectricityReadingsState));
+
+        Dispatcher.Dispatch(new HasSeenWelcomeScreenAction(seen: true));
     }
 
 }

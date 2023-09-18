@@ -107,7 +107,7 @@ builder.Services.AddLogging(c =>
 
 });
 
-builder.Services.AddSingleton<AppConfig>();
+builder.Services.AddSingleton<AppStatus>();
 
 builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
