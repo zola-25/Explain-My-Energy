@@ -5,6 +5,7 @@ using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Data.Weather;
 using Energy.App.Standalone.Data.Weather.Interfaces;
+using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Validation;
@@ -34,10 +35,7 @@ builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
 
 builder.Services.AddTransient<IMeterAuthorizationCheck, MeterAuthorizationCheck>();
-builder.Services.AddTransient<IEnergyReadingRetriever, EnergyReadingRetriever>();
 
-
-builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
 builder.Services.AddTransient<IForecastGenerator, ForecastGenerator>();
 builder.Services.AddTransient<IForecastCoefficientsCreator, ForecastCoefficientsCreator>();
@@ -113,22 +111,18 @@ builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped<ISetDefaultLocalState, SetDefaultLocalState>();
 
+bool isDemoMode = builder.Configuration.eIsDemoMode();
 
-ConfigurationHelper.Initialize(builder.Configuration);
+if (isDemoMode)
+{
+    builder.Services.AddTransient<IEnergyReadingRetriever, DemoEnergyReadingRetriever>();
+}
+else
+{
+    builder.Services.AddTransient<IEnergyReadingRetriever, EnergyReadingRetriever>();
+}
 
+builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
 
 await builder.Build().RunAsync();
-
-public static class ConfigurationHelper
-{
-    public static IConfiguration Configuration {get; private set; }
-    public static bool IsDemoSetup {get; private set; }
-
-    public static void Initialize(IConfiguration configuration)
-    {
-        Configuration = configuration;
-        var hasDemoSet = bool.TryParse(Configuration["App:UseDemoSetup"], out bool useDemoSetup);
-        IsDemoSetup = hasDemoSet && useDemoSetup;
-    }
-}

@@ -44,12 +44,19 @@ export default function (appEnv, appDemo) {
     if (appDemo) {
         copyPatterns.push(
             {
-                from: posix.join(_resolve(__dirname, 'data/appsettings.json').replace(/\\/g, '/')),
+                from: posix.join(_resolve(__dirname, 'data/appsettings.demo.json').replace(/\\/g, '/')),
                 to: "appsettings.json"
             },
             {
                 from: posix.join(_resolve(__dirname, 'data/demo/').replace(/\\/g, '/')),
                 to: "demo/",
+            })
+    } else {
+
+        copyPatterns.push(
+            {
+                from: posix.join(_resolve(__dirname, 'data/appsettings.json').replace(/\\/g, '/')),
+                to: "appsettings.json"
             })
     }
 
