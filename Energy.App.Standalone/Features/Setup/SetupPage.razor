@@ -1,6 +1,6 @@
 ﻿@page "/Setup"
 @using Blazored.LocalStorage;
-
+@inject AppStatus AppConfig
 @inherits FluxorComponent
 
 
@@ -14,6 +14,7 @@
             <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3 mx-auto eme-focus">App Setup</MudText>
             <MudIconButton Class="ma-0"
                            ButtonType="ButtonType.Button"
+                           Disabled="@AppConfig.IsDemoMode"
                            Size="Size.Small"
                            Variant="Variant.Outlined"
                            OnClick="WipeAllAsync"

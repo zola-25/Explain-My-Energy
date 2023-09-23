@@ -5,7 +5,11 @@
   "scripts": {
     "build": "node src/build.js",
     "buildDev": "node src/build.js --development",
+    "buildDevDemo": "node src/build.js --development --demo",
+
     "buildProd": "node src/build.js --production",
+    "buildProdDemo": "node src/build.js --production --demo",
+
     "buildCreditsDoc": "node src/attributionAndLicensing/GenerateCreditsDoc.js",
     "test": "mocha -R mocha-junit-reporter --reporter-option mochaFile=testResults/clientDeploymentTestResults.xml --recursive --grep '.*' src/test"
   },

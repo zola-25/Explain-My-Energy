@@ -48,7 +48,16 @@ public static class Extensions
         return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();
     }
 
+    public static bool eIsDemoMode(this IConfiguration configuration) {
 
+        string value = configuration["App:UseDemoSetup"];
+
+        if(value == null) 
+            return false;
+        
+        bool demoModeProperty = bool.TryParse(value, out bool demoMode);
+        return demoModeProperty && demoMode;
+    }
     public static List<HourOfDayPriceState> eMapToHourOfDayPriceState(this IEnumerable<DefaultHourOfDayPrice> hourOfDayPriceStates)
     {
         return hourOfDayPriceStates.Select(c => new HourOfDayPriceState

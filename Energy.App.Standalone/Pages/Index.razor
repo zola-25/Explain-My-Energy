@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Energy.App.Standalone.Pages.SetupWizard
+@inject AppStatus AppStatus
 
 <ExtendedPageTitle>Welcome</ExtendedPageTitle>
 
@@ -17,6 +18,7 @@
                 <MudText Typo="Typo.h4" Align="Align.Center" Class="mx-auto eme-focus">Welcome to Explain My Energy</MudText>
 
                 <MudButton Class="ma-0"
+                            Disabled="@AppStatus.IsDemoMode"
                            OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
                            Size="Size.Small"
                            ButtonType="ButtonType.Button"

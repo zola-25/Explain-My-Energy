@@ -23,12 +23,16 @@ const argv = yargs(hideBin(process.argv))
         .option('development',{
             type: 'boolean',
             description: 'Run in development mode',
-
         })
         .conflicts({
             development: ['staging', 'production'],
             staging: ['development', 'production'],
             production: ['development', 'staging']
+        })
+        .option("demo", {
+            type: 'boolean',
+            describe: 'Run in demo mode',
+            default: false
         })
     .argv;
 
@@ -52,6 +56,10 @@ try {
         throw new Error('No mode specified');
     }
     
+    if (argv.demo) {
+        process.env.APP_DEMO = 'true'    
+    }
+
     const scriptDirectory = dirname(process.argv[1]);
 
     execSync('node ./src/attributionAndLicensing/GenerateCreditsDoc.js', { stdio: 'inherit', env: process.env});
@@ -65,11 +73,11 @@ try {
     let webpackConfig;
 
     if (argv.production) {
-        webpackConfig = webpackProdConfig('production');
+        webpackConfig = webpackProdConfig('production', argv.demo);
     } else if (argv.staging) {
-        webpackConfig = webpackProdConfig('staging');
+        webpackConfig = webpackProdConfig('staging', argv.demo);
     } else if (argv.development) {
-        webpackConfig = webpackDevConfig;
+        webpackConfig = webpackDevConfig('development', argv.demo);
     } else {
         throw new Error('No mode specified');
     }
