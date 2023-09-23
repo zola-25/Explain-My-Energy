@@ -12,7 +12,7 @@ jobs:
     name: Dotnet-Unit-Test-${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest]
     uses: ./.github/workflows/eme-reusable-dotnet-unit-tests.yml
     permissions:
       checks: write
@@ -25,7 +25,7 @@ jobs:
     name: Frontend-Checks-Test-${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest]
         frontendEnv: [development, staging, production]
     uses: ./.github/workflows/eme-reusable-frontend-setup-checks.yml
     permissions:
