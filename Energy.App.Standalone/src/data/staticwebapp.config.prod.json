@@ -12,8 +12,8 @@
   },
   "routes": [
     {
-      "route": "/Credits",
-      "rewrite": "/Credits.html"
+      "route": "/Credits.html",
+      "rewrite": "/Credits"
     }
   ],
   "globalHeaders": {
