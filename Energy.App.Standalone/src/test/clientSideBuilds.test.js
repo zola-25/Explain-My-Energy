@@ -136,7 +136,7 @@ environments.forEach((environment) => {
 
     });
 
-    it(`${environment} should have an ico favicon, an apple-touch-icon, and a manifest.json`, function () {
+    it(`${environment} should have an ico favicon, an apple-touch-icon, and a manifest.webmanifest`, function () {
 
       const faviconsDir = _resolve(outputDirectory);
 
@@ -150,8 +150,8 @@ environments.forEach((environment) => {
       $index(`link[rel="icon"][href="/favicon.ico"]`).toArray().length.should.equal(1);
       $index(`link[rel="apple-touch-icon"][href="/apple-touch-icon.png"]`).toArray().length.should.equal(1);
 
-      fs.readdirSync(outputDirectory).should.include('manifest.json');
-      $index(`link[rel="manifest"][href="manifest.json"]`).toArray().length.should.equal(1);
+      fs.readdirSync(outputDirectory).should.include('manifest.webmanifest');
+      $index(`link[rel="manifest"][href="manifest.webmanifest"]`).toArray().length.should.equal(1);
 
     });
 
