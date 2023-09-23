@@ -11,7 +11,7 @@ const { fullApplicationName, licenseFilePath } = config
 
 
 
-export default function (appEnv) {
+export default function (appEnv, appDemo) {
 
     const defaultHeaderData = {
         title: fullApplicationName,
@@ -21,7 +21,16 @@ export default function (appEnv) {
     }
 
     let headerData;
-    if (appEnv === 'development') {
+
+    if (appDemo ) {
+        headerData = {
+            ...defaultHeaderData,
+            ogUrl: 'https://demo.explainmyenergy.net',
+            ogImage: 'https://demo.explainmyenergy.net/images/DecemberWeather.png',
+            robotsContent: 'noindex, nofollow'
+        }
+    } 
+    else if (appEnv === 'development') {
         headerData = {
             ...defaultHeaderData,
             ogUrl: 'https://dev.explainmyenergy.net',

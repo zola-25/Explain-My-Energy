@@ -12,7 +12,7 @@ import appInfoConfig from "./appInfoConfig.js";
 
 export default function (appEnv, appDemo) {
 
-    const envAppInfoConfig = appInfoConfig(appEnv);
+    const envAppInfoConfig = appInfoConfig(appEnv, appDemo);
 
     const __dirname = dirname(fileURLToPath(import.meta.url));
 
