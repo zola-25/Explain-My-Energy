@@ -19,15 +19,29 @@ namespace Energy.App.Standalone.Features.Setup.Household
 
         public HouseholdState()
         {
-            OutCodeCharacters = null;
-            IhdMacId = null;
+            Saved = false;
             Invalid = false;
             MoveInDate = null;
+            IhdMacId = null;
+            OutCodeCharacters = null;
             PrimaryHeatSource = MeterType.Gas;
-            Saved = false;
         }
     }
 
+    public static class CreateUtilities {
+        public static HouseholdState Create() {
+            
+            
+            return new HouseholdState() {
+                Saved = false,
+                Invalid = false,
+                MoveInDate = null,
+                IhdMacId = null,
+                OutCodeCharacters = null,
+                PrimaryHeatSource = MeterType.Gas
+            };
+        }
 
+    }
 
 }

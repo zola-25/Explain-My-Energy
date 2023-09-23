@@ -1,5 +1,6 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
+@inject AppStatus AppConfig
 
 <MudPaper Class="ma-3 " Elevation="0">
     <MudText Class="fw-bolder" Typo="Typo.h5">Meter Setup</MudText>
@@ -30,7 +31,7 @@
 
             @if (context.Added)
             {
-                <MudButton Class="ma-1" Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
+                <MudButton Class="ma-1" Color="Color.Error" Disabled="@AppConfig.IsDemoMode" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
             }
             else
             {
@@ -53,8 +54,8 @@
             {
                 <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
 
-                    <MudLink Disabled="@(!context.Added)" Underline="Underline.None" Href="@($"/MeterAuthorization/{context.MeterType}")">
-                        <MudButton Color="Color.Default" Disabled="@(!context.Added)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                    <MudLink Disabled="@(!context.Added || AppConfig.IsDemoMode)" Underline="Underline.None" Href="@($"/MeterAuthorization/{context.MeterType}")">
+                        <MudButton Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
                     </MudLink>
                 </MudTooltip>
             }
@@ -88,10 +89,11 @@
             {
                 @if (context.LatestReadingsDate != null)
                 {
-                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate()" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || AppConfig.IsDemoMode" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
                                Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
                 }
-                <MudButton Class="ma-1"  Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
+                <MudButton Class="ma-1" Disabled="@AppConfig.IsDemoMode"
+                    Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
             }
 
         </MudTd>

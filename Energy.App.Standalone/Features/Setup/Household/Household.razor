@@ -1,5 +1,6 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
+@inject AppStatus AppConfig
 
 @if (_readyToInteract)
 {
@@ -16,6 +17,7 @@
                     <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
                                    Placeholder="Select Move-in Date"
                                    FixDay="1"
+                                   Disabled="@AppConfig.IsDemoMode"
                                    OpenTo="OpenTo.Year"
                                    Clearable="true"
                                    DateFormat="MMMM yyyy"
@@ -25,7 +27,7 @@
                 </div>
 
                 <div class="my-3 d-flex align-baseline">
-                    <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required
+                    <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@AppConfig.IsDemoMode"
                                   Placeholder="IHD MAC ID"></MudTextField>
                     <InfoTooltip>
                         This is a 16 character code that uniquely identifies your Smart Meter. <br />
@@ -39,6 +41,7 @@
                                      T="OutCode" CoerceText="true"
                                      Clearable="true"
                                               Required
+                                      Disabled="@AppConfig.IsDemoMode"
                                      ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                      MinCharacters="2"
                                      OnClearButtonClick="ClearPostalArea"
@@ -54,14 +57,15 @@
                         In the UK, 80% of people use some form of Gas central heating
                     </InfoTooltip>
                 </div>
-                <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
+                <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
+                                Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
                     <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
                     <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
                 </MudRadioGroup>
 
             </MudCardContent>
             <MudCardActions Class="d-flex flex-column align-start ">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Color="Color.Primary">@_saveButtonText</MudButton>
+                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
 
                 <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
                     @_saveResponseMessage

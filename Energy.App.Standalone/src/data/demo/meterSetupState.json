@@ -1,0 +1,1076 @@
+{
+  "GasMeter": {
+    "GlobalId": "1dafa683-4e7f-48e6-b2e4-4f8fdb333797",
+    "MeterType": 0,
+    "Mpxn": "1234567891024",
+    "InitialSetupValid": true,
+    "Authorized": true,
+    "Authorizing": false,
+    "AuthorizeFailed": false,
+    "SetupValid": true,
+    "TariffDetails": [
+      {
+        "GlobalId": "4c9657f0-bfe0-4deb-9691-61a3ea94ffc0",
+        "DateAppliesFrom": "2023-04-01T00:00:00",
+        "PencePerKWh": 12.36,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 33.6,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 12.36
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 12.36
+          }
+        ]
+      },
+      {
+        "GlobalId": "28843c9a-8772-44d4-b14a-aab296631d83",
+        "DateAppliesFrom": "2022-10-01T00:00:00",
+        "PencePerKWh": 10.3,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 28,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 10.3
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 10.3
+          }
+        ]
+      },
+      {
+        "GlobalId": "05f2ba39-1ea3-4d7e-8109-70b1ec11ac97",
+        "DateAppliesFrom": "2022-04-01T00:00:00",
+        "PencePerKWh": 7.37,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 23,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 7.37
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 7.37
+          }
+        ]
+      },
+      {
+        "GlobalId": "da408649-0013-4947-9944-3c11c069f721",
+        "DateAppliesFrom": "2021-10-01T00:00:00",
+        "PencePerKWh": 4.1,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 24,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 4.1
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 4.1
+          }
+        ]
+      },
+      {
+        "GlobalId": "470972fb-cdc2-43fb-8096-9558c16017b0",
+        "DateAppliesFrom": "2021-04-01T00:00:00",
+        "PencePerKWh": 3.3,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 25,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 3.3
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 3.3
+          }
+        ]
+      }
+    ]
+  },
+  "ElectricityMeter": {
+    "GlobalId": "5e1a2384-14de-4411-8fe6-cb6ce3a368d9",
+    "MeterType": 1,
+    "Mpxn": "1234567891026",
+    "InitialSetupValid": true,
+    "Authorized": true,
+    "Authorizing": false,
+    "AuthorizeFailed": false,
+    "SetupValid": true,
+    "TariffDetails": [
+      {
+        "GlobalId": "a3fb7d83-814f-403f-91a1-44d8b3fa3fc1",
+        "DateAppliesFrom": "2023-04-01T00:00:00",
+        "PencePerKWh": 40.8,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 55.2,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 40.8
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 40.8
+          }
+        ]
+      },
+      {
+        "GlobalId": "b77f2993-b695-4d56-acc0-a8bd4c8c653d",
+        "DateAppliesFrom": "2022-10-01T00:00:00",
+        "PencePerKWh": 34,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 46,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 34
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 34
+          }
+        ]
+      },
+      {
+        "GlobalId": "4af69b90-c297-475f-bab7-060d42a5512b",
+        "DateAppliesFrom": "2022-04-01T00:00:00",
+        "PencePerKWh": 28.3,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 45,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 28.3
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 28.3
+          }
+        ]
+      },
+      {
+        "GlobalId": "93341a19-0a92-44c7-9d81-8a0f32bf1ce5",
+        "DateAppliesFrom": "2021-10-01T00:00:00",
+        "PencePerKWh": 20.8,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 23,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 20.8
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 20.8
+          }
+        ]
+      },
+      {
+        "GlobalId": "489fe88e-2874-4454-9a3d-bae4b12ea96b",
+        "DateAppliesFrom": "2021-04-01T00:00:00",
+        "PencePerKWh": 19,
+        "IsHourOfDayFixed": true,
+        "DailyStandingChargePence": 23,
+        "HourOfDayPrices": [
+          {
+            "HourOfDay": "00:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "01:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "02:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "03:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "04:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "05:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "06:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "07:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "08:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "09:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "10:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "11:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "12:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "13:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "14:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "15:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "16:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "17:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "18:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "19:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "20:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "21:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "22:00:00",
+            "PencePerKWh": 19
+          },
+          {
+            "HourOfDay": "23:00:00",
+            "PencePerKWh": 19
+          }
+        ]
+      }
+    ]
+  }
+}
