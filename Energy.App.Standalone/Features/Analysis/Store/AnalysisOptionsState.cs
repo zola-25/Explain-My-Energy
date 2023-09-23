@@ -39,19 +39,19 @@ namespace Energy.App.Standalone.Features.Analysis.Store
             Gas = new MeterAnalysisOptions
             {
                 MeterType = MeterType.Gas,
-                CalendarTerm = CalendarTerm.Week,
+                CalendarTerm = CalendarTerm.Month,
                 DegreeDifference = 0,
                 HighlightSet = false,
                 HighlightStart = null,
                 HighlightEnd = null,
                 ShowCost = false,
                 ToggleSource = ToggleSource.None,
-                UseHistoricalForecast = true
+                UseHistoricalForecast = false
             };
             Electricity = new MeterAnalysisOptions
             {
                 MeterType = MeterType.Electricity,
-                CalendarTerm = CalendarTerm.Week,
+                CalendarTerm = CalendarTerm.Month,
                 DegreeDifference = 0,
                 HighlightSet = false,
                 HighlightStart = null,
