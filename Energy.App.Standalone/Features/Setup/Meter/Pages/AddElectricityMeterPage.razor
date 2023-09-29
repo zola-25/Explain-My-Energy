@@ -12,8 +12,9 @@
                     <MudButton Class="ma-1" Color="Color.Primary"
                                ButtonType="ButtonType.Button"
                                Variant="Variant.Filled"
-                               Size="Size.Small"
-                               StartIcon="@Icons.Material.Filled.ArrowBack">Back to Setup</MudButton>
+                               Size="Size.Small">
+                        <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Setup</span>
+                    </MudButton>
                 </MudLink>
             </MudTooltip>
             <AddElectricityMeterFormComponent OnSuccessfulCallback="OnSuccessfulSave" />

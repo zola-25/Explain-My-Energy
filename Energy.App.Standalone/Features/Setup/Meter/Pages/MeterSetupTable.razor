@@ -37,7 +37,7 @@
             {
                 <MudTooltip Text="@(!HouseholdState.Value.Saved ? "Configure Household to add a Meter" : $"Add your {context.MeterType} Meter")">
                     <MudLink Disabled="@(!HouseholdState.Value.Saved)" Underline="Underline.None" Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")">
-                        <MudBadge Visible=@(HouseholdState.Value.Saved) Icon="@Icons.Material.Outlined.Add"  Color="Color.Success" Overlap="true">
+                        <MudBadge Visible=@(HouseholdState.Value.Saved) Icon="@Icons.Material.Outlined.Add" Color="Color.Success" Overlap="true">
                             <MudButton Disabled="@(!HouseholdState.Value.Saved)" Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Add</MudButton>
                         </MudBadge>
                     </MudLink>
@@ -120,8 +120,9 @@
                                Disabled="@(!context.Added)"
                                ButtonType="ButtonType.Button"
                                Variant="Variant.Filled"
-                               Size="Size.Small"
-                               StartIcon="@Icons.Material.Filled.CurrencyPound">Tariffs</MudButton>
+                               Size="Size.Small">
+                        <span><i class="fa-solid fa-sterling-sign" aria-hidden="true"></i> Tariffs</span>
+                    </MudButton>
                 </MudLink>
             </MudTooltip>
         </MudTd>

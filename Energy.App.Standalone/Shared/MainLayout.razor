@@ -7,7 +7,7 @@
 <div>
     <MudLayout>
         <MudAppBar Elevation="1" Class="">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudIconButton UserAttributes="@(new () {{"id","toggle-show-main-site-links-button" },{"aria-controls","main-site-links-region"},{"aria-expanded",_drawerOpen}})" Title="Toggle Expand Main Site Links" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
             <div class="w-fit-content">
                 <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy @(_demoNote) @(_demoNote2)</MudText></MudNavLink>
             </div>
@@ -20,7 +20,7 @@
                 <ShareMenu />
             </MudTooltip>
         </MudAppBar>
-        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <MudDrawer UserAttributes="@(new () {{"id", "main-site-links-region"},{"role","region" },{"aria-label","Contains Main Site Navigation Links"}})" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
             <NavMenu></NavMenu>
         </MudDrawer>
         <MudMainContent>

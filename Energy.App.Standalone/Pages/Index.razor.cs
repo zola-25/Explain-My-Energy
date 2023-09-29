@@ -13,6 +13,15 @@ namespace Energy.App.Standalone.Pages
 
         bool Ready;
 
+        protected override void OnInitialized()
+        {
+            if (AppStatus.IsDemoMode && !AppStatus.HadAutoRedirect) 
+            {
+                AppStatus.SetHadAutoRedirect();
+                NavManager.NavigateTo("/HeatingMeter/Gas", replace: true);
+            }
+        }
+
         protected override void OnParametersSet()
         {
             Ready = false;
@@ -23,15 +32,6 @@ namespace Energy.App.Standalone.Pages
             OpenWizard = OpenWizard || defaultOpenWizard;
 
             Ready = true;
-        }
-
-        protected override void OnAfterRender(bool firstRender)
-        {
-            if (firstRender && AppStatus.IsDemoMode && !AppStatus.HadAutoRedirect)
-            {
-                AppStatus.SetHadAutoRedirect();
-                NavManager.NavigateTo("/HeatingMeter/Gas");
-            }
         }
     }
 }

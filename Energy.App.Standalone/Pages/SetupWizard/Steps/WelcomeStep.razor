@@ -15,18 +15,16 @@
                 class="mx-auto">
                 <MudButton Size="Size.Medium"
                            Variant="Variant.Outlined"
-                           EndIcon="fa-regular fa-thumbs-up"
                            Color="Color.Info"
                            OnClick="OnExploreClick">
-                    Okay! Let me explore
+                    <span><i aria-hidden="true" class="fa-regular fa-thumbs-up"></i> Okay! Let me explore</span>
                 </MudButton>
                 <MudButton
                     Size="Size.Medium"
                     Variant="Variant.Outlined"
-                    EndIcon="fa-solid fa-wand-magic-sparkles"
                     Color="Color.Success"
                     OnClick="OnSetupWizardClick">
-                    Start Setup Wizard
+                    <span>Start Setup Wizard <i aria-hidden="true" class="fa-solid fa-wand-magic-sparkles"></i></span>
                 </MudButton>
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="OnExploreClick">Exit</MudButton>
