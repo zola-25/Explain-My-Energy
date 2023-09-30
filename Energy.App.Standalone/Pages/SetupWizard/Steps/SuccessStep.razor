@@ -16,11 +16,18 @@
         <div class="d-flex justify-end px-4">
 
             <div class="mx-auto">
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
-                <MudButton 
-                    Size="Size.Medium" 
-                    Variant="Variant.Outlined" 
-                    Href="@ElectricityNavLink">
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           OnClick="GoBackCallback">
+                    <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</span>
+                </MudButton>
+                <MudButton ButtonType="ButtonType.Button"
+                           Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Disabled=@(!ElectricityValid)
+                           Href="@ElectricityNavLink"
+                           Target="_self">
                     <span>View Electricity Analysis <i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
                 </MudButton>
                 <MudButton Size="Size.Medium"
@@ -28,9 +35,11 @@
                            Color="Color.Success"
                            Disabled="@(!GasValid)"
                            ButtonType="ButtonType.Button"
-                           Href="@GasNavLink">
+                           Href="@GasNavLink"
+                           Target="_self">
                     <span>View Gas Analysis <i class="fa-solid fa-fire" aria-hidden="true"></i></span>
                 </MudButton>
+
 
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>

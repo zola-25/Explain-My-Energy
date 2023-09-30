@@ -3,15 +3,16 @@
     <MudGrid Justify="Justify.Center">
         <MudItem  xs="12">
             <div class="d-flex justify-space-between">
-                <MudBreadcrumbs Items="BreadcrumbItems" MaxItems="4"  Separator=">">
+                <MudBreadcrumbs aria-label="Wizard steps completed" Items="BreadcrumbItems" ExpanderIcon="fa-solid fa-left-right"  MaxItems="4"  Separator=">">
                     <ItemTemplate Context="item">
-                        <MudText Typo="Typo.h6">@item.Text</MudText>
+                        <MudText aria-label="@($"Wizard step {item.Text}")" Typo="Typo.h6">@item.Text</MudText>
                     </ItemTemplate>
                 </MudBreadcrumbs>
 
                 <MudText Class="@((HeaderText is null) ? "d-none" : "fw-bold mx-auto")"
                          Align="Align.Center"
-                         Typo="Typo.h5">@HeaderText</MudText>
+                         Typo="Typo.h5"
+                         aria-label="Welcome">@HeaderText</MudText>
                 <MudIconButton Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
             </div>
         </MudItem>

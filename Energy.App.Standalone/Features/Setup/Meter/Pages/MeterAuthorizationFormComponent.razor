@@ -35,7 +35,7 @@
                                   Value="@MoveInDateString"></MudTextField>
                 </CopyToClipboardTextField>
             </div>
-            <div class="d-flex justify-center p-3">
+            <div class="d-flex justify-center p-3 mt-4">
                 <MudButton 
                     OnClick="OnCheckAuthorizationClicked" 
                     Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
@@ -61,7 +61,7 @@
                 <p>n3rgy responded with: @AuthorizeFailedMessage</p>
             </div>
             
-            <iframe id="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" class="n3rgy-iframe" hidden="@AuthorizeSucceeded"></iframe>
+            <iframe id="n3rgy-iframe" name="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" class="n3rgy-iframe" hidden="@AuthorizeSucceeded"></iframe>
         </MudCardContent>
         
     </MudCard>

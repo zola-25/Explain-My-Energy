@@ -41,6 +41,7 @@
                                      For="@(() => _householdDetails.OutCode)"
                                      T="OutCode" CoerceText="true"
                                      Clearable="true"
+                                     aria-label="Postal Area Autocomplete"
                                      Required
                                       Disabled="@AppConfig.IsDemoMode"
                                      ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
@@ -58,9 +59,9 @@
                         In the UK, 80% of people use some form of Gas central heating
                     </InfoTooltip>
                 </div>
-                <MudRadioGroup T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
+                <MudRadioGroup Name="Primary Heat Source" T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
                                 Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
-                    <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
+                    <MudRadio  T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
                     <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
                 </MudRadioGroup>
 
