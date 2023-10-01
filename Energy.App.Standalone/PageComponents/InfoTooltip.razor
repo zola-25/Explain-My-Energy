@@ -1,6 +1,6 @@
 ﻿<MudTooltip ShowOnClick="true" ShowOnFocus="true" ShowOnHover="true" Arrow="true">
     <ChildContent>
-        <MudIconButton Color="@Color.Info" Icon="@Icons.Material.Outlined.Info"></MudIconButton>
+        <MudIconButton Title="IconTitle" Color="@Color.Info" Icon="@Icons.Material.Outlined.Info"></MudIconButton>
     </ChildContent>
     <TooltipContent>
         <MudText Typo="Typo.body2">@ChildContent</MudText>
@@ -9,4 +9,6 @@
 
 @code {
     [Parameter] public RenderFragment ChildContent { get; set; }
+
+    [Parameter, EditorRequired] public string IconTitle { get; set; }
 }

@@ -1,38 +1,32 @@
 @inherits FluxorComponent
 <StepTemplate CloseWizardCallback="CloseWizardCallback" BreadcrumbItems="BreadcrumbItems">
     <SetupStepPage>
-        <MeterAuthorizationFormComponent MeterType="MeterType.Gas" FreshNavigation="true"/>
+        <MeterAuthorizationFormComponent MeterType="MeterType.Gas" FreshNavigation="true" />
     </SetupStepPage>
     <ActionButtons>
         <div class="d-flex justify-end px-4">
 
-            <div class="mx-auto">
-                <MudButton
-                    Size="Size.Medium"
-                    Variant="Variant.Outlined"
-                    StartIcon="fa-solid fa-arrow-left"
-                    Color="Color.Default"
-                    OnClick="GoBackCallback">
-                    Back
-                </MudButton>
-                <MudButton
-                    Size="Size.Medium"
-                    Variant="Variant.Outlined"
-                    EndIcon="fa-solid fa-arrow-right"
-                    Color="Color.Default"
-                    Class="@(CanMoveNext ? "d-none" : "")"
-                    OnClick="SkipToElectricity">
-                    Skip to Electricity
-                </MudButton>
 
-                <MudButton
-                    Size="Size.Medium"
-                    Variant="Variant.Outlined"
-                    EndIcon="fa-solid fa-arrow-right"
-                    Disabled="@(!CanMoveNext)"
-                    Color="Color.Success"
-                    OnClick="GoToNextStageCallback">
-                    Electricity
+            <div class="mx-auto">
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           OnClick="GoBackCallback">
+                    <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</span>
+                </MudButton>
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           Class="@(CanMoveNext ? "d-none" : "")"
+                           OnClick="SkipToElectricity">
+                    <span>Skip to Electricity <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                </MudButton>
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Disabled="@(!CanMoveNext)"
+                           Color="Color.Success"
+                           OnClick="GoToNextStageCallback">
+                    <span>Add Electricity <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                 </MudButton>
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>

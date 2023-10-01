@@ -7,8 +7,12 @@
         <div class="d-flex justify-end px-4">
 
             <div class="mx-auto">
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Welcome Page</MudButton>
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" EndIcon="fa-solid fa-arrow-right" Disabled="@(!CanMoveNext)" Color="Color.Success" OnClick="GoToNextStageCallback">Next</MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBackCallback">
+                    <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Welcome Page</span>
+                </MudButton>
+                <MudButton Size="Size.Medium" Variant="Variant.Outlined" Disabled="@(!CanMoveNext)" Color="Color.Success" OnClick="GoToNextStageCallback">
+                    <span>Next <i aria-hidden="true" class="fa-solid fa-arrow-right"></i></span>
+                </MudButton>
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
         </div>

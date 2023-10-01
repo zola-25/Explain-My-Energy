@@ -1,6 +1,6 @@
 .n3rgy-iframe ::deep {
     width: 100%;
-    height: calc(80vh - 100px);
+    height: calc(60vh - 100px);
     border: 1px solid black;
 
     margin-top: 12px;

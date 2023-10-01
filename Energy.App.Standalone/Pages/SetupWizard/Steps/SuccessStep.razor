@@ -5,9 +5,8 @@
                 <MudPaper Elevation="2" Class="p-2 mt-2">
                     <MudAlert Severity="Severity.Success" Elevation="0" Class="eme-alert">Setup wizard completed</MudAlert>
 
-                    <AppSetupStatus 
-                        HistoricalAnalysisValidCallback="HistoricalAnalysisValidCallback"
-                        HeatingAnalysisValidCallback="HeatingAnalysisValidCallback"></AppSetupStatus>
+                    <AppSetupStatus HistoricalAnalysisValidCallback="HistoricalAnalysisValidCallback"
+                                    HeatingAnalysisValidCallback="HeatingAnalysisValidCallback"></AppSetupStatus>
                 </MudPaper>
             </MudItem>
         </MudGrid>
@@ -17,9 +16,31 @@
         <div class="d-flex justify-end px-4">
 
             <div class="mx-auto">
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="fa-solid fa-arrow-left" Color="Color.Default" OnClick="GoBackCallback">Back</MudButton>
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ElectricBolt" Color="Color.Success" Disabled="@(!ElectricityValid)" ButtonType="ButtonType.Button" Href="@ElectricityNavLink">View Electricity Analysis</MudButton>
-                <MudButton Size="Size.Medium" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.LocalFireDepartment" Color="Color.Success" Disabled="@(!GasValid)" ButtonType="ButtonType.Button" Href="@GasNavLink">View Gas Analysis</MudButton>
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           OnClick="GoBackCallback">
+                    <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back</span>
+                </MudButton>
+                <MudButton ButtonType="ButtonType.Button"
+                           Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Disabled=@(!ElectricityValid)
+                           Href="@ElectricityNavLink"
+                           Target="_self">
+                    <span>View Electricity Analysis <i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+                </MudButton>
+                <MudButton Size="Size.Medium"
+                           Variant="Variant.Outlined"
+                           Color="Color.Success"
+                           Disabled="@(!GasValid)"
+                           ButtonType="ButtonType.Button"
+                           Href="@GasNavLink"
+                           Target="_self">
+                    <span>View Gas Analysis <i class="fa-solid fa-fire" aria-hidden="true"></i></span>
+                </MudButton>
+
+
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="CloseWizardCallback">Exit</MudButton>
         </div>

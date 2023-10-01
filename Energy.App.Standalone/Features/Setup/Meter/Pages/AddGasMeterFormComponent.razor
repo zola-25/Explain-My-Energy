@@ -15,26 +15,22 @@
 
                 <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn" Placeholder="MPRN" Required></MudTextField>
 
-                <MudText Class="mt-5">
-                    <p>Don't know your Gas Meter's MPRN number?</p>
-                    <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i class="fa">&#xf08e;</i></MudLink></p>
-                </MudText>
+                 <MudText Class="mt-5">
+                     <p>Don't know your Gas Meter's MPRN number?</p>
+                     <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i class="fa">&#xf08e;</i></MudLink></p>
+                 </MudText>
 
 
-            </MudCardContent>
-            <MudCardActions Class="d-block">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+             </MudCardContent>
+             <MudCardActions Class="d-block">
+                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
-                    <MudGrid Spacing="2" Class="mt-2" hidden=" @(!_submitSuccessful)">
-                        <MudItem>
-
-                            <MudText Color="Color.Success">
-                                <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
-
-                                Gas Meter Valid - proceed to authorize access to n3rgy.com?
-                            </MudText>
-                        </MudItem>
-                    </MudGrid>
+                    <div class="@(_submitSuccessful ? "visible" : "invisible") d-flex my-5 mud-typography-h6 mud-success-text justify-start align-baseline ">
+                        <span class="mx-auto">
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            Gas Meter Valid - proceed to authorize access to n3rgy.com?
+                        </span>
+                    </div>
 
                 </MudCardActions>
             </MudCard>
