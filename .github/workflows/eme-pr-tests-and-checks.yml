@@ -19,7 +19,7 @@ jobs:
       contents: read
     with:
       os: ${{matrix.os}}
-      DotNetVersion: ${{ '7.0.400' }}
+      DotNetVersion: ${{ '7.0.401' }}
 
   call-frontend-checks-test:
     name: Frontend-Checks-Test-${{matrix.os}}
@@ -34,7 +34,7 @@ jobs:
     with:
       os: ${{matrix.os}}
       frontendEnv: ${{matrix.frontendEnv}}
-      DotNetVersion: ${{ '7.0.400' }}
+      DotNetVersion: ${{ '7.0.401' }}
       NodeVersion: ${{ '18.x' }}
 
   results-check:
