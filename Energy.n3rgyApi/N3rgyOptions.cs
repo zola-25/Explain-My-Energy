@@ -1,8 +1,7 @@
-﻿namespace Energy.n3rgyApi
+﻿namespace Energy.n3rgyApi;
+
+public class N3rgyOptions
 {
-    public class N3rgyOptions
-    {
-        public string ElectricityApi { get; set; }
-        public string GasApi { get; set; }
-    }
+    public string ElectricityApi { get; set; }
+    public string GasApi { get; set; }
 }

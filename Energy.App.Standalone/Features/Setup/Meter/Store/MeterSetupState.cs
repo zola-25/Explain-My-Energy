@@ -19,8 +19,7 @@ public record MeterSetupState
 
     public MeterState this[MeterType meterType]
     {
-        get
-        {
+        get {
             return meterType switch
             {
                 MeterType.Gas => GasMeter,
@@ -28,7 +27,6 @@ public record MeterSetupState
                 _ => throw new ArgumentOutOfRangeException(nameof(meterType), meterType, null),
             };
         }
-        
     }
 
     public MeterSetupState()
@@ -39,5 +37,4 @@ public record MeterSetupState
 
         ElectricityMeter = Utilities.GetMeterInitialState(MeterType.Electricity);
     }
-
 }

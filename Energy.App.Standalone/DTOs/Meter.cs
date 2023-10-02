@@ -21,23 +21,23 @@ public class Meter : IValidatableObject
         switch (MeterType)
         {
             case MeterType.Gas:
+            {
+                if (Mpxn.eIsNotValidMprn())
                 {
-                    if (Mpxn.eIsNotValidMprn())
-                    {
-                        yield return new ValidationResult("Gas MPRN Number is Invalid", new[] { "Mpxn" });
-                    }
-
-                    break;
+                    yield return new ValidationResult("Gas MPRN Number is Invalid", new[] { "Mpxn" });
                 }
+
+                break;
+            }
             case MeterType.Electricity:
+            {
+                if (Mpxn.eIsNotValidMpan())
                 {
-                    if (Mpxn.eIsNotValidMpan())
-                    {
-                        yield return new ValidationResult("Electricity MPAN Number is Invalid", new[] { "Mpxn" });
-                    }
-
-                    break;
+                    yield return new ValidationResult("Electricity MPAN Number is Invalid", new[] { "Mpxn" });
                 }
+
+                break;
+            }
         }
     }
 }

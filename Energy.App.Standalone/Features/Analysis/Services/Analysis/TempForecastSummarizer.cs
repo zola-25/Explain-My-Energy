@@ -71,21 +71,22 @@ public class TempForecastSummarizer : ITempForecastSummarizer
         var periodWeatherReadings = _heatingForecastState.Value.ForecastWeatherReadings
                                         .Where(c => c.UtcTime >= start && c.UtcTime <= end)
                                         .ToList();
-        
+
         List<DailyCostedReading> forecastCosts;
 
         if (useHistorical)
         {
             forecastCosts = _historicalForecastState.Value[meterType]
                 .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
-        } else
+        }
+        else
         {
             forecastCosts = _heatingForecastState.Value.ForecastDailyCosts
                 .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
         }
 
 
-        
+
         var totalKWh = forecastCosts.Sum(c => c.KWh);
         var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPounds);
         var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
@@ -111,5 +112,4 @@ public class TempForecastSummarizer : ITempForecastSummarizer
         };
         return results;
     }
-
 }

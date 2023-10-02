@@ -6,8 +6,8 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions.Tariffs;
 
 public class DeleteAllGasTariffsAction
 {
-    [ReducerMethod]
-    public static MeterSetupState Store(MeterSetupState state, DeleteAllGasTariffsAction action)
+    [ReducerMethod(typeof(DeleteAllGasTariffsAction))]
+    public static MeterSetupState Store(MeterSetupState state)
     {
         return state with
         {
@@ -17,5 +17,4 @@ public class DeleteAllGasTariffsAction
             }
         };
     }
-
 }

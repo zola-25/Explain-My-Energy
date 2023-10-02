@@ -27,7 +27,7 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
         _weatherState = weatherState;
     }
 
-    public HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType, 
+    public HistoricalAnalysis GetCurrentDurationAnalysis(MeterType meterType,
         CalendarTerm term)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
@@ -35,7 +35,7 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
         return GetHistoricalAnalysis(meterType, start, end, term);
     }
 
-    public HistoricalAnalysis GetPreviousDurationAnalysis(MeterType meterType, 
+    public HistoricalAnalysis GetPreviousDurationAnalysis(MeterType meterType,
         CalendarTerm term)
     {
         (DateTime start, DateTime end) = _periodDateRanges.GetPreviousPeriodDates(term);
@@ -43,10 +43,10 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
         return GetHistoricalAnalysis(meterType, start, end, term);
     }
 
-    private HistoricalAnalysis GetHistoricalAnalysis(MeterType meterType, 
+    private HistoricalAnalysis GetHistoricalAnalysis(MeterType meterType,
         DateTime start, DateTime end, CalendarTerm term)
     {
-        var costedReadings = (meterType == MeterType.Electricity 
+        var costedReadings = (meterType == MeterType.Electricity
             ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings).ToList();
         var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcTime >= start && c.UtcTime <= end)
             .ToList();
@@ -56,15 +56,15 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
         decimal co2ConversionFactor = _co2Conversion.GetCo2ConversionFactor(meterType);
 
         bool hasData = historicalCosts.Count > 0;
-        
+
         var totalKWh = historicalCosts.Sum(c => c.KWh);
         var totalCost = historicalCosts.Sum(c => c.CostPounds);
         var totalCo2 = totalKWh * co2ConversionFactor;
-        
+
         var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
         var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
         var totalCo2Rounded = totalCo2.Round(2);
-    
+
         if (hasData)
         {
             return new HistoricalAnalysis()
@@ -93,5 +93,4 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
             TemperatureRange = new TemperatureRange()
         };
     }
-
 }

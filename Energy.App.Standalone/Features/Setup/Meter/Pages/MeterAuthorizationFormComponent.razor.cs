@@ -42,7 +42,7 @@ public partial class MeterAuthorizationFormComponent
 
 
     private bool _freshNavigation = true;
-    protected override async Task  OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
         try
         {

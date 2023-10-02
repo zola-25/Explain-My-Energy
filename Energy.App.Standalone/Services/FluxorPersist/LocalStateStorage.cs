@@ -1,26 +1,25 @@
 ﻿using Blazored.LocalStorage;
 using Fluxor.Persist.Storage;
 
-namespace Energy.App.Standalone.Services.FluxorPersist
+namespace Energy.App.Standalone.Services.FluxorPersist;
+
+public class LocalStateStorage : IStringStateStorage
 {
-    public class LocalStateStorage : IStringStateStorage
+
+    private ILocalStorageService LocalStorage { get; set; }
+
+    public LocalStateStorage(ILocalStorageService localStorage)
     {
+        LocalStorage = localStorage;
+    }
 
-        private ILocalStorageService LocalStorage { get; set; }
+    public async ValueTask<string> GetStateJsonAsync(string statename)
+    {
+        return await LocalStorage.GetItemAsStringAsync(statename);
+    }
 
-        public LocalStateStorage(ILocalStorageService localStorage)
-        {
-            LocalStorage = localStorage;
-        }
-
-        public async ValueTask<string> GetStateJsonAsync(string statename)
-        {
-            return await LocalStorage.GetItemAsStringAsync(statename);
-        }
-
-        public async ValueTask StoreStateJsonAsync(string statename, string json)
-        {
-            await LocalStorage.SetItemAsStringAsync(statename, json);
-        }
+    public async ValueTask StoreStateJsonAsync(string statename, string json)
+    {
+        await LocalStorage.SetItemAsStringAsync(statename, json);
     }
 }

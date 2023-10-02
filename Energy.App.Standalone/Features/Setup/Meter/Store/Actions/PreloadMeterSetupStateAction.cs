@@ -4,7 +4,7 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions;
 
 public class PreloadMeterSetupStateAction
 {
-    public MeterSetupState MeterSetupState {get;private set;}
+    public MeterSetupState MeterSetupState { get; private set; }
 
     public PreloadMeterSetupStateAction(MeterSetupState meterSetupState)
     {

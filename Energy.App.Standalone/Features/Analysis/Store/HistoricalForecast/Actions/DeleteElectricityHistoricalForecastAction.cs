@@ -2,18 +2,17 @@
 using Fluxor;
 using System.Collections.Immutable;
 
-namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions
+namespace Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
+
+public class DeleteElectricityHistoricalForecastAction
 {
-    public class DeleteElectricityHistoricalForecastAction
+    [ReducerMethod(typeof(DeleteElectricityHistoricalForecastAction))]
+    public static HistoricalForecastState Reduce(HistoricalForecastState state)
     {
-        [ReducerMethod]
-        public static HistoricalForecastState Reduce(HistoricalForecastState state, DeleteElectricityHistoricalForecastAction action)
+        return state with
         {
-            return state with
-            {
-                ElectricityForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
-                ElectricityLastUpdate = DateTime.MinValue
-            };
-        }
+            ElectricityForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
+            ElectricityLastUpdate = DateTime.MinValue
+        };
     }
 }

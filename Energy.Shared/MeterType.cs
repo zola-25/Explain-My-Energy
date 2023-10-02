@@ -1,15 +1,14 @@
-﻿namespace Energy.Shared
+﻿namespace Energy.Shared;
+
+
+public enum MeterType
 {
+    Gas,
+    Electricity
+}
 
-    public enum MeterType
-    {
-        Gas,
-        Electricity
-    }
-
-    public enum MeterHeatingType
-    {
-        Gas,
-        Electricity
-    }
+public enum MeterHeatingType
+{
+    Gas,
+    Electricity
 }

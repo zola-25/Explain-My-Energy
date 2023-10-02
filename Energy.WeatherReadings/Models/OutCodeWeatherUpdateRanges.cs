@@ -50,6 +50,4 @@ public record OutCodeWeatherUpdateRanges
         return (LatestHistoricalUtc.Value, LatestHistoricalUtc.Value, false);
 
     }
-
-
 }

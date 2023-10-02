@@ -4,35 +4,34 @@ using Energy.Shared;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
 
-namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions
+namespace Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
+
+public class DeleteHeatingForecastAction
 {
-    public class DeleteHeatingForecastAction
+    public MeterType HeatingMeterType { get; }
+
+    public DeleteHeatingForecastAction(MeterType heatingMeterType)
     {
-        public MeterType HeatingMeterType {get; }
+        HeatingMeterType = heatingMeterType;
+    }
 
-        public DeleteHeatingForecastAction(MeterType heatingMeterType)
+    [ReducerMethod]
+    public static HeatingForecastState Reduce(HeatingForecastState state, DeleteHeatingForecastAction action)
+    {
+        return state with
         {
-            HeatingMeterType = heatingMeterType;
-        }
+            C = 0,
+            Gradient = 0,
+            ForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
+            ForecastWeatherReadings = ImmutableList<TemperaturePoint>.Empty,
+            SavedCoefficients = false,
+            CoefficientsUpdatedWithReadingDate = DateTime.MinValue,
+            ForecastsUpdatedWithReadingDate = DateTime.MinValue,
+            LoadingHeatingForecast = false,
+            LatestReadingDate = DateTime.MinValue,
+            HeatingMeterType = action.HeatingMeterType,
+            LoadingCoefficients = false,
 
-        [ReducerMethod]
-        public static HeatingForecastState Reduce(HeatingForecastState state, DeleteHeatingForecastAction action)
-        {
-            return state with
-            {
-                C = 0,
-                Gradient = 0,
-                ForecastDailyCosts = ImmutableList<DailyCostedReading>.Empty,
-                ForecastWeatherReadings = ImmutableList<TemperaturePoint>.Empty,
-                SavedCoefficients = false,
-                CoefficientsUpdatedWithReadingDate = DateTime.MinValue,
-                ForecastsUpdatedWithReadingDate = DateTime.MinValue,
-                LoadingHeatingForecast = false,
-                LatestReadingDate = DateTime.MinValue,
-                HeatingMeterType = action.HeatingMeterType,
-                LoadingCoefficients = false,
-                
-            };
-        }
+        };
     }
 }

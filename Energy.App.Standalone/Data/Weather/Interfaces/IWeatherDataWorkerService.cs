@@ -1,6 +1,5 @@
-﻿namespace Energy.App.Standalone.Data.Weather.Interfaces
+﻿namespace Energy.App.Standalone.Data.Weather.Interfaces;
+
+public interface IWeatherDataWorkerService : IWeatherDataService
 {
-    public interface IWeatherDataWorkerService : IWeatherDataService
-    {
-    }
 }

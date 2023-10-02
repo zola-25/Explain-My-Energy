@@ -10,7 +10,6 @@ public class NotifyHeatingSetupFinishedAction
         Message = message;
         Success = success;
     }
-
 }
 
 

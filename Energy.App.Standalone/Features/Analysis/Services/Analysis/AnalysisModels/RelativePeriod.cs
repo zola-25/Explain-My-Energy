@@ -1,9 +1,8 @@
-﻿namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models
+﻿namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+
+public enum RelativePeriod
 {
-    public enum RelativePeriod
-    {
-        Current,
-        Previous,
-        Next
-    }
+    Current,
+    Previous,
+    Next
 }

@@ -3,10 +3,9 @@ using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
 
-namespace Energy.App.Standalone.Features.EnergyReadings
+namespace Energy.App.Standalone.Features.EnergyReadings;
+
+public interface IEnergyImportValidation
 {
-    public interface IEnergyImportValidation
-    {
-        EnergyImportValidationResult Validate(MeterState meterSetup, bool forceReload, DateTime lastReadingsCheck, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
-    }
+    EnergyImportValidationResult Validate(MeterState meterSetup, bool forceReload, DateTime lastReadingsCheck, ImmutableList<BasicReading> existingBasicReadings, ImmutableList<CostedReading> existingCostedReadings);
 }

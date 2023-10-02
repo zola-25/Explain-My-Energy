@@ -22,7 +22,7 @@
             <MudPaper Class="my-2 d-flex justify-center" Elevation="0">
 
                 @* TODO *@
-                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@DurationAnalysis.TemperatureRange.TemperatureColourStyle">@_temperatureText</MudChip>
+                <MudChip Icon="@Icons.Material.Filled.Thermostat" Color="Color.Transparent" Style="@(DurationAnalysis.TemperatureRange.TemperatureColourStyle)">@_temperatureText</MudChip>
 
             </MudPaper>
         }
@@ -68,7 +68,7 @@
 
         _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
 
-        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Previous, DurationAnalysis.Start);
+        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Previous);
         _rangeText = Term.AnalysisPeriodDateRangeText(RelativePeriod.Previous, DurationAnalysis.Start, DurationAnalysis.End);
         _temperatureText = Term.AnalysisPeriodTemperatureText(RelativePeriod.Previous, DurationAnalysis.TemperatureRange);
         

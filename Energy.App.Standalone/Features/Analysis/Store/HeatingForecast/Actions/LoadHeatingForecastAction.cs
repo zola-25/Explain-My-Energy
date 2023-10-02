@@ -117,7 +117,7 @@ public class LoadHeatingForecastAction
 
                 dispatcher.Dispatch(new StoreHeatingForecastAction(dailyAggregatedCostedReadings, temperaturePoints, latestReadingDate));
                 dispatcher.Dispatch(new NotifyHeatingForecastUpdatedAction(degreeDifference));
-                
+
                 string completionMessage = $"Heating Forecast: {dailyAggregatedCostedReadings.Count} readings updated with {degreeDifference} degree difference";
 
                 action.CompletionSource?.SetResult((true, completionMessage));
@@ -137,5 +137,4 @@ public class LoadHeatingForecastAction
             }
         }
     }
-
 }

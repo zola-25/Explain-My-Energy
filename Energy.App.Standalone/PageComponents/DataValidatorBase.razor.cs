@@ -102,7 +102,7 @@ public partial class DataValidatorBase : FluxorComponent
         await Task.WhenAll(gasReadingsCompletion.Task, electricityReadingsCompletion.Task);
 
 
-            
+
         await Task.Delay(1);
         StateHasChanged();
         UpdateStatus = "Ready";

@@ -15,6 +15,6 @@ public class PreloadElectricityReadingsAction
     public static ElectricityReadingsState OnPreloadElectricityReadingsReducer(ElectricityReadingsState state, PreloadElectricityReadingsAction action)
     {
         state = action.ElectricityReadingsState;
-        return state;
+        return action.ElectricityReadingsState;
     }
 }

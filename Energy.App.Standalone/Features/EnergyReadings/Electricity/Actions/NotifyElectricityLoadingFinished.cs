@@ -1,17 +1,14 @@
-﻿namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions
+﻿namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+
+public class NotifyElectricityLoadingFinished
 {
-    public class NotifyElectricityLoadingFinished { 
 
-        public bool Success { get; }
-        public string Message { get; }
+    public bool Success { get; }
+    public string Message { get; }
 
-        public NotifyElectricityLoadingFinished(bool success, string message)
-        {
-            Success = success;
-            Message = message;
-        }
-
+    public NotifyElectricityLoadingFinished(bool success, string message)
+    {
+        Success = success;
+        Message = message;
     }
-
-
 }

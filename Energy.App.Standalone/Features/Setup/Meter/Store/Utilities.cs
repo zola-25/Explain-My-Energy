@@ -23,5 +23,4 @@ public static class Utilities
             AuthorizeFailedMessage = null,
         };
     }
-
 }

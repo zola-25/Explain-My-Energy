@@ -48,13 +48,14 @@ public static class Extensions
         return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();
     }
 
-    public static bool eIsDemoMode(this IConfiguration configuration) {
+    public static bool eIsDemoMode(this IConfiguration configuration)
+    {
 
         string value = configuration["App:UseDemoSetup"];
 
-        if(value == null) 
+        if (value == null)
             return false;
-        
+
         bool demoModeProperty = bool.TryParse(value, out bool demoMode);
         return demoModeProperty && demoMode;
     }
@@ -241,7 +242,6 @@ public static class Extensions
             yield return currentDate;
             currentDate = currentDate.AddDays(1);
         }
-
     }
 
     public static int eGetDateCountInclusive(this DateTime startDate, DateTime endDate)

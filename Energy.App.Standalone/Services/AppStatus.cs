@@ -4,9 +4,9 @@ namespace Energy.App.Standalone.Services;
 
 public class AppStatus
 {
-    public bool HadAutoRedirect {get; private set; }
-    public bool IsDemoMode {get;set; }
-    
+    public bool HadAutoRedirect { get; private set; }
+    public bool IsDemoMode { get; set; }
+
     public void SetHadAutoRedirect()
     {
         HadAutoRedirect = true;

@@ -5,143 +5,139 @@ using Energy.App.Standalone.Features.Setup.Household;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
 
-namespace Energy.App.Standalone.Features.Setup.Weather.Store
+namespace Energy.App.Standalone.Features.Setup.Weather.Store;
+
+
+public record EnsureWeatherLoadedAction
 {
+    public bool ForceReload { get; }
+    public TaskCompletionSource<(bool success, string message)> TaskCompletion { get; }
 
-    public record EnsureWeatherLoadedAction
+    public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<(bool success, string message)> taskCompletion = null)
     {
-        public bool ForceReload { get; }
-        public TaskCompletionSource<(bool success, string message)> TaskCompletion { get; }
+        ForceReload = forceReload;
+        TaskCompletion = taskCompletion;
+    }
 
-        public EnsureWeatherLoadedAction(bool forceReload, TaskCompletionSource<(bool success, string message)> taskCompletion = null)
+    [ReducerMethod(typeof(EnsureWeatherLoadedAction))]
+    public static WeatherState Reduce(WeatherState state)
+    {
+        return state with
         {
-            ForceReload = forceReload;
-            TaskCompletion = taskCompletion;
+            Loading = true
+        };
+    }
+
+    [ReducerMethod(typeof(NotifyWeatherLoadingFinished))]
+    public static WeatherState NotifyWeatherLoadingFinishedReducer(WeatherState state)
+    {
+        return state with
+        {
+            Loading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static WeatherState StoreWeatherReloadedReadingsActionReducer(WeatherState state, StoreWeatherReloadedReadingsAction action)
+    {
+        return state with
+        {
+            OutCodeCharacters = action.OutCodeCharacters,
+            LastUpdated = DateTime.UtcNow,
+            WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList()
+        };
+    }
+
+    [ReducerMethod]
+    public static WeatherState StoreWeatherUpdatedReadingsActionReducer(WeatherState state, StoreWeatherUpdatedReadingsAction action)
+    {
+        var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
+
+        return state with
+        {
+            LastUpdated = DateTime.UtcNow,
+            WeatherReadings = state.WeatherReadings
+                .RemoveAll(c => c.UtcTime >= firstUpdateDate)
+                .AddRange(action.UpdatedWeatherReadings)
+        };
+    }
+
+    private class Effect : Effect<EnsureWeatherLoadedAction>
+    {
+        private readonly IState<HouseholdState> _householdState;
+        private readonly IState<WeatherState> _weatherState;
+        private readonly IWeatherDataService _weatherDataService;
+
+        public Effect(IState<HouseholdState> householdState,
+                      IState<WeatherState> weatherState,
+                      IWeatherDataService weatherDataService)
+        {
+            _householdState = householdState;
+            _weatherState = weatherState;
+            _weatherDataService = weatherDataService;
         }
 
-        [ReducerMethod(typeof(EnsureWeatherLoadedAction))]
-        public static WeatherState Reduce(WeatherState state)
+        public override async Task HandleAsync(EnsureWeatherLoadedAction action, IDispatcher dispatcher)
         {
-            return state with
+
+            if (!_householdState.Value.Saved || _householdState.Value.Invalid)
             {
-                Loading = true
-            };
-        }
-
-        [ReducerMethod(typeof(NotifyWeatherLoadingFinished))]
-        public static WeatherState NotifyWeatherLoadingFinishedReducer(WeatherState state)
-        {
-            return state with
-            {
-                Loading = false
-            };
-        }
-
-        [ReducerMethod]
-        public static WeatherState StoreWeatherReloadedReadingsActionReducer(WeatherState state, StoreWeatherReloadedReadingsAction action)
-        {
-            return state with
-            {
-                OutCodeCharacters = action.OutCodeCharacters,
-                LastUpdated = DateTime.UtcNow,
-                WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList()
-            };
-        }
-
-        [ReducerMethod]
-        public static WeatherState StoreWeatherUpdatedReadingsActionReducer(WeatherState state, StoreWeatherUpdatedReadingsAction action)
-        {
-            var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
-
-            return state with
-            {
-                LastUpdated = DateTime.UtcNow,
-                WeatherReadings = state.WeatherReadings
-                    .RemoveAll(c => c.UtcTime >= firstUpdateDate)
-                    .AddRange(action.UpdatedWeatherReadings)
-            };
-        }
-
-        private class Effect : Effect<EnsureWeatherLoadedAction>
-        {
-            private readonly IState<HouseholdState> _householdState;
-            private readonly IState<WeatherState> _weatherState;
-            private readonly IWeatherDataService _weatherDataService;
-
-            public Effect(IState<HouseholdState> householdState,
-                          IState<WeatherState> weatherState,
-                          IWeatherDataService weatherDataService)
-            {
-                _householdState = householdState;
-                _weatherState = weatherState;
-                _weatherDataService = weatherDataService;
+                var message = "Household not saved or invalid";
+                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(false, message));
+                action.TaskCompletion?.SetResult((false, message));
+                return;
             }
 
-            public override async Task HandleAsync(EnsureWeatherLoadedAction action, IDispatcher dispatcher)
+            string outCode = _householdState.Value.OutCodeCharacters;
+
+
+            if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || action.ForceReload)
             {
 
-                if (!_householdState.Value.Saved || _householdState.Value.Invalid)
+                var results = await _weatherDataService.GetForOutCode(outCode);
+
+                dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode));
+
+                var message = $"Loaded {results.Count} days of weather data for {outCode}";
+                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
+                action.TaskCompletion?.SetResult((true, message));
+                return;
+            }
+            else
+            {
+
+                var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
+                    UtcTime;
+                var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
+                    UtcTime;
+
+                if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
                 {
-                    var message = "Household not saved or invalid";
-                    dispatcher.Dispatch(new NotifyWeatherLoadingFinished(false, message));
-                    action.TaskCompletion?.SetResult((false, message));
-                    return;
-                }
 
-                string outCode = _householdState.Value.OutCodeCharacters;
+                    var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
 
+                    if (results.Count == 0)
+                    {
+                        var noNewDataMessage = $"No new weather data available for {outCode}";
+                        dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noNewDataMessage));
+                        action.TaskCompletion?.SetResult((true, noNewDataMessage));
+                        return;
+                    }
 
-                if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || action.ForceReload)
-                {
+                    dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results));
 
-                    var results = await _weatherDataService.GetForOutCode(outCode);
-
-                    dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode));
-
-                    var message = $"Loaded {results.Count} days of weather data for {outCode}";
+                    var message = $"Updated {results.Count} new days of weather data for {outCode}";
                     dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
                     action.TaskCompletion?.SetResult((true, message));
+
                     return;
+
                 }
-                else
-                {
-
-                    var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-                        UtcTime;
-                    var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-                        UtcTime;
-
-                    if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
-                    {
-
-                        var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
-
-                        if (results.Count == 0)
-                        {
-                            var noNewDataMessage = $"No new weather data available for {outCode}";
-                            dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noNewDataMessage));
-                            action.TaskCompletion?.SetResult((true, noNewDataMessage));
-                            return;
-                        }
-
-                        dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results));
-
-                        var message = $"Updated {results.Count} new days of weather data for {outCode}";
-                        dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
-                        action.TaskCompletion?.SetResult((true, message));
-
-                        return;
-
-                    }
-                }
-
-                var noUpdateNeededMessage = $"Weather Data up-to-date for {outCode}";
-                dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noUpdateNeededMessage));
-                action.TaskCompletion?.SetResult((true, noUpdateNeededMessage));
             }
 
+            var noUpdateNeededMessage = $"Weather Data up-to-date for {outCode}";
+            dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, noUpdateNeededMessage));
+            action.TaskCompletion?.SetResult((true, noUpdateNeededMessage));
         }
-
-        
     }
 }

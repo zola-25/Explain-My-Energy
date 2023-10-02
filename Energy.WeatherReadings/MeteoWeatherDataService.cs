@@ -101,5 +101,4 @@ public class MeteoWeatherDataService : IMeteoWeatherDataService
             badResponseException.Response.ReasonPhrase,
             badResponseException);
     }
-
 }

@@ -68,7 +68,7 @@ public class HistoricalForecastSummarizer : IHistoricalForecastSummarizer
         var totalKWh = forecastDailyCosts.Sum(c => c.KWh);
         var totalCost = forecastDailyCosts.Sum(c => c.ReadingTotalCostPounds);
         var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
-        
+
         var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
         var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
         var totalCo2Rounded = totalCo2.Round(1);
@@ -85,5 +85,4 @@ public class HistoricalForecastSummarizer : IHistoricalForecastSummarizer
         };
         return results;
     }
-
 }

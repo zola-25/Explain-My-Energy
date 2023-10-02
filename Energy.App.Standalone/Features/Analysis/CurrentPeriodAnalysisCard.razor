@@ -87,7 +87,7 @@
         base.OnParametersSet();
 
         _analysisOptionsActionFactory = new AnalysisOptionsActionFactory(MeterType);
-        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Current, CurrentPeriodAnalysisToDate.Start);
+        _headerText = Term.AnalysisPeriodHeader(RelativePeriod.Current);
         _rangeText = Term.AnalysisPeriodDateRangeText(RelativePeriod.Current, CurrentPeriodForecastAnalysis.Start, CurrentPeriodForecastAnalysis.End);
         _temperatureText = Term.AnalysisPeriodTemperatureText(RelativePeriod.Current, CurrentPeriodForecastAnalysis.TemperatureRange);
         _consumptionIcon = MeterType == MeterType.Electricity ? Icons.Material.Filled.ElectricBolt : Icons.Material.Filled.LocalFireDepartment;

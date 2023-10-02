@@ -1,9 +1,8 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 
-namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+
+public interface ICostedReadingsToDailyAggregator
 {
-    public interface ICostedReadingsToDailyAggregator
-    {
-        IEnumerable<DailyCostedReading> Aggregate(IEnumerable<CostedReading> costedReadings);
-    }
+    IEnumerable<DailyCostedReading> Aggregate(IEnumerable<CostedReading> costedReadings);
 }

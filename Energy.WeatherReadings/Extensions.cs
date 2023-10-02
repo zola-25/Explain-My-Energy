@@ -2,41 +2,39 @@
 using Energy.WeatherReadings.Models;
 using System.Text;
 
-namespace Energy.WeatherReadings
+namespace Energy.WeatherReadings;
+
+public static class Extensions
 {
-    public static class Extensions
+    public static string BuildQueryString(this Dictionary<string, string> queryParameters)
     {
-        public static string BuildQueryString(this Dictionary<string, string> queryParameters)
+        StringBuilder queryStringBuilder = new StringBuilder();
+
+        foreach (KeyValuePair<string, string> parameter in queryParameters)
         {
-            StringBuilder queryStringBuilder = new StringBuilder();
-
-            foreach (KeyValuePair<string, string> parameter in queryParameters)
+            if (queryStringBuilder.Length > 0)
             {
-                if (queryStringBuilder.Length > 0)
-                {
-                    queryStringBuilder.Append('&');
-                }
-
-                string encodedKey = Uri.EscapeDataString(parameter.Key);
-                string encodedValue = Uri.EscapeDataString(parameter.Value);
-
-                queryStringBuilder.AppendFormat("{0}={1}", encodedKey, encodedValue);
+                queryStringBuilder.Append('&');
             }
 
-            return queryStringBuilder.ToString();
+            string encodedKey = Uri.EscapeDataString(parameter.Key);
+            string encodedValue = Uri.EscapeDataString(parameter.Value);
+
+            queryStringBuilder.AppendFormat("{0}={1}", encodedKey, encodedValue);
         }
 
-        public static string WeatherCodeToSummary(this int? weatherCode)
+        return queryStringBuilder.ToString();
+    }
+
+    public static string WeatherCodeToSummary(this int? weatherCode)
+    {
+        if (weatherCode == null)
         {
-            if(weatherCode == null)
-            {
-                return String.Empty;
-            }
-
-            var wmoEnum = (WMOCodes)weatherCode;
-
-            return wmoEnum.eEnumToFormatted(keepFirstUpper: true, keepRestUpper: false);
+            return String.Empty;
         }
 
+        var wmoEnum = (WMOCodes)weatherCode;
+
+        return wmoEnum.eEnumToFormatted(keepFirstUpper: true, keepRestUpper: false);
     }
 }

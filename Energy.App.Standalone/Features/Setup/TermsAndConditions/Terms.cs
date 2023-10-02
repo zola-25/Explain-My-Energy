@@ -13,7 +13,7 @@ public record TermsAndConditionsState
 // create action class 
 public class HasSeenWelcomeScreenAction
 {
-    public bool Seen { get;  }
+    public bool Seen { get; }
 
     public HasSeenWelcomeScreenAction(bool seen)
     {

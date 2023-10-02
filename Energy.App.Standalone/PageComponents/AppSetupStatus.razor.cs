@@ -110,7 +110,7 @@ public partial class AppSetupStatus
         HeatingForecastStatus = GetHeatingForecastStatus();
         HeatingForecastSeverity = HeatingForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
-        
+
 
         Ready = true;
     }
@@ -124,7 +124,7 @@ public partial class AppSetupStatus
 
         switch (heatingMeter)
         {
-            case MeterType.Gas:                
+            case MeterType.Gas:
                 HeatingAnalysisValidCallback?.Invoke(this, (MeterType.Gas, HeatingForecastStatus.Valid));
                 HistoricalAnalysisValidCallback?.Invoke(this, (MeterType.Electricity, ElectricityHistoricalForecastStatus.Valid));
                 break;
@@ -133,7 +133,7 @@ public partial class AppSetupStatus
                 HistoricalAnalysisValidCallback?.Invoke(this, (MeterType.Gas, GasHistoricalForecastStatus.Valid));
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(heatingMeter), heatingMeter, "Meter not recognised"); 
+                throw new ArgumentOutOfRangeException(nameof(heatingMeter), heatingMeter, "Meter not recognised");
         }
     }
 

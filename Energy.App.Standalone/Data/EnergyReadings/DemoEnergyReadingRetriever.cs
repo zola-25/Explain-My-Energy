@@ -60,7 +60,7 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
                         c.UtcTime.Day == missingReadingDateTime.Day &&
                         c.UtcTime.Hour == missingReadingDateTime.Hour &&
                         c.UtcTime.Minute == missingReadingDateTime.Minute).First();
-                    
+
 
                     decimal demoReadingKWh = 0;
 
@@ -77,9 +77,9 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
 
             }).ToList();
-            
+
             // ensure we don't include double entries for the same date/time
-            
+
             demoMissingBasicReadings.RemoveAll(c => c.UtcTime <= requestedDemoReadings.Last().UtcTime);
             requestedDemoReadings.AddRange(demoMissingBasicReadings);
         }

@@ -1,8 +1,6 @@
-﻿namespace Energy.App.Standalone.Features.Setup.Household.Actions
-{
-    public class NotifyHouseholdSavedSuccess
-    {
+﻿namespace Energy.App.Standalone.Features.Setup.Household.Actions;
 
-    }
+public class NotifyHouseholdSavedSuccess
+{
 
 }
