@@ -21,12 +21,12 @@
         <MudDivider></MudDivider>
 
         <MudTooltip  Text="@ElectricityTooltipText()" Placement="Placement.Right"  RootClass="w-Inherit">
-            <MudNavLink UserAttributes="@(new() {{"role", "link"}})" Disabled="ElectricityDisabled" Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
+            <MudNavLink  Disabled="ElectricityDisabled" Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
                 <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsElectricity ? Icons.Material.Filled.Thermostat : "")">Electricity</NavMenuNavLinkContent>
             </MudNavLink>
         </MudTooltip>
         <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
-            <MudNavLink UserAttributes="@(new() {{"role", "link"}})"
+            <MudNavLink 
                         Disabled="GasDisabled" 
                     Class="navbar-nav-item" 
                     Href="@GasHref" 
