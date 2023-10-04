@@ -1,12 +1,15 @@
 ﻿@if (!String.IsNullOrWhiteSpace(SuffixIcon))
 {
-    <MudPaper Elevation="0"  Class="d-flex background-inherit">
+    <MudPaper Elevation="0" Class="d-flex background-inherit color-inherit">
         @ChildContent <MudIcon Color="@IconColor" Class="mud-nav-link-icon mud-nav-link-icon-default ml-3" Icon="@SuffixIcon"></MudIcon>
     </MudPaper>
 }
 else
 {
-    @ChildContent
+    <MudPaper Elevation="0" Class="d-flex background-inherit color-inherit">
+        @ChildContent
+    </MudPaper>
+
 }
 
 @code {
