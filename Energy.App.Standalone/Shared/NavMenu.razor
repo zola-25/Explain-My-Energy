@@ -21,15 +21,28 @@
         <MudDivider></MudDivider>
 
         <MudTooltip  Text="@ElectricityTooltipText()" Placement="Placement.Right"  RootClass="w-Inherit">
-            <MudNavLink  Disabled="ElectricityDisabled" Class="navbar-nav-item" Href="@ElectricityHref" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ElectricBolt" ActiveClass="active-navbar-item">
+            <MudNavLink UserAttributes="@(new () 
+                            {{"role", "link"}, 
+                            {"aria-label","Electricity Analysis"}, 
+                            {"aria-disabled", $"{ElectricityDisabled}"}})"
+                        Disabled="@ElectricityDisabled"
+                        Class="navbar-nav-item"
+                        Href="@(ElectricityDisabled ? null : ElectricityHref)"
+                        Match="NavLinkMatch.All" 
+                        Icon="@Icons.Material.Filled.ElectricBolt" 
+                        ActiveClass="active-navbar-item">
                 <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsElectricity ? Icons.Material.Filled.Thermostat : "")">Electricity</NavMenuNavLinkContent>
             </MudNavLink>
         </MudTooltip>
         <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
             <MudNavLink 
-                        Disabled="GasDisabled" 
-                    Class="navbar-nav-item" 
-                    Href="@GasHref" 
+                    UserAttributes="@(new () 
+                        {{"role", "link"}, 
+                        {"aria-label","Gas Analysis"},
+                        {"aria-disabled", $"{GasDisabled}"}})"
+                    Class="navbar-nav-item"
+                    Disabled="@GasDisabled"
+                    Href="@(GasDisabled ? null : GasHref)"
                     Match="NavLinkMatch.Prefix"
                     Icon="@Icons.Material.Filled.LocalFireDepartment" 
                     ActiveClass="active-navbar-item">
