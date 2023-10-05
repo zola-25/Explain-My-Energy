@@ -47,7 +47,13 @@
             else
             {
                 <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
-                    <MudButton Href="@($"/MeterAuthorization/{context.MeterType}")" Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                    <MudButton 
+                        aria-label="@($"Authorize {context.MeterType} Meter")"
+                        Href="@($"/MeterAuthorization/{context.MeterType}")" 
+                        Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)" 
+                        ButtonType="ButtonType.Button" 
+                        Variant="Variant.Filled" 
+                        Size="Size.Small">Authorize</MudButton>
                 </MudTooltip>
             }
         </MudTd>

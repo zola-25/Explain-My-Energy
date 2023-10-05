@@ -20,7 +20,12 @@
                 <ShareMenu />
             </MudTooltip>
         </MudAppBar>
-            <MudDrawer UserAttributes="@(new () {{"id", "main-site-links-region"},{"role","region" },{"aria-label","Contains Main Site Navigation Links"}})" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <MudDrawer 
+                UserAttributes="@(new () {{"id", "main-site-links-region"},{"role","region" },{"aria-label","Contains Main Site Navigation Links"}})" 
+                @bind-Open="_drawerOpen" 
+                ClipMode="DrawerClipMode.Always" 
+                Elevation="2"
+                DisableOverlay="true">
             <NavMenu></NavMenu>
         </MudDrawer>
         <MudMainContent>
