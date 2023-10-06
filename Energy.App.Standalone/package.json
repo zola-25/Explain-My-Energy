@@ -57,7 +57,7 @@
     "marked": "^9.0.0",
     "mocha": "^10.2.0",
     "mocha-junit-reporter": "^2.2.1",
-    "postcss": "^8.4.28",
+    "postcss": "^8.4.31",
     "postcss-loader": "^7.3.3",
     "sass": "^1.68.0",
     "sass-loader": "^13.3.2",
