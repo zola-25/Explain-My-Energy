@@ -28,7 +28,7 @@
             <MudCardActions Class="d-block">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
-                    <div class="@(_submitSuccessful ? "visible" : "invisible") d-flex my-5 mud-typography-h6 mud-success-text justify-start align-baseline ">
+                    <div class="@(_submitSuccessful ? "d-flex" : "d-none") my-5 mud-typography-h6 mud-success-text justify-start align-baseline ">
                         <span class="mx-auto">
                             <i class="fa-solid fa-check" aria-hidden="true"></i>
                             Electricity Meter Valid - proceed to authorize access to n3rgy.com?

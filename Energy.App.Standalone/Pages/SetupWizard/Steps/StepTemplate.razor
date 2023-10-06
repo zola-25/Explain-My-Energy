@@ -1,4 +1,5 @@
-﻿
+﻿@implements IAsyncDisposable
+
 <MudPaper aria-label="Wizard step content" Elevation="2" Class="p-4">
     <MudGrid Justify="Justify.Center">
         <MudItem  xs="12">
@@ -26,6 +27,7 @@
     </MudGrid>
 </MudPaper>
 @code {
+    [Inject] IJSRuntime JS { get; set; }
 
     [Parameter] public List<BreadcrumbItem> BreadcrumbItems { get; set; }
 
@@ -39,4 +41,26 @@
 
     [Parameter] public RenderFragment HeaderContent { get; set; }
 
+    private IJSObjectReference module;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./Pages/SetupWizard/Steps/StepTemplate.razor.js");
+            await module.InvokeVoidAsync("scrollToTop");
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
 }
