@@ -28,18 +28,56 @@
 		<ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
 		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
 	</ItemGroup>
-
-
+	
+	
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
 	</Target>
-
+	
 	<PropertyGroup>
 		<RunAOTCompilation>true</RunAOTCompilation>
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		 <Environment>Development</Environment>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Environment>Development</Environment>
+	</PropertyGroup>
+	
 
+	<Target Name="CopyCustomFiles" BeforeTargets="BeforeBuild">
+    	<Message Importance="high" Text="Environment is $(Environment)" />
+    	<Copy SourceFiles="@(CustomFiles)" DestinationFolder="$(ProjectDir)wwwroot\%(RecursiveDir)" />
+  </Target>
+
+
+	<ItemGroup Condition="'$(Environment)' == 'Development'">
+		<CustomFiles Include="webAssets/webAssetsDevelopment/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Environment)' == 'Staging'">
+		<CustomFiles Include="webAssets/webAssetsStaging/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Environment)' == 'Production'">
+		<CustomFiles Include="webAssets/webAssetsProduction/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Environment)' == 'DemoDevelopment'">
+		<CustomFiles Include="webAssets/webAssetsDemoDevelopment/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Environment)' == 'DemoStaging'">
+		<CustomFiles Include="webAssets/webAssetsDemoStaging/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Environment)' == 'DemoProduction'">
+		<CustomFiles Include="webAssets/webAssetsDemoProduction/**/*.*" />
+	</ItemGroup>
 
 
 </Project>
