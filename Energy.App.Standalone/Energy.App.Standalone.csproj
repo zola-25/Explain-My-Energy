@@ -8,9 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="wwwroot/**/*"></None>
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Fluxor" Version="5.9.1" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
 		<PackageReference Include="Fluxor.Persist" Version="2.5.3" />
@@ -79,6 +76,12 @@
 
 	<ItemGroup Condition="'$(Environment)' == 'DemoProduction'">
 		<CustomFiles Include="webAssets/webAssetsDemoProduction/**/*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 
