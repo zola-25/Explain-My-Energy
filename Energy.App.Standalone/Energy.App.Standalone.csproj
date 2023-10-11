@@ -7,7 +7,9 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
-
+	<ItemGroup>
+		<None Include="wwwroot/**/*"></None>
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Fluxor" Version="5.9.1" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.9.1" />
