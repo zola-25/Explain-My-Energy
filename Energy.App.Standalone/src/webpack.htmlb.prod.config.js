@@ -11,7 +11,7 @@ import appInfoConfig from "./appInfoConfig.js";
 
 
 
-export default function (appEnv, appDemo) {
+export default function (appEnv, appDemo, assetOutputPath) {
 
     const envAppInfoConfig = appInfoConfig(appEnv, appDemo);
     const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -65,15 +65,16 @@ export default function (appEnv, appDemo) {
         plugins: [
             new HtmlBundlerPlugin({
                 // define a relative or absolute path to entry templates
-                outputPath: _resolve(__dirname, '../wwwroot'),
+                outputPath: assetOutputPath,
                 entry: {
                     index: {
                         import: _resolve(__dirname, 'views/index_template.ejs'),
                         data: envAppInfoConfig.headerData,
+                        test: /\.ejs$/,
                     },
                     Credits: {
                         import: _resolve(__dirname, 'views/Credits.html'),
-
+                        test: /\.html$/,
                     }
                 },
                 preprocessor: 'ejs',
@@ -134,7 +135,7 @@ export default function (appEnv, appDemo) {
         mode: 'production',
         devtool: 'hidden-source-map',
         output: {
-            path: _resolve(__dirname, '../wwwroot'),
+            path: assetOutputPath,
             publicPath: '/',
             clean: {
                 keep: /temp/

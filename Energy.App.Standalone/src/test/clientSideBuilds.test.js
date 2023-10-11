@@ -9,7 +9,6 @@ import { globSync } from 'glob';
 
 const scriptDirectory = 'src/test';
 
-const outputDirectory = _resolve(scriptDirectory, '../../wwwroot');
 
 const environments = process.env.npm_config_environments ? process.env.npm_config_environments.split(",") : ['development', 'staging', 'production'];
 
@@ -17,9 +16,10 @@ environments.forEach((environment) => {
 
   describe('buildClientSide', function () {
 
+    const outputDirectory = _resolve(scriptDirectory, `../../webAssets/webAssets${environment.at(0).toUpperCase() + environment.slice(1)}`);
+
     const indexHtmlPath = _resolve(outputDirectory, 'index.html');
     const CreditsHtmlPath = _resolve(outputDirectory, 'Credits.html');
-
 
 
     let indexHtmlContents;
@@ -31,7 +31,7 @@ environments.forEach((environment) => {
     before(`${environment} build client side`, function () {
 
       if (fs.existsSync(outputDirectory)) {
-        clearDirectory(outputDirectory, 'temp');
+        clearDirectory(outputDirectory);
       }
       this.timeout(1000 * 60 * 2);
 
@@ -48,7 +48,7 @@ environments.forEach((environment) => {
     after(`${environment} cleanup client side`, function () {
 
       if (fs.existsSync(outputDirectory)) {
-        clearDirectory(outputDirectory, 'temp');
+        clearDirectory(outputDirectory);
       }
 
       indexHtmlContents = null;
