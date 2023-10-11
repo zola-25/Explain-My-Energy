@@ -114,7 +114,7 @@ try {
                 if (fs.existsSync(webAssetsBuildFolder)) {
                     clearDirectory(webAssetsBuildFolder, 'temp');
                 } else {
-                    fs.mkdirSync(webAssetsBuildFolder);
+                    fs.mkdirSync(webAssetsBuildFolder, { recursive: true});
                 }
 
                 let webpackConfig;
