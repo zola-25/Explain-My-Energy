@@ -22,7 +22,7 @@ export default function (appEnv, appDemo) {
 
     let headerData;
 
-    if (appDemo ) {
+    if (appDemo === 'true' || appDemo === true) {
         headerData = {
             ...defaultHeaderData,
             ogUrl: 'https://demo.explainmyenergy.net',

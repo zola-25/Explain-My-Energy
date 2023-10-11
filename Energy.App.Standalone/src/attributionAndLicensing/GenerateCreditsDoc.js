@@ -6,7 +6,7 @@ import appInfoConfig from '../appInfoConfig.js';
 
 const APP_ENV = process.env.APP_ENV;
 
-const { projectRootPath, generatedPartialsOutputDirectory } = appInfoConfig(APP_ENV);
+const { projectRootPath, generatedPartialsOutputDirectory } = appInfoConfig(APP_ENV, 'false');
 const generatedPartialsFolder = path.resolve(generatedPartialsOutputDirectory)
 const generatedCreditsViewsPath = path.resolve(projectRootPath, 'src/views/Credits.html')
 
