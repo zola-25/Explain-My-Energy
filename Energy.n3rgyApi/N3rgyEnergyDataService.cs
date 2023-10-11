@@ -2,6 +2,7 @@
 using Energy.n3rgyApi.Models;
 using Energy.Shared;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace Energy.n3rgyApi;
@@ -35,6 +36,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
     {
         HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
 
         string path = $"1?start={startDate:yyyyMMdd}&end={endDate:yyyyMMdd}";
 
@@ -73,6 +76,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
         DateTime endDate = DateTime.Today.AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
 
         string path = $"1?start={startDate:yyyyMMdd}&end={endDate:yyyyMMdd}";
 
@@ -90,6 +95,7 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
         DateTime endDate = DateTime.Today.AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         string path = $"1?start={startDate:yyyyMMdd}&end={endDate:yyyyMMdd}";
 

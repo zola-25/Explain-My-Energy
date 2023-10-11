@@ -17,31 +17,27 @@
                     whole seasonal energy costs, simply with a mouse scroll (or a swipe)</li>
             </ul>
 
-            <br />
             <p>
                 <strong>This is a hobby project, and a beta version of the application.</strong> Feedback is much appreciated and
-                will help determine whether the app provides enough value to warrant maintaining and developing further.
+                will help determine whether the app provides enough value to warrant maintaining and developing further. Please feel free to email me at <MudLink
+                    Href="mailto:explainmyenergy@solores-software.net">explainmyenergy@solores-software.net</MudLink> with any
+                problems, comments or suggestions.
             </p>
+            <ul class="ml-3">
+                <li>The app doesn't sell energy; doesn't sell your data; it doesn't collect your
+                data. There is no sign up, no login, no cookies, no tracking, no ads.</li>
+            <li>The app uses Blazor WebAssembly process everything on your device.</li>
+            <li>To view a demo version, with setup pre-configured with example data, go to <MudLink Href="https://demo.explainmyenergy.net">demo.explainmyenergy.net</MudLink></li>
+            </ul>
 
-            <p>The app doesn't sell energy; doesn't sell your data; it doesn't collect your
-                data.</p>
-            <p>There is no sign up, no login, no cookies, no tracking, no ads.</p>
-            <p>The app uses Blazor WebAssembly process everything on your device.</p>
-            <p>To view a demo version, with setup pre-configured, go to <a href="https://demo.explainmyenergy.net">demo.explainmyenergy.net</a></p>
-            
-            <p>Please feel free to email me at <a
-                    href="mailto:explainmyenergy@solores-software.net">explainmyenergy@solores-software.net</a> with any
-                problems, comments or suggestions.</p>
-
-            <p><strong>Explain My Energy's</strong> Terms &amp; Conditions can be viewed here: <MudLink
+            <p><strong>Explain My Energy's</strong> Terms &amp; Conditions can be viewed here: <MudLink aria-haspopup="dialog"
                     OnClick="ShowTermsDialog">Terms &amp; Conditions</MudLink>
             </p>
-            <p>By using this application, you acknowledge that you agree to these terms.</p>
-            <p>The Privacy Policy is also available here: <MudLink OnClick="ShowPrivacyDialog">Privacy Policy</MudLink>
-            </p>
-        </div>
+            <ul class="ml-3">
+            <li>By using this application, you acknowledge that you agree to these terms. The Privacy Policy is also available here: <MudLink OnClick="ShowPrivacyDialog" aria-haspopup="dialog">Privacy Policy</MudLink></li>
+            </ul>
 
-        <MudDialog @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
+        <MudDialog  @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
 
             <DialogContent>
                 <TermsAndConditionsContents />
@@ -63,10 +59,13 @@
             </DialogActions>
         </MudDialog>
 
+        <p><strong>Getting Started</strong></p>
+        <ul class="ml-3">
+            <li>There is a Setup Wizard that provides a simple step-by-step process to configuring the application.</li> 
+            <li>Otherwise feel free to explore the application and set up your home and meters manually.</li>
+        </ul>
+        </div>
 
-        <br />
-        <br />
-        Otherwise, feel free to explore the application and set up your home and meters manually.
     </MudText>
 
 </MudPaper>

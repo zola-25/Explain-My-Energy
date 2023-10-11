@@ -22,14 +22,17 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using System.Threading.Tasks;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
-
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+await AddAppSettings(builder, "appsettings.json");
+
 
 builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
@@ -56,8 +59,7 @@ builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>()
 
 builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
-builder.Services.AddMudServices(config =>
-{
+builder.Services.AddMudServices(config => {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
     config.SnackbarConfiguration.PreventDuplicates = false;
     config.SnackbarConfiguration.NewestOnTop = false;
@@ -69,11 +71,10 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 
-builder.Services.AddBlazoredLocalStorage(config =>
-    {
-        config.JsonSerializerOptions.WriteIndented = false;
+builder.Services.AddBlazoredLocalStorage(config => {
+    config.JsonSerializerOptions.WriteIndented = false;
 
-    }
+}
 
 );
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
@@ -81,26 +82,22 @@ builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 
 
 System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
-builder.Services.AddFluxor(options =>
-{
+builder.Services.AddFluxor(options => {
     options = options.ScanAssemblies(currentAssembly);
 
 #if DEBUG
-    options.UseReduxDevTools(devToolsOptions =>
-    {
+    options.UseReduxDevTools(devToolsOptions => {
         devToolsOptions.Latency = TimeSpan.FromMilliseconds(1000);
         devToolsOptions.UseSystemTextJson();
     });
 #endif
-    options.UsePersist(persistMiddlewareOptions =>
-    {
+    options.UsePersist(persistMiddlewareOptions => {
         persistMiddlewareOptions.UseInclusionApproach();
     });
 });
 
 
-builder.Services.AddLogging(c =>
-{
+builder.Services.AddLogging(c => {
     c.SetMinimumLevel(LogLevel.Information);
 
 });
@@ -126,3 +123,20 @@ builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
 
 await builder.Build().RunAsync();
+
+
+
+async ValueTask AddAppSettings(WebAssemblyHostBuilder builder, string appsettingsLocation)
+{
+
+    var http = new HttpClient() {
+        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    };
+
+    builder.Services.AddScoped(sp => http);
+
+    using var response = await http.GetAsync(requestUri: appsettingsLocation);
+    using var stream = await response.Content.ReadAsStreamAsync();
+
+    builder.Configuration.AddJsonStream(stream);
+}
