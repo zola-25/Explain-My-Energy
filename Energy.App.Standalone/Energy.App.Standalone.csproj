@@ -40,41 +40,41 @@
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		 <Environment>Development</Environment>
+		<ClientEnv>Development</ClientEnv>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<Environment>Development</Environment>
+		<ClientEnv>Development</ClientEnv>
 	</PropertyGroup>
-	
+
 
 	<Target Name="CopyCustomFiles" BeforeTargets="BeforeBuild">
-    	<Message Importance="high" Text="Environment is $(Environment)" />
+    	<Message Importance="high" Text="ClientEnv is $(ClientEnv)" />
     	<Copy SourceFiles="@(CustomFiles)" DestinationFolder="$(ProjectDir)wwwroot\%(RecursiveDir)" />
   </Target>
 
 
-	<ItemGroup Condition="'$(Environment)' == 'Development'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'Development'">
 		<CustomFiles Include="webAssets/webAssetsDevelopment/**/*.*" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Environment)' == 'Staging'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'Staging'">
 		<CustomFiles Include="webAssets/webAssetsStaging/**/*.*" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Environment)' == 'Production'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'Production'">
 		<CustomFiles Include="webAssets/webAssetsProduction/**/*.*" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Environment)' == 'DemoDevelopment'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'DemoDevelopment'">
 		<CustomFiles Include="webAssets/webAssetsDemoDevelopment/**/*.*" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Environment)' == 'DemoStaging'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'DemoStaging'">
 		<CustomFiles Include="webAssets/webAssetsDemoStaging/**/*.*" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Environment)' == 'DemoProduction'">
+	<ItemGroup Condition="'$(ClientEnv)' == 'DemoProduction'">
 		<CustomFiles Include="webAssets/webAssetsDemoProduction/**/*.*" />
 	</ItemGroup>
 
