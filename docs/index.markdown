@@ -1,3 +1,12 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+title: Explain My Energy Documentation
+layout: default
+nav_order: 1
+---
+
+
 # Explain My Energy Documentation
 
 ## Introduction
@@ -19,7 +28,7 @@ Once users have access, the application automates the download of their energy u
 - Powerful charting tools that allow you to see everything from granular hourly energy spikes, to whole seasonal energy costs, simply with a mouse scroll (or a swipe)
 
 <p align="center" width="100%">
-    <img src="Demo1.gif" width="500" height="450" alt="Analysis Demo gif" />
+    <img src="assets/img/Demo1.gif" width="700" height="450" alt="Analysis Demo gif" />
 </p>
 
 
@@ -50,8 +59,5 @@ The application is designed to be as accurate as possible, but there are some ca
 - The data provided by n3rgy is not always up-to-date. There may be a lag of days or even weeks between the data being collected by the smart meter and it being available through the n3rgy consumer service. This means the application may not be able to show you your most recent energy usage data.
 
 - There may limited amout of historical data available. If you've only recently moved into a property, or your energy provider has only recently started providing data to n3rgy, then there may be limited historical data available. This makes it difficult to provide accurate forecasts of future energy usage and costs.
-
-
-
 
 

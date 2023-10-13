@@ -52,25 +52,26 @@
                         Your Postal Area is the first 4 characters of your postcode (or sometimes 3 in London). <br /> It's needed to retrieve weather data for your location, so we can forecast your energy usage with weather changes
                     </InfoTooltip>
                 </div>
-                <div class="d-flex align-baseline">
+                <div class="d-flex align-baseline justify-center">
                     <MudText>What is your home's primary heating source?</MudText>
-                    <InfoTooltip IconTitle="Tooltip for selecting your home's primary heating source">
+                    <InfoTooltip  IconTitle="Tooltip for selecting your home's primary heating source">
                         What do you use to heat your home? <br />
                         In the UK, 80% of people use some form of Gas central heating
                     </InfoTooltip>
                 </div>
+                 <div class="d-flex align-baseline justify-center">
                 <MudRadioGroup Name="Primary Heat Source" T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
                                 Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
                     <MudRadio  T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
                     <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
                 </MudRadioGroup>
-
+                 </div>
             </MudCardContent>
             <MudCardActions Class="d-flex flex-column align-start ">
-                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
+                 <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
 
-                <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
-                    @_saveResponseMessage
+                <MudText Class="mx-auto mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
+                     <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
                 </MudText>
             </MudCardActions>
         </MudCard>

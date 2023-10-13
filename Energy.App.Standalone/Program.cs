@@ -17,6 +17,7 @@ using Energy.WeatherReadings;
 using Fluxor;
 using Fluxor.Persist.Middleware;
 using Fluxor.Persist.Storage;
+using Ganss.Xss;
 using MathNet.Numerics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -54,6 +55,9 @@ builder.Services.AddTransient<ICostCalculator, CostCalculator>();
 builder.Services.AddTransient<ICostedReadingsToDailyAggregator, CostedReadingsToDailyAggregator>();
 builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMovingAverage>();
 builder.Services.AddTransient<IHistoricalForecastValidation, HistoricalForecastValidation>();
+
+builder.Services.AddSingleton<IHtmlSanitizer, HtmlSanitizer>();
+builder.Services.AddSingleton<ISanitization, Sanitization>();
 
 builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();
 
