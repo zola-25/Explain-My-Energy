@@ -1,0 +1,49 @@
+﻿
+
+<MudDialog  Class="tooltip-dialog"
+    ClassActions="d-flex justify-center"  DefaultFocus="DefaultFocus.Element" >
+    <TitleContent>
+         <div class="d-flex justify-end align-baseline">
+            <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="false"  Class="mx-auto fw-bolder" Color="Color.Inherit">@_docSnippetHeader</MudText>
+            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0" OnClick="CloseDocSnippetDialog">
+                <i class="fa-solid fa-xmark fa-xl" aria-hidden="true"></i>
+            </MudIconButton>
+         </div>
+    </TitleContent>
+    <DialogContent>
+        <MudText  Typo="Typo.body1">@SnippetContent</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudLink Typo="Typo.h6" Class="mb-5 fw-bolder" Color="Color.Inherit" Href="@DocumentLink" Underline="Underline.Hover" Target="_blank">Open Documentation <i aria-hidden="true" class="fa">&#xf08e;</i></MudLink>
+
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+
+    [Parameter, EditorRequired] public RenderFragment SnippetContent { get; set; }
+    [Parameter, EditorRequired] public string DocumentLink { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private DialogOptions DialogOptions = new()
+        {
+            MaxWidth = MaxWidth.Medium,
+            CloseButton = true,
+        };
+
+    string _docSnippetHeader;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _docSnippetHeader = MudDialog.Title;
+    }
+    private void CloseDocSnippetDialog(MouseEventArgs mouseEventArgs)
+    {
+        
+        MudDialog.Close();
+    }
+
+    
+}

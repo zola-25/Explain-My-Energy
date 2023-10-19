@@ -6,23 +6,23 @@
     <EditForm Model="@_gasMeter" OnValidSubmit="@HandleValidSubmit">
         <MudCard Elevation="0">
             <MudCardHeader>
-                <MudText Class="mx-auto" Typo="Typo.h6">Setup your Gas Meter</MudText>
+                <MudText Class="fw-bolder" Typo="Typo.h6">Add your Gas Meter</MudText>
             </MudCardHeader>
             <MudCardContent>
 
                 <DataAnnotationsValidator />
 
 
-                <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn" Placeholder="MPRN" Required></MudTextField>
+                <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn" Placeholder="Enter your MPRN number here" Required></MudTextField>
 
-                 <MudText Class="mt-5 mx-auto">
+                 <MudText Typo="Typo.body1" Class="mt-5 mx-auto">
                      <p>Don't know your Gas Meter's MPRN number?</p>
-                     <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank"  >findmysupplier.energy <i class="fa">&#xf08e;</i></MudLink></p>
+                     <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></MudLink></p>
                  </MudText>
 
 
              </MudCardContent>
-             <MudCardActions Class="flex-column align-start align-baseline">
+             <MudCardActions Class="d-flex flex-column align-start align-baseline">
                  <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
 
                     <div aria-hidden="@(!_submitSuccessful)" class="@(_submitSuccessful ? "visible" : "invisible") mx-auto mud-typography-h6 mud-success-text mt-2">

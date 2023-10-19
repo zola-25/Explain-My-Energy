@@ -1,0 +1,63 @@
+﻿@inject IDialogService DialogService
+
+<div>
+    <MudToggleIconButton Toggled="_toggleStatus" ToggledChanged="ShowSnippetDialog"
+                         DisableRipple="true" Title="@IconTitle" Color="@Color.Info"
+                         ToggledIcon="@Icons.Material.Filled.Info"
+                         Icon="@Icons.Material.Outlined.Info">@IconTitle</MudToggleIconButton>
+</div>
+@code {
+    [Parameter, EditorRequired] public string IconTitle { get; set; }
+    [Parameter, EditorRequired] public string DocSnippetHeader { get; set; }
+
+    [Parameter, EditorRequired] public DocSnippet DocSnippet { get; set; }
+    [Inject] DocsContent DocsContent { get; set; }
+
+
+    bool _toggleStatus;
+
+    IDialogReference _dialog;
+    private async Task ShowSnippetDialog(bool toggled)
+    {
+
+        if (toggled)
+        {
+            _toggleStatus = true;
+            var parameters = new DialogParameters<DocTooltipDialog>();
+            parameters.Add(x => x.SnippetContent, _snippetContent);
+            parameters.Add(x => x.DocumentLink, _documentLink);
+
+            _dialog = await DialogService.ShowAsync<DocTooltipDialog>(DocSnippetHeader, parameters, new DialogOptions { ClassBackground="tooltip-overlay", CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall, Position = DialogPosition.TopRight });
+            _ = await _dialog.Result;
+            _toggleStatus = false;
+        }
+        else
+        {
+            if (_dialog != null)
+            {
+                _dialog.Close();
+            }
+            _toggleStatus = false;
+        }
+
+    }
+
+    RenderFragment _snippetContent;
+    string _documentLink;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+
+        var (content, docPath) = await DocsContent.GetDocSnippet(DocSnippet);
+        _snippetContent = builder =>
+        {
+            builder.AddMarkupContent(0, content);
+        };
+
+        _documentLink = docPath;
+
+
+    }
+}

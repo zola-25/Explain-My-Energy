@@ -6,29 +6,42 @@
     <EditForm Model="@_electricityMeter" OnValidSubmit="@HandleValidSubmit">
         <MudCard Elevation="0">
             <MudCardHeader>
-                <MudText Typo="Typo.h6">Add your Electricity Meter</MudText>
+                <MudText Class="fw-bolder" Typo="Typo.h6">Add your Electricity Meter</MudText>
             </MudCardHeader>
             <MudCardContent>
 
 
                 <DataAnnotationsValidator />
+                <div class="d-flex flex-column justify-start flex-grow-1 gap-4">
 
-                <MudInput For="@(() => _electricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@_electricityMeter.Mpxn" Placeholder="MPAN"
-                        Required></MudInput>
- 
+                    <div class="d-flex flex-row align-baseline">
+                        <MudTextField For="@(() => _electricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@_electricityMeter.Mpxn" Placeholder="Enter your MPAN number here"
+                                                Required></MudTextField>
+                         <DocTooltipIcon DocSnippetHeader="Electricity Meter MPAN" DocSnippet="DocSnippet.ElectricityMeterMPAN" IconTitle="Help for Electricity Meter Setup" />
+                     </div>
+                     <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+                </div>
                 <div id="national-grid-iframe-container" class="mt-5 @(!_hideNationalGrid ? "toggled" : "")">
-                    <p>Don't know your Electricity Meter's MPAN number?</p>
-                    <p>Quickly find it via the <MudButton Size="Size.Small" ButtonType="ButtonType.Button" StartIcon="@Icons.Material.Filled.Bolt" Variant="Variant.Outlined" Color="Color.Default" @onclick="ToggleNationalGrid">National Grid</MudButton></p>
+                    <MudText Typo="Typo.body1" Class="d-flex flex-column justify-center align-center mb-2">
+                        <p>Don't know your Electricity Meter's MPAN number?</p>
+                        <p>
+                            Quickly find it via by toggling the National Grid lookup service:   <MudButton StartIcon="@Icons.Material.Filled.Bolt" Size="Size.Small"
+                                                                                                            Variant="_hideNationalGrid ? Variant.Outlined : Variant.Filled"
+                                                                                                            Color="Color.Default"
+                                                                                                            title="@(_hideNationalGrid ? "Show the National Grid Service" : "Hide the National Grid Service")"
+                                                                                                            OnClick="ToggleNationalGrid">@(_hideNationalGrid ? "Show Lookup" : "Hide Lookup Service")</MudButton>
+                        </p>
+                        <p>The service can be also accessed in a separate tab at <MudLink Href="https://supplier.nationalgrid.co.uk" Target="_blank">supplier.nationalgrid.co.uk <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></MudLink></p>
+                    </MudText>
                     <iframe id="iframeNationalGrid" hidden="@_hideNationalGrid"
                             src="https://supplier.nationalgrid.co.uk"></iframe>
                 </div>
 
 
-            </MudCardContent>
-            <MudCardActions Class="d-block">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+                </MudCardContent>
+                <MudCardActions Class="d-flex flex-column align-start align-baseline">
 
-                    <div class="@(_submitSuccessful ? "d-flex" : "d-none") my-5 mud-typography-h6 mud-success-text justify-start align-baseline ">
+                    <div aria-hidden="@(!_submitSuccessful)" class="@(_submitSuccessful ? "visible" : "invisible") mx-auto  mud-typography-h6 mud-success-text mt-2 ">
                         <span class="mx-auto">
                             <i class="fa-solid fa-check" aria-hidden="true"></i>
                             Electricity Meter Valid - proceed to authorize access to n3rgy.com?
@@ -61,7 +74,7 @@
     {
         base.OnInitialized();
         MapElectricityMeter();
-        
+
     }
 
     private void MapElectricityMeter()

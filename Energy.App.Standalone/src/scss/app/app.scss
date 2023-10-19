@@ -103,28 +103,35 @@ h1:focus {
 .disable-pointer {
     pointer-events: none;
 }
-
 @media screen and (min-width: 300px) {
     #national-grid-iframe-container.toggled {
         height: 1000px;
+        margin-right: 10px;
+        margin-left: 10px;
     }
 }
 
 @media screen and (min-width: 400px) {
     #national-grid-iframe-container.toggled {
         height: 900px;
+        margin-right: 30px;
+        margin-left: 30px;
     }
 }
 
 @media screen and (min-width: 600px) {
     #national-grid-iframe-container.toggled {
         height: 800px;
+        margin-right: 40px;
+        margin-left: 40px;
     }
 }
 
 @media only screen and (min-width: 1088px) {
     #national-grid-iframe-container.toggled {
         height: 600px;
+        margin-right: 60px;
+        margin-left: 60px;
     }
 }
 
@@ -270,4 +277,17 @@ h1:focus {
 
 .nav-top-scroll-margin {
     scroll-margin-top: 4rem;
+}
+
+.tooltip-overlay {
+    .mud-overlay-scrim {
+        opacity: 0.2;
+    }
+}
+
+
+.tooltip-dialog {
+    .mud-dialog-title {
+        padding-bottom: 0px;    
+    }
 }

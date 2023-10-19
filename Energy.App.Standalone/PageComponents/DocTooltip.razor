@@ -1,0 +1,76 @@
+﻿
+<MudTooltip IsVisibleChanged="VisibleChanged" IsVisible="_tooltipVisible" ShowOnClick="false" ShowOnHover="false" ShowOnFocus="true" Arrow="true">
+    <ChildContent>
+        @* <MudToggleIconButton  Toggled="_tooltipVisible" DisableRipple="true" Title="@IconTitle" ToggledIcon="@Icons.Material.Filled.Info" Color="@Color.Info" Icon="@Icons.Material.Outlined.Info">@IconTitle</MudToggleIconButton> *@
+        <MudIconButton ClickPropagation="false" DisableRipple="true" Title="@IconTitle"  Color="@Color.Info" Icon="@Icons.Material.Outlined.Info">@IconTitle</MudIconButton>
+
+    </ChildContent>
+    <TooltipContent>
+        <MudText Typo="Typo.body2">@SnippetContent</MudText>
+        <MudLink Typo="Typo.body2" Class="fw-bolder" Color="Color.Inherit" Href="@documentLink" Underline="Underline.Hover" Target="_blank">Open Documentation <i aria-hidden="true" class="fa">&#xf08e;</i></MudLink>
+    </TooltipContent>
+</MudTooltip>
+
+@code {
+    [Inject] DocsContent DocsContent { get; set; }
+
+    [Parameter, EditorRequired] public DocSnippet DocSnippet { get; set; }
+
+    [Parameter, EditorRequired] public string IconTitle { get; set; }
+
+    RenderFragment SnippetContent;
+
+    bool _tooltipVisible = false;
+    bool _toggleIconToggled = false;
+
+    private void ToggleButtonChanged(bool isToggled)
+    {
+        if (isToggled)
+        {
+
+                _tooltipVisible = true;
+        }
+        else
+        {
+                _tooltipVisible = false;
+        }
+    }
+
+    private void VisibleChanged(bool isVisible)
+    {
+        if (isVisible)
+        {
+            _tooltipVisible = true;
+            _toggleIconToggled = true;
+            // if(!_toggleIconToggled)
+            // {
+            //     _toggleIconToggled = true;
+            // }
+        }
+        else
+        {
+            _tooltipVisible = false;
+            _toggleIconToggled = false;
+            // if(_toggleIconToggled)
+            // {
+            //     _toggleIconToggled = false;
+            // }
+        }
+
+
+    }
+
+    string documentLink;
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+
+        var (content, docPath) = await DocsContent.GetDocSnippet(DocSnippet);
+        SnippetContent = builder =>
+        {
+            builder.AddMarkupContent(0, content);
+        };
+        documentLink = docPath;
+    }
+}

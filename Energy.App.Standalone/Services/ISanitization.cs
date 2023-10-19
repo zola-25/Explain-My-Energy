@@ -2,4 +2,5 @@
 
 public interface ISanitization
 {
+    string Sanitize(string html);
 }

@@ -51,9 +51,9 @@ The input is an auto-complete text field, so you can enter the first two charact
 
 This is the energy type (Gas or Electric), and hence the energy meter, that is used for your primary heating. In 80% of UK homes, this is Gas, though Electric heating is more common in flats and apartments.
 
-This meter's data will be analysed with respect to your local weather data, to help forecast future consumption based on forecast weather, and further ahead, local climate data. More details on this are documented in the Heating Meter Analysis section here: [Heating Meter Analysis](../Analysis/HeatingMeterAnalysis.md)
+This meter's data will be analysed with respect to your local weather data, to help forecast future consumption based on forecast weather, and further ahead, local climate data. More details on this are documented in the Heating Meter Analysis section here: [Heating Meter Analysis](../Analysis/analysis-options.markdown#heating-meter-analysis)
 
-### On completion
+### Household completion
 
 Once you have entered and saved your household details, the application will automatically retrieve the historical and future weather data for your location. This can take a few seconds.
 
