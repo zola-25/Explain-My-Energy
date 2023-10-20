@@ -3,18 +3,21 @@
 <MudPaper aria-label="Wizard step content" Elevation="2" Class="p-4">
     <MudGrid Justify="Justify.Center">
         <MudItem  xs="12">
-            <div class="d-flex justify-space-between">
-                <MudBreadcrumbs aria-label="Wizard steps completed" Items="BreadcrumbItems" ExpanderIcon="fa-solid fa-left-right"  MaxItems="4"  Separator=">">
-                    <ItemTemplate Context="item">
-                        <MudText aria-label="@($"Wizard step {item.Text}")" Typo="Typo.h6">@item.Text</MudText>
+            <div class="d-flex  justify-space-between align-center fw-bolder">
+                <MudBreadcrumbs  aria-label="Wizard steps completed" Items="BreadcrumbItems" ExpanderIcon="fa-solid fa-left-right"  Class="d-flex flex-wrap fw-bolder" MaxItems="4">
+                    <ItemTemplate  Context="item">
+                        <MudText aria-label="@($"Wizard step {item.Text}")" Class="fw-bolder" Typo="Typo.h6">@item.Text</MudText>
                     </ItemTemplate>
+                    <SeparatorTemplate>
+                            <MudText Typo="Typo.h6" Class="fw-bolder">></MudText>
+                    </SeparatorTemplate>
                 </MudBreadcrumbs>
 
                 <MudText Class="@((HeaderText is null) ? "d-none" : "fw-bold mx-auto")"
                          Align="Align.Center"
                          Typo="Typo.h5"
                          aria-label="Welcome">@HeaderText</MudText>
-                <MudIconButton Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
+                <MudIconButton Class="flex-nowrap px-4 me-5" Color="Color.Dark" Size="Size.Large" Title="Exit Wizard" Icon="@Icons.Material.Filled.Close" OnClick="CloseWizardCallback"></MudIconButton>
             </div>
         </MudItem>
         <MudItem xs="12">

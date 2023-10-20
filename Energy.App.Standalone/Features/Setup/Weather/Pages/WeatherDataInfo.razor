@@ -17,15 +17,17 @@
         <MudTh Class="fw-bold">Latest Reading</MudTh>
         <MudTh Class="fw-bold">Short-term Forecast Range</MudTh>
         <MudTh Class="fw-bold">Long-term Climate Forecast Range</MudTh>
+        <MudTh Class="fw-bold">View Data</MudTh>
+
     </HeaderContent>
     <RowTemplate>
         @if (!HouseholdState.Value.Saved)
         {
-            <MudTd colspan="4">Complete Household setup to import local weather data</MudTd>
+            <MudTd colspan="5">Complete Household setup to import local weather data</MudTd>
         }
         else if (WeatherState.Value.Loading)
         {
-            <MudTd colspan="4">Loading Weather Data...</MudTd>
+            <MudTd colspan="5">Loading Weather Data...</MudTd>
         }
         else if (WeatherState.Value.WeatherReadings.Any())
         {
@@ -69,6 +71,9 @@
                 }
                 @climateReadings.First().UtcTime.eToString("dnn MMM yy", true) - @climateReadings.Last().UtcTime.eToString("dnn MMM yy", true)
 
+            </MudTd>
+            <MudTd DataLabel="View Weather Data">
+                <MudButton Href="/WeatherData" Color="Color.Secondary" Variant="Variant.Filled">View Data</MudButton>
             </MudTd>
         }
     </RowTemplate>

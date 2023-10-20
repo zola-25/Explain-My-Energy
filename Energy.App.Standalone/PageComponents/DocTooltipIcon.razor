@@ -1,6 +1,6 @@
 ﻿@inject IDialogService DialogService
 
-<div>
+<div class="@(OptionalRootClass ?? String.Empty)">
     <MudToggleIconButton Toggled="_toggleStatus" ToggledChanged="ShowSnippetDialog"
                          DisableRipple="true" Title="@IconTitle" Color="@Color.Info"
                          ToggledIcon="@Icons.Material.Filled.Info"
@@ -9,6 +9,7 @@
 @code {
     [Parameter, EditorRequired] public string IconTitle { get; set; }
     [Parameter, EditorRequired] public string DocSnippetHeader { get; set; }
+    [Parameter] public string OptionalRootClass { get; set; }
 
     [Parameter, EditorRequired] public DocSnippet DocSnippet { get; set; }
     [Inject] DocsContent DocsContent { get; set; }
@@ -24,6 +25,8 @@
         {
             _toggleStatus = true;
             var parameters = new DialogParameters<DocTooltipDialog>();
+
+            parameters.Add(x => x.ErrorLoadingSnippet, _errorLoadingSnippet);
             parameters.Add(x => x.SnippetContent, _snippetContent);
             parameters.Add(x => x.DocumentLink, _documentLink);
 
@@ -44,20 +47,21 @@
 
     RenderFragment _snippetContent;
     string _documentLink;
+    bool _errorLoadingSnippet;
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
 
-        var (content, docPath) = await DocsContent.GetDocSnippet(DocSnippet);
+        var snippet = await DocsContent.GetDocSnippet(DocSnippet);
         _snippetContent = builder =>
         {
-            builder.AddMarkupContent(0, content);
+            builder.AddMarkupContent(0, snippet.Content);
         };
 
-        _documentLink = docPath;
-
+        _documentLink = snippet.DocPath;
+        _errorLoadingSnippet = snippet.Error;
 
     }
 }

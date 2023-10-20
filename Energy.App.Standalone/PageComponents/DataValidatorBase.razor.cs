@@ -9,6 +9,8 @@ using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using MudBlazor.Components.Snackbar;
+
 #pragma warning disable IDE0058
 
 namespace Energy.App.Standalone.PageComponents;
@@ -16,8 +18,9 @@ namespace Energy.App.Standalone.PageComponents;
 public partial class DataValidatorBase : FluxorComponent
 {
     [Inject]
-    private IDispatcher Dispatcher { get; set; }
-
+    public IDispatcher Dispatcher { get; set; }
+    [Inject]
+    public ISnackbar Snackbar { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

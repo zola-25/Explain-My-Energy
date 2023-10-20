@@ -12,17 +12,17 @@
     <MudItem xs="12">
         <div class="d-flex justify-end align-baseline">
             <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3 mx-auto eme-focus">App Setup</MudText>
-            <MudIconButton Class="ma-0"
-                           ButtonType="ButtonType.Button"
-                           Disabled="@AppConfig.IsDemoMode"
-                           Size="Size.Small"
-                           Variant="Variant.Outlined"
-                           OnClick="WipeAllAsync"
-                           Color="Color.Error"
-                           Icon="@Icons.Material.Filled.DeleteForever"
-                           Title="Wipe all data">
+            <MudButton Class="ma-0"
+                       ButtonType="ButtonType.Button"
+                       Disabled="@AppConfig.IsDemoMode"
+                       Size="Size.Small"
+                       Variant="Variant.Filled"
+                       OnClick="WipeAllAsync"
+                       Color="Color.Error"
+                       EndIcon="@Icons.Material.Filled.DeleteForever"
+                       title="Wipe all data?">
                 Wipe All Data
-            </MudIconButton>
+            </MudButton>
         </div>
     </MudItem>
     <MudItem xs="12">
@@ -45,22 +45,22 @@
     </MudItem>
 </MudGrid>
 
-<MudMessageBox @ref="WipeAllDataBox" Title="Warning" CancelText="Cancel">
+<MudMessageBox @ref="WipeAllDataBox" Title="Delete Everything" CancelText="Cancel">
     <MessageContent>
-        This will remove all user associated data,<br />
-        reset the application and return the user to the initial welcome screen
-        <br />
-        <br />
-        <strong>This cannot be undone</strong>
-        <br />
-        <br />
-
+        <MudText Typo="Typo.body2">
+            <strong>This will remove all user associated data stored in the browser for this site.</strong>
+            <br />
+            <strong>It will reset the application and return the user to the initial welcome screen.</strong>
+            <br />
+            <strong>This <em>cannot</em> be undone</strong>
+            <br />
+        </MudText>
     </MessageContent>
     <YesButton>
-        <MudButton Variant="Variant.Text" Class="ml-2" Color="Color.Error" Size="Size.Small">Delete</MudButton>
+        <MudButton Variant="Variant.Filled" Class="mx-auto" Color="Color.Error" Size="Size.Small">Delete</MudButton>
     </YesButton>
     <CancelButton>
-        <MudButton Variant="Variant.Text" Color="Color.Default" Size="Size.Small">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Class="mx-auto" Color="Color.Default" Size="Size.Small">Cancel</MudButton>
     </CancelButton>
 </MudMessageBox>
 

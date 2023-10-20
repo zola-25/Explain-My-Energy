@@ -44,7 +44,7 @@ However, we provide easy access to lookup services that allows users to find the
 
 With these details, users can access their energy usage data through the n3rgy consumer service. The application helps guide the users through the process of authorizing access to the n3rgy service.
 
-Users also provide their postal area, (the first 3 or 4 characters of their postcode), allowing the application to look up historical and forecast weather data for their area. This is used to show how weather affects their energy usage, and forecast their consumption and costs into the future.  
+Users also provide their postal area, (the first 3 or 4 characters of their postcode), allowing the application to look up historical and forecast weather data for their area. This is used to show how weather affects their energy usage, and forecast their consumption and costs into the future. We use the open-source and non-commerical weather and climate API provided by [Open-Meteo](https://open-meteo.com/)
 
 Optionally, users can also provide their energy tariff details. Since energy tariffs in the UK have been mostly static over the past two years, the application provides sensible default historical and present-day tariffs based on the national average at the time. However, if users know their tariff details, they can enter them. 
 
@@ -58,6 +58,6 @@ The application is designed to be as accurate as possible, but there are some ca
 
 - The data provided by n3rgy is not always up-to-date. There may be a lag of days or even weeks between the data being collected by the smart meter and it being available through the n3rgy consumer service. This means the application may not be able to show you your most recent energy usage data.
 
-- There may limited amout of historical data available. If you've only recently moved into a property, or your energy provider has only recently started providing data to n3rgy, then there may be limited historical data available. This makes it difficult to provide accurate forecasts of future energy usage and costs.
+- There may limited amount of historical data available. If you've only recently moved into a property, or your energy provider has only recently started providing data to n3rgy, then there may be limited historical data available. This makes it difficult to provide accurate forecasts of future energy usage and costs.
 
 

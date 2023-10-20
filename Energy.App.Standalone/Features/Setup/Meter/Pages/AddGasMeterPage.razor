@@ -8,12 +8,9 @@
         <MudPaper Elevation="2" Class="mt-2">
             <div class="d-flex justify-space-between mt-5 ">
                 <MudTooltip ShowOnHover="true" Text="Return to Setup">
-                    <MudLink Underline="Underline.None"
-                             Href="@($"/Setup")">
-                        <MudButton Class="ma-5" Color="Color.Default"
-                                   ButtonType="ButtonType.Button"
-                                   Variant="Variant.Filled"
-                                   Size="Size.Small">
+                    <MudLink Underline="Underline.None" Href="@($"/Setup")">
+                        <MudButton Class="ma-5" Color="Color.Default" ButtonType="ButtonType.Button"
+                            Variant="Variant.Filled" Size="Size.Small">
                             <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Setup</span>
                         </MudButton>
                     </MudLink>
@@ -28,7 +25,8 @@
             <div class="d-flex justify-center">
                 <MudTooltip Text="Proceed to Authorize Meter for data access?">
                     <MudLink Underline="Underline.None" Href="@($"/MeterAuthorization/{MeterType.Gas}")">
-                        <MudButton Color="Color.Success" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">Authorize</MudButton>
+                        <MudButton Color="Color.Success" ButtonType="ButtonType.Button" Variant="Variant.Filled"
+                            Size="Size.Small">Authorize</MudButton>
                     </MudLink>
                 </MudTooltip>
             </div>
@@ -40,7 +38,7 @@
 @code
 {
     bool _showAuthorization = false;
-
+        
     private Task OnSuccessfulSave()
     {
         _showAuthorization = true;

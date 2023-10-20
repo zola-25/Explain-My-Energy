@@ -7,10 +7,12 @@ public static class LogEventIds
 {
 
 
-    public static EventId WeatherImportFail = new EventId(10010, $"Portal.{nameof(WeatherImportFail)}");
-    public static EventId WeatherImportBadResponse = new EventId(10011, $"Portal.{nameof(WeatherImportBadResponse)}");
-    public static EventId WeatherImportException = new EventId(10012, $"Portal.{nameof(WeatherImportException)}");
-    public static EventId WeatherImportFailedToUpdateToLatestDates = new EventId(10014, $"Portal.{nameof(WeatherImportFailedToUpdateToLatestDates)}");
+    public readonly static EventId WeatherImportFail = new EventId(10010, $"WeatherReadings.{nameof(WeatherImportFail)}");
+    public readonly static EventId WeatherImportBadResponse = new EventId(10011, $"WeatherReadings.{nameof(WeatherImportBadResponse)}");
+    public readonly static EventId WeatherImportException = new EventId(10012, $"WeatherReadings.{nameof(WeatherImportException)}");
+    public readonly static EventId WeatherImportFailedToUpdateToLatestDates = new EventId(10014, $"WeatherReadings.{nameof(WeatherImportFailedToUpdateToLatestDates)}");
 
-    public static EventId OutCodeVerificationException = new EventId(20010, $"Portal.{nameof(OutCodeVerificationException)}");
+    public readonly static EventId OutCodeVerificationException = new EventId(20010, $"OutCode.{nameof(OutCodeVerificationException)}");
+
+    public readonly static EventId DocumentSnippetFailedToLoad = new EventId(30010, $"DocSnippet.{nameof(DocumentSnippetFailedToLoad)}");
 }

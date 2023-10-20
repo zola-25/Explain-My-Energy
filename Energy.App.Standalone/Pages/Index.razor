@@ -5,49 +5,50 @@
 <ExtendedPageTitle>Welcome</ExtendedPageTitle>
 
 
-@if (Ready)
-{
+    @if (Ready)
+    {
 
-    <MudGrid Justify="Justify.Center">
-        <MudItem xs="12">
-            <WizardModal @bind-Open="OpenWizard">
-            </WizardModal>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Elevation="0" Class="p-2 mt-3 d-flex justify-end align-baseline">
-                <MudText Typo="Typo.h4" Align="Align.Center" Class="mx-auto eme-focus">Welcome to Explain My Energy</MudText>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12">
+                <WizardModal @bind-Open="OpenWizard">
+                </WizardModal>
+            </MudItem>
+            <MudItem xs="12">
+                <MudPaper Elevation="0" Class="p-2 mt-3 d-flex justify-end align-baseline">
+                    <MudText Typo="Typo.h4" Align="Align.Center" Class="mx-auto eme-focus">Welcome to Explain My Energy</MudText>
 
-                <MudButton Class="ma-0"
-                            Disabled="@AppStatus.IsDemoMode"
-                           OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
-                           Size="Size.Small"
-                           ButtonType="ButtonType.Button"
-                           Variant="Variant.Outlined"
-                           Color="Color.Info"
-                           StartIcon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudButton>
+                    <MudButton Class="ma-0 fw-bolder"
+                               Disabled="@AppStatus.IsDemoMode"
+                               OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
+                               Size="Size.Medium"
+                               ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Color="Color.Info"
+                               StartIcon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudButton>
 
 
-            </MudPaper>
-        </MudItem>
+                </MudPaper>
+            </MudItem>
 
-        <MudItem xs="12">
-            <MudPaper Elevation="2" Class="p-2">
-                <MudText Typo="Typo.h5" Class="ma-4 fw-bolder">App Setup Status</MudText>
-                <AppSetupStatus />
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Elevation="2" Class="p-2">
-                <WeatherDataInfo></WeatherDataInfo>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Elevation="2" Class="p-2">
-                <AnalysisOptionsTable />
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-}
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="p-2">
+                    <MudText Typo="Typo.h5" Class="ma-4 fw-bolder">App Setup Status</MudText>
+                    <AppSetupStatus />
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="p-2">
+                    <WeatherDataInfo></WeatherDataInfo>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="p-2">
+                    <AnalysisOptionsTable />
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+
 @code {
     bool OpenWizard = false;
 }

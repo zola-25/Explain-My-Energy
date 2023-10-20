@@ -103,6 +103,7 @@ h1:focus {
 .disable-pointer {
     pointer-events: none;
 }
+
 @media screen and (min-width: 300px) {
     #national-grid-iframe-container.toggled {
         height: 1000px;
@@ -272,7 +273,7 @@ h1:focus {
 }
 
 .nav-bottom-scroll-margin {
-    scroll-margin-bottom: 3rem;    
+    scroll-margin-bottom: 3rem;
 }
 
 .nav-top-scroll-margin {
@@ -282,12 +283,33 @@ h1:focus {
 .tooltip-overlay {
     .mud-overlay-scrim {
         opacity: 0.2;
+        animation: none;
+        -webkit-animation: none;
     }
 }
 
 
 .tooltip-dialog {
-    .mud-dialog-title {
-        padding-bottom: 0px;    
+    animation: none;
+    -webkit-animation: none;
+}
+
+.weather-data-table > .mud-table-container {
+    overflow-y: unset;
+
+    > table > thead > tr > th {
+        text-align: center;
+        font-weight: bolder;
+        position: sticky;
+        top: 0;
+    }
+
+    > table > tbody > tr >td {
+        text-align: center;
+    }
+
+    > table {
+        position: relative;
+        border-collapse: collapse;
     }
 }

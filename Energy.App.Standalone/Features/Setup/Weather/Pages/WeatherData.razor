@@ -1,0 +1,87 @@
+﻿@page "/WeatherData"
+@inherits FluxorComponent
+@using Energy.Shared
+@using Energy.App.Standalone.Features.Setup.Weather.Store
+@inject IDispatcher Dispatcher
+@inject IState<WeatherState> WeatherState
+
+
+<ExtendedPageTitle>Weather Data</ExtendedPageTitle>
+
+<MudPaper Elevation="3" Class="mt-5 pa-5">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12">
+            <div class="d-flex flex-wrap justify-start mt-5 align-baseline ">
+                <MudTooltip ShowOnHover="true" Text="Return to Setup">
+                    <MudLink Underline="Underline.None" Href="@($"/Setup")">
+                        <MudButton Class="ms-0 fw-bolder" Color="Color.Default" ButtonType="ButtonType.Button"
+                                   Variant="Variant.Filled" Size="Size.Small">
+                            <span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Setup</span>
+                        </MudButton>
+                    </MudLink>
+                </MudTooltip>
+                <MudText Class="mx-auto fw-bolder" Typo="Typo.h4">Weather Data</MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <div class="d-flex flex-wrap justify-center align-center mt-5 ">
+
+                <MudButton Class="fw-bolder" Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadWeatherData">Load/Reload Data</MudButton>
+                <MudText Align="Align.Center" Class="ml-3 fw-bolder" Typo="Typo.h6">Postal Area: @Outcode</MudText>
+
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="mt-5 mb-10">
+
+                @if (WeatherState.Value.Loading)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else if (!WeatherState.Value.WeatherReadings.Any())
+                {
+                    <p><em>No weather readings loaded</em></p>
+                }
+                else
+                {
+                    <MudTable T="DailyWeatherRecord" ReadOnly="true" Virtualize="true" Items="WeatherState.Value.WeatherReadings" FixedHeader="true"  Height="85vh" Breakpoint="Breakpoint.Sm" AllowUnsorted="false"  SortLabel="Sort By" Striped="true">
+                        <HeaderContent>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.UtcTime)">Date</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.TemperatureAverage)">Temp. Avg ℃</MudTableSortLabel></MudTh>
+
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsHistorical)">Historical?</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsRecentForecast)">Recent Forecast?</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsNearForecast)">Near Term Forecast?</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsClimateForecast)">Climate Forecast?</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.Summary)">Weather Code Summary</MudTableSortLabel></MudTh>
+
+                        </HeaderContent>
+
+                        <RowTemplate>
+                            <MudTd DataLabel="Date">@context.UtcTime.ToShortDateString()</MudTd>
+                            <MudTd DataLabel="Temp. Avg ℃">@context.TemperatureAverage</MudTd>
+                            <MudTd DataLabel="Historical?">@context.IsHistorical</MudTd>
+                            <MudTd DataLabel="Recent Forecast?">@context.IsRecentForecast</MudTd>
+                            <MudTd DataLabel="Near Term Forecast?">@context.IsNearForecast</MudTd>
+                            <MudTd DataLabel="Climate Forecast?">@context.IsClimateForecast</MudTd>
+                            <MudTd DataLabel="Summary">@context.Summary</MudTd>
+
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+@code {
+
+    private async Task LoadWeatherData()
+    {
+        var completion = new TaskCompletionSource<(bool, string)>();
+        Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, completion));
+        await completion.Task;
+    }
+
+    public string Outcode => WeatherState.Value?.OutCodeCharacters ?? String.Empty;
+
+}
