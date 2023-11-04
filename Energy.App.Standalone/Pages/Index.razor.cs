@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Fluxor;
 using Energy.App.Standalone.Features.Setup.TermsAndConditions;
+using Energy.App.Standalone.Services;
 
 namespace Energy.App.Standalone.Pages;
 

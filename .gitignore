@@ -421,5 +421,7 @@ FodyWeavers.xsd
 /Energy.App.Standalone/wwwroot/**/*
 Energy.App.Standalone/src/views/Credits.html
 Energy.App.Standalone/webAssets/**/*
-
 .env
+
+*.pem
+*.key

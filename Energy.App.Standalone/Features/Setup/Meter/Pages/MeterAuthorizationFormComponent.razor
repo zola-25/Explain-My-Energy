@@ -1,3 +1,4 @@
+@using Energy.App.Standalone.PageComponents
 @inherits FluxorComponent
 
 
@@ -7,12 +8,17 @@
 {
     <MudCard id="authorization-scroll-top" Elevation="0" Class="h-fit-content over-auto">
         <MudCardHeader>
-            <MudText Typo="Typo.h6">@MeterType Meter Authorization</MudText>
+            <div class="d-flex flex-grow-1 flex-wrap justify-space-between align-center">
+                <MudText Class="d-flex fw-bolder" Typo="Typo.h6">@MeterType Meter Authorization</MudText>
+                <DocTooltipIcon OptionalRootClass="d-flex"
+                                DocSnippet="DocSnippet.AuthorizationN3rgyPage"
+                                DocSnippetHeader="Meter Authorization Walk-through"
+                                IconTitle="Help for Meter Authorization" />
+            </div>
         </MudCardHeader>
         <MudCardContent Class="h-100percent">
 
             <div class="mb-1">
-
                 <CopyToClipboardTextField CopyString="@MeterSetupState.Value[MeterType].Mpxn">
                     <MudTextField T="string"
                                   Label="@MpxnLabel"
@@ -24,6 +30,13 @@
                 <CopyToClipboardTextField CopyString="@HouseholdState.Value.IhdMacId">
                     <MudTextField T="string"
                                   Label="IHD MAC ID"
+                                  InputType="@_ihdInputType"
+                                  AdornmentIcon="@_ihdVisibleIcon"
+                                  FullWidth="true"
+                                  AdornmentColor="@(_ihdVisible ? Color.Warning : Color.Default)"
+                                  Adornment="Adornment.End"
+                                  OnAdornmentClick="ToggleIhdVisibility"
+                                  AdornmentAriaLabel="@_ihdVisibleAria"
                                   ReadOnly="true"
                                   Value="@HouseholdState.Value.IhdMacId"></MudTextField>
 
@@ -36,22 +49,21 @@
                 </CopyToClipboardTextField>
             </div>
             <div class="d-flex justify-center p-3 mt-4">
-                <MudButton 
-                    OnClick="OnCheckAuthorizationClicked" 
-                    Variant="Variant.Filled" hidden="@AuthorizeSucceeded">Confirm Authorization</MudButton>
+                <MudButton OnClick="OnCheckAuthorizationClicked"
+                           Variant="Variant.Filled" hidden="@AuthorizeSucceeded"><span class="fw-bolder">Check Authorization</span></MudButton>
             </div>
             <div class="d-flex justify-end">
                 <MudLink Href="https://data.n3rgy.com/consumer-sign-up" Target="_blank" Underline="Underline.Hover" hidden="@AuthorizeSucceeded">Open Sign-up in a separate tab <i class="fa-solid fa-external-link" aria-hidden="true"></i></MudLink>
             </div>
 
 
-            <div id="authorizationSuccess" class="mt-2" hidden="@(!AuthorizeSucceeded)">
+            <div id="authorizationSuccess" class="d-flex justify-center mt-2" hidden="@(!AuthorizeSucceeded)">
 
                 <MudText Color="Color.Success" Typo="Typo.h5">Authorized</MudText>
 
                 @if (ReadingsLoading)
                 {
-                    <MudText>Your @MeterType meter data is now being processed</MudText>
+                    <MudText Color="Color.Success"> - Your @MeterType meter data is now being processed</MudText>
                 }
             </div>
 
@@ -60,9 +72,28 @@
                 <p>We could not access your smart meter data - have you completed the authorization process with n3rgy?</p>
                 <p>n3rgy responded with: @AuthorizeFailedMessage</p>
             </div>
-            
+
             <iframe id="n3rgy-iframe" name="n3rgy-iframe" src="https://data.n3rgy.com/consumer-sign-up" class="n3rgy-iframe" hidden="@AuthorizeSucceeded"></iframe>
         </MudCardContent>
-        
+
     </MudCard>
+}
+
+@code {
+
+    string _ihdVisibleAria = "IHD MAC ID is password masked";
+    string _ihdVisibleIcon = "fa-solid fa-eye-slash";
+
+    MudBlazor.InputType _ihdInputType = MudBlazor.InputType.Password;
+
+    bool _ihdVisible = false;
+
+    private void ToggleIhdVisibility(MouseEventArgs mouseEventArgs)
+    {
+        _ihdVisible = !_ihdVisible;
+        _ihdVisibleIcon = _ihdVisible ? "fa-solid fa-eye" : "fa-solid fa-eye-slash";
+        _ihdVisibleAria = _ihdVisible ? "IHD MAC ID not password masked, clear text" : "IHD MAC ID is password masked";
+        _ihdInputType = _ihdVisible ? MudBlazor.InputType.Text : MudBlazor.InputType.Password;
+    }
+
 }

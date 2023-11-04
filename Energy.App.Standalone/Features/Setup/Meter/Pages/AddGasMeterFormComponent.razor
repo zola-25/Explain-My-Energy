@@ -6,35 +6,48 @@
     <EditForm Model="@_gasMeter" OnValidSubmit="@HandleValidSubmit">
         <MudCard Elevation="0">
             <MudCardHeader>
-                <MudText Typo="Typo.h6">Setup your Gas Meter</MudText>
+                <MudText Class="fw-bolder" Typo="Typo.h6">Add your Gas Meter</MudText>
             </MudCardHeader>
             <MudCardContent>
 
                 <DataAnnotationsValidator />
 
+                <div class="d-flex flex-column justify-start flex-grow-1 gap-4">
 
-                <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn" Placeholder="MPRN" Required></MudTextField>
-
-                 <MudText Class="mt-5">
-                     <p>Don't know your Gas Meter's MPRN number?</p>
-                     <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">findmysupplier.energy <i class="fa">&#xf08e;</i></MudLink></p>
-                 </MudText>
-
-
-             </MudCardContent>
-             <MudCardActions Class="d-block">
-                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
-
-                    <div class="@(_submitSuccessful ? "visible" : "invisible") d-flex my-5 mud-typography-h6 mud-success-text justify-start align-baseline ">
-                        <span class="mx-auto">
-                            <i class="fa-solid fa-check" aria-hidden="true"></i>
-                            Gas Meter Valid - proceed to authorize access to n3rgy.com?
-                        </span>
+                    <div class="d-flex flex-row align-baseline">
+                        <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn"
+                            Placeholder="Enter your MPRN number here" Required></MudTextField>
+                        <DocTooltipIcon DocSnippetHeader="Gas Meter MPRN"
+                            DocSnippet="DocSnippet.GasMeterMPRN" IconTitle="Help for Gas Meter Setup" />
                     </div>
+                    <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled"
+                        Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+                </div>
 
-                </MudCardActions>
-            </MudCard>
-        </EditForm>
+
+                <MudText Typo="Typo.body1" Class="mt-5 mx-auto">
+                    <p>Don't know your Gas Meter's MPRN number?</p>
+                    <p>Find it here via <MudLink Href="https://www.findmysupplier.energy/" Target="_blank">
+                            findmysupplier.energy <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </MudLink>
+                    </p>
+                </MudText>
+
+
+            </MudCardContent>
+            <MudCardActions Class="d-flex flex-column align-start align-baseline">
+                
+                <div aria-hidden="@(!_submitSuccessful)"
+                    class="@(_submitSuccessful ? "visible" : "invisible") mx-auto mud-typography-h6 mud-success-text mt-2">
+                    <span class="mx-auto">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                        Gas Meter Valid - proceed to authorize access to n3rgy.com?
+                    </span>
+                </div>
+
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
 }
 @code {
 

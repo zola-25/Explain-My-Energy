@@ -3,77 +3,74 @@
 @using Energy.App.Standalone.Features.Setup.TermsAndConditions
 
 
-<div class="popover-container">
-    <div class="@(_opened ? "popover-overlay" : "no-overlay")">@_opened</div>
+@* <MudOverlay @bind-Visible="_opened" AutoClose="false" Absolute="false"
+            DarkBackground="true"
+            ZIndex="1150"
+            LockScroll="false"
+            Class="overflow-scroll"
+            LockScrollClass="@String.Empty" />
+ *@
 
-    @if (_opened)
-    {
-        <MudPopover Open="_opened"
-                    Class="eme-popover mt-7 mb-16"
-                    Fixed="true"
-                    OverflowBehavior="OverflowBehavior.FlipNever"
-                    AnchorOrigin="Origin.BottomCenter"
-                    TransformOrigin="Origin.TopCenter"
-                    RelativeWidth="true">
+<MudDialog @bind-IsVisible="_opened" DisableSidePadding="true" DefaultFocus="DefaultFocus.LastChild" 
+Options="@(new DialogOptions() {  MaxWidth=MaxWidth.Large, CloseButton = false,NoHeader=true, CloseOnEscapeKey=true, DisableBackdropClick=true,  Position=DialogPosition.TopCenter })">
 
+    <DialogContent>
+        @switch (CurrentStage)
+        {
+            case SetupStage.WelcomeScreenSplash:
+                <WelcomeStep CloseWizardCallback="CloseModal"
+                             GoToNextStageCallback="GoToNextStageCallback" />
+                break;
+            case SetupStage.Household:
+                <HouseholdStep BreadcrumbItems="BreadcrumbItems"
+                               CloseWizardCallback="CloseModal"
+                               GoBackCallback="GoToPreviousStageCallback"
+                               GoToNextStageCallback="GoToNextStageCallback" />
 
-            @switch (CurrentStage)
-            {
-                case SetupStage.WelcomeScreenSplash:
-                    <WelcomeStep CloseWizardCallback="CloseModal"
-                                 GoToNextStageCallback="GoToNextStageCallback" />
-                    break;
-                case SetupStage.Household:
-                    <HouseholdStep BreadcrumbItems="BreadcrumbItems"
-                                   CloseWizardCallback="CloseModal"
-                                   GoBackCallback="GoToPreviousStageCallback"
-                                   GoToNextStageCallback="GoToNextStageCallback" />
+                break;
+            case SetupStage.GasMeter:
+                <GasMeterStep BreadcrumbItems="BreadcrumbItems"
+                              CloseWizardCallback="CloseModal"
+                              GoBackCallback="GoToPreviousStageCallback"
+                              GoToNextStageCallback="GoToNextStageCallback"
+                              SkipToElectricity="SkipToElectricityCallback" />
 
-                    break;
-                case SetupStage.GasMeter:
-                    <GasMeterStep BreadcrumbItems="BreadcrumbItems"
-                                  CloseWizardCallback="CloseModal"
-                                  GoBackCallback="GoToPreviousStageCallback"
-                                  GoToNextStageCallback="GoToNextStageCallback"
-                                  SkipToElectricity="SkipToElectricityCallback" />
-
-                    break;
-                case SetupStage.GasMeterAuthorization:
-                    <GasAuthorizationStep BreadcrumbItems="BreadcrumbItems"
-                                          CloseWizardCallback="CloseModal"
-                                          GoBackCallback="GoToPreviousStageCallback"
-                                          GoToNextStageCallback="GoToNextStageCallback"
-                                          SkipToElectricity="SkipToElectricityCallback" />
-                    break;
-                case SetupStage.ElectricityMeter:
-                    <ElectricityMeterStep BreadcrumbItems="BreadcrumbItems"
-                                          CloseWizardCallback="CloseModal"
-                                          GoBackCallback="GoToPreviousStageCallback"
-                                          GoToNextStageCallback="GoToNextStageCallback"
-                                          SkipToDone="SkipToDone" />
-                    break;
-                case SetupStage.ElectricityMeterAuthorization:
-                    <ElectricityAuthorizationStep BreadcrumbItems="BreadcrumbItems"
-                                                  CloseWizardCallback="CloseModal"
-                                                  GoBackCallback="GoToPreviousStageCallback"
-                                                  GoToNextStageCallback="GoToNextStageCallback"
-                                                  SkipToDone="SkipToDone" />
-                    break;
-                case SetupStage.Done:
-                    <SuccessStep BreadcrumbItems="BreadcrumbItems"
-                                 CloseWizardCallback="CloseModal"
-                                 GoBackCallback="GoToPreviousStageCallback" />
+                break;
+            case SetupStage.GasMeterAuthorization:
+                <GasAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                      CloseWizardCallback="CloseModal"
+                                      GoBackCallback="GoToPreviousStageCallback"
+                                      GoToNextStageCallback="GoToNextStageCallback"
+                                      SkipToElectricity="SkipToElectricityCallback" />
+                break;
+            case SetupStage.ElectricityMeter:
+                <ElectricityMeterStep BreadcrumbItems="BreadcrumbItems"
+                                      CloseWizardCallback="CloseModal"
+                                      GoBackCallback="GoToPreviousStageCallback"
+                                      GoToNextStageCallback="GoToNextStageCallback"
+                                      SkipToDone="SkipToDone" />
+                break;
+            case SetupStage.ElectricityMeterAuthorization:
+                <ElectricityAuthorizationStep BreadcrumbItems="BreadcrumbItems"
+                                              CloseWizardCallback="CloseModal"
+                                              GoBackCallback="GoToPreviousStageCallback"
+                                              GoToNextStageCallback="GoToNextStageCallback"
+                                              SkipToDone="SkipToDone" />
+                break;
+            case SetupStage.Done:
+                <SuccessStep BreadcrumbItems="BreadcrumbItems"
+                             CloseWizardCallback="CloseModal"
+                             GoBackCallback="GoToPreviousStageCallback" />
 
 
-                    break;
+                break;
 
-                default:
-                    Logger.LogError("Setup Stage not recognised: {SetupStage}", CurrentStage);
-                    break;
-            }
-        </MudPopover>
-    }
-</div>
+            default:
+                Logger.LogError("Setup Stage not recognised: {SetupStage}", CurrentStage);
+                break;
+        }
+    </DialogContent>
+</MudDialog>
 
 @code {
 

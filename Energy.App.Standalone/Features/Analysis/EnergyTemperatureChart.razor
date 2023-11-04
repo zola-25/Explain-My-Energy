@@ -5,16 +5,21 @@
 
 
 
+
+<div class="d-flex flex-column align-center">
+    <div class="d-flex flex-row align-center justify-center">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="d-flex eme-focus">@MeterType Meter Analysis</MudText>
+        <DocTooltipIcon DocSnippetHeader="Temperature-dependent Chart"
+                        DocSnippet="DocSnippet.ChartTemperatureDependent" IconTitle="Help for the Temperature-dependent Chart" />
+    </div>
+    <MudPaper Class="d-flex" Elevation="0">
+        <MudLink Href="https://open-meteo.com/" Typo="Typo.body2" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
+    </MudPaper>
+</div>
+
 @if (_ready)
 {
-    <div class="d-flex flex-column align-center">
-        <MudText Typo="Typo.h4" Align="Align.Center" Class="d-flex eme-focus">@MeterType Meter Analysis</MudText>
-        <MudPaper Class="d-flex" Elevation="0">
-            <MudLink Href="https://open-meteo.com/" Typo="Typo.body2" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
-        </MudPaper>
-    </div>
-
-    <div id="profile-chart-meter-@MeterGlobalId" class="profile-chart-meter" >
+    <div id="profile-chart-meter-@MeterGlobalId" class="profile-chart-meter">
     </div>
 }
 
@@ -270,7 +275,7 @@
         base.Dispose();
 
         await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
-        
+
     }
 
 }

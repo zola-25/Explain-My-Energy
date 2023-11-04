@@ -4,9 +4,10 @@
 @inherits FluxorComponent
 
 <MudTooltip ShowOnHover="true" Text="Return to Setup">
-    <MudLink Underline="Underline.None"
+    <MudLink Class="ma-5 " Underline="Underline.None"
              Href="@($"/Setup")">
-        <MudButton Class="ma-1" Color="Color.Primary"
+        <MudButton Color="Color.Default"
+                   Class="fw-bolder"
                    ButtonType="ButtonType.Button"
                    Variant="Variant.Filled"
                    Size="Size.Small">
@@ -15,34 +16,36 @@
     </MudLink>
 </MudTooltip>
 
+
+<div class="d-flex justify-center align-center flex-wrap">
+    <MudText Class="d-flex fw-bolder" Align="Align.Center" Typo="Typo.h5">@MeterType Tariff History </MudText>
+    <DocTooltipIcon DocSnippetHeader="Editing Tariffs" DocSnippet="DocSnippet.EditingTariffs" IconTitle="Help for Adding and Editing Tariffs" />
+</div>
+
 <MudTable Items="@_tariffDetailRows" Elevation="0">
     <ToolBarContent>
-        <MudStack Spacing="1">
-            <MudText Typo="Typo.h6">Tariff History</MudText>
-            <MudText Typo="Typo.body1">@($"{MeterType} Meter")</MudText>
-            </MudStack>
-            <MudSpacer />
-            <MudIconButton OnClick="OnAddNewTariffClick"
-                           Disabled="@AppConfig.IsDemoMode"
-                           ButtonType="ButtonType.Button"
-                           Color="Color.Primary"
-                           Variant="Variant.Filled"
-                           Class="rounded-circle"
-                           Icon="@Icons.Material.Filled.Add"
-                           Title="Add Updated Tariff"></MudIconButton>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh></MudTh>
+        <MudSpacer />
+        <MudIconButton OnClick="OnAddNewTariffClick"
+                       Disabled="@AppConfig.IsDemoMode"
+                       ButtonType="ButtonType.Button"
+                       Color="Color.Primary"
+                       Variant="Variant.Filled"
+                       Class="rounded-circle mr-5"
+                       Icon="@Icons.Material.Filled.Add"
+                       Title="Add Tariff Period"></MudIconButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh></MudTh>
 
-            <MudTh>Tariff Type</MudTh>
-            <MudTh>Applies From</MudTh>
-            <MudTh>Unit Rate (p/kWh)</MudTh>
-            <MudTh>Daily Standing Charge (p/Day)</MudTh>
-            <MudTh></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>
-                @if (!context.IsHourOfDayFixed)
+        <MudTh Class="fw-bolder">Tariff Type</MudTh>
+        <MudTh Class="fw-bolder">Applies From</MudTh>
+        <MudTh Class="fw-bolder">Unit Rate (p/kWh)</MudTh>
+        <MudTh Class="fw-bolder">Daily Standing Charge (p/Day)</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            @if (!context.IsHourOfDayFixed)
             {
                 <MudButton Variant="Variant.Outlined"
                            Size="Size.Small"
@@ -68,8 +71,9 @@
         </MudTd>
         <MudTd DataLabel="Daily Standing Charge (p/Day)">@context.DailyStandingChargePence.ePenceRateDisplay()</MudTd>
         <MudTd DataLabel="Edit">
-            <MudButton Variant="Variant.Outlined"
+            <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
+                       Class="fw-bolder"
                        Disabled="@AppConfig.IsDemoMode"
                        OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
         </MudTd>

@@ -107,24 +107,32 @@ h1:focus {
 @media screen and (min-width: 300px) {
     #national-grid-iframe-container.toggled {
         height: 1000px;
+        margin-right: 10px;
+        margin-left: 10px;
     }
 }
 
 @media screen and (min-width: 400px) {
     #national-grid-iframe-container.toggled {
         height: 900px;
+        margin-right: 30px;
+        margin-left: 30px;
     }
 }
 
 @media screen and (min-width: 600px) {
     #national-grid-iframe-container.toggled {
         height: 800px;
+        margin-right: 40px;
+        margin-left: 40px;
     }
 }
 
 @media only screen and (min-width: 1088px) {
     #national-grid-iframe-container.toggled {
         height: 600px;
+        margin-right: 60px;
+        margin-left: 60px;
     }
 }
 
@@ -265,9 +273,43 @@ h1:focus {
 }
 
 .nav-bottom-scroll-margin {
-    scroll-margin-bottom: 3rem;    
+    scroll-margin-bottom: 3rem;
 }
 
 .nav-top-scroll-margin {
     scroll-margin-top: 4rem;
+}
+
+.tooltip-overlay {
+    .mud-overlay-scrim {
+        opacity: 0.2;
+        animation: none;
+        -webkit-animation: none;
+    }
+}
+
+
+.tooltip-dialog {
+    animation: none;
+    -webkit-animation: none;
+}
+
+.weather-data-table > .mud-table-container {
+    overflow-y: unset;
+
+    > table > thead > tr > th {
+        text-align: center;
+        font-weight: bolder;
+        position: sticky;
+        top: 0;
+    }
+
+    > table > tbody > tr >td {
+        text-align: center;
+    }
+
+    > table {
+        position: relative;
+        border-collapse: collapse;
+    }
 }

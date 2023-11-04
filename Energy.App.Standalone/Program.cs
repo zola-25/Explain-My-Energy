@@ -17,6 +17,7 @@ using Energy.WeatherReadings;
 using Fluxor;
 using Fluxor.Persist.Middleware;
 using Fluxor.Persist.Storage;
+using Ganss.Xss;
 using MathNet.Numerics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -54,6 +55,8 @@ builder.Services.AddTransient<ICostCalculator, CostCalculator>();
 builder.Services.AddTransient<ICostedReadingsToDailyAggregator, CostedReadingsToDailyAggregator>();
 builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMovingAverage>();
 builder.Services.AddTransient<IHistoricalForecastValidation, HistoricalForecastValidation>();
+
+builder.Services.AddSingleton<IHtmlSanitizer, HtmlSanitizer>();
 
 builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();
 
@@ -105,6 +108,9 @@ builder.Services.AddLogging(c => {
 builder.Services.AddSingleton<AppStatus>();
 
 builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json")));
+
+builder.Services.AddSingleton<DocsContent>();
 
 builder.Services.AddScoped<ISetDefaultLocalState, SetDefaultLocalState>();
 
@@ -122,7 +128,20 @@ else
 builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+try
+{
+    var docsContent = host.Services.GetRequiredService<DocsContent>();
+    await docsContent.LoadAll();
+}
+catch (Exception ex)
+{
+    var logger = host.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while initializing the app.");
+}
+
+await host.RunAsync();
 
 
 

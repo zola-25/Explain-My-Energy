@@ -4,12 +4,17 @@
 @inject IDispatcher Dispatcher
 
 <div class="d-flex justify-space-between align-baseline">
-    <MudPaper Class="d-flex ma-3" Elevation="0">
+    <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
         <MudText Typo="Typo.h5" Class=" fw-bolder">Weather Data Status</MudText>
+        <DocTooltipIcon DocSnippetHeader="Weather Data Status"
+                        DocSnippet="DocSnippet.WeatherDataStatus" IconTitle="Help for Weather Data Status" />
+
     </MudPaper>
+    
     <MudPaper Class="d-flex ma-3" Elevation="0">
         <MudLink Href="https://open-meteo.com/" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
     </MudPaper>
+    
 </div>
 <MudTable Items="Enumerable.Range(0, 1)" T="int" Elevation="0">
     <HeaderContent>
@@ -17,15 +22,17 @@
         <MudTh Class="fw-bold">Latest Reading</MudTh>
         <MudTh Class="fw-bold">Short-term Forecast Range</MudTh>
         <MudTh Class="fw-bold">Long-term Climate Forecast Range</MudTh>
+        <MudTh Class="fw-bold">View Data</MudTh>
+
     </HeaderContent>
     <RowTemplate>
         @if (!HouseholdState.Value.Saved)
         {
-            <MudTd colspan="4">Complete Household setup to import local weather data</MudTd>
+            <MudTd colspan="5">Complete Household setup to import local weather data</MudTd>
         }
         else if (WeatherState.Value.Loading)
         {
-            <MudTd colspan="4">Loading Weather Data...</MudTd>
+            <MudTd colspan="5">Loading Weather Data...</MudTd>
         }
         else if (WeatherState.Value.WeatherReadings.Any())
         {
@@ -69,6 +76,9 @@
                 }
                 @climateReadings.First().UtcTime.eToString("dnn MMM yy", true) - @climateReadings.Last().UtcTime.eToString("dnn MMM yy", true)
 
+            </MudTd>
+            <MudTd DataLabel="View Weather Data">
+                <MudButton Href="/WeatherDataTable" Color="Color.Secondary" Variant="Variant.Filled">View Data</MudButton>
             </MudTd>
         }
     </RowTemplate>

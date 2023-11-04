@@ -2,8 +2,11 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JsRuntime
 
-<MudText Typo="Typo.h4" Align="Align.Center" Class="eme-focus">@MeterType Meter Analysis</MudText>
-
+<div class="d-flex flex-row align-center justify-center">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="d-flex eme-focus">@MeterType Meter Analysis</MudText>
+    <DocTooltipIcon DocSnippetHeader="Temperature-independent Chart"
+                    DocSnippet="DocSnippet.ChartTemperatureIndependent" IconTitle="Help for the Temperature-independent Chart" />
+</div>
 @if (_ready)
 {
     <div id="profile-chart-meter-@MeterGlobalId" class="profile-chart-meter">

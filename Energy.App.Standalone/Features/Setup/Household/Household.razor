@@ -15,72 +15,63 @@
                 <ValidationSummary />
                 <div class="my-3 d-flex align-baseline">
                     <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
-                                   Placeholder="Select Move-in Date"
-                                   FixDay="1"
-                                   Disabled="@AppConfig.IsDemoMode"
-                                   OpenTo="OpenTo.Year"
-                                   Clearable="true"
-                                   
-                                   DateFormat="MMMM yyyy"
-                                   MaxDate="DateTime.Today"></MudDatePicker>
+                                    Placeholder="Select Move-in Date"
+                                    FixDay="1"
+                                    Disabled="@AppConfig.IsDemoMode"
+                                    OpenTo="OpenTo.Year"
+                                    Clearable="true"
+                                    DateFormat="MMMM yyyy"
+                                    MaxDate="DateTime.Today"></MudDatePicker>
+                     <DocTooltipIcon DocSnippetHeader="Move-in Date" DocSnippet="DocSnippet.HouseholdMoveInDate" IconTitle="Help for Move-in Date" />
 
-                    <InfoTooltip IconTitle="Tooltip for Move-in DatePicker">Your move in date ensures only energy data relevant to you is processed</InfoTooltip>
-                </div>
+                 </div>
 
-                <div class="my-3 d-flex align-baseline">
-                    <MudTextField For="@(() => _householdDetails.IhdMacId)" @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@AppConfig.IsDemoMode"
-                                  Placeholder="IHD MAC ID"></MudTextField>
-                    <InfoTooltip IconTitle="Tooltip for IHD MAC ID">
-                        This is a 16 character code that uniquely identifies your Smart Meter. <br />
-                        It is sometimes called a GUID or EUI. It can usually be found on the back of the physical Smart Meter or within the batter case. <br />
-                        In some models it can be found by accessing the settings in the Smart Meter user interface
-                    </InfoTooltip>
-                </div>
-                <div class="my-3 d-flex align-baseline">
-                    <MudAutocomplete @bind-Value="_householdDetails.OutCode"
-                                     For="@(() => _householdDetails.OutCode)"
-                                     T="OutCode" CoerceText="true"
-                                     Clearable="true"
-                                     Placeholder="Postal Area"
-                                     Required
+                 <div class="my-3 d-flex align-baseline">
+                     <MudTextField For="@(() => _householdDetails.IhdMacId)"
+                     @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@AppConfig.IsDemoMode"
+                                   Placeholder="IHD MAC ID"></MudTextField>
+                     <DocTooltipIcon DocSnippetHeader="In-Home Device MAC ID" DocSnippet="DocSnippet.HouseholdIHD" IconTitle="Help for IHD MAC ID" />
+
+                 </div>
+                 <div class="my-3 d-flex align-baseline">
+                     <MudAutocomplete @bind-Value="_householdDetails.OutCode"
+                                      For="@(() => _householdDetails.OutCode)"
+                                      T="OutCode" CoerceText="true"
+                                      Clearable="true"
+                                      Placeholder="Postal Area"
+                                              Required
                                       Disabled="@AppConfig.IsDemoMode"
-                                     ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
-                                     MinCharacters="2"
-                                     OnClearButtonClick="ClearPostalArea"
-                                     SearchFuncWithCancel="SearchOutCodes"></MudAutocomplete>
-                    <InfoTooltip IconTitle="Tooltip for Postal Area">
-                        Your Postal Area is the first 4 characters of your postcode (or sometimes 3 in London). <br /> It's needed to retrieve weather data for your location, so we can forecast your energy usage with weather changes
-                    </InfoTooltip>
-                </div>
-                <div class="d-flex align-baseline">
-                    <MudText>What is your home's primary heating source?</MudText>
-                    <InfoTooltip IconTitle="Tooltip for selecting your home's primary heating source">
-                        What do you use to heat your home? <br />
-                        In the UK, 80% of people use some form of Gas central heating
-                    </InfoTooltip>
-                </div>
-                <MudRadioGroup Name="Primary Heat Source" T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
-                                Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
-                    <MudRadio  T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
-                    <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
-                </MudRadioGroup>
+                                      ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
+                                      MinCharacters="2"
+                                      OnClearButtonClick="ClearPostalArea"
+                                      SearchFuncWithCancel="SearchOutCodes"></MudAutocomplete>
+                         <DocTooltipIcon DocSnippetHeader="Postal Area" DocSnippet="DocSnippet.HouseholdPostalArea" IconTitle="Help for Postal Area" />
+                 </div>
+                 <div class="d-flex align-baseline justify-center">
+                     <MudText>What is your home's primary heating source?</MudText>
+                     <DocTooltipIcon DocSnippetHeader="Primary Heating Source" DocSnippet="DocSnippet.HouseholdPrimaryHeatingSource" IconTitle="Help for selecting your home's primary heating source" />
+                 </div>
+                 <div class="d-flex align-baseline justify-center">
+                     <MudRadioGroup Name="Primary Heat Source" T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
+                                    Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
+                         <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
+                         <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
+                     </MudRadioGroup>
+                 </div>
+             </MudCardContent>
+             <MudCardActions Class="d-flex flex-column align-start ">
+                 <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
 
-            </MudCardContent>
-            <MudCardActions Class="d-flex flex-column align-start ">
-                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
-
-                <MudText Class="mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
-                    @_saveResponseMessage
-                </MudText>
-            </MudCardActions>
-        </MudCard>
-    </EditForm>
+                 <MudText Class="mx-auto mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
+                     <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
+                 </MudText>
+             </MudCardActions>
+         </MudCard>
+     </EditForm>
 }
 @code {
 
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
-
-    [Parameter] public EventCallback SaveSuccessfulCallback {get; set;}
 
     HouseholdDetails _householdDetails = new();
 
@@ -114,11 +105,10 @@
     }
 
 
-    private async void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
+    private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
         _submitSuccessful = true;
         _saveResponseMessage = "Household Details Saved";
-        await SaveSuccessfulCallback.InvokeAsync();
     }
 
 
