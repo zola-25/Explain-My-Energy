@@ -18,14 +18,12 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Explain My Energy Documentation
+title: Explain My Energy Docs
 description: >- # this means to ignore newlines until "baseurl:"
   The documentation for the Explain My Energy web application.
   Explain My Energy is a free application that allows users to gain insight into their energy usage and 
   forecast future energy costs, regardless of the utility provider and without needing to use paid applications or services.  
-domain: solores-software.net
-baseurl: "/ExplainMyEnergy" # the subpath of your site, e.g. /blog
-url: "https://solores-software.net" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://docs.explainmyenergy.net" # the base hostname & protocol for your site, e.g. http://example.com
 
 
 # Build settings
@@ -33,17 +31,31 @@ theme: just-the-docs
 
 heading_anchors: true # Enable anchor links for headings
 
+logo: "/assets/img/Logo.png"
+
 color_scheme: dark # dark or light
 
 search_enabled: true
 
-aux_links:
-  - title: "Explain My Energy on GitHub"
-    url: "https://github.com/zola-25/Explain-My-Energy"
-  - title: "Explain My Energy App"
-    url: "https://explainmyenergy.net"
-  - title: "Explain My Energy Demo App"
+callouts:
+  warning:
+    title: Caution
+    color: yellow
+  highlight:
+    color: blue
+
+
+
+nav_external_links:
+  - title: "Demo App"
     url: "https://demo.explainmyenergy.net"
+    open_in_new_tab: true
+  - title: "Main App"
+    url: "https://explainmyenergy.net"
+    open_in_new_tab: true
+  - title: "GitHub"
+    url: "https://github.com/zola-25/Explain-My-Energy"
+    open_in_new_tab: true
 
 # Exclude from processing.
 # The following items will not be processed, by default.

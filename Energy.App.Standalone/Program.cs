@@ -57,7 +57,6 @@ builder.Services.AddTransient<IForecastReadingsMovingAverage, ForecastReadingsMo
 builder.Services.AddTransient<IHistoricalForecastValidation, HistoricalForecastValidation>();
 
 builder.Services.AddSingleton<IHtmlSanitizer, HtmlSanitizer>();
-builder.Services.AddSingleton<ISanitization, Sanitization>();
 
 builder.Services.AddTransient<IEnergyImportValidation, EnergyImportValidation>();
 
@@ -129,7 +128,20 @@ else
 builder.Services.AddTransient<IEnergyReadingService, EnergyReadingService>();
 
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+try
+{
+    var docsContent = host.Services.GetRequiredService<DocsContent>();
+    await docsContent.LoadAll();
+}
+catch (Exception ex)
+{
+    var logger = host.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while initializing the app.");
+}
+
+await host.RunAsync();
 
 
 

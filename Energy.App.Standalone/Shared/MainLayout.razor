@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject IConfiguration Configuration
+@inject AppStatus AppStatus
 
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
@@ -10,50 +11,52 @@
             <MudIconButton UserAttributes="@(new () {{"id","toggle-show-main-site-links-button" },{"aria-controls","main-site-links-region"},{"aria-expanded",_drawerOpen}})" Title="Toggle Expand Main Site Links" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
             <div class="w-fit-content">
                 <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy @(_demoNote) @(_demoNote2)</MudText></MudNavLink>
-            </div>
-            <MudSpacer />
-            <div class="w-fit-content menu-nav-item git-hub">
-                <MudNavLink Icon="@Icons.Custom.Brands.GitHub" IconColor="Color.Inherit"  Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
-            </div>
+                </div>
+                <MudSpacer />
+                
 
-            <MudTooltip Arrow="true" Placement="Placement.Bottom" ShowOnClick="false" ShowOnFocus="true" ShowOnHover="true" Text="Share this App!">
-                <ShareMenu />
-            </MudTooltip>
-        </MudAppBar>
-            <MudDrawer 
-                UserAttributes="@(new () {{"id", "main-site-links-region"},{"role","region" },{"aria-label","Contains Main Site Navigation Links"}})" 
-                @bind-Open="_drawerOpen" 
-                ClipMode="DrawerClipMode.Always" 
-                Elevation="2"
-                DisableOverlay="true">
-            <NavMenu></NavMenu>
-        </MudDrawer>
-        <MudMainContent>
-            <MudContainer>
-                <DataValidatorBase>
+                <div class="w-fit-content">
 
-                    @Body
+                    <MudButton Color="Color.Inherit" IconColor="Color.Inherit" Href="@AppStatus.DocsUri" EndIcon="fa-solid fa-book-open" IconSize="Size.Small"
+                               Target="_Blank" Size="Size.Small">Documentation</MudButton>
+                </div>
+                <div class="w-fit-content menu-nav-item git-hub">
+                    <MudNavLink Icon="@Icons.Custom.Brands.GitHub" IconColor="Color.Inherit" Href="https://github.com/zola-25/Explain-My-Energy"></MudNavLink>
+                </div>
+            </MudAppBar>
+            <MudDrawer UserAttributes="@(new () {{"id", "main-site-links-region"},{"role","region" },{"aria-label","Contains Main Site Navigation Links"}})"
+            @bind-Open="_drawerOpen"
+                       ClipMode="DrawerClipMode.Always"
+                       Elevation="2"
+                       DisableOverlay="true">
+                <NavMenu></NavMenu>
+            </MudDrawer>
+            <MudMainContent>
+                <MudContainer>
+                    <DataValidatorBase>
 
-                </DataValidatorBase>
-            </MudContainer>
-        </MudMainContent>
-        <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-start" DisableGutters="true" Bottom="true" Dense="true" Fixed="true" Elevation="1">
-            <div class="w-fit-content footer-nav-item">
-                <MudNavLink  Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
-            </div>
-            <div class="w-fit-content footer-nav-item">
-                <MudNavLink Href="/TermsAndConditions">Terms &amp; Conditions</MudNavLink>
-            </div>
-            <MudSpacer />
+                        @Body
 
-            <div class="w-fit-content footer-nav-item">
+                    </DataValidatorBase>
+                </MudContainer>
+            </MudMainContent>
+            <MudAppBar Color="Color.Dark" ToolBarClass="d-flex justify-start" DisableGutters="true" Bottom="true" Dense="true" Fixed="true" Elevation="1">
+                <div class="w-fit-content footer-nav-item">
+                    <MudNavLink Href="/PrivacyPolicy">Privacy Policy</MudNavLink>
+                </div>
+                <div class="w-fit-content footer-nav-item">
+                    <MudNavLink Href="/TermsAndConditions">Terms &amp; Conditions</MudNavLink>
+                </div>
+                <MudSpacer />
 
-                <MudNavLink  Href="/Credits">Credits</MudNavLink>
-            </div>
+                <div class="w-fit-content footer-nav-item">
 
-        </MudAppBar>
-    </MudLayout>
-</div>
+                    <MudNavLink Href="/Credits">Credits</MudNavLink>
+                </div>
+
+            </MudAppBar>
+        </MudLayout>
+    </div>
     @code {
 
     bool _drawerOpen = true;
@@ -71,7 +74,7 @@
                 SecondaryContrastText = Colors.Shades.White,
                 Tertiary = Colors.Orange.Darken4,
                 HoverOpacity = 0.3,
-                
+
             },
             Typography = new Typography
             {
@@ -83,7 +86,8 @@
     string _demoNote = "";
     string _demoNote2 = "";
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         _demoNote = Configuration["App:UseDemoSetup"] == "True" ? "Demo" : "";
     }
 

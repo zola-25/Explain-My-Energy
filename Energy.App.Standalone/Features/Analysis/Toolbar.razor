@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 
 <MudToolBar WrapContent="true" Class="justify-space-between">
-    <MudPaper Elevation="0" Class="ma-2">
+    <MudPaper Elevation="0" Class="d-flex align-center ma-2">
 
         <MudTooltip Placement="Placement.Top" Text="Chart kWh Consumption, or Costs with Tariff Details">
             <MudSwitch Checked="_costToggled"
@@ -14,10 +14,12 @@
                        Label="@_costToggleLabelText"
                        LabelPosition="LabelPosition.Start" />
         </MudTooltip>
+        <DocTooltipIcon DocSnippetHeader="Chart kWh vs Cost"
+                        DocSnippet="DocSnippet.AnalysisOptionsChartKWhVsCost" IconTitle="Help for Switching between Chart kWh and Cost" />
     </MudPaper>
 
 
-    <MudPaper Elevation="0" Class="term-mud-select-min-width ma-2">
+    <MudPaper Elevation="0" Class="term-mud-select-min-width d-flex align-center ma-2">
         <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
             <MudSelect  Class="w-100percent"
@@ -34,11 +36,13 @@
                 }
             </MudSelect>
         </MudTooltip>
+        <DocTooltipIcon DocSnippetHeader="Aggregate Analysis Term"
+                        DocSnippet="DocSnippet.AnalysisOptionsAnalysisTerm" IconTitle="Help for Setting Aggregate Analysis Term" />
     </MudPaper>
 
     @if (IsPrimaryHeatingSource)
     {
-        <MudPaper Elevation="0" Class="ma-2">
+        <MudPaper Elevation="0" Class="d-flex align-center ma-2">
 
             <MudTooltip Placement="Placement.Top" Text="Forecast using Historical Moving Average, or the Temperature effect on your consumption. For warm weather periods, Historical Forecasts may be more accurate. For colder months, Temperature forecasts will show how your consumption increases as it gets colder.">
                 <MudSwitch Checked="_historicalForecastToggled"
@@ -50,9 +54,11 @@
                            Label="@_historicalForecastToggleLabelText"
                            LabelPosition="LabelPosition.Start" />
             </MudTooltip>
+            <DocTooltipIcon DocSnippetHeader="Temperature Forecast Toggle"
+                            DocSnippet="DocSnippet.AnalysisOptionsTemperatureVsHistorical" IconTitle="Help for Switching between Historical and Temperature Forecasting" />
         </MudPaper>
 
-        <MudPaper Elevation="0" Class="ma-2">
+        <MudPaper Elevation="0" Class="d-flex align-center ma-2">
             <MudTooltip Placement="Placement.Top" Text="If using Temperature Forecast, see how your consumption is effected by increasing or decreasing the daily forecast Temperature">
                 <MudNumericField Value="@_degreesDifference"
                                  TextChanged="DegreeDifferenceChange"
@@ -68,6 +74,8 @@
                                  Adornment="Adornment.End"
                                  AdornmentText="°C" />
             </MudTooltip>
+            <DocTooltipIcon DocSnippetHeader="Adjusting Forecast Temperature"
+                            DocSnippet="DocSnippet.AnalysisOptionsAdjustingForecast" IconTitle="Help for Adjusting Forecast Temperature" />
         </MudPaper>
     }
 </MudToolBar>

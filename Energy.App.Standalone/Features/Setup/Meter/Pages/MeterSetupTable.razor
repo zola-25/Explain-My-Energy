@@ -18,7 +18,7 @@
     <HeaderContent>
         <MudTh Class="fw-bold">Type</MudTh>
         <MudTh Class="fw-bold">Add / Remove </MudTh>
-        <MudTh Class="fw-bold">MPAN / MPRN</MudTh>
+        <MudTh Class="fw-bold">MPxN</MudTh>
         <MudTh Class="fw-bold">Authorized</MudTh>
         <MudTh Class="fw-bold">Energy Readings</MudTh>
         <MudTh Class="fw-bold">Manual Update Readings</MudTh>
@@ -31,14 +31,17 @@
 
             @if (context.Added)
             {
-                <MudButton Class="ma-1" Color="Color.Error" Disabled="@AppConfig.IsDemoMode" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
+                <div class="d-flex align-center">
+                    <MudButton Class="ma-1" Color="Color.Error" Disabled="@AppConfig.IsDemoMode" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
+                    <DocTooltipIcon DocSnippetHeader="Remove Meter" DocSnippet="DocSnippet.ManualActionsRemoveMeter" IconTitle="Help for Updating or Removing Meters" />
+                </div>
             }
             else
             {
                 <MudButton aria-label="@($"Add {context.MeterType} Meter")" Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")" Disabled="@(!HouseholdState.Value.Saved || AppConfig.IsDemoMode)" Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">@($"Add {@context.MeterType}")</MudButton>
             }
         </MudTd>
-        <MudTd DataLabel="MPAN / MPRN">@context.Mpxn</MudTd>
+        <MudTd DataLabel="MPxN">@context.Mpxn</MudTd>
         <MudTd DataLabel="Authorized">
             @if (context.Authorized)
             {
@@ -47,13 +50,12 @@
             else
             {
                 <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
-                    <MudButton 
-                        aria-label="@($"Authorize {context.MeterType} Meter")"
-                        Href="@($"/MeterAuthorization/{context.MeterType}")" 
-                        Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)" 
-                        ButtonType="ButtonType.Button" 
-                        Variant="Variant.Filled" 
-                        Size="Size.Small">Authorize</MudButton>
+                    <MudButton aria-label="@($"Authorize {context.MeterType} Meter")"
+                               Href="@($"/MeterAuthorization/{context.MeterType}")"
+                               Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)"
+                               ButtonType="ButtonType.Button"
+                               Variant="Variant.Filled"
+                               Size="Size.Small">Authorize</MudButton>
                 </MudTooltip>
             }
         </MudTd>
@@ -79,18 +81,22 @@
                 {
                     <MudText>No Energy Readings Loaded</MudText>
                 }
+
             }
         </MudTd>
         <MudTd DataLabel="Manual Update Readings">
             @if (context.Authorized && !context.ReadingsLoading)
             {
-                @if (context.LatestReadingsDate != null)
-                {
-                    <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || AppConfig.IsDemoMode" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
-                               Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
-                }
-                <MudButton Class="ma-1" Disabled="@AppConfig.IsDemoMode"
-                    Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
+                <div class="d-flex align-center">
+                    @if (context.LatestReadingsDate != null)
+                    {
+                        <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || AppConfig.IsDemoMode" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                                   Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
+                    }
+                    <MudButton Class="ma-1" Disabled="@AppConfig.IsDemoMode"
+                               Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
+                    <DocTooltipIcon DocSnippetHeader="Update or Reload" DocSnippet="DocSnippet.ManualActionsUpdateMeterData" IconTitle="Help for Updating or Reloading Readings" />
+                </div>
             }
 
         </MudTd>
@@ -111,15 +117,15 @@
         <MudTd DataLabel="Set Tariffs">
             @*<MudTooltip Text="Tooltip">*@
 
-                <MudButton aria-label="@($"{context.MeterType} Meter Tariffs")" Href="@($"/Tariffs/{context.MeterType}")"
-                                Target="_self"
-                               Color="Color.Primary"
-                                Disabled="@(!context.Added || AppConfig.IsDemoMode)"
-                               ButtonType="ButtonType.Button"
-                               Variant="Variant.Filled"
-                               Size="Size.Small">
-                        <span><i class="fa-solid fa-sterling-sign" aria-hidden="true"></i> Tariffs</span>
-                    </MudButton>
+            <MudButton aria-label="@($"{context.MeterType} Meter Tariffs")" Href="@($"/Tariffs/{context.MeterType}")"
+                       Target="_self"
+                       Color="Color.Primary"
+                       Disabled="@(!context.Added || AppConfig.IsDemoMode)"
+                       ButtonType="ButtonType.Button"
+                       Variant="Variant.Filled"
+                       Size="Size.Small">
+                <span><i class="fa-solid fa-sterling-sign" aria-hidden="true"></i> Tariffs</span>
+            </MudButton>
         </MudTd>
     </RowTemplate>
 

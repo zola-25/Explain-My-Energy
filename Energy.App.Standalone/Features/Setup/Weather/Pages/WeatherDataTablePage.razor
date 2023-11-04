@@ -1,4 +1,4 @@
-﻿@page "/WeatherData"
+﻿@page "/WeatherDataTable"
 @inherits FluxorComponent
 @using Energy.Shared
 @using Energy.App.Standalone.Features.Setup.Weather.Store
@@ -21,6 +21,8 @@
                     </MudLink>
                 </MudTooltip>
                 <MudText Class="mx-auto fw-bolder" Typo="Typo.h4">Weather Data</MudText>
+                <DocTooltipIcon DocSnippetHeader="Weather Data Table"
+                                DocSnippet="DocSnippet.WeatherDataTable" IconTitle="Help for Weather Data Table" />
             </div>
         </MudItem>
         <MudItem xs="12">
@@ -44,9 +46,17 @@
                 }
                 else
                 {
-                    <MudTable T="DailyWeatherRecord" ReadOnly="true" Virtualize="true" Items="WeatherState.Value.WeatherReadings" FixedHeader="true"  Height="85vh" Breakpoint="Breakpoint.Sm" AllowUnsorted="false"  SortLabel="Sort By" Striped="true">
+                    <MudTable T="DailyWeatherRecord" ReadOnly="true" Virtualize="true"  
+                            Items="WeatherState.Value.WeatherReadings" 
+                            FixedHeader="true"  
+                            Height="85vh" 
+                            Breakpoint="Breakpoint.Sm" 
+                            
+                            AllowUnsorted="true"  
+                            SortLabel="Sort By" 
+                            Striped="true">
                         <HeaderContent>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.UtcTime)">Date</MudTableSortLabel></MudTh>
+                            <MudTh Class="fw-bold"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<DailyWeatherRecord, object>(c=>c.UtcTime)">Date</MudTableSortLabel></MudTh>
                             <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.TemperatureAverage)">Temp. Avg ℃</MudTableSortLabel></MudTh>
 
                             <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsHistorical)">Historical?</MudTableSortLabel></MudTh>

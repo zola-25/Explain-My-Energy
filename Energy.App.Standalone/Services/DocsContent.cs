@@ -8,16 +8,22 @@ public class DocsContent
 {
     private readonly ILogger<DocsContent> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ISanitization _sanitization;
 
     private readonly Dictionary<DocSnippet, Snippet> _savedSnippets;
 
-    public DocsContent(ILogger<DocsContent> logger, IHttpClientFactory httpClientFactory, ISanitization sanitization)
+    public DocsContent(ILogger<DocsContent> logger, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
-        _sanitization = sanitization;
         _savedSnippets = new Dictionary<DocSnippet, Snippet>();
+    }
+
+    public async ValueTask LoadAll() {
+
+        foreach (var docSnippet in Enum.GetValues<DocSnippet>())
+        {
+            _ = await GetDocSnippet(docSnippet);
+        }
     }
 
     public async Task<Snippet> GetDocSnippet(DocSnippet docSnippet)
@@ -47,11 +53,9 @@ public class DocsContent
 
             htmlDoc.Load(responseMessage.Content.ReadAsStream());
             var snippetNode = htmlDoc.DocumentNode.SelectSingleNode($"//main//*[@id='{anchor}']");
-            //var parentSnippetNode = snippetNode.ParentNode;
-            //var snippetNodes = parentSnippetNode.SelectNodes(".//following-sibling::p[preceding::h3]");
+            
             var current = snippetNode;
             StringBuilder content = new StringBuilder();
-            //content.Append(htmlSanitizer.Sanitize(snippetNode.OuterHtml)); // Add the first header to your content.
 
             while (current != null)
             {
@@ -115,6 +119,7 @@ public class DocsContent
     }
 
     public static Dictionary<DocSnippet, string> SnippetSubpaths = new Dictionary<DocSnippet, string>() {
+        {DocSnippet.SetupWizard, "setup/setup-wizard.html#setup-wizard"},
         {DocSnippet.HouseholdIHD, "setup/household.html#smart-meter-ihd-id"},
         {DocSnippet.HouseholdMoveInDate, "setup/household.html#move-in-date"},
         {DocSnippet.HouseholdPostalArea, "setup/household.html#postal-area"},
@@ -122,6 +127,18 @@ public class DocsContent
         {DocSnippet.GasMeterMPRN, "setup/gas-meter.html#gas-meter-mprn"},
         {DocSnippet.ElectricityMeterMPAN, "setup/electricity-meter.html#electricity-meter-mpan"},
         {DocSnippet.AuthorizationN3rgyPage, "setup/authorization.html#authorization-process"},
+        {DocSnippet.WeatherDataStatus, "setup/local-weather.html#weather-data-status"},
+        {DocSnippet.WeatherDataTable, "setup/local-weather.html#weather-data-table"},
+        {DocSnippet.ManualActionsUpdateMeterData, "setup/manual-actions.html#update-or-reload-meter-readings"},
+        {DocSnippet.ManualActionsWipeAllData, "setup/manual-actions.html#wipe-all-data"},
+        {DocSnippet.ManualActionsRemoveMeter, "setup/manual-actions.html#removing-meters"},
+        {DocSnippet.EditingTariffs, "setup/tariffs.html#editing-tariffs" },
+        {DocSnippet.AnalysisOptionsChartKWhVsCost, "analysis/analysis-options.html#chart-kwh-vs-cost"},
+        {DocSnippet.AnalysisOptionsAnalysisTerm, "analysis/analysis-options.html#analysis-term"},
+        {DocSnippet.AnalysisOptionsTemperatureVsHistorical, "analysis/analysis-options.html#temperature-forecast-vs-historical"},
+        {DocSnippet.AnalysisOptionsAdjustingForecast, "analysis/analysis-options.html#adjusting-temperature-forecast"},
+        {DocSnippet.ChartTemperatureDependent, "analysis/understanding-chart-data.html#temperature-dependent-energy-chart"},
+        {DocSnippet.ChartTemperatureIndependent, "analysis/understanding-chart-data.html#temperature-independent-energy-chart"},
         };
 }
 
@@ -133,17 +150,26 @@ public class Snippet
 }
 
 
-
-
 public enum DocSnippet
 {
+    SetupWizard,
     HouseholdIHD,
     HouseholdMoveInDate,
     HouseholdPostalArea,
     HouseholdPrimaryHeatingSource,
     GasMeterMPRN,
     ElectricityMeterMPAN,
-    AuthorizationPresetFields,
     AuthorizationN3rgyPage,
-    AuthorizationCheckButton,
+    WeatherDataStatus,
+    WeatherDataTable,
+    ManualActionsUpdateMeterData,
+    ManualActionsRemoveMeter,
+    ManualActionsWipeAllData,
+    EditingTariffs,
+    AnalysisOptionsChartKWhVsCost,
+    AnalysisOptionsAnalysisTerm,
+    AnalysisOptionsTemperatureVsHistorical,
+    AnalysisOptionsAdjustingForecast,
+    ChartTemperatureDependent,
+    ChartTemperatureIndependent,
 }

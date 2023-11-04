@@ -4,13 +4,14 @@
     <MudToggleIconButton Toggled="_toggleStatus" ToggledChanged="ShowSnippetDialog"
                          DisableRipple="true" Title="@IconTitle" Color="@Color.Info"
                          ToggledIcon="@Icons.Material.Filled.Info"
+                         Size="Size"
                          Icon="@Icons.Material.Outlined.Info">@IconTitle</MudToggleIconButton>
 </div>
 @code {
     [Parameter, EditorRequired] public string IconTitle { get; set; }
     [Parameter, EditorRequired] public string DocSnippetHeader { get; set; }
     [Parameter] public string OptionalRootClass { get; set; }
-
+    [Parameter] public Size Size { get; set; } = Size.Medium;
     [Parameter, EditorRequired] public DocSnippet DocSnippet { get; set; }
     [Inject] DocsContent DocsContent { get; set; }
 
@@ -49,9 +50,14 @@
     string _documentLink;
     bool _errorLoadingSnippet;
 
+    bool _snippetLoaded;
+
     protected override async Task OnParametersSetAsync()
     {
-        await base.OnParametersSetAsync();
+        if(_snippetLoaded)
+        {
+            return;
+        }
 
 
         var snippet = await DocsContent.GetDocSnippet(DocSnippet);
@@ -62,6 +68,6 @@
 
         _documentLink = snippet.DocPath;
         _errorLoadingSnippet = snippet.Error;
-
+        _snippetLoaded = true;
     }
 }
