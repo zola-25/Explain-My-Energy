@@ -108,7 +108,7 @@ builder.Services.AddLogging(c => {
 builder.Services.AddSingleton<AppStatus>();
 
 builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentNullException("DocsUri not found in appsettings.json")));
+builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json")));
 
 builder.Services.AddSingleton<DocsContent>();
 

@@ -118,7 +118,7 @@ public class DocsContent
         }
     }
 
-    public static Dictionary<DocSnippet, string> SnippetSubpaths = new Dictionary<DocSnippet, string>() {
+    public static readonly Dictionary<DocSnippet, string> SnippetSubpaths = new Dictionary<DocSnippet, string>() {
         {DocSnippet.SetupWizard, "setup/setup-wizard.html#setup-wizard"},
         {DocSnippet.HouseholdIHD, "setup/household.html#smart-meter-ihd-id"},
         {DocSnippet.HouseholdMoveInDate, "setup/household.html#move-in-date"},

@@ -16,6 +16,6 @@ public class AppStatus
     public AppStatus(IConfiguration configuration)
     {
         IsDemoMode = configuration.eIsDemoMode();
-        DocsUri = configuration["App:DocsUri"] ?? throw new ArgumentNullException("DocsUri not found in appsettings.json");
+        DocsUri = configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json");
     }
 }

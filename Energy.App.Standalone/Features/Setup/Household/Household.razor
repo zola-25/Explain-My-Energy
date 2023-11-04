@@ -73,8 +73,6 @@
 
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
 
-    [Parameter] public EventCallback SaveSuccessfulCallback { get; set; }
-
     HouseholdDetails _householdDetails = new();
 
     string _saveResponseMessage = string.Empty;
@@ -107,11 +105,10 @@
     }
 
 
-    private async void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
+    private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
         _submitSuccessful = true;
         _saveResponseMessage = "Household Details Saved";
-        await SaveSuccessfulCallback.InvokeAsync();
     }
 
 
