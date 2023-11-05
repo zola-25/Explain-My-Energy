@@ -36,6 +36,10 @@
 	</Target>
 	
 	<PropertyGroup>
+
+		<EmccLinkOptimizationFlag>-O1</EmccLinkOptimizationFlag>
+		<EmccCompileOptimizationFlag>-O1</EmccCompileOptimizationFlag>
+		
 		<RunAOTCompilation>true</RunAOTCompilation>
 		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
