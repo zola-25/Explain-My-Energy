@@ -3,7 +3,6 @@ using Energy.n3rgyApi.Interfaces;
 using Energy.n3rgyApi.Models;
 using Energy.Shared;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace Energy.App.Standalone.Data.EnergyReadings;
 

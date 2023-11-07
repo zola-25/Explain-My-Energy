@@ -12,6 +12,13 @@
 @using Energy.App.Standalone.Data.EnergyReadings.Interfaces
 @using Energy.App.Standalone.Shared
 @using Energy.App.Standalone.PageComponents
+@using Energy.App.Standalone.Services;
+@using Energy.App.Standalone.Services.FluxorPersist
+@using Energy.App.Standalone.Services.FluxorPersist.Demo
+@using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces
+@using Energy.App.Standalone.Services.DocSnippets;
+
+
 @using Energy.Shared;
 @using Microsoft.AspNetCore.Components
 @using MudBlazor
@@ -20,8 +27,8 @@
 @using Energy.App.Standalone.Extensions
 @using MathNet.Numerics
 @using Energy.App.Standalone.Features.Analysis.Store;
-@using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 @using Energy.App.Standalone.Features.Analysis.Services.Analysis
+@using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 @using Energy.App.Standalone.Features.Analysis.Services.Analysis.ChartModels;
 
 @using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions
@@ -31,6 +38,7 @@
 @using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 @using Energy.App.Standalone.Features.Setup.Household
 @using Energy.App.Standalone.Features.Setup.Household.Actions
+@using Energy.App.Standalone.Features.Setup.TermsAndConditions;
 
 @using Energy.App.Standalone.Features.Setup.Meter
 @using Energy.App.Standalone.Features.Setup.Meter.Pages
@@ -41,6 +49,7 @@
 @using Energy.App.Standalone.Features.Setup.Weather
 @using Energy.App.Standalone.Features.Setup.Weather.Pages
 @using Energy.App.Standalone.Features.Setup.Weather.Store
+
 @using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 @using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 @using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
@@ -49,5 +58,3 @@
 @using Energy.App.Standalone.DTOs
 @using Energy.App.Standalone.DTOs.Tariffs
 @using System.Collections.Immutable
-@using Energy.App.Standalone.Services;
-@using Energy.App.Standalone.Services.FluxorPersist;

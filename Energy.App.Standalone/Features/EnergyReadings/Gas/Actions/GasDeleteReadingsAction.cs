@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
@@ -15,7 +15,6 @@ public class GasDeleteReadingsAction
             CostedReadings = ImmutableList<CostedReading>.Empty,
             BasicReadings = ImmutableList<BasicReading>.Empty,
             Loading = false,
-            LastUpdated = DateTime.MinValue,
             LastCheckedForNewReadings = DateTime.MinValue
         };
     }

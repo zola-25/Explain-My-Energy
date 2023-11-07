@@ -1,10 +1,10 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.Shared;
 using MathNet.Numerics;
 using Fluxor;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -29,7 +29,7 @@ public class TempForecastSummarizer : ITempForecastSummarizer
     public ForecastAnalysis GetNextPeriodForecastTotals(MeterType meterType,
         CalendarTerm term, bool useHistorical)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetNextPeriodDates(term);
+        (var start, var end) = _periodDateRanges.GetNextPeriodDates(term);
 
         var results = ForecastAnalysis
         (
@@ -46,7 +46,7 @@ public class TempForecastSummarizer : ITempForecastSummarizer
     public ForecastAnalysis GetCurrentPeriodForecastTotals(MeterType meterType,
         CalendarTerm term, bool useHistorical)
     {
-        (DateTime start, DateTime end) = _periodDateRanges.GetCurrentPeriodDates(term);
+        (var start, var end) = _periodDateRanges.GetCurrentPeriodDates(term);
 
         var results = ForecastAnalysis
         (
@@ -72,28 +72,21 @@ public class TempForecastSummarizer : ITempForecastSummarizer
                                         .Where(c => c.UtcTime >= start && c.UtcTime <= end)
                                         .ToList();
 
-        List<DailyCostedReading> forecastCosts;
-
-        if (useHistorical)
-        {
-            forecastCosts = _historicalForecastState.Value[meterType]
+        var forecastCosts = useHistorical
+            ? _historicalForecastState.Value[meterType]
+                .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList()
+            : _heatingForecastState.Value.ForecastDailyCosts
                 .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
-        }
-        else
-        {
-            forecastCosts = _heatingForecastState.Value.ForecastDailyCosts
-                .Where(c => c.UtcTime >= start && c.UtcTime <= end).ToList();
-        }
 
 
 
-        var totalKWh = forecastCosts.Sum(c => c.KWh);
-        var totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPounds);
-        var totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
+        decimal totalKWh = forecastCosts.Sum(c => c.KWh);
+        decimal totalCost = forecastCosts.Sum(c => c.ReadingTotalCostPounds);
+        decimal totalCo2 = totalKWh * _co2Conversion.GetCo2ConversionFactor(meterType);
 
-        var totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
-        var totalCostRounded = totalCost.Round(term.NumberOfDecimals());
-        var totalCo2Rounded = totalCo2.Round(1);
+        decimal totalKWhRounded = totalKWh.Round(term.NumberOfDecimals());
+        decimal totalCostRounded = totalCost.Round(term.NumberOfDecimals());
+        decimal totalCo2Rounded = totalCo2.Round(1);
 
         var results = new ForecastAnalysis()
         {

@@ -122,6 +122,18 @@ try {
     const template = Handlebars.compile(templateText, { preventIndent: true, strict: true, noEscape: true });
     const htmlRendered = template({ packageInfos: encodedPackageInfosWithLicenseText });
 
+    DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+        // Add rel="noopener noreferrer" to all links that open in a new tab
+        if (node.tagName === 'A' && node.getAttribute('target') === '_blank') {
+            node.setAttribute('rel', 'noopener noreferrer nofollow');
+        }
+        // Add rel="nofollow" only to links that do not open in a new tab
+        else if (node.tagName === 'A' && node.hasAttribute('href')) {
+            node.setAttribute('rel', 'nofollow');
+        }
+
+    });
+
     const htmlSanitized = DOMPurify.sanitize(htmlRendered, { USE_PROFILES: { html: true } });
 
     console.log('DOMPurify removed %d elements.', DOMPurify.removed.length)

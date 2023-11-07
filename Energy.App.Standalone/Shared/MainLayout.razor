@@ -10,10 +10,16 @@
         <MudAppBar Elevation="1" Class="">
             <MudIconButton UserAttributes="@(new () {{"id","toggle-show-main-site-links-button" },{"aria-controls","main-site-links-region"},{"aria-expanded",_drawerOpen}})" Title="Toggle Expand Main Site Links" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
             <div class="w-fit-content">
-                <MudNavLink Href="/"> <MudText Typo="Typo.h5" Color="Color.Inherit" Class="m-0">Explain My Energy @(_demoNote) @(_demoNote2)</MudText></MudNavLink>
+                <MudNavLink Href="/">
+                        <MudText Align="Align.Center" 
+                                Typo="Typo.h5"
+                                 Color="Color.Inherit"
+                                 Class="eme-main-header m-0">Explain My Energy @(_demoNote)</MudText>
+                    </MudNavLink>
+
                 </div>
                 <MudSpacer />
-                
+
 
                 <div class="w-fit-content">
 
@@ -83,8 +89,7 @@
             },
         };
 
-    string _demoNote = "";
-    string _demoNote2 = "";
+    string _demoNote = String.Empty;
 
     protected override void OnInitialized()
     {

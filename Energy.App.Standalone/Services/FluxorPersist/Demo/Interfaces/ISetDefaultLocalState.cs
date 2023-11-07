@@ -3,7 +3,7 @@ using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 
-namespace Energy.App.Standalone.Services.FluxorPersist;
+namespace Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 
 public interface ISetDefaultLocalState
 {

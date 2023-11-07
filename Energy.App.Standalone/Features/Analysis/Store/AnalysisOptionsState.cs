@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.Shared;
@@ -26,7 +26,7 @@ public record AnalysisOptionsState
     }
 
     [property: JsonIgnore]
-    public IEnumerable<MeterAnalysisOptions> All => new[] { Electricity, Gas };
+    public IEnumerable<MeterAnalysisOptions> All => new[] {  Gas, Electricity };
 
     public MeterAnalysisOptions Electricity { get; init; }
 

@@ -72,8 +72,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
     public async Task TestAccessWithException(MeterType meterType,
         string mac, CancellationToken ctx = default)
     {
-        DateTime startDate = DateTime.Today.AddDays(-4);
-        DateTime endDate = DateTime.Today.AddDays(-3);
+        DateTime startDate = DateTime.UtcNow.Date.AddDays(-4);
+        DateTime endDate = DateTime.UtcNow.Date.AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -91,8 +91,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
     public async Task<HttpResponseMessage> TestAccess(MeterType meterType,
         string mac, CancellationToken ctx = default)
     {
-        DateTime startDate = DateTime.Today.AddDays(-4);
-        DateTime endDate = DateTime.Today.AddDays(-3);
+        DateTime startDate = DateTime.UtcNow.Date.AddDays(-4);
+        DateTime endDate = DateTime.UtcNow.Date.AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

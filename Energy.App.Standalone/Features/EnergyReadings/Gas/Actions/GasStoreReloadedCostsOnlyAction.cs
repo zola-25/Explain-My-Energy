@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;

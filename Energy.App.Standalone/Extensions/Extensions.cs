@@ -37,12 +37,6 @@ public static class Extensions
         return string.Format($"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}");
     }
 
-    public static long eToUnixTime(this DateTime dateTime)
-    {
-        TimeZoneInfo timeZone = AppDefaults.GetUkTimezone();
-        return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
-    }
-
     public static long eToUnixTicksNoOffset(this DateTime dateTime)
     {
         return new DateTimeOffset(dateTime).ToUnixTimeMilliseconds();

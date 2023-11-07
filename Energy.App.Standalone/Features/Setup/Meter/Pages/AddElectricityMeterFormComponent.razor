@@ -17,7 +17,7 @@
                     <div class="d-flex flex-row align-baseline">
                         <MudTextField For="@(() => _electricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@_electricityMeter.Mpxn" Placeholder="Enter your MPAN number here"
                                                 Required></MudTextField>
-                         <DocTooltipIcon DocSnippetHeader="Electricity Meter MPAN" DocSnippet="DocSnippet.ElectricityMeterMPAN" IconTitle="Help for Electricity Meter Setup" />
+                         <DocTooltipIcon DocSnippetHeader="Electricity Meter MPAN" DocSnippetType="DocSnippetType.ElectricityMeterMPAN" IconTitle="Help for Electricity Meter Setup" />
                      </div>
                      <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
                 </div>

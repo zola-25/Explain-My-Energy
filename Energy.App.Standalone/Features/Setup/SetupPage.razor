@@ -8,10 +8,10 @@
 
 
 
-<MudGrid Justify="Justify.Center">
+<MudGrid Justify="Justify.Center" Class="mb-15">
     <MudItem xs="12">
-        <div class="d-flex justify-end align-baseline">
-            <MudText Typo="Typo.h4" Align="Align.Center" Class="mt-3 mx-auto eme-focus">App Setup</MudText>
+
+        <div class="d-flex justify-end align-baseline mt-2">
             <MudButton Class="ma-0"
                        ButtonType="ButtonType.Button"
                        Disabled="@AppConfig.IsDemoMode"
@@ -23,12 +23,13 @@
                        title="Wipe all data?">
                 Wipe All Data
             </MudButton>
-            <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippet="DocSnippet.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
+            <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
 
         </div>
+
     </MudItem>
     <MudItem xs="12">
-        <MudPaper Elevation="2" Class="p-2 mt-2">
+        <MudPaper Elevation="2" Class="p-2">
 
             <Household></Household>
 
@@ -36,13 +37,13 @@
     </MudItem>
     <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2">
-            <WeatherDataInfo></WeatherDataInfo>
+            <MeterSetupTable></MeterSetupTable>
         </MudPaper>
     </MudItem>
 
-    <MudItem xs="12">
+    <MudItem xs="12" >
         <MudPaper Elevation="2" Class="p-2">
-            <MeterSetupTable></MeterSetupTable>
+            <WeatherDataInfo></WeatherDataInfo>
         </MudPaper>
     </MudItem>
 </MudGrid>

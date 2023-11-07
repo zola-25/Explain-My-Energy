@@ -1,7 +1,5 @@
 ﻿@page "/WeatherDataTable"
 @inherits FluxorComponent
-@using Energy.Shared
-@using Energy.App.Standalone.Features.Setup.Weather.Store
 @inject IDispatcher Dispatcher
 @inject IState<WeatherState> WeatherState
 
@@ -22,7 +20,7 @@
                 </MudTooltip>
                 <MudText Class="mx-auto fw-bolder" Typo="Typo.h4">Weather Data</MudText>
                 <DocTooltipIcon DocSnippetHeader="Weather Data Table"
-                                DocSnippet="DocSnippet.WeatherDataTable" IconTitle="Help for Weather Data Table" />
+                                DocSnippetType="DocSnippetType.WeatherDataTable" IconTitle="Help for Weather Data Table" />
             </div>
         </MudItem>
         <MudItem xs="12">

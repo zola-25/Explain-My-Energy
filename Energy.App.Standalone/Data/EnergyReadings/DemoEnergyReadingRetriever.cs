@@ -1,6 +1,6 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Services.FluxorPersist;
+using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 using Energy.Shared;
 using System;
 using System.Collections.Immutable;
@@ -64,7 +64,7 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
                     decimal demoReadingKWh = 0;
 
-                    var randomFactor = 1 + random.NextDouble() * 0.2 * (random.Next(2) == 1 ? 1 : -1);
+                    double randomFactor = 1 + (random.NextDouble() * 0.2 * (random.Next(2) == 1 ? 1 : -1));
                     demoReadingKWh = lastYearsReading.KWh * (decimal)randomFactor; // just repeat historical zero KWh readings
 
                     return new BasicReading()

@@ -1,5 +1,5 @@
 ﻿using Energy.App.Standalone.Extensions;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;
@@ -69,20 +69,17 @@ public class EnergyImportValidation : IEnergyImportValidation
             };
         }
 
-        if (updateCosts)
-        {
-            return new EnergyImportValidationResult
+        return updateCosts
+            ? new EnergyImportValidationResult
             {
                 UpdateType = UpdateType.JustCosts,
                 IncludeCosts = true,
                 CanUpdate = true,
+            }
+            : new EnergyImportValidationResult
+            {
+                UpdateType = UpdateType.NoUpdateNeeded,
+                CanUpdate = false,
             };
-        }
-
-        return new EnergyImportValidationResult
-        {
-            UpdateType = UpdateType.NoUpdateNeeded,
-            CanUpdate = false,
-        };
     }
 }

@@ -107,6 +107,18 @@ try {
         breaks: true,
     });
 
+    DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+        // Add rel="noopener noreferrer" to all links that open in a new tab
+        if (node.tagName === 'A' && node.getAttribute('target') === '_blank') {
+            node.setAttribute('rel', 'noopener noreferrer nofollow');
+        }
+        // Add rel="nofollow" only to links that do not open in a new tab
+        else if (node.tagName === 'A' && node.hasAttribute('href')) {
+            node.setAttribute('rel', 'nofollow');
+        }
+
+    });
+
     const sanitizedLicenseHtml = DOMPurify.sanitize(unsanitizedLicenseHtml, { USE_PROFILES: { html: true }  });
 
     const sanitizedFullApplicationName = DOMPurify.sanitize(appInfoEnvConfig.fullApplicationName, { USE_PROFILES: { html: true }  });

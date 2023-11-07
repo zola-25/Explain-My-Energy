@@ -1,5 +1,5 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 namespace Energy.Test;
 

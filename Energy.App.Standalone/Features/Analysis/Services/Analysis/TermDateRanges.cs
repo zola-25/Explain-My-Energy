@@ -1,5 +1,5 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 

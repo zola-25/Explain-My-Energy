@@ -3,18 +3,18 @@
 @inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
 
-<div class="d-flex justify-space-between align-baseline">
+<div class="d-flex flex-wrap justify-space-between align-baseline">
     <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
         <MudText Typo="Typo.h5" Class=" fw-bolder">Weather Data Status</MudText>
         <DocTooltipIcon DocSnippetHeader="Weather Data Status"
-                        DocSnippet="DocSnippet.WeatherDataStatus" IconTitle="Help for Weather Data Status" />
+                        DocSnippetType="DocSnippetType.WeatherDataStatus" IconTitle="Help for Weather Data Status" />
 
     </MudPaper>
-    
+
     <MudPaper Class="d-flex ma-3" Elevation="0">
         <MudLink Href="https://open-meteo.com/" Target="_blank">Weather data by Open-Meteo.com <i class="fa">&#xf08e;</i></MudLink>
     </MudPaper>
-    
+
 </div>
 <MudTable Items="Enumerable.Range(0, 1)" T="int" Elevation="0">
     <HeaderContent>
@@ -28,11 +28,19 @@
     <RowTemplate>
         @if (!HouseholdState.Value.Saved)
         {
-            <MudTd colspan="5">Complete Household setup to import local weather data</MudTd>
+            <MudTd colspan="5">
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                    Complete Household setup to view your imported local Weather Data
+                </MudText>
+            </MudTd>
         }
         else if (WeatherState.Value.Loading)
         {
-            <MudTd colspan="5">Loading Weather Data...</MudTd>
+            <MudTd colspan="5">
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                    Loading Weather Data...
+                </MudText>
+            </MudTd>
         }
         else if (WeatherState.Value.WeatherReadings.Any())
         {

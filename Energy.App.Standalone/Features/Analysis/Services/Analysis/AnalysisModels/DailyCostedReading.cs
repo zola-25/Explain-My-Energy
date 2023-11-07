@@ -1,4 +1,4 @@
-namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 public record DailyCostedReading
 {

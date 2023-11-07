@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.Shared;
 using System.Collections.Immutable;

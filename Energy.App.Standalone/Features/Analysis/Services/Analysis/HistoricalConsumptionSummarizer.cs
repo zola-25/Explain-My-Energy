@@ -1,11 +1,11 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.Shared;
 using MathNet.Numerics;
 using Fluxor;
 using Energy.App.Standalone.Features.EnergyReadings.Gas;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 

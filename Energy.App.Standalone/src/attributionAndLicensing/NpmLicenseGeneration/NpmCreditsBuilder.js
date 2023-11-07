@@ -12,32 +12,32 @@ import { marked } from 'marked';
 
 
 const argv = yargs(hideBin(process.argv))
-.option('packagesJsonFolder', {    
-    type: 'string',
-    demandOption: true,
-    describe: 'The folder containing the projects packages.json file',
-}).option('htmlFragmentToGenerateFilePath', {
-    type: 'string',
-    demandOption: false,
-    describe: 'The path to the generated html document. Defaults to the project root/src/attributionAndLicensing/generatedPartials/NpmCreditsPartial.html',
-}).option('tempLicenseOutputFolder', {
-    type: 'string',
-    demandOption: false,
-    describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the current script directory/NpmLicenseOutput',
-}).option('customFormatFile', {
-    type: 'string',
-    demandOption: false,
-    describe: 'The path to the license customFormat JSON file. Defaults to the current script directory/customFormatExample.json',
-}).option('npmCreditsTemplateFile', {
-    type: 'string',
-    demandOption: false,
-    describe: 'The path to the npm credits template file. Defaults to the current script directory/NpmCreditsPartialTemplate.hbs',
-}).
-option('generatedPartialsFolder',{
-    type: 'string',
-    demandOption: false,
-    describe: 'The path to the generated partials folder. Defaults to project root/src/attributionAndLicensing/generatedPartials',
-}).argv;
+    .option('packagesJsonFolder', {
+        type: 'string',
+        demandOption: true,
+        describe: 'The folder containing the projects packages.json file',
+    }).option('htmlFragmentToGenerateFilePath', {
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the generated html document. Defaults to the project root/src/attributionAndLicensing/generatedPartials/NpmCreditsPartial.html',
+    }).option('tempLicenseOutputFolder', {
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the temporary license output folder where the license generation will take place. Defaults to the current script directory/NpmLicenseOutput',
+    }).option('customFormatFile', {
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the license customFormat JSON file. Defaults to the current script directory/customFormatExample.json',
+    }).option('npmCreditsTemplateFile', {
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the npm credits template file. Defaults to the current script directory/NpmCreditsPartialTemplate.hbs',
+    }).
+    option('generatedPartialsFolder', {
+        type: 'string',
+        demandOption: false,
+        describe: 'The path to the generated partials folder. Defaults to project root/src/attributionAndLicensing/generatedPartials',
+    }).argv;
 
 const originalLocation = process.cwd();
 
@@ -46,7 +46,7 @@ const scriptDirectory = path.dirname(process.argv[1]);
 console.log(`Running ${scriptName}, in script directory: ${scriptDirectory}`);
 
 const packagesJsonFolder = path.resolve(argv.packagesJsonFolder);
-    
+
 const generatedPartialsFolder = argv.generatedPartialsFolder ? argv.generatedPartialsFolder : path.resolve(packagesJsonFolder, 'src/attributionAndLicensing/generatedPartials');
 const htmlFragmentToGenerateFilePath = argv.htmlFragmentToGenerateFilePath ? argv.htmlFragmentToGenerateFilePath : path.join(generatedPartialsFolder, './NpmCreditsPartial.html');
 
@@ -57,7 +57,7 @@ try {
 
 
 
-    if(fs.existsSync(htmlFragmentToGenerateFilePath)){
+    if (fs.existsSync(htmlFragmentToGenerateFilePath)) {
         fs.rmSync(htmlFragmentToGenerateFilePath);
     }
 
@@ -66,7 +66,7 @@ try {
     }
     fs.mkdirSync(tempLicenseOutputFolder);
 
-    
+
     const npmCreditsTemplateFile = argv.npmCreditsTemplateFile ? argv.npmCreditsTemplateFile : path.join(scriptDirectory, './NpmCreditsPartialTemplate.hbs');
 
     const customFormatFile = argv.customFormatFile ? argv.customFormatFile : path.join(scriptDirectory, './customFormatExample.json');
@@ -89,7 +89,7 @@ try {
 
     const licenseHashRegEx = /(?<header>^#+\s+licen[sc]es?\s*)(?<license>.+?(?=#+|$(?![\r\n])))/gims
     const licenseUnderlineHeaderRegEx = /(?<header>^\s*licen[sc]es?.*\n[=-]+\n)(?<license>.+?(?==+|-{2,}|$(?![\r\n])))/gims
-    
+
     const encodedPackageInfosWithLicenseText = [];
 
     for (const [packageNameAndVersion, packageDetails] of Object.entries(packageInfos)) {
@@ -103,7 +103,7 @@ try {
             : (() => { throw new Error(`License text file not found: ${licenceTextFile}`); })();
 
 
-            
+
         let licenseContent;
 
         const hashResultRegEx = licenseHashRegEx.exec(licensePlainText)
@@ -125,7 +125,19 @@ try {
             breaks: true,
         });
 
-        const licensePlainTextEncodedSanitized = DOMPurify.sanitize(licensePlainTextEncoded, { USE_PROFILES: { html: true }});
+        DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+            // Add rel="noopener noreferrer" to all links that open in a new tab
+            if (node.tagName === 'A' && node.getAttribute('target') === '_blank') {
+                node.setAttribute('rel', 'noopener noreferrer nofollow');
+            }
+            // Add rel="nofollow" only to links that do not open in a new tab
+            else if (node.tagName === 'A' && node.hasAttribute('href')) {
+                node.setAttribute('rel', 'nofollow');
+            }
+
+        });
+
+        const licensePlainTextEncodedSanitized = DOMPurify.sanitize(licensePlainTextEncoded, { USE_PROFILES: { html: true } });
 
 
         const lowerCaseLicenseContent = licenseContent.toLowerCase();
@@ -142,9 +154,9 @@ try {
                 breaks: true,
             })
 
-            copyrightHtmlSanitized = DOMPurify.sanitize(copyrightHtml, { USE_PROFILES: { html: true }});
+            copyrightHtmlSanitized = DOMPurify.sanitize(copyrightHtml, { USE_PROFILES: { html: true } });
         }
-        
+
 
         if (!packageDetails.licenses.trim()) {
             throw new Error(`License is null or whitespace for package ${packageNameAndVersion}`);
@@ -155,19 +167,20 @@ try {
         }
 
         const licenseTypeEncoded = he.encode(packageDetails.licenses.trim(), { strict: true });
-        const licenseTypeEncodedSanitized = DOMPurify.sanitize(licenseTypeEncoded, { USE_PROFILES: { html: true }});
+        const licenseTypeEncodedSanitized = DOMPurify.sanitize(licenseTypeEncoded, { USE_PROFILES: { html: true } });
 
         const packageNameEncoded = he.encode(packageName, { strict: true });
-        const packageNameEncodedSanitized = DOMPurify.sanitize(packageNameEncoded, { USE_PROFILES: { html: true }});
+        const packageNameEncodedSanitized = DOMPurify.sanitize(packageNameEncoded, { USE_PROFILES: { html: true } });
 
-        const hasSeparateCopyright = !!copyrightHtmlSanitized; 
+        const hasSeparateCopyright = !!copyrightHtmlSanitized;
 
-        const encodedPackageInfo = { 
-            PackageName: packageNameEncodedSanitized, 
+        const encodedPackageInfo = {
+            PackageName: packageNameEncodedSanitized,
             HasSeparateCopyright: hasSeparateCopyright,
-            Copyright: copyrightHtmlSanitized, 
+            Copyright: copyrightHtmlSanitized,
             LicenseTextEncodedToInsert: licensePlainTextEncodedSanitized,
-            LicenseType: licenseTypeEncodedSanitized };
+            LicenseType: licenseTypeEncodedSanitized
+        };
 
         encodedPackageInfosWithLicenseText.push(encodedPackageInfo);
 
@@ -190,19 +203,19 @@ try {
 
 
 
-} catch  (error) {
+} catch (error) {
     console.error(error);
     console.error(error.message);
     console.error(error.stack);
     process.exitCode = 1;
 }
-finally{
+finally {
 
     process.chdir(originalLocation);
 
     console.log('Clearing temporary license output folder');
 
-    if(fs.existsSync(tempLicenseOutputFolder)){
+    if (fs.existsSync(tempLicenseOutputFolder)) {
         fs.rmSync(tempLicenseOutputFolder, { recursive: true });
     }
 
