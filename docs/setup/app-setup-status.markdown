@@ -19,5 +19,4 @@ It shows:
 
 - **Electricity and Gas Historical Forecasts:** If the historical forecast readings have been calculated for each meter, issues preventing the historical forecast readings from being calculated, or if the historical forecast readings are not up to date.
 
-
 - **Temperature-dependent Forecasts:** If the temperature-dependent forecast readings have been calculated for the heating meter (usually the gas meter, and the one that was set up as the 'Primary Heating Source' in the Household setup). It can also report back some issues that may be preventing the forecast readings from being calculated.
