@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Meter Tariffs
-nav_order: 6
+nav_order: 7
 parent: Setup
 ---
 
