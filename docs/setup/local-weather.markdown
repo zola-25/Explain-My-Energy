@@ -21,8 +21,9 @@ As soon as your setup your household details described at [Household Setup](./ho
 
 Once you have setup and authorized your Gas and/or Electricity meters, a detailed breakdown can be viewed for each meter from the Sidebar menu. 
 
-Documentation for understanding the Chart Data displayed: [Understanding Chart Data](../analysis/understanding-chart-data).
-Documentation for the analysis options available: [Analysis Options](../analysis/analysis-options).
+- Documentation for understanding the Chart Data: [Understanding Chart Data](../analysis/understanding-chart-data).
+
+- Documentation for the Analysis Options available: [Analysis Options](../analysis/analysis-options).
 
 You can see a simple summary of the application's weather data for your location in the Setup page. Usually on every revisit to the application, the weather data should be automatically updated, but if for any reason its not (such as application malfunction or more likely an internet connection issue), you can see the current status of the app's weather data in the *Weather Data Status* section on the Setup page.
 
