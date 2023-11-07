@@ -12,9 +12,11 @@ nav_order: 1
 
 ## Introduction
 
-This is the documentation for the Explain My Energy project. It is intended to be used with the [Explain My Energy web app](https://explainmyenergy.net/).
+This is the documentation for the **Explain My Energy** project. It is intended to be used with the Explain My Energy web app.
 
-Explain My Energy is an open-source hobby project inspired by some of the ideas of a B2B-focused UK startup, that didn't quite make it to version 1.0.
+The link to the live app is listed below, although if you want to dive straight in, it's recommended to have a look at the pre-configured demo version first, available at [demo.explainmyenergy.com](https://demo.explainmyenergy.com).
+
+**Explain My Energy** is an open-source hobby project inspired by some of the ideas of a B2B-focused UK startup, that didn't quite make it to version 1.0.
 
 The goal is to provide a consumer-focused, free, easy-to-use tool for users to understand their home energy usage -  forecasting future energy bills and seeing how seasonal temperature changes affects energy costs.
 
@@ -62,11 +64,11 @@ Optionally, users can also provide their energy tariff details. Since energy tar
 
 ## Browser Support
 
-As the application makes extensive use of browser local storage, *it may not be functional on some mobile browsers*, as these browsers often have reduced local storage limits.
+The application should be fully functional on up-to-date desktop browsers. It has been tested on the latest desktop versions of Chrome and Firefox.
 
-There is potential to migrate the storage to use IndexedDB, which would allow the application to work on mobile browsers.
+The application currently makes extensive use of browser local storage and the initial app download size is quite large. Currently *it may not be functional on some mobile browsers*, as these browsers usually have comparatively smaller local storage and cache limits. 
 
-The application should be fully functional on desktop browsers. It has been tested on the latest desktop versions of Chrome and Firefox.
+There is potential to migrate the storage to use IndexedDB, which would allow the application to support more mobile browsers.
 
 ## Caveats, precautions and what we can't do
 

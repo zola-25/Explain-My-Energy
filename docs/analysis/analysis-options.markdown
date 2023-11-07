@@ -42,3 +42,19 @@ This switch allows you to toggle between forecasting based on historical consump
 This input allows you to adjust the future temperature forecast, to see how much your energy usage and costs are affected by dramatic changes in weather conditions. It can be increased or decreased by a degree Celsius at a time, and the chart, along with the aggregation analysis, will update to reflect the new forecast.
 
 You can see the future temperature plot on the chart change, along with the change in kWh and cost, and the change in the current and future totals in the aggregation analysis.
+
+## Analysis Options Status
+
+This table, available on the home page, simply displays the current analysis options set for each meter, assuming the meter has been fully set up with energy readings imported and forecast readings calculated. 
+
+For both Gas and Electricity Meters it displays:
+
+- Whether a Temperature Forecast or Historical Forecast is being used
+
+- The adjusted degrees Celsius for the Temperature Forecast
+
+- The aggregate analysis Term (i.e. Daily, Weekly or Monthly)
+
+- Any analysis Term chart zooms toggled 
+
+- Whether the chart is displaying kWh or Cost.
