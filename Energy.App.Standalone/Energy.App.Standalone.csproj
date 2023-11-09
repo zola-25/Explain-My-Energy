@@ -41,7 +41,7 @@
 		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 		<!-- Set the trimming mode to link only the assemblies you specify -->
 		<TrimMode>partial</TrimMode>
-
+		<InvariantGlobalization>true</InvariantGlobalization>
 	</PropertyGroup>
 	<ItemGroup>
 		<TrimmerRootAssembly Include="Microsoft.*" />
