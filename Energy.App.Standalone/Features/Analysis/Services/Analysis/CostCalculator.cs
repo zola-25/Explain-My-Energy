@@ -1,7 +1,7 @@
 ﻿using Energy.Shared;
 using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 

@@ -1,5 +1,18 @@
 @inherits FluxorComponent
-@if (Ready) {
+@using Energy.App.Standalone.Pages.SetupWizard
+@inject AppStatus AppStatus
+
+@if (Ready)
+{
+    <div class="d-flex justify-space-between align-baseline">
+        <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
+            <MudText Typo="Typo.h5" Class=" fw-bolder">App Setup Status</MudText>
+            <DocTooltipIcon DocSnippetHeader="App Setup Status"
+                            DocSnippetType="DocSnippetType.AppSetupStatus"
+                            IconTitle="Help for App Setup Status" />
+        </MudPaper>
+    </div>
+
     <MudList Dense="true">
         <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
         <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert></MudListItem>

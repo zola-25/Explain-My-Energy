@@ -44,7 +44,7 @@ export default function (appEnv, appDemo, assetOutputPath) {
     if (appDemo) {
         copyPatterns.push(
             {
-                from: posix.join(_resolve(__dirname, 'data/appsettings.demo.json').replace(/\\/g, '/')),
+                from: posix.join(_resolve(__dirname, 'data/appsettings.Demo.json').replace(/\\/g, '/')),
                 to: "appsettings.json"
             },
             {

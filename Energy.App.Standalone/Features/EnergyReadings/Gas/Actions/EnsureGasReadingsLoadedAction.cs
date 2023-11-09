@@ -1,7 +1,7 @@
 ﻿using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast.Actions;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
@@ -56,7 +56,6 @@ public class EnsureGasReadingsLoadedAction
         {
             BasicReadings = action.BasicReadings,
             CostedReadings = action.CostedReadings,
-            LastUpdated = DateTime.UtcNow,
             LastCheckedForNewReadings = DateTime.UtcNow,
         };
     }
@@ -231,7 +230,7 @@ public class EnsureGasReadingsLoadedAction
             {
                 _logger.LogError(e, "Error loading {MeterType} readings", meterType);
 
-                var errorMessage = $"{meterType} Readings: Error loading readings";
+                string errorMessage = $"{meterType} Readings: Error loading readings";
                 action.TaskCompletion?.SetResult((false, errorMessage));
 
                 dispatcher.Dispatch(new NotifyGasLoadingFinished(false, errorMessage));

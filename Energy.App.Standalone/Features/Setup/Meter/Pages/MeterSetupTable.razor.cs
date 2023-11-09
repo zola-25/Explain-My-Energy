@@ -18,7 +18,6 @@ public partial class MeterSetupTable
 {
     [Inject] private ISnackbar Snackbar { get; set; }
 
-    [Inject] private IState<HouseholdState> HouseholdState { get; set; }
     [Inject] private IState<GasReadingsState> GasReadingsState { get; set; }
     [Inject] private IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
 

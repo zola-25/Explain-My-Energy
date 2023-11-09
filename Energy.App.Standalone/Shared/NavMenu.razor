@@ -1,11 +1,12 @@
 ﻿@inherits FluxorComponent
 
 <MudPaper Class="py-0" Elevation="0" UserAttributes="@(new() { {"id","main-nav"}, {"role", "navigation" }, {"aria-label", "Main Site Links"}})">
-    <MudNavMenu  Color="Color.Info" Bordered="true" Class="d-flex flex-column">
+    <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
 
         <MudTooltip Text="@(!HouseholdSetupValid ? "Setup required" : "")" Placement="Placement.Right" RootClass="w-Inherit">
 
-            <MudNavLink Href="/Setup"  Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-navbar-item">
+            <MudNavLink Href="/Setup" Class="navbar-nav-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.House" ActiveClass="active-navbar-item">
+
 
                 @if (HouseholdSetupValid)
                 {
@@ -20,40 +21,49 @@
         </MudTooltip>
         <MudDivider></MudDivider>
 
-        <MudTooltip  Text="@ElectricityTooltipText()" Placement="Placement.Right"  RootClass="w-Inherit">
-            <MudNavLink UserAttributes="@(new () 
-                            {{"role", "link"}, 
-                            {"aria-label","Electricity Analysis"}, 
+        <MudTooltip Text="@ElectricityTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
+            <MudNavLink UserAttributes="@(new ()
+                            {{"role", "link"},
+                            {"aria-label","Electricity Analysis"},
                             {"aria-disabled", $"{ElectricityDisabled}"}})"
                         Disabled="@ElectricityDisabled"
                         Class="navbar-nav-item"
                         Href="@(ElectricityDisabled ? null : ElectricityHref)"
-                        Match="NavLinkMatch.All" 
-                        Icon="@Icons.Material.Filled.ElectricBolt" 
+                        Match="NavLinkMatch.All"
+                        Icon="@Icons.Material.Filled.ElectricBolt"
                         ActiveClass="active-navbar-item">
                 <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsElectricity ? Icons.Material.Filled.Thermostat : "")">Electricity</NavMenuNavLinkContent>
-            </MudNavLink>
-        </MudTooltip>
-        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
-            <MudNavLink 
-                    UserAttributes="@(new () 
-                        {{"role", "link"}, 
-                        {"aria-label","Gas Analysis"},
-                        {"aria-disabled", $"{GasDisabled}"}})"
-                    Class="navbar-nav-item"
-                    Disabled="@GasDisabled"
-                    Href="@(GasDisabled ? null : GasHref)"
-                    Match="NavLinkMatch.Prefix"
-                    Icon="@Icons.Material.Filled.LocalFireDepartment" 
-                    ActiveClass="active-navbar-item">
-                <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsGas ? Icons.Material.Filled.Thermostat : "")">Gas</NavMenuNavLinkContent>
+
 
             </MudNavLink>
+        </MudTooltip>
+        <MudDivider></MudDivider>
+
+        <MudTooltip Text="@GasTooltipText()" Placement="Placement.Right" RootClass="w-Inherit">
+
+            <MudNavLink UserAttributes="@(new ()
+                        {{"role", "link"},
+                        {"aria-label","Gas Analysis"},
+                        {"aria-disabled", $"{GasDisabled}"}})"
+                        Class="navbar-nav-item"
+                        Disabled="@GasDisabled"
+                        Href="@(GasDisabled ? null : GasHref)"
+                        Match="NavLinkMatch.Prefix"
+                        Icon="@Icons.Material.Filled.LocalFireDepartment"
+                        ActiveClass="active-navbar-item">
+                <NavMenuNavLinkContent SuffixIcon="@(HeatingMeterIsGas ? Icons.Material.Filled.Thermostat : "")">Gas</NavMenuNavLinkContent>
+            </MudNavLink>
+
         </MudTooltip>
     </MudNavMenu>
 </MudPaper>
 
 @code {
+
+
+    [Inject] AppStatus AppStatus { get; set; }
+
+    bool DisabledBadge => !AppStatus.IsDemoMode;
 
     [Inject]
     IState<HouseholdState> HouseholdState { get; set; }

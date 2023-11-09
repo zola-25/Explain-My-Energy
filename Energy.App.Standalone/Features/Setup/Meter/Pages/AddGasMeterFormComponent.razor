@@ -18,7 +18,7 @@
                         <MudTextField For="@(() => _gasMeter.Mpxn)" Label="Gas Meter MPRN" @bind-Value="@_gasMeter.Mpxn"
                             Placeholder="Enter your MPRN number here" Required></MudTextField>
                         <DocTooltipIcon DocSnippetHeader="Gas Meter MPRN"
-                            DocSnippet="DocSnippet.GasMeterMPRN" IconTitle="Help for Gas Meter Setup" />
+                                         DocSnippetType="DocSnippetType.GasMeterMPRN" IconTitle="Help for Gas Meter Setup" />
                     </div>
                     <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled"
                         Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>

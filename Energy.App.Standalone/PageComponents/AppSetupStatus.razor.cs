@@ -1,4 +1,3 @@
-using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
 using Energy.App.Standalone.Features.Analysis.Store.HeatingForecast;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity;
@@ -12,10 +11,13 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Collections.Immutable;
 using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
+using Energy.App.Standalone.Features.Setup.TermsAndConditions;
 
 namespace Energy.App.Standalone.PageComponents;
 public partial class AppSetupStatus
 {
+    [Inject] IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
     [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
     [Inject] IState<ElectricityReadingsState> ElectricityReadingsState { get; set; }
@@ -23,10 +25,15 @@ public partial class AppSetupStatus
     [Inject] IState<HistoricalForecastState> HistoricalForecastState { get; set; }
     [Inject] IState<HeatingForecastState> HeatingForecastState { get; set; }
 
+
+
     [Parameter] public EventHandler<(MeterType, bool)> HeatingAnalysisValidCallback { get; set; }
     [Parameter] public EventHandler<(MeterType, bool)> HistoricalAnalysisValidCallback { get; set; }
 
     bool Ready;
+
+    bool OpenWizard = false;
+
 
     bool HouseholdSetupValid;
     string HouseholdStatus;
@@ -66,8 +73,7 @@ public partial class AppSetupStatus
         base.OnParametersSet();
         Ready = false;
         SetupStage = SetupStageFlags.None;
-
-
+        
         HouseholdSetupValid = !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
         HouseholdStatus = HouseholdSetupValid ? " Valid" : "Setup Required";
         HouseholdSeverity = HouseholdSetupValid ? Severity.Success : Severity.Warning;
@@ -110,6 +116,9 @@ public partial class AppSetupStatus
         HeatingForecastStatus = GetHeatingForecastStatus();
         HeatingForecastSeverity = HeatingForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
+        var termsAccepted = TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed;
+        bool defaultOpenWizard = !termsAccepted;
+        OpenWizard = OpenWizard || defaultOpenWizard;
 
 
         Ready = true;

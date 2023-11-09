@@ -24,8 +24,51 @@ public static class DefaultTariffData
             .ToImmutableList();
     }
 
-    public static readonly List<DefaultTariffDetail> DefaultTariffs = new List<DefaultTariffDetail>
-    {
+    public static readonly List<DefaultTariffDetail> DefaultTariffs = new() {
+            // Direct Debit Price Cap 1st Oct 2023 - 31st Dec 2023 - https://www.moneysavingexpert.com/news/2021/08/energy-price-cap-to-rise-by--139---but-you-can-save--200-by-switch/
+            new()
+            {
+                IsHourOfDayFixed = true,
+                MeterType = MeterType.Electricity,
+                ExampleTariffType = ExampleTariffType.StandardFixedDaily,
+                PencePerKWh = 27.35m,
+                DateAppliesFrom = new DateTime(2023, 10, 01),
+                DailyStandingChargePence = 53.37m,
+                DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(27.35m).ToList(),
+            },
+            new()
+            {
+                IsHourOfDayFixed = true,
+                MeterType = MeterType.Gas,
+                ExampleTariffType = ExampleTariffType.StandardFixedDaily,
+                PencePerKWh = 6.89m,
+                DateAppliesFrom = new DateTime(2023, 10, 01),
+                DailyStandingChargePence = 29.62m,
+                DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(6.89m).ToList(),
+
+            },
+            // Direct Debit Price Cap 1st July - 30th Sept 2023 - https://www.moneysavingexpert.com/news/2023/08/energy-bills-to-fall-as-new-price-cap-is-announced---what-you-ne/
+            new()
+            {
+                IsHourOfDayFixed = true,
+                MeterType = MeterType.Electricity,
+                ExampleTariffType = ExampleTariffType.StandardFixedDaily,
+                PencePerKWh = 30.11m,
+                DateAppliesFrom = new DateTime(2023, 07, 01),
+                DailyStandingChargePence = 52.97m,
+                DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(30.11m).ToList(),
+            },
+            new()
+            {
+                IsHourOfDayFixed = true,
+                MeterType = MeterType.Gas,
+                ExampleTariffType = ExampleTariffType.StandardFixedDaily,
+                PencePerKWh = 7.51m,
+                DateAppliesFrom = new DateTime(2023, 07, 01),
+                DailyStandingChargePence = 29.11m,
+                DefaultHourOfDayPrices = CreateUniform24HourOfDayPrices(7.51m).ToList(),
+
+            },
             new()
             {
                 IsHourOfDayFixed = true,

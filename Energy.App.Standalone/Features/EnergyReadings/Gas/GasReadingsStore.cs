@@ -1,4 +1,4 @@
-﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.Models;
+﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.Shared;
 using Fluxor;
 using Fluxor.Persist.Storage;
@@ -18,7 +18,6 @@ public record GasReadingsState
 
     [property: JsonIgnore]
     public ImmutableList<CostedReading> CostedReadings { get; init; }
-    public DateTime LastUpdated { get; init; }
 
     public DateTime LastCheckedForNewReadings { get; init; }
 
@@ -27,7 +26,6 @@ public record GasReadingsState
         Loading = false;
         CostedReadings = ImmutableList<CostedReading>.Empty;
         BasicReadings = ImmutableList<BasicReading>.Empty;
-        LastUpdated = DateTime.MinValue;
         LastCheckedForNewReadings = DateTime.MinValue;
     }
 }

@@ -28,19 +28,13 @@ public static class Extensions
 
     public static string eTimeSpanToString(this TimeSpan timeSpan)
     {
-        return string.Format($"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}");
+        return String.Format($"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}");
     }
 
     public static string eTimeSpanToString(this TimeSpan? nullableTimeSpan)
     {
         TimeSpan timeSpan = nullableTimeSpan ?? TimeSpan.Zero;
-        return string.Format($"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}");
-    }
-
-    public static long eToUnixTime(this DateTime dateTime)
-    {
-        TimeZoneInfo timeZone = AppDefaults.GetUkTimezone();
-        return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime)).ToUnixTimeMilliseconds();
+        return String.Format($"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}");
     }
 
     public static long eToUnixTicksNoOffset(this DateTime dateTime)
@@ -54,7 +48,9 @@ public static class Extensions
         string value = configuration["App:UseDemoSetup"];
 
         if (value == null)
+        {
             return false;
+        }
 
         bool demoModeProperty = bool.TryParse(value, out bool demoMode);
         return demoModeProperty && demoMode;
@@ -196,8 +192,8 @@ public static class Extensions
             return $"Unit Rate: {tariffDetailState.PencePerKWh:N0}p/kWh";
         }
 
-        HourOfDayPriceState maxCost = tariffDetailState.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
-        HourOfDayPriceState minCost = tariffDetailState.HourOfDayPrices.MinBy(c => c.PencePerKWh);
+        var maxCost = tariffDetailState.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
+        var minCost = tariffDetailState.HourOfDayPrices.MinBy(c => c.PencePerKWh);
         return $"Variable Unit Rate: {minCost.PencePerKWh:N0}p/kWh - {maxCost.PencePerKWh:N0}p/kWh";
     }
 
@@ -209,8 +205,8 @@ public static class Extensions
             return $"Unit Rate: {tariffDetail.PencePerKWh:N0}p/kWh";
         }
 
-        HourOfDayPrice maxCost = tariffDetail.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
-        HourOfDayPrice minCost = tariffDetail.HourOfDayPrices.MinBy(c => c.PencePerKWh);
+        var maxCost = tariffDetail.HourOfDayPrices.MaxBy(c => c.PencePerKWh);
+        var minCost = tariffDetail.HourOfDayPrices.MinBy(c => c.PencePerKWh);
         return $"Variable Unit Rate: {minCost.PencePerKWh:N0}p/kWh - {maxCost.PencePerKWh:N0}p/kWh";
     }
 

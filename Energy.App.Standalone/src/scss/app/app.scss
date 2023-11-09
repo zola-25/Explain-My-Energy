@@ -246,9 +246,37 @@ h1:focus {
     }
 }
 
+.snippet-content {
+    ul {
+        list-style: disc;
+    }
+
+    ul li {
+        margin: 1.25rem 0rem;
+    }
+
+    p {
+        font-size: var(--mud-typography-body1-size);
+        font-family: var(--mud-typography-body1-family);
+        font-weight: var(--mud-typography-body1-weight);
+        line-height: var(--mud-typography-body1-lineheight);
+        letter-spacing: var(--mud-typography-body1-letterspacing);
+        text-transform: var(--mud-typography-body1-text-transform);
+        margin-bottom: 1.25rem;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+}
+
 .navbar-nav-item {
     a {
         text-decoration: none;
+    }
+
+    .mud-nav-link {
+        margin-top: 8px;
     }
 }
 
@@ -304,12 +332,30 @@ h1:focus {
         top: 0;
     }
 
-    > table > tbody > tr >td {
+    > table > tbody > tr > td {
         text-align: center;
     }
 
     > table {
         position: relative;
         border-collapse: collapse;
+    }
+}
+
+@media (min-width: 600px) {
+    .eme-main-header {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width:600px) {
+    .eme-main-header {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width:416px) {
+    .eme-main-header {
+        font-size: 0.75rem;
     }
 }

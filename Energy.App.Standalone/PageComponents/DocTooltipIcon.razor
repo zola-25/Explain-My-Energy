@@ -12,8 +12,8 @@
     [Parameter, EditorRequired] public string DocSnippetHeader { get; set; }
     [Parameter] public string OptionalRootClass { get; set; }
     [Parameter] public Size Size { get; set; } = Size.Medium;
-    [Parameter, EditorRequired] public DocSnippet DocSnippet { get; set; }
-    [Inject] DocsContent DocsContent { get; set; }
+    [Parameter, EditorRequired] public DocSnippetType DocSnippetType { get; set; }
+    [Inject] DocSnippetsLoader DocSnippetsLoader { get; set; }
 
 
     bool _toggleStatus;
@@ -60,7 +60,7 @@
         }
 
 
-        var snippet = await DocsContent.GetDocSnippet(DocSnippet);
+        var snippet = await DocSnippetsLoader.GetIndividualDocSnippet(DocSnippetType);
         _snippetContent = builder =>
         {
             builder.AddMarkupContent(0, snippet.Content);

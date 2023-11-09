@@ -1,6 +1,5 @@
 using Blazored.LocalStorage;
 using Energy.App.Standalone;
-using Energy.App.Standalone.Data;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
 using Energy.App.Standalone.Data.Weather;
@@ -11,19 +10,20 @@ using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
 using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Validation;
 using Energy.App.Standalone.Features.EnergyReadings;
 using Energy.App.Standalone.Services;
+using Energy.App.Standalone.Services.DocSnippets;
 using Energy.App.Standalone.Services.FluxorPersist;
+using Energy.App.Standalone.Services.FluxorPersist.Demo;
+using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
 using Fluxor;
 using Fluxor.Persist.Middleware;
 using Fluxor.Persist.Storage;
 using Ganss.Xss;
-using MathNet.Numerics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
-using System.Threading.Tasks;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -110,7 +110,7 @@ builder.Services.AddSingleton<AppStatus>();
 builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json")));
 
-builder.Services.AddSingleton<DocsContent>();
+builder.Services.AddSingleton<DocSnippetsLoader>();
 
 builder.Services.AddScoped<ISetDefaultLocalState, SetDefaultLocalState>();
 
@@ -132,8 +132,8 @@ var host = builder.Build();
 
 try
 {
-    var docsContent = host.Services.GetRequiredService<DocsContent>();
-    await docsContent.LoadAll();
+    var docsContent = host.Services.GetRequiredService<DocSnippetsLoader>();
+    await docsContent.PreloadAllSnippets();
 }
 catch (Exception ex)
 {
