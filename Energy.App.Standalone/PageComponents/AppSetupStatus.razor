@@ -4,34 +4,14 @@
 
 @if (Ready)
 {
-    <div>
-        <WizardModal @bind-Open="OpenWizard">
-        </WizardModal>
-    </div>
-    <div class="p-2 mt-3 d-flex flex-wrap justify-space-between align-baseline">
+    <div class="d-flex justify-space-between align-baseline">
         <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
             <MudText Typo="Typo.h5" Class=" fw-bolder">App Setup Status</MudText>
             <DocTooltipIcon DocSnippetHeader="App Setup Status"
-                            DocSnippetType="DocSnippetType.AppSetupStatus" 
+                            DocSnippetType="DocSnippetType.AppSetupStatus"
                             IconTitle="Help for App Setup Status" />
-
         </MudPaper>
-
-        <MudPaper Class="d-flex ma-3" Elevation="0">
-            <MudButton Class="ma-0 fw-bolder"
-                       Disabled="@AppStatus.IsDemoMode"
-                       OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
-                       Size="Size.Medium"
-                       ButtonType="ButtonType.Button"
-                       Variant="Variant.Filled"
-                       Color="Color.Info"
-                       StartIcon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudButton>
-            <DocTooltipIcon OptionalRootClass="align-self-center" DocSnippetHeader="Setup Wizard" DocSnippetType="DocSnippetType.SetupWizard" IconTitle="Using the Setup Wizard" />
-
-        </MudPaper>
-
     </div>
-
 
     <MudList Dense="true">
         <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>

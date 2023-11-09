@@ -82,7 +82,7 @@ public class EnsureGasHistoricalForecastAction
 
                 dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings));
 
-                var resultMessage = @$"{meterType} Historical Forecast created 
+                string resultMessage = @$"{meterType} Historical Forecast created 
                                             with {forecastDailyCostedReadings.Count} daily readings";
 
                 dispatcher.Dispatch(new NotifyGasForecastResult(true, resultMessage));
@@ -94,7 +94,7 @@ public class EnsureGasHistoricalForecastAction
             {
                 _logger.LogError(ex, "Error ensuring {MeterType} historical forecast", meterType);
 
-                var resultMessage = $"Error ensuring {meterType} historical forecast";
+                string resultMessage = $"Error ensuring {meterType} historical forecast";
 
                 dispatcher.Dispatch(new NotifyGasForecastResult(false, resultMessage));
                 action.TaskCompletionSource?.SetResult((false, resultMessage));

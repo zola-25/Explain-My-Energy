@@ -2,6 +2,8 @@
 @using Energy.App.Standalone.Pages.HtmlContentFiles
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
+@inject AppStatus AppStatus
+
 <StepTemplate HeaderText="Welcome to Explain My Energy" CloseWizardCallback="OnExploreClick">
     <SetupStepPage>
         <WelcomeScreenContent>
@@ -20,13 +22,16 @@
                            OnClick="OnExploreClick">
                     <span><i aria-hidden="true" class="fa-regular fa-thumbs-up"></i> Okay! Let me explore</span>
                 </MudButton>
-                <MudButton 
+                @if (!AppStatus.IsDemoMode)
+                {
+                    <MudButton 
                     Size="Size.Medium"
                     Variant="Variant.Outlined"
                     Color="Color.Success"
                     OnClick="OnSetupWizardClick">
                     <span>Start Setup Wizard <i aria-hidden="true" class="fa-solid fa-wand-magic-sparkles"></i></span>
                 </MudButton>
+                }
             </div>
             <MudButton Class="me-0" Color="Color.Default" OnClick="OnExploreClick">Exit</MudButton>
         </div>

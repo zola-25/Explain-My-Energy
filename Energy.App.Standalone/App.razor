@@ -72,15 +72,13 @@
             return;
         }
 
-        Dispatcher.Dispatch(new PreloadHouseholdStateAction(DefaultLocalState.HouseholdState));
+        Dispatcher.Dispatch(new PreloadHouseholdStateAction(DefaultLocalState.DemoHousehold));
 
-        Dispatcher.Dispatch(new PreloadMeterSetupStateAction(DefaultLocalState.MeterSetupState));
+        Dispatcher.Dispatch(new PreloadMeterSetupStateAction(DefaultLocalState.DemoMeterSetup));
 
-        Dispatcher.Dispatch(new PreloadGasReadingsAction(DefaultLocalState.GasReadingsState));
+        Dispatcher.Dispatch(new PreloadGasReadingsAction(DefaultLocalState.DemoGasReadings));
 
-        Dispatcher.Dispatch(new PreloadElectricityReadingsAction(DefaultLocalState.ElectricityReadingsState));
-
-        Dispatcher.Dispatch(new HasSeenWelcomeScreenAction(seen: true));
+        Dispatcher.Dispatch(new PreloadElectricityReadingsAction(DefaultLocalState.DemoElectricityReadings));
     }
 
 }

@@ -56,15 +56,19 @@
                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
                 {
                     <MudTooltip Text="Up to date">
-                        @latestReading.eDateToDowShortMonthYY()
-                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon>
+                        <div class="d-flex align-center">
+                            @latestReading.eDateToDowShortMonthYY()
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon>
+                        </div>
                     </MudTooltip>
                 }
                 else
                 {
                     <MudTooltip Text="Missing Latest Weather Data">
-                        @latestReading.eDateToDowShortMonthYY()
-                        <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Default"></MudIcon>
+                        <div class="d-flex align-center">
+                            @latestReading.eDateToDowShortMonthYY()
+                            <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Default"></MudIcon>
+                        </div>
                     </MudTooltip>
                 }
             </MudTd>

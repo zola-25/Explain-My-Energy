@@ -22,18 +22,18 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
         switch (meterType)
         {
             case MeterType.Gas:
-                if (_demoLocalState.GasReadingsState == null)
+                if (_demoLocalState.DemoGasReadings == null)
                 {
                     await _demoLocalState.LoadDefaultsIfDemo();
                 }
-                existingDemoReadings = _demoLocalState.GasReadingsState.BasicReadings;
+                existingDemoReadings = _demoLocalState.DemoGasReadings.BasicReadings;
                 break;
             case MeterType.Electricity:
-                if (_demoLocalState.ElectricityReadingsState == null)
+                if (_demoLocalState.DemoElectricityReadings == null)
                 {
                     await _demoLocalState.LoadDefaultsIfDemo();
                 }
-                existingDemoReadings = _demoLocalState.ElectricityReadingsState.BasicReadings;
+                existingDemoReadings = _demoLocalState.DemoElectricityReadings.BasicReadings;
                 break;
             default:
                 throw new NotImplementedException();
@@ -41,25 +41,23 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
         var requestedDemoReadings = existingDemoReadings.Where(x => x.UtcTime >= startDate && x.UtcTime <= endDate).ToList();
 
+        var demoReadingsLookup = GetDemoReadingsLookup(existingDemoReadings);
+
         if (requestedDemoReadings.Last().UtcTime < endDate)
         {
             var random = new Random();
 
             // Get last year's data with slight variance for any future missing data
             var readingDatesMissing = requestedDemoReadings.Last().UtcTime.eGenerateAllDatesBetween(endDate, true).ToList();
-            var demoMissingBasicReadings = readingDatesMissing.SelectMany(x =>
-            {
+            var demoMissingBasicReadings = readingDatesMissing.SelectMany(x => {
 
-                return Enumerable.Range(0, 48).Select(i =>
-                {
+                return Enumerable.Range(0, 48).Select(i => {
 
                     var missingReadingDateTime = x.AddTicks(TimeSpan.TicksPerMinute * 30 * i);
 
-                    var lastYearsReading = existingDemoReadings.Where(c =>
-                        c.UtcTime.Month == missingReadingDateTime.Month &&
-                        c.UtcTime.Day == missingReadingDateTime.Day &&
-                        c.UtcTime.Hour == missingReadingDateTime.Hour &&
-                        c.UtcTime.Minute == missingReadingDateTime.Minute).First();
+                    var missingReadingTimeSpan = missingReadingDateTime - new DateTime(missingReadingDateTime.Year,1,1);
+
+                    var lastYearsReading = demoReadingsLookup[missingReadingTimeSpan];
 
 
                     decimal demoReadingKWh = 0;
@@ -67,8 +65,7 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
                     double randomFactor = 1 + (random.NextDouble() * 0.2 * (random.Next(2) == 1 ? 1 : -1));
                     demoReadingKWh = lastYearsReading.KWh * (decimal)randomFactor; // just repeat historical zero KWh readings
 
-                    return new BasicReading()
-                    {
+                    return new BasicReading() {
                         UtcTime = missingReadingDateTime,
                         KWh = demoReadingKWh,
                         Forecast = false
@@ -84,5 +81,16 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
             requestedDemoReadings.AddRange(demoMissingBasicReadings);
         }
         return requestedDemoReadings;
+    }
+
+    private static Dictionary<TimeSpan, BasicReading> GetDemoReadingsLookup(IEnumerable<BasicReading> demoReadings)
+    {
+        var beginningOfDemoDataYear = demoReadings.First().UtcTime;
+
+        var oneYearOfDemoReadings = demoReadings
+            .Where(c => c.UtcTime < beginningOfDemoDataYear.AddYears(1).AddTicks(-(TimeSpan.TicksPerMinute * 30)))
+            .ToList();
+
+        return oneYearOfDemoReadings.ToDictionary(c => c.UtcTime - beginningOfDemoDataYear);
     }
 }

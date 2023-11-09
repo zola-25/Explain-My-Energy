@@ -1,20 +1,30 @@
-﻿using Fluxor;
+﻿using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
+using Energy.App.Standalone.Services.FluxorPersist.Demo.JsonModels;
+using Fluxor;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 
 public class PreloadElectricityReadingsAction
 {
-    public ElectricityReadingsState ElectricityReadingsState { get; }
+    public DemoElectricityReadings DemoElectricityReadings { get; }
 
-    public PreloadElectricityReadingsAction(ElectricityReadingsState electricityReadingsState)
+    public PreloadElectricityReadingsAction(DemoElectricityReadings demoElectricityReadings)
     {
-        ElectricityReadingsState = electricityReadingsState;
+        DemoElectricityReadings = demoElectricityReadings;
     }
 
-    [ReducerMethod]
-    public static ElectricityReadingsState OnPreloadElectricityReadingsReducer(ElectricityReadingsState state, PreloadElectricityReadingsAction action)
+    public class PreloadDemoDataEffects : Effect<PreloadElectricityReadingsAction>
     {
-        state = action.ElectricityReadingsState;
-        return action.ElectricityReadingsState;
+
+        public override Task HandleAsync(PreloadElectricityReadingsAction action, IDispatcher dispatcher)
+        {
+            var gasReadings = action.DemoElectricityReadings.BasicReadings
+                .Where(c => c.UtcTime >= DateTime.UtcNow.AddYears(-1).AddDays(-30)).ToImmutableList();
+
+            dispatcher.Dispatch(new StorePreloadedElectricityReadingsAction(gasReadings));
+            return Task.CompletedTask;
+        }
     }
 }

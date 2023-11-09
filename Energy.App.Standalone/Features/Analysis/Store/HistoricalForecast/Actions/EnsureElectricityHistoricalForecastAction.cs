@@ -78,7 +78,7 @@ public class EnsureElectricityHistoricalForecastAction
 
                 dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings));
 
-                var resultMessage = $"{meterType} Historical Forecast created with {forecastDailyCostedReadings.Count} daily readings";
+                string resultMessage = $"{meterType} Historical Forecast created with {forecastDailyCostedReadings.Count} daily readings";
                 dispatcher.Dispatch(new NotifyElectricityForecastResult(true, resultMessage));
 
                 action.TaskCompletionSource?.SetResult((true, resultMessage));
@@ -88,7 +88,7 @@ public class EnsureElectricityHistoricalForecastAction
             {
                 _logger.LogError(ex, "Error ensuring {MeterType} historical forecast", meterType);
 
-                var resultMessage = $"Error ensuring {meterType} historical forecast";
+                string resultMessage = $"Error ensuring {meterType} historical forecast";
                 dispatcher.Dispatch(new NotifyElectricityForecastResult(false, resultMessage));
                 action.TaskCompletionSource?.SetResult((false, resultMessage));
                 return Task.CompletedTask;

@@ -1,18 +1,21 @@
 ﻿@if (!String.IsNullOrWhiteSpace(SuffixIcon))
 {
-    <MudPaper Elevation="0" Class="d-flex background-inherit color-inherit">
-        @ChildContent <MudIcon Color="@IconColor" Class="mud-nav-link-icon mud-nav-link-icon-default ml-3" Icon="@SuffixIcon"></MudIcon>
+    <MudPaper Elevation="0" Class="d-flex justify-start align-center background-inherit color-inherit">
+        @ChildContent <MudIcon Color="@IconColor" Class="mud-nav-link-icon mud-nav-link-icon-default ml-3" Icon="@SuffixIcon"></MudIcon><MudChip Size="Size.Small" Class="@(DisabledBadge ? "d-none" : "ms-2")" Color="Color.Primary">Explore</MudChip>
     </MudPaper>
 }
 else
 {
-    <MudPaper Elevation="0" Class="d-flex background-inherit color-inherit">
-        @ChildContent
+    <MudPaper Elevation="0" Class="d-flex justify-start align-center background-inherit color-inherit">
+        @ChildContent <MudChip Size="Size.Small" Class="@(DisabledBadge ? "d-none" : "ms-2")" Color="Color.Primary">Explore</MudChip>
     </MudPaper>
 
 }
 
 @code {
+    [Inject] AppStatus AppStatus { get; set; }
+
+    bool DisabledBadge => !AppStatus.IsDemoMode;
     [Parameter, EditorRequired] public string SuffixIcon { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public Color IconColor { get; set; }

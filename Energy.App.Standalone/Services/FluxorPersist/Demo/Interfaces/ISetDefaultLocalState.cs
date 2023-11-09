@@ -1,16 +1,13 @@
-﻿using Energy.App.Standalone.Features.EnergyReadings.Electricity;
-using Energy.App.Standalone.Features.EnergyReadings.Gas;
-using Energy.App.Standalone.Features.Setup.Household;
-using Energy.App.Standalone.Features.Setup.Meter.Store;
+﻿using Energy.App.Standalone.Services.FluxorPersist.Demo.JsonModels;
 
 namespace Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 
 public interface ISetDefaultLocalState
 {
-    GasReadingsState GasReadingsState { get; }
-    ElectricityReadingsState ElectricityReadingsState { get; }
-    MeterSetupState MeterSetupState { get; }
-    HouseholdState HouseholdState { get; }
+    DemoGasReadings DemoGasReadings { get;  }
+    DemoElectricityReadings DemoElectricityReadings { get; }
+    DemoMeterSetup DemoMeterSetup { get; }
+    DemoHousehold DemoHousehold { get; }
     bool IsDemoMode { get; }
 
     void ClearAllData();

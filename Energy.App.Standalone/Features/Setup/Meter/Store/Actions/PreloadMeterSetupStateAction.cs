@@ -1,20 +1,45 @@
-﻿using Fluxor;
+﻿using Energy.App.Standalone.DTOs.Tariffs;
+using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
+using Energy.App.Standalone.Services.FluxorPersist.Demo.JsonModels;
+using Energy.Shared;
+using Fluxor;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions;
 
 public class PreloadMeterSetupStateAction
 {
-    public MeterSetupState MeterSetupState { get; private set; }
+    public DemoMeterSetup DemoMeterSetup { get; private set; }
 
-    public PreloadMeterSetupStateAction(MeterSetupState meterSetupState)
+    public PreloadMeterSetupStateAction(DemoMeterSetup demoMeterSetup)
     {
-        MeterSetupState = meterSetupState;
+        DemoMeterSetup = demoMeterSetup;
     }
 
     [ReducerMethod]
     public static MeterSetupState OnPreloadMeterSetupStateReducer(MeterSetupState state, PreloadMeterSetupStateAction action)
     {
-        state = action.MeterSetupState;
-        return state;
+        
+        return state with {
+            ElectricityMeter = new MeterState {
+                Authorized = true,
+                GlobalId = action.DemoMeterSetup.ElectricityMeter.GlobalId,
+                MeterType = action.DemoMeterSetup.ElectricityMeter.MeterType,
+                Mpxn = action.DemoMeterSetup.ElectricityMeter.Mpxn,
+                InitialSetupValid = true,
+                SetupValid = true,
+                AuthorizeFailedMessage = null,
+                TariffDetails = DefaultTariffData.GetDefaultTariffs(MeterType.Electricity, ExampleTariffType.StandardFixedDaily)
+            },
+            GasMeter = new MeterState {
+                Authorized = true,
+                GlobalId = action.DemoMeterSetup.GasMeter.GlobalId,
+                MeterType = action.DemoMeterSetup.GasMeter.MeterType,
+                Mpxn = action.DemoMeterSetup.GasMeter.Mpxn,
+                InitialSetupValid = true,
+                SetupValid = true,
+                AuthorizeFailedMessage = null,
+                TariffDetails = DefaultTariffData.GetDefaultTariffs(MeterType.Gas, ExampleTariffType.StandardFixedDaily)
+            },
+        };
     }
 }

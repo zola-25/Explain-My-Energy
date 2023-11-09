@@ -112,7 +112,6 @@ builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.
 
 builder.Services.AddSingleton<DocSnippetsLoader>();
 
-builder.Services.AddTransient<IDemoReadingsUpdater, DemoReadingsUpdater>();
 builder.Services.AddScoped<ISetDefaultLocalState, SetDefaultLocalState>();
 
 bool isDemoMode = builder.Configuration.eIsDemoMode();
