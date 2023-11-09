@@ -69,10 +69,6 @@
 		<ClientEnv>Development</ClientEnv>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<ClientEnv>DemoProduction</ClientEnv>
-	</PropertyGroup>
-
 	<Target Name="CopyCustomFiles" BeforeTargets="BeforeBuild">
 		<Message Importance="high" Text="ClientEnv is $(ClientEnv)" />
 		<ItemGroup>
