@@ -29,35 +29,58 @@
 		<ProjectReference Include="..\Energy.Shared\Energy.Shared.csproj" />
 		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
 	</ItemGroup>
-	
-	
+
+
 	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
 		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
 	</Target>
-	
+
+	<PropertyGroup>
+		<!-- Enable trimming -->
+		<PublishTrimmed>true</PublishTrimmed>
+		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+		<!-- Set the trimming mode to link only the assemblies you specify -->
+		<TrimMode>partial</TrimMode>
+
+	</PropertyGroup>
+	<ItemGroup>
+		<TrimmerRootAssembly Include="Microsoft.*" />
+		<TrimmerRootAssembly Include="MudBlazor" />
+		<TrimmerRootAssembly Include="System.Net.Http.Json" />
+		<TrimmerRootAssembly Include="Fluxor" />
+		<TrimmerRootAssembly Include="Fluxor.Blazor.Web" />
+		<TrimmerRootAssembly Include="Fluxor.Persist" />
+		<TrimmerRootAssembly Include="HtmlSanitizer" />
+		<TrimmerRootAssembly Include="AngleSharp" />
+		<TrimmerRootAssembly Include="HtmlAgilityPack" />
+		<TrimmerRootAssembly Include="System.Collections.Immutable" />
+	</ItemGroup>
+
 	<PropertyGroup>
 		<RunAOTCompilation>true</RunAOTCompilation>
-		<PublishTrimmed>false</PublishTrimmed>
 		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
 	</PropertyGroup>
-	
+
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<ClientEnv>Development</ClientEnv>
 	</PropertyGroup>
-	
+
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<ClientEnv>Development</ClientEnv>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<ClientEnv>DemoProduction</ClientEnv>
+	</PropertyGroup>
 
 	<Target Name="CopyCustomFiles" BeforeTargets="BeforeBuild">
-    	<Message Importance="high" Text="ClientEnv is $(ClientEnv)" />
+		<Message Importance="high" Text="ClientEnv is $(ClientEnv)" />
 		<ItemGroup>
 			<FilesToDelete Include="$(ProjectDir)wwwroot/**/*" />
 		</ItemGroup>
 		<Delete Files="@(FilesToDelete)" />
 		<Copy SourceFiles="@(CustomFiles)" DestinationFolder="$(ProjectDir)wwwroot\%(RecursiveDir)" />
-  </Target>
+	</Target>
 
 
 	<ItemGroup Condition="'$(ClientEnv)' == 'Development'">
@@ -85,9 +108,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="wwwroot\appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="wwwroot\appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 
