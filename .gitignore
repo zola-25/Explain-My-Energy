@@ -47,9 +47,6 @@ bld/
 
 **/launchSettings.json
 
-**/appsettings.json
-**/appsettings.*.json
-
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
