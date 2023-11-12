@@ -103,10 +103,10 @@ environments.forEach((environment) => {
 
     });
 
-    it(`${environment} should have noindex for robots for now, regardless of environment`, function () {
+    it(`${environment} should have noindex for robots for now, but not production`, function () {
 
       if (environment === 'production') {
-        $index('meta[name="robots"]').attr('content').should.equal('noindex, nofollow');
+        $index('meta[name="robots"]').length.should.equal(0);
       } else {
         $index('meta[name="robots"]').attr('content').should.equal('noindex, nofollow');
       }

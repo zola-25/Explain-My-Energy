@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: 
 Disallow: /_content/
 Disallow: /.auth/
 Disallow: /_framework/

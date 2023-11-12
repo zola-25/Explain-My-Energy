@@ -171,24 +171,11 @@ public class DocSnippetsLoader
                 htmlSanitizer.PostProcessNode += (sender, e) => {
                     if(e.Node is IHtmlAnchorElement a)
                     {
-                        
                         a.SetAttribute("target", "_blank");
                         e.Node.TextContent += " (new tab)";
 
-                        var linkUriBuilder = new UriBuilder(a.Href);
-                        var sourceUriBuilder = new UriBuilder(sourceUrl);
-                        if (linkUriBuilder.Uri.Host == sourceUriBuilder.Uri.Host)
-                        {
-                            a.RelationList.Add("noopener");
-                            a.RelationList.Add("noreferrer");
-                        }
-                        else
-                        {
-                            a.RelationList.Add("nofollow");
-                            a.RelationList.Add("noopener");
-                            a.RelationList.Add("noreferrer");
-
-                        }
+                        a.RelationList.Add("noopener");
+                        a.RelationList.Add("noreferrer");
                     }
                 };
 

@@ -27,35 +27,19 @@ export default function (appEnv, appDemo) {
             ...defaultHeaderData,
             ogUrl: 'https://demo.explainmyenergy.net',
             ogImage: 'https://demo.explainmyenergy.net/images/DecemberWeather.png',
-            robotsContent: 'noindex, nofollow'
         }
+
     } 
-    else if (appEnv === 'development') {
-        headerData = {
-            ...defaultHeaderData,
-            ogUrl: 'https://dev.explainmyenergy.net',
-            ogImage: 'https://dev.explainmyenergy.net/images/DecemberWeather.png',
-            robotsContent: 'noindex, nofollow'
-        }
-    } else if (appEnv === 'staging') {
-        headerData = {
-            ...defaultHeaderData,
-            ogUrl: 'https://staging.explainmyenergy.net',
-            ogImage: 'https://staging.explainmyenergy.net/images/DecemberWeather.png',
-            robotsContent: 'noindex, nofollow'
-        }
-    } else if (appEnv === 'production') {
+    else {
         headerData = {
             ...defaultHeaderData,
             ogUrl: 'https://explainmyenergy.net',
             ogImage: 'https://explainmyenergy.net/images/DecemberWeather.png',
-            robotsContent: 'noindex, nofollow'
         }
-    } else {
-        throw new Error('No APP_ENV environment variable set');
+    } 
+    if (appEnv !== 'production') {
+        headerData.robotsContent = 'noindex, nofollow'
     }
-
-
 
     const resolvedLicenseFilePath = path.resolve(licenseFilePath)
 

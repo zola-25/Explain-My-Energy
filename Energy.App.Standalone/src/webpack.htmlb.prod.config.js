@@ -35,7 +35,7 @@ export default function (appEnv, appDemo, assetOutputPath) {
         to: "[name][ext]"
     },
     {
-        from: posix.join(_resolve(__dirname, 'data/robots.disallow.txt').replace(/\\/g, '/')),
+        from: posix.join(_resolve(__dirname, 'data/robots.allow.txt').replace(/\\/g, '/')),
         to: "robots.txt",
     },
     ];

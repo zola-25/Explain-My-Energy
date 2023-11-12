@@ -9,8 +9,10 @@
     <link href="manifest.webmanifest" rel="manifest" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <% if(locals.robotsContent) { %>
     <meta name="robots" content="<%= robotsContent %>">
-
+    <% } %>
+    
     <meta name="description" content="<%= description %>" />
 
     <meta name="color-scheme" content="only light" />
