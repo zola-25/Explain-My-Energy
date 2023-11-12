@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using Polly.Extensions.Http;
+using Polly;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -76,7 +78,6 @@ builder.Services.AddMudServices(config => {
 
 builder.Services.AddBlazoredLocalStorage(config => {
     config.JsonSerializerOptions.WriteIndented = false;
-
 }
 
 );
@@ -107,8 +108,11 @@ builder.Services.AddLogging(c => {
 
 builder.Services.AddSingleton<AppStatus>();
 
-builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json")));
+builder.Services.AddHttpClient("DemoData", c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    .AddPolicyHandler(GetRetryPolicy());
+    
+builder.Services.AddHttpClient("DocsSite", c => c.BaseAddress = new Uri(builder.Configuration["App:DocsUri"] ?? throw new ArgumentException("DocsUri not found in appsettings.json")))
+    .AddPolicyHandler(GetRetryPolicy());
 
 builder.Services.AddSingleton<DocSnippetsLoader>();
 
@@ -145,17 +149,21 @@ await host.RunAsync();
 
 
 
-async ValueTask AddAppSettings(WebAssemblyHostBuilder builder, string appsettingsLocation)
+static async ValueTask AddAppSettings(WebAssemblyHostBuilder builder, string appsettingsLocation)
 {
-
-    var http = new HttpClient() {
-        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    using var http = new HttpClient() {
+        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress),        
     };
-
-    builder.Services.AddScoped(sp => http);
-
+    
     using var response = await http.GetAsync(requestUri: appsettingsLocation);
     using var stream = await response.Content.ReadAsStreamAsync();
 
     builder.Configuration.AddJsonStream(stream);
 }
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(1, retryAttempt => TimeSpan.FromSeconds(2));
+};

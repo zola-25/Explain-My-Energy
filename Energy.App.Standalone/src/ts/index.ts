@@ -1,9 +1,5 @@
-﻿
-export * from './Files/types'
-export * from './Files/chartCreation'
+﻿import { ChartFunctions } from './Files/chartCreation'
 
-import { Charts } from './Files/chartCreation'
+ChartFunctions.Load();
 
 console.log("Loading Charts...")
-
-Charts.Load();
