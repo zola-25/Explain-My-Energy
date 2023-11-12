@@ -4,6 +4,12 @@ export * from './Files/chartCreation'
 
 import { Charts } from './Files/chartCreation'
 
-console.log("Loading Charts...")
+import FluxorPersistIndexedDb from './FluxorPersistIndexedDb'
 
+console.log("Loading Charts...")
 Charts.Load();
+
+console.log("Loading FluxorPersistIndexedDb...")
+FluxorPersistIndexedDb.Load();
+
+

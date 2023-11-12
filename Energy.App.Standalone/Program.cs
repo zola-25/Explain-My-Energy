@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using DexieNET;
 using Energy.App.Standalone;
 using Energy.App.Standalone.Data.EnergyReadings;
 using Energy.App.Standalone.Data.EnergyReadings.Interfaces;
@@ -14,6 +15,7 @@ using Energy.App.Standalone.Services.DocSnippets;
 using Energy.App.Standalone.Services.FluxorPersist;
 using Energy.App.Standalone.Services.FluxorPersist.Demo;
 using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
+using Energy.App.Standalone.Services.FluxorPersist.Dexie;
 using Energy.n3rgyApi;
 using Energy.WeatherReadings;
 using Fluxor;
@@ -24,6 +26,10 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
+using DexieNET;
+using DnetIndexedDb;
+using DnetIndexedDb.Models;
+using Energy.App.Standalone.Services.FluxorPersist.DnetIndexedDb;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -76,13 +82,37 @@ builder.Services.AddMudServices(config => {
 
 builder.Services.AddBlazoredLocalStorage(config => {
     config.JsonSerializerOptions.WriteIndented = false;
+});
 
-}
 
-);
-builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
-builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
+builder.Services.AddIndexedDbDatabase<FluxorStateIndexedDb>(options => {
+    options.UseDatabase(GetFluxorStateDatabaseModel());
+});
+IndexedDbDatabaseModel GetFluxorStateDatabaseModel()
+{
+    return new IndexedDbDatabaseModel {
+        Name = "FluxorStateDbModel",
+        Version = 1,
+        Stores = new List<IndexedDbStore> {
+            new IndexedDbStore {
+                Name = "FluxorState",
+                Indexes = new List<IndexedDbIndex> {
+                    new IndexedDbIndex {
+                        Name = "StateName",
+                    }
+                },
+                Key = new IndexedDbStoreParameter() {
+                    AutoIncrement = false,
+                    KeyPath = "StateName"
+                },
+                
+            }
+            
+    }
+};
 
+builder.Services.AddScoped<IIndexedDbAccessor, FluxorPersistIndexedDbAccessor>();
+builder.Services.AddScoped<IStoreHandler, IndexedDBStoreHandler>();
 
 System.Reflection.Assembly currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options => {
