@@ -15,7 +15,7 @@ public static class OutCodeLookup
             }
 
             return OutCodes.Where(
-                c => c.OutCodeCharacters.StartsWith(filter, true, CultureInfo.GetCultureInfo("en-GB")));
+                c => c.OutCodeCharacters.StartsWith(filter, true, CultureInfo.InvariantCulture));
 
         }, ctx);
     }

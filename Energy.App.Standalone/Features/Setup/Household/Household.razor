@@ -39,7 +39,8 @@
                                       T="OutCode" CoerceText="true"
                                       Clearable="true"
                                       Placeholder="Postal Area"
-                                              Required
+                                      Culture="@System.Globalization.CultureInfo.InvariantCulture"
+                                      Required
                                       Disabled="@AppConfig.IsDemoMode"
                                       ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                       MinCharacters="2"
