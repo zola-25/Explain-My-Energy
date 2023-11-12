@@ -17,9 +17,13 @@
                     <MudDatePicker @bind-Date="@_householdDetails.MoveInDate" For="@(() => _householdDetails.MoveInDate)" Required
                                     Placeholder="Select Move-in Date"
                                     FixDay="1"
+                                    @bind-Date:after="@(() => { _openTo = OpenTo.Month; })"
                                     Disabled="@AppConfig.IsDemoMode"
-                                    OpenTo="OpenTo.Year"
+                                    OpenTo="@_openTo"
+                                    AnchorOrigin="Origin.CenterRight"
+                                    TransformOrigin="Origin.CenterRight"
                                     Clearable="true"
+                                    DisableToolbar="@_disableToolbar"
                                     DateFormat="MMMM yyyy"
                                     MaxDate="DateTime.Today"></MudDatePicker>
                      <DocTooltipIcon DocSnippetHeader="Move-in Date" DocSnippetType="DocSnippetType.HouseholdMoveInDate" IconTitle="Help for Move-in Date" />
@@ -73,6 +77,9 @@
 @code {
 
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
+    [Inject] IJSRuntime JS { get; set; }
+
+    private IJSObjectReference module;
 
     HouseholdDetails _householdDetails = new();
 
@@ -93,8 +100,10 @@
         _readyToInteract = true;
     }
 
+    OpenTo _openTo = OpenTo.Year;
     private void SetHouseholdInputs()
     {
+        _openTo = HouseholdState.Value.MoveInDate is null ? OpenTo.Year : OpenTo.Month;
         _householdDetails = new HouseholdDetails()
             {
                 IhdMacId = HouseholdState.Value.IhdMacId,
@@ -105,6 +114,26 @@
         _saveButtonText = HouseholdState.Value.Saved ? "Update" : "Save";
     }
 
+    BrowserDimension _browserDimension;
+    bool _disableToolbar = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./Features/Setup/Household/Household.razor.js");
+            _browserDimension = await module.InvokeAsync<BrowserDimension>("getBrowserDimensions");
+
+            if (_browserDimension.Height < 500)
+            {
+                _disableToolbar = true;
+                StateHasChanged();
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
 
     private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
@@ -112,6 +141,12 @@
         _saveResponseMessage = "Household Details Saved";
     }
 
+
+    private class BrowserDimension
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
 
     private void HandleValidSubmit()
     {
@@ -130,5 +165,13 @@
     private void ClearPostalArea()
     {
         _householdDetails.OutCode = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
     }
 }
