@@ -1,3 +1,5 @@
+![CodeQL](https://github.com/zola-25/Explain-My-Energy/actions/workflows/codeql.yml/badge.svg)
+
 # Explain My Energy
 
 This is an open-source hobby project that provides a standalone, serverless Blazor WebAssembly app to enable UK-based users easy access to detailed insights on their energy usage and energy costs.
