@@ -95,7 +95,8 @@ jobs:
           cache-dependency-path: ./Energy.App.Standalone/package-lock.json
       - name: Install npm dependencies
         working-directory: ./Energy.App.Standalone
-        run: npm ci
+        run: |
+          npm ci
         
       - name: Restore for .NET dependencies required for whole solution
         working-directory: ./
@@ -104,7 +105,7 @@ jobs:
       - name: Build Client Side For Dev
         working-directory: ./Energy.App.Standalone
         run: |
-          npm build --development
+          npm run buildDev
           
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
