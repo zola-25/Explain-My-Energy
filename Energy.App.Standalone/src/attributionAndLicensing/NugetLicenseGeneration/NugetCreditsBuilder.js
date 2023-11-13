@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import yargs from 'yargs';
@@ -69,11 +69,12 @@ try {
 
 
     console.log('Clearing NuGet caches');
-    execSync('dotnet nuget locals all --clear');
+    spawnSync('dotnet nuget locals all --clear', { shell: false});
 
     console.log('Restoring project packages');
-    execSync(`dotnet restore ${projectCsprojPath}`);
-    execSync('dotnet tool restore');
+    const dotnetRestoreArgs = ['restore', projectCsprojPath];
+    spawnSync("dotnet", dotnetRestoreArgs, { shell: false, stdio: 'inherit' });
+    spawnSync("dotnet", [ "tool", "restore"], { shell: false , stdio: 'inherit'});
 
 
     if (fs.existsSync(tempLicenseOutputFolder)) {
@@ -88,7 +89,9 @@ try {
 
     fs.writeFileSync(tempLicenseOverridePackageNamesFile, JSON.stringify(licenseInfoOverrideParsed.map(c => c.PackageName)), 'utf8');
 
-    execSync(`dotnet dotnet-project-licenses -i ${projectCsprojPath} -u -t -o -j  --use-project-assets-json  --outfile ${tempPackageLicenseJsonFileOutput} --packages-filter ${tempLicenseOverridePackageNamesFile} --manual-package-information ${licenseInfoOverrideFile} --licenseurl-to-license-mappings ${licenseUrlToLicenseTypeOverrideFile}`, { cwd: tempLicenseOutputFolder });
+    const dotnetProjectLicensesArgs = ['tool', 'run', 'dotnet-project-licenses','-i', projectCsprojPath, '-u', '-t', '-o', '-j', '--use-project-assets-json', '--outfile', tempPackageLicenseJsonFileOutput, '--packages-filter', tempLicenseOverridePackageNamesFile, '--manual-package-information', licenseInfoOverrideFile, '--licenseurl-to-license-mappings', licenseUrlToLicenseTypeOverrideFile]
+    
+    spawnSync("dotnet", dotnetProjectLicensesArgs, { shell: false, stdio: 'inherit', cwd: tempLicenseOutputFolder });
 
     const parsedPackageInfos = JSON.parse(fs.readFileSync(tempPackageLicenseJsonFileOutput, 'utf8'));
 
@@ -146,10 +149,11 @@ try {
 
 
 } catch (error) {
+    process.exitCode = 1;
+
     console.error(error);
     console.error(error.message);
     console.error(error.stack);
-    process.exitCode = 1;
 
 } finally {
 

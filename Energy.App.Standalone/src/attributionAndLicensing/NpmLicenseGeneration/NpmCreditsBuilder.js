@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import fs from 'fs';
-import path from 'path';
+import path, { dirname } from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import he from 'he';
@@ -55,8 +55,6 @@ const tempLicenseOutputFolder = argv.tempLicenseOutputFolder ? argv.tempLicenseO
 
 try {
 
-
-
     if (fs.existsSync(htmlFragmentToGenerateFilePath)) {
         fs.rmSync(htmlFragmentToGenerateFilePath);
     }
@@ -78,9 +76,24 @@ try {
 
     process.chdir(packagesJsonFolder);
 
-    execSync(`license-checker-rseidelsohn --production --json --nopeer --direct --excludePackagesStartingWith="explain-my-energy" \
-            --out ${packageLicenceJsonFile} --excludePrivatePackages --relativeModulePath --relativeLicensePath \
-            --files ${licensePlainTextFolder} --customPath ${customFormatFile}`);
+/*     const licenseCheckerArgs = ['--production', '--json ', '--nopeer ', '--direct ', '--excludePackagesStartingWith="explain-my-energy"',
+        '--out ', packageLicenceJsonFile, '--excludePrivatePackages ', '--relativeModulePath ', '--relativeLicensePath ',
+        '--files ', licensePlainTextFolder, '--customPath ', customFormatFile];
+    execSync("license-checker-rseidelsohn", licenseCheckerArgs);
+ */    
+    if (!isSafePath(customFormatFile)) {
+        throw new Error(`Custom format file unsafe path: ${customFormatFile}`);
+    }
+    if (!isSafePath(packageLicenceJsonFile)) {
+        throw new Error(`Package license json file unsafe path: ${packageLicenceJsonFile}`);
+    }
+    if (!isSafePath(licensePlainTextFolder)) {
+        throw new Error(`License plain text folder unsafe path: ${licensePlainTextFolder}`);
+    } 
+    let licenseCheckerCmd = `license-checker-rseidelsohn --production --json --nopeer --direct --excludePackagesStartingWith="explain-my-energy" \
+                                --out ${packageLicenceJsonFile} --excludePrivatePackages --relativeModulePath --relativeLicensePath \
+                                --files ${licensePlainTextFolder} --customPath ${customFormatFile}`;
+    execSync(licenseCheckerCmd, { shell: false, stdio: 'inherit' });
 
     process.chdir(originalLocation);
 
@@ -204,10 +217,10 @@ try {
 
 
 } catch (error) {
+    process.exitCode = 1;
     console.error(error);
     console.error(error.message);
     console.error(error.stack);
-    process.exitCode = 1;
 }
 finally {
 
@@ -221,4 +234,13 @@ finally {
 
     console.log('Completed')
 
+}
+
+function isSafePath(pathToCheck) {
+    return (fs.existsSync(pathToCheck) || fs.existsSync(dirname(pathToCheck))) 
+        && pathToCheck.split(' ').length === 1 
+        && pathToCheck.split('\t').length === 1 
+        && pathToCheck.split('\n').length === 1
+        && pathToCheck.split('\r').length === 1
+        && path.isAbsolute(pathToCheck);
 }

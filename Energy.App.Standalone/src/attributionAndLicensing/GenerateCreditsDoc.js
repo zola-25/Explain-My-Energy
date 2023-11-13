@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import appInfoConfig from '../appInfoConfig.js';
@@ -27,18 +27,35 @@ try {
     fs.mkdirSync(generatedPartialsFolder);
 
     console.log('Generating Nuget credits partial')
-    execSync(`node src/attributionAndLicensing/NugetLicenseGeneration/NugetCreditsBuilder.js --projectCsprojPath ${projectCsprojPath} --htmlFragmentToGenerateFilePath ${generatedPartialsFolder}/NugetCreditsPartial.html`,
-        { stdio: 'inherit', env: process.env });
 
+    const scriptDirectory = path.dirname(process.argv[1]);
+    const nugetCreditsBuilderPath = path.resolve(scriptDirectory, './NugetLicenseGeneration/NugetCreditsBuilder.js');
+    const nugetCmd = "node" //./NugetLicenseGeneration/NugetCreditsBuilder.js";
+    const nugetArgs = [nugetCreditsBuilderPath, "--projectCsprojPath", projectCsprojPath, "--htmlFragmentToGenerateFilePath", path.join(generatedPartialsFolder, "NugetCreditsPartial.html")];
+    const nugetResult = execFileSync(nugetCmd, nugetArgs, { shell: false, stdio: ['inherit', 'inherit', 'pipe'],  env: process.env });
+
+    if(nugetResult && nugetResult.stderr) {
+        console.log(nugetResult.stderr.toString());
+        throw new Error("Error generating Nuget credits partial", nugetResult.stderr.toString());
+    }
     console.log('Generating Npm credits partial')
-    execSync(`node src/attributionAndLicensing/NpmLicenseGeneration/NpmCreditsBuilder.js --packagesJsonFolder ${projectRootPath} --htmlFragmentToGenerateFilePath ${generatedPartialsFolder}/NpmCreditsPartial.html`,
-        { stdio: 'inherit', env: process.env });
+
+    const npmCreditsBuilderPath = path.resolve(scriptDirectory, './NpmLicenseGeneration/NpmCreditsBuilder.js');
+    const npmArgs = [npmCreditsBuilderPath, "--packagesJsonFolder", projectRootPath, "--htmlFragmentToGenerateFilePath", path.join(generatedPartialsFolder, "NpmCreditsPartial.html")];
+    execFileSync("node", npmArgs, { shell: false, stdio: 'inherit', env: process.env });
+
 
     console.log('Generating final credits file')
-    execSync(`node src/attributionAndLicensing/FinalCreditsDocGeneration/FinalCreditsDocGeneration.js --projectRootPath ${projectRootPath} --finalGeneratedCreditsHtmlDocPath ${generatedPartialsFolder}/Credits.html`,
-        { stdio: 'inherit', env: process.env });
 
+    const finalCreditsBuilderPath = path.resolve(scriptDirectory, './FinalCreditsDocGeneration/FinalCreditsDocGeneration.js');
+    const finalCreditsArgs = [finalCreditsBuilderPath, "--projectRootPath", projectRootPath, "--finalGeneratedCreditsHtmlDocPath", path.join(generatedPartialsFolder, "Credits.html")];
     
+    const finalCreditsResult = execFileSync("node", finalCreditsArgs, { shell: false, stdio: ['inherit', 'inherit', 'pipe'], env: process.env});
+    
+    if(finalCreditsResult && finalCreditsResult.stderr) {
+        console.log(finalCreditsResult.stderr.toString());
+        throw new Error("Error generating final credits file", finalCreditsResult.stderr.toString());
+    }
 
     console.log('Copying generated credits file to views folder')
     fs.copyFileSync(path.resolve(generatedPartialsFolder, 'Credits.html'), generatedCreditsViewsPath);
@@ -47,11 +64,12 @@ try {
 
 } catch (error) {
 
+    process.exitCode = 1;
+
     console.log('Error generating credits file in views folder')
     console.log(error);
     console.log(error.message);
 
-    process.exitCode = 1;
 }
 finally {
 
