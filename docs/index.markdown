@@ -14,19 +14,19 @@ nav_order: 1
 
 This is the documentation for the **Explain My Energy** project. It is intended to be used with the Explain My Energy web app.
 
-The link to the live app is listed below, although if you want to dive straight in, it's recommended to have a look at the pre-configured demo version first, available at [demo.explainmyenergy.com](https://demo.explainmyenergy.com).
+The link to the live app is listed below, although if you want to dive straight in, it's recommended to have a look at the pre-configured demo version first, available at [demo.explainmyenergy.net](https://demo.explainmyenergy.net).
 
-**Explain My Energy** is an open-source hobby project inspired by some of the ideas of a B2B-focused UK startup, that didn't quite make it to version 1.0.
+**Explain My Energy** is an open-source hobby project inspired from some of the ideas of a B2B-focused UK startup, that didn't quite make it to version 1.0.
 
 The goal is to provide a consumer-focused, free, easy-to-use tool for users to understand their home energy usage -  forecasting future energy bills and seeing how seasonal temperature changes affects energy costs.
 
 It is only functional for UK users, but the code could easily be extended to support energy usage data from any source.
 
-- For a pre-configured example setup, see [demo.explainmyenergy.com](https://demo.explainmyenergy.com)
+- For a pre-configured example setup, see [demo.explainmyenergy.net](https://demo.explainmyenergy.net)
+
+- The live version of the app is available at [explainmyenergy.net](https://explainmyenergy.net)
 
 - The source code for this project is available on [GitHub](https://github.com/zola-25/Explain-My-Energy)
-
-- The live version of the app is available at [explainmyenergy.com](https://explainmyenergy.com)
 
 
 ## Purpose
@@ -64,26 +64,41 @@ Optionally, users can also provide their energy tariff details. Since energy tar
 
 ## Browser Support
 
-The application should be fully functional on up-to-date desktop browsers. It has been tested on the latest desktop versions of Chrome and Firefox.
+The application should be fully functional on up-to-date desktop browsers. It has been tested on the latest desktop versions of Chrome, Firefox, Edge and Safari*.
 
 The application currently makes extensive use of browser local storage and the initial app download size is quite large. Currently *it may not be functional on some mobile browsers*, as these browsers usually have comparatively smaller local storage and cache limits. 
 
-There is potential to migrate the storage to use IndexedDB, which would allow the application to support more mobile browsers.
+However both the main app and the demo site have been successfully tested on the iPhone 13* and Galaxy S8, although older devices, or those with out-of-date OS versions may have issues. For iOS ideally use the latest version (17.4 at time of writing), and likewise for Android (version 14 at time of writing). Your mileage may vary.
 
+There is potential to migrate the storage to use IndexedDB, which should allow more support for mobile browsers.
+
+{: .note-title }
+> \*WebKit Browsers
+> 
+> WebKit based browsers such as Safari currently exhibit intermittent issues during testing, regardless of platform, but appear to be working fine in the wild.
+> 
+ 
 ## Caveats, precautions and what we can't do
 
 The application is designed to be as accurate and easy-to-use as possible, but there are some caveats to be aware of:
 
 {: .warning }
-When using the app, your energy usage data, smart meter IHD MAC ID, and meter serial numbers are stored in your browser's local storage and not encrypted. Other sites, or applications, cannot access this data, but if someone has access to your device, or your device is compromised with malware, this data could be accessed.
+> When using the app, your energy usage data, smart meter IHD MAC ID, and meter serial numbers are stored in your browser's local storage and not encrypted. Other sites, or applications, cannot access this data, but if someone has gained access to your device, or your device's security is compromised (with malware for example), this data could be accessed.
+> 
+> Without any assumption of your IT knowledge, standard device security measures apply - don't set up this app with your energy details on a publicly shared device or a device you don't trust, and keep your device, anti-virus and browser up to date (especially Windows devices - but this is likely all enabled by default).
+
+
 
 {: .note-title }
-> Other Data
+> **Other Data**
 > 
 > - The application does not ask for, or store, any personal details, such as your name, address, email address, on your browser or on any server. 
+> - Diagnostic data is not currently collected, but may be in the future. This data is anonymous and will only contain data on application errors and usage, will not record any user-related data such as energy readings. It will be opt-in only.
+> - The application does not use any third-party analytics, advertising or tracking services.
+> - For all these details in more explicit form, see the Privacy Policy either on the [demo site](https://demo.explainmyenergy.net/PrivacyPolicy) or the [main application](https://explainmyenergy.net/PrivacyPolicy). They are identical.
 
 {: .note-title }
-> Energy Data Availability
+> **Energy Data Availability**
 > 
 > - The application is designed to work with smart meters that are connected to the n3rgy consumer service. This is a service that is provided by n3rgy to energy providers, and is not available to all energy providers. If your energy provider does not provide data to n3rgy, then you will not be able to use this application.
 > 
