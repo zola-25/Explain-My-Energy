@@ -42,7 +42,7 @@ I'm also looking at migrating the storage to use IndexedDB, which *should* drast
 
 There's comprehensive documentation at [docs.explainmyenergy.net](https://docs.explainmyenergy.net/). 
 
-Exploring the **demo** implementation, pre-configured with dummy data and requiring no setup, is highly recommended and available at [demo.explainmyenergy.net](https://demo.explainmyenergy.net/)
+Exploring the **demo** implementation, pre-configured with dummy data and requiring no setup, is recommended and available at [demo.explainmyenergy.net](https://demo.explainmyenergy.net/)
 
 The **live** version that you can to analyze your own energy data, is available at [explainmyenergy.net](https://explainmyenergy.net/)
 
