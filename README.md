@@ -1,4 +1,4 @@
-![CodeQL](https://github.com/zola-25/Explain-My-Energy/actions/workflows/codeql.yml/badge.svg)
+![CodeQL](https://github.com/zola-25/Explain-My-Energy/actions/workflows/codeql.yml/badge.svg) ![Main App Playwright Tests](https://dev.azure.com/eme-devops-crunchy/Explain%20My%20Energy/_apis/build/status%2FFull%20App%20Deploy%20and%20Test?branchName=main&stageName=Deploy_production_app_Playwright_Testing&jobName=Run%20Playwright%20Tests%20Production)
 
 # Explain My Energy
 
