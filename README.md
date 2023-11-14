@@ -37,6 +37,10 @@ I'm also looking at migrating the storage to use IndexedDB, which *should* drast
 > Be aware that all data is stored unencrypted in the browser's local storage. No personal data is requested or stored by the application, but to function, the app requires a smart meter IHD (In Home Device) MAC ID, and energy meter MPAN and MPRN numbers. The documentation has more details on these numbers on the [setup page](https://docs.explainmyenergy.net/setup.html).
 > 
 > Data stored in browser local storage is only accessible by the web app that created it, but the usual precautions apply - don't use this app on a shared device or a device that you don't trust, and keep your device, anti-virus and browser up to date.
+> 
+> 
+> > There's a plan in place to encrypt this setup data with a user-provided strong password.
+> > This won't require server-held user accounts or third-party authentication providers, which has always been the aim
 
 ## Getting Started
 
