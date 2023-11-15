@@ -9,15 +9,14 @@ public static class Mapping
     {
         return new DailyWeatherRecord
         {
-            IsClimateForecast = dailyWeatherReading.IsClimateForecast,
-            IsHistorical = dailyWeatherReading.IsHistorical,
-            IsNearForecast = dailyWeatherReading.IsNearForecast,
-            IsRecentForecast = dailyWeatherReading.IsRecentForecast,
-            OutCode = dailyWeatherReading.OutCode,
+            IsClimate = dailyWeatherReading.IsClimateForecast,
+            IsHist = dailyWeatherReading.IsHistorical,
+            IsNear = dailyWeatherReading.IsNearForecast,
+            IsRecent = dailyWeatherReading.IsRecentForecast,
+            OC = dailyWeatherReading.OutCode,
             Summary = dailyWeatherReading.Summary,
-            TemperatureAverage = dailyWeatherReading.TemperatureAverage,
-            Updated = dailyWeatherReading.Updated,
-            UtcTime = dailyWeatherReading.UtcTime
+            TempAvg = dailyWeatherReading.TemperatureAverage,
+            Utc = dailyWeatherReading.UtcTime
         };
     }
 }

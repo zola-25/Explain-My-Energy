@@ -4,26 +4,36 @@
 <MudPaper Class="pa-5">
     <MudText Typo="Typo.body1" Align="Align.Start">
         <div class="welcome-screen-content">
-            <p><strong>Explain My Energy</strong> is a free, open-source web application to help you understand both your existing
-                energy bills and your future energy costs and consumption.</p>
-            <p>It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be
-                working).</p>
-            <p>The application uses your historical energy usage, your energy tariff details and local weather data to
-                give you:</p>
+            <p>
+                <strong>Explain My Energy</strong> is a free, open-source web application to help you understand both your existing
+                energy bills and your future energy costs and consumption.
+            </p>
+            <p>
+                It is designed to be used by anyone, as long as you have a smart meter (it doesn't even have to be
+                working).
+            </p>
+            <p>
+                The application uses your historical energy usage, your energy tariff details and local weather data to
+                give you:
+            </p>
             <ul class="ml-3">
                 <li>Detailed breakdowns of your historical, current and future energy costs and consumption</li>
-                <li>How much your costs change with weather changes - change the forecast, and see how much your energy
-                    usage spikes (or drops) </li>
-                <li>Powerful charting tools that allow you to see everything from granular hourly energy spikes, to
-                    whole seasonal energy costs, simply with a mouse scroll (or a swipe)</li>
+                <li>
+                    How much your costs change with weather changes - change the forecast, and see how much your energy
+                    usage spikes (or drops)
+                </li>
+                <li>
+                    Powerful charting tools that allow you to see everything from granular hourly energy spikes, to
+                    whole seasonal energy costs, simply with a mouse scroll (or a swipe)
+                </li>
             </ul>
 
-            
+
             <ul class="ml-3">
                 @if (AppStatus.IsDemoMode)
                 {
                     <li>
-                        This is a <strong>Demo Version</strong> of the app. No setup functionality is available, instead, the app is pre-configured with example data. 
+                        This is a <strong>Demo Version</strong> of the app. No setup functionality is available, instead, the app is pre-configured with example data.
                         Instead, you can explore the app, and see the Analysis it can provide, along with the typical setup data required.
                         The live version, with full functionality, is available at <MudLink Href="https://explainmyenergy.net">explainmyenergy.net</MudLink>
                     </li>
@@ -33,53 +43,68 @@
 
                     <li>To view a demo version, with setup pre-configured with example data, go to <MudLink Href="https://demo.explainmyenergy.net">demo.explainmyenergy.net</MudLink></li>
                 }
-                <li>The app doesn't sell energy; doesn't sell your data; it doesn't collect your
-                data. There is no sign up, no login, no cookies, no tracking, no ads.</li>
-            <li>The app uses Blazor WebAssembly process everything on your device.</li>
+                <li>
+                    The app doesn't sell energy; doesn't sell your data; it doesn't collect your
+                    data. There is no sign up, no login, no cookies, no tracking, no ads.
+                </li>
+                <li>The app uses Blazor WebAssembly process everything on your device.</li>
 
-                
+
             </ul>
 
             <p>
-                <strong>This is a hobby project, and a beta version of the application.</strong> Feedback is much appreciated and
-                will help determine whether the app provides enough value to warrant maintaining and developing further. Please feel free to email me at <MudLink Href="mailto:explainmyenergy@solores-software.net">explainmyenergy@solores-software.net</MudLink> with any
-                problems, comments or suggestions.
+                <strong>This is a hobby project, and a beta version of the application.</strong> 
+                Feedback is appreciated. Feel free to email me at <MudLink Href="mailto:explainmyenergy@solores-software.net">explainmyenergy@solores-software.net</MudLink> 
+                or raise an issue in the <MudLink Href="https://github.com/zola-25/Explain-My-Energy">GitHub Repo</MudLink>
             </p>
 
-            <p><strong>Explain My Energy's</strong> Terms &amp; Conditions can be viewed here: <MudLink aria-haspopup="dialog"
-                    OnClick="ShowTermsDialog">Terms &amp; Conditions</MudLink>
+            <p>
+                <strong>Explain My Energy's</strong> Terms &amp; Conditions can be viewed here: <MudLink aria-haspopup="dialog"
+                                                                                                         OnClick="ShowTermsDialog">Terms &amp; Conditions</MudLink>
             </p>
             <ul class="ml-3">
-            <li>By using this application, you acknowledge that you agree to these terms. The Privacy Policy is also available here: <MudLink OnClick="ShowPrivacyDialog" aria-haspopup="dialog">Privacy Policy</MudLink></li>
+                <li>By using this application, you acknowledge that you agree to these terms. The Privacy Policy is also available here: <MudLink OnClick="ShowPrivacyDialog" aria-haspopup="dialog">Privacy Policy</MudLink></li>
             </ul>
 
-        <MudDialog  @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
+            <MudDialog @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
 
-            <DialogContent>
-                <TermsAndConditionsContents />
-            </DialogContent>
-            <DialogActions>
-                <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default" OnClick="CloseTermsDialog">
-                    Close</MudButton>
-            </DialogActions>
-        </MudDialog>
+                <DialogContent>
+                    <TermsAndConditionsContents />
+                </DialogContent>
+                <DialogActions>
+                    <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default" OnClick="CloseTermsDialog">
+                        Close
+                    </MudButton>
+                </DialogActions>
+            </MudDialog>
 
-        <MudDialog @bind-IsVisible="PrivacyDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
+            <MudDialog @bind-IsVisible="PrivacyDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
 
-            <DialogContent>
-                <PrivacyPolicyContents />
-            </DialogContent>
-            <DialogActions>
-                <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default"
-                    OnClick="ClosePrivacyDialog">Close</MudButton>
-            </DialogActions>
-        </MudDialog>
+                <DialogContent>
+                    <PrivacyPolicyContents />
+                </DialogContent>
+                <DialogActions>
+                    <MudButton Variant="Variant.Filled" Size="Size.Large" Color="Color.Default"
+                               OnClick="ClosePrivacyDialog">Close</MudButton>
+                </DialogActions>
+            </MudDialog>
 
-        <p><strong>Getting Started</strong></p>
-        <ul class="ml-3">
-            <li>There is a Setup Wizard that provides a simple step-by-step process to configuring the application.</li> 
-            <li>Otherwise feel free to explore the application and set up your home and meters manually.</li>
-        </ul>
+            <p><strong>Getting Started</strong></p>
+
+            @if (AppStatus.IsDemoMode)
+            {
+                <ul class="ml-3">
+                    <li>Feel free to explore the application - from the Side Menu you can access the analysis and experiment with the options, and the Setup page will show the an example of the data needed to configure the live application</li>
+                </ul>
+
+            }
+            else
+            {
+                <ul class="ml-3">
+                    <li>There is a Setup Wizard that provides a simple step-by-step process to configuring the application.</li>
+                    <li>Otherwise feel free to explore the application and set up your home and meters manually.</li>
+                </ul>
+            }
         </div>
 
     </MudText>

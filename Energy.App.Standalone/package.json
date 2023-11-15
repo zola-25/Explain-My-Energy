@@ -6,7 +6,6 @@
     "build": "node src/build.js",
     "buildDev": "node src/build.js --development",
     "buildDevDemo": "node src/build.js --development --demoonly",
-
     "buildProd": "node src/build.js --production",
     "buildProdDemo": "node src/build.js --production --demoonly",
     "buildCreditsDoc": "node src/attributionAndLicensing/GenerateCreditsDoc.js",
@@ -72,6 +71,7 @@
   },
   "dependencies": {
     "@amcharts/amcharts5": "^5.4.2",
+    "localstorage-ext": "^1.0.3",
     "lodash": "^4.17.21"
   }
 }

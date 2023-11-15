@@ -43,7 +43,6 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
                                     on pred.DayOfYear equals hist.UtcTime.DayOfYear
                                select new BasicReading
                                {
-                                   Forecast = true,
                                    KWh = hist.KWh,
                                    UtcTime = pred
                                }).ToList();
@@ -83,7 +82,6 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
             {
                 KWh = (decimal)movingAverage,
                 UtcTime = historicalReading.UtcTime,
-                Forecast = true
             };
             movingStats.Push((double)historicalReading.KWh);
         }

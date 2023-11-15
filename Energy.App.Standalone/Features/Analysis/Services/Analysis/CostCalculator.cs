@@ -69,7 +69,7 @@ public class CostCalculator : ICostCalculator
                                                                 equals halfHourlyPrice.HourOfDay
                                                             select new CostedReading()
                                                             {
-                                                                TarrifAppliesFrom = currentTariff.DateAppliesFrom.Value,
+                                                                TariffAppliesFrom = currentTariff.DateAppliesFrom.Value,
                                                                 TariffDailyStandingCharge = currentTariff.DailyStandingChargePence,
                                                                 TariffHalfHourlyStandingCharge = halfHourlyStandingChargePence,
                                                                 TariffPencePerKWh = halfHourlyPrice.PencePerKWh,
@@ -77,7 +77,6 @@ public class CostCalculator : ICostCalculator
                                                                 UtcTime = basicReading.UtcTime,
                                                                 KWh = basicReading.KWh,
                                                                 CostPounds = (basicReading.KWh * halfHourlyPrice.PencePerKWh + halfHourlyStandingChargePence) / 100,
-                                                                IsForecast = basicReading.Forecast
                                                             };
             costedReadings.AddRange(calculatedReadings);
         }

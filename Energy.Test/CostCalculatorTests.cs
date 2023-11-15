@@ -97,7 +97,7 @@ public class CostCalculatorTests
 
         Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
         {
-            var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TarrifAppliesFrom);
+            var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TariffAppliesFrom);
             Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingCharge);
 
             if (applicableTariff.IsHourOfDayFixed)
@@ -117,8 +117,6 @@ public class CostCalculatorTests
                 decimal expectedCost = ((costReading.KWh * halfHourlyPrice.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48)) / 100;
                 Assert.Equal(expectedCost, costReading.CostPounds);
             }
-
-            Assert.False(costReading.IsForecast);
 
         });
 
@@ -200,7 +198,7 @@ public class CostCalculatorTests
 
         Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
         {
-            var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TarrifAppliesFrom);
+            var applicableTariff = tariffs.First(c => c.DateAppliesFrom == costReading.TariffAppliesFrom);
 
             Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingCharge);
 
@@ -208,9 +206,6 @@ public class CostCalculatorTests
 
             decimal expectedCost = ((costReading.KWh * applicableTariff.PencePerKWh) + (applicableTariff.DailyStandingChargePence / 48)) / 100;
             Assert.Equal(expectedCost, costReading.CostPounds);
-
-
-            Assert.False(costReading.IsForecast);
 
         });
 
@@ -249,14 +244,12 @@ public class CostCalculatorTests
 
         Assert.All<CostedReading>(calculatedCostedReadings, (costReading) =>
         {
-            Assert.Equal(applicableTariff.DateAppliesFrom, costReading.TarrifAppliesFrom);
+            Assert.Equal(applicableTariff.DateAppliesFrom, costReading.TariffAppliesFrom);
             Assert.Equal(applicableTariff.DailyStandingChargePence, costReading.TariffDailyStandingCharge);
 
             Assert.True(costReading.TariffPencePerKWh == applicableTariff.PencePerKWh);
 
             Assert.Equal(totalKWhForPeriod / (periodDays * 48), costReading.KWh);
-
-            Assert.False(costReading.IsForecast);
 
         });
 

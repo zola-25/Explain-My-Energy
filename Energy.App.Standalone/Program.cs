@@ -66,10 +66,10 @@ builder.Services.AddTransient<IWeatherDataService, WeatherDataService>();
 
 builder.Services.AddMudServices(config => {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
-    config.SnackbarConfiguration.PreventDuplicates = false;
-    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.PreventDuplicates = true;
+    config.SnackbarConfiguration.NewestOnTop = true;
     config.SnackbarConfiguration.ShowCloseIcon = true;
-    config.SnackbarConfiguration.MaxDisplayedSnackbars = 7;
+    config.SnackbarConfiguration.MaxDisplayedSnackbars = 3;
     config.SnackbarConfiguration.VisibleStateDuration = 5000;
     config.SnackbarConfiguration.HideTransitionDuration = 500;
     config.SnackbarConfiguration.ShowTransitionDuration = 500;

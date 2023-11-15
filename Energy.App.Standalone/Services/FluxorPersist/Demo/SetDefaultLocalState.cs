@@ -35,7 +35,7 @@ public class SetDefaultLocalState : ISetDefaultLocalState
 
 
 
-    public async Task LoadDefaultsIfDemo()
+    public async Task LoadDefaultsIfDemo()  
     {
         if (!IsDemoMode)
         {

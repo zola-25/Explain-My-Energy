@@ -42,15 +42,15 @@
                 </MudText>
             </MudTd>
         }
-        else if (WeatherState.Value.WeatherReadings.Any())
+        else if (WeatherState.Value.WReadings.Any())
         {
-            <MudTd DataLabel="Historical">From @WeatherState.Value.WeatherReadings.First().UtcTime.eToString("dnn MMM yyyy", true)</MudTd>
+            <MudTd DataLabel="Historical">From @WeatherState.Value.WReadings.First().Utc.eToString("dnn MMM yyyy", true)</MudTd>
             <MudTd DataLabel="Latest">
                 @{
-                    var latestReading = WeatherState.Value.WeatherReadings.Where(c => c.IsRecentForecast).
-                    OrderBy(c => c.UtcTime).
+                    var latestReading = WeatherState.Value.WReadings.Where(c => c.IsRecent).
+                    OrderBy(c => c.Utc).
                     Last().
-                    UtcTime;
+                    Utc;
                 }
 
                 @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
@@ -74,19 +74,19 @@
             </MudTd>
             <MudTd DataLabel="Short-term">
                 @{
-                    var forecastReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsNearForecast).
-                    OrderBy(c => c.UtcTime).
+                    var forecastReadings = WeatherState.Value.WReadings.Where(c => c.IsNear).
+                    OrderBy(c => c.Utc).
                     ToList();
                 }
-                @forecastReadings.First().UtcTime.eDateToDowShortMonthYY() - @forecastReadings.Last().UtcTime.eDateToDowShortMonthYY()
+                @forecastReadings.First().Utc.eDateToDowShortMonthYY() - @forecastReadings.Last().Utc.eDateToDowShortMonthYY()
             </MudTd>
             <MudTd DataLabel="Long-term">
                 @{
-                    var climateReadings = WeatherState.Value.WeatherReadings.Where(c => c.IsClimateForecast).
-                    OrderBy(c => c.UtcTime).
+                    var climateReadings = WeatherState.Value.WReadings.Where(c => c.IsClimate).
+                    OrderBy(c => c.Utc).
                     ToList();
                 }
-                @climateReadings.First().UtcTime.eToString("dnn MMM yy", true) - @climateReadings.Last().UtcTime.eToString("dnn MMM yy", true)
+                @climateReadings.First().Utc.eToString("dnn MMM yy", true) - @climateReadings.Last().Utc.eToString("dnn MMM yy", true)
 
             </MudTd>
             <MudTd DataLabel="View Weather Data">

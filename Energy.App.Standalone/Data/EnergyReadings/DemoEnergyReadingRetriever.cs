@@ -68,7 +68,6 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
                     return new BasicReading() {
                         UtcTime = missingReadingDateTime,
                         KWh = demoReadingKWh,
-                        Forecast = false
                     };
                 });
 

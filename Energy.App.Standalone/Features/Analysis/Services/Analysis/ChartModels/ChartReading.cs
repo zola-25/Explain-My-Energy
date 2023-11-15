@@ -10,5 +10,4 @@ public class ChartReading
     public decimal HalfHourlyStandingCharge { get; set; }
     public DateTime TariffAppliesFrom { get; set; }
     public string TariffType { get; set; }
-    public bool IsForecast { get; set; }
 }

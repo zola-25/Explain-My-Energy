@@ -15,9 +15,8 @@ public static class Mapping
             DailyStandingCharge = costedReading.TariffDailyStandingCharge,
             DateTicks = costedReading.UtcTime.eToUnixTicksNoOffset(),
             HalfHourlyStandingCharge = costedReading.TariffHalfHourlyStandingCharge,
-            TariffAppliesFrom = costedReading.TarrifAppliesFrom,
+            TariffAppliesFrom = costedReading.TariffAppliesFrom,
             TariffType = costedReading.IsFixedCostPerHour ? "Fixed Rate" : "Variable Rate",
-            IsForecast = costedReading.IsForecast
         };
     }
 

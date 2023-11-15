@@ -9,7 +9,6 @@ export interface ChartReading {
     halfHourlyStandingCharge: number;
     tariffAppliesFrom: Date;
     tariffType: string;
-    isForecast: boolean;
 }
 
 export interface ChartDailyForecastReading {

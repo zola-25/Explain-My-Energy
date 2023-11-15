@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 
 public record DailyCostedReading
@@ -7,8 +9,12 @@ public record DailyCostedReading
 
     public decimal PencePerKWh { get; init; }
     public DateTime UtcTime { get; init; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public decimal KWh { get; init; }
+    
     public decimal ReadingTotalCostPounds { get; init; }
-    public bool Forecast { get; init; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsFixedCostPerHour { get; init; }
 }
