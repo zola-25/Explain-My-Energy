@@ -42,22 +42,22 @@ public record EnsureWeatherLoadedAction
     {
         return state with
         {
-            OutCodeCharacters = action.OutCodeCharacters,
+            OutCode = action.OutCode,
             LastUpdated = DateTime.UtcNow,
-            WeatherReadings = action.ReloadedWeatherReadings.ToImmutableList()
+            WReadings = action.ReloadedWeatherReadings.ToImmutableList()
         };
     }
 
     [ReducerMethod]
     public static WeatherState StoreWeatherUpdatedReadingsActionReducer(WeatherState state, StoreWeatherUpdatedReadingsAction action)
     {
-        var firstUpdateDate = action.UpdatedWeatherReadings.First().UtcTime;
+        var firstUpdateDate = action.UpdatedWeatherReadings.First().Utc;
 
         return state with
         {
             LastUpdated = DateTime.UtcNow,
-            WeatherReadings = state.WeatherReadings
-                .RemoveAll(c => c.UtcTime >= firstUpdateDate)
+            WReadings = state.WReadings
+                .RemoveAll(c => c.Utc >= firstUpdateDate)
                 .AddRange(action.UpdatedWeatherReadings)
         };
     }
@@ -91,7 +91,7 @@ public record EnsureWeatherLoadedAction
             string outCode = _householdState.Value.OutCodeCharacters;
 
 
-            if (_weatherState.Value.WeatherReadings.eIsNullOrEmpty() || action.ForceReload)
+            if (_weatherState.Value.WReadings.eIsNullOrEmpty() || action.ForceReload)
             {
 
                 var results = await _weatherDataService.GetForOutCode(outCode);
@@ -106,10 +106,10 @@ public record EnsureWeatherLoadedAction
             else
             {
 
-                var latestReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsRecentForecast)?.
-                    UtcTime;
-                var latestHistoricalReading = _weatherState.Value.WeatherReadings.FindLast(c => c.IsHistorical)?.
-                    UtcTime;
+                var latestReading = _weatherState.Value.WReadings.FindLast(c => c.IsRecent)?.
+                    Utc;
+                var latestHistoricalReading = _weatherState.Value.WReadings.FindLast(c => c.IsHist)?.
+                    Utc;
 
                 if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
                 {
@@ -124,7 +124,7 @@ public record EnsureWeatherLoadedAction
                         return;
                     }
 
-                    dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results));
+                    dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results, outCode));
 
                     var message = $"Updated {results.Count} new days of weather data for {outCode}";
                     dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));

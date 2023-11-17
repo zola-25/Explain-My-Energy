@@ -4,12 +4,12 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store;
 
 public class StoreWeatherReloadedReadingsAction
 {
-    public string OutCodeCharacters { get; }
     public List<DailyWeatherRecord> ReloadedWeatherReadings { get; }
+    public string OutCode { get; }
 
-    public StoreWeatherReloadedReadingsAction(List<DailyWeatherRecord> reloadedWeatherReadings, string outCodeCharacters)
+    public StoreWeatherReloadedReadingsAction(List<DailyWeatherRecord> reloadedWeatherReadings, string outCode)
     {
         ReloadedWeatherReadings = reloadedWeatherReadings;
-        OutCodeCharacters = outCodeCharacters;
+        OutCode = outCode;
     }
 }

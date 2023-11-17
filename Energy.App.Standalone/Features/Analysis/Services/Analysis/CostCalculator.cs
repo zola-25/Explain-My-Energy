@@ -19,7 +19,7 @@ public class CostCalculator : ICostCalculator
             return new List<CostedReading>();
         }
 
-        var firstReadingTime = basicReadings.First().UtcTime;
+        var firstReadingTime = basicReadings.First().Utc;
         if (firstReadingTime < allTariffsOrderedArray[0].DateAppliesFrom)
         {
             string message = $"All tariffs apply after first reading date {firstReadingTime:D}";
@@ -37,14 +37,14 @@ public class CostCalculator : ICostCalculator
             {
 
                 tariffReadings = basicReadings.Where(
-                   c => c.UtcTime >= currentTariff.DateAppliesFrom).ToList();
+                   c => c.Utc >= currentTariff.DateAppliesFrom).ToList();
 
             }
             else
             {
                 var nextTariff = allTariffsOrderedArray[i + 1];
                 tariffReadings = basicReadings.Where(
-                   c => c.UtcTime >= currentTariff.DateAppliesFrom && c.UtcTime < nextTariff.DateAppliesFrom).ToList();
+                   c => c.Utc >= currentTariff.DateAppliesFrom && c.Utc < nextTariff.DateAppliesFrom).ToList();
 
             }
 
@@ -65,19 +65,18 @@ public class CostCalculator : ICostCalculator
             decimal halfHourlyStandingChargePence = currentTariff.DailyStandingChargePence / 48m;
 
             IEnumerable<CostedReading> calculatedReadings = from basicReading in tariffReadings
-                                                            join halfHourlyPrice in halfHourOfDayPrices on basicReading.UtcTime.TimeOfDay
+                                                            join halfHourlyPrice in halfHourOfDayPrices on basicReading.Utc.TimeOfDay
                                                                 equals halfHourlyPrice.HourOfDay
                                                             select new CostedReading()
                                                             {
-                                                                TarrifAppliesFrom = currentTariff.DateAppliesFrom.Value,
+                                                                TariffAppliesFrom = currentTariff.DateAppliesFrom.Value,
                                                                 TariffDailyStandingCharge = currentTariff.DailyStandingChargePence,
                                                                 TariffHalfHourlyStandingCharge = halfHourlyStandingChargePence,
                                                                 TariffPencePerKWh = halfHourlyPrice.PencePerKWh,
                                                                 IsFixedCostPerHour = currentTariff.IsHourOfDayFixed,
-                                                                UtcTime = basicReading.UtcTime,
+                                                                UtcTime = basicReading.Utc,
                                                                 KWh = basicReading.KWh,
                                                                 CostPounds = (basicReading.KWh * halfHourlyPrice.PencePerKWh + halfHourlyStandingChargePence) / 100,
-                                                                IsForecast = basicReading.Forecast
                                                             };
             costedReadings.AddRange(calculatedReadings);
         }

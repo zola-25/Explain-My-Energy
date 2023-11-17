@@ -48,7 +48,7 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
     {
         var costedReadings = (meterType == MeterType.Electricity
             ? _electricityReadingsState.Value.CostedReadings : _gasReadingsState.Value.CostedReadings).ToList();
-        var weatherReadings = _weatherState.Value.WeatherReadings.Where(c => c.UtcTime >= start && c.UtcTime <= end)
+        var weatherReadings = _weatherState.Value.WReadings.Where(c => c.Utc >= start && c.Utc <= end)
             .ToList();
 
         var historicalCosts = costedReadings.FindAll(c => c.UtcTime >= start && c.UtcTime < end.AddDays(1));
@@ -78,9 +78,9 @@ public class HistoricalConsumptionSummarizer : IHistoricalConsumptionSummarizer
                 PeriodCostPounds = totalCostRounded,
                 TemperatureRange = weatherReadings.Any() ? new TemperatureRange()
                 {
-                    LowDailyTemp = weatherReadings.Min(c => c.TemperatureAverage).Round(0).ToInt(),
-                    HighDailyTemp = weatherReadings.Max(c => c.TemperatureAverage).Round(0).ToInt(),
-                    AverageTemp = weatherReadings.Average(c => c.TemperatureAverage).Round(0).ToInt()
+                    LowDailyTemp = weatherReadings.Min(c => c.TempAvg).Round(0).ToInt(),
+                    HighDailyTemp = weatherReadings.Max(c => c.TempAvg).Round(0).ToInt(),
+                    AverageTemp = weatherReadings.Average(c => c.TempAvg).Round(0).ToInt()
                 } : new TemperatureRange()
             };
         }

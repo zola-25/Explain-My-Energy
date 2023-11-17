@@ -6,8 +6,11 @@ public class StoreWeatherUpdatedReadingsAction
 {
     public List<DailyWeatherRecord> UpdatedWeatherReadings { get; }
 
-    public StoreWeatherUpdatedReadingsAction(List<DailyWeatherRecord> updatedWeatherReadings)
+    public string OutCode { get; } = string.Empty;
+
+    public StoreWeatherUpdatedReadingsAction(List<DailyWeatherRecord> updatedWeatherReadings, string outCode)
     {
         UpdatedWeatherReadings = updatedWeatherReadings;
+        OutCode = outCode;
     }
 }

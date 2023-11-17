@@ -4,6 +4,7 @@ using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
+using Energy.App.Standalone.Features.Setup.TermsAndConditions;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
@@ -32,11 +33,24 @@ public partial class DataValidatorBase : FluxorComponent
 
     [Inject]
     IState<HouseholdState> HouseholdState { get; set; }
-
+    [Inject]
+    IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
+    
+    [Inject]
+    NavigationManager  NavigationManager { get; set; }
 
     protected override void Dispose(bool disposing)
     {
+        
         base.Dispose(disposing);
+    }
+
+
+    bool isFirstPageLoad = true;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        isFirstPageLoad = true;
     }
 
     protected override async Task OnInitializedAsync()
@@ -48,43 +62,91 @@ public partial class DataValidatorBase : FluxorComponent
         await Task.Delay(1);
         StateHasChanged();
 
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-
-        SubscribeToAction<NotifyWeatherLoadingFinished>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+        
+        SubscribeToAction<EnsureWeatherLoadedAction>((action) => {
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add("Loading Weather Readings",  Severity.Info,
+                    options=> { options.HideIcon=true; },key: "Loading Weather Readings" );
+            }
         });
 
-        SubscribeToAction<NotifyGasLoadingFinished>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-
+        SubscribeToAction<NotifyWeatherLoadingFinished>((action) => {
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.RemoveByKey("Loading Weather Readings");
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning,
+                    options=> { options.HideIcon=true; } );
+            }
         });
 
-        SubscribeToAction<NotifyElectricityLoadingFinished>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        SubscribeToAction<EnsureGasReadingsLoadedAction>((action) => {
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add("Loading Gas Readings", Severity.Info,
+                    options=> { options.HideIcon=true; },key: "Loading Gas Readings" );
+            }
         });
 
-        SubscribeToAction<NotifyHeatingSetupFinishedAction>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
-
+        SubscribeToAction<NotifyGasLoadingFinished>((action) => {
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.RemoveByKey("Loading Gas Readings");
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning,
+                    options=> { options.HideIcon=true; });
+            }
         });
 
-        SubscribeToAction<NotifyHeatingForecastFinishedAction>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        SubscribeToAction<EnsureElectricityReadingsLoadedAction>((action) => {
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add("Loading Electricity Readings", Severity.Info,
+                    options=> { options.HideIcon=true; },key: "Loading Electricity Readings" );
+            }
         });
 
-        SubscribeToAction<NotifyElectricityForecastResult>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+        SubscribeToAction<NotifyElectricityLoadingFinished>((action) => {
+
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.RemoveByKey("Loading Electricity Readings");
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning,
+                    options => options.HideIcon = true);
+            }
         });
-        SubscribeToAction<NotifyGasForecastResult>((action) =>
-        {
-            Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning);
+
+        SubscribeToAction<NotifyHeatingSetupFinishedAction>((action) => {
+           
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
+            }
         });
+
+        SubscribeToAction<NotifyHeatingForecastFinishedAction>((action) => {
+            
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
+            }
+        });
+
+        SubscribeToAction<NotifyElectricityForecastResult>((action) => {
+            
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
+            }
+        });
+        SubscribeToAction<NotifyGasForecastResult>((action ) => {
+
+            if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
+            {
+                Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
+            }
+        });
+
 
         var weatherReadingCompletion = new TaskCompletionSource<(bool, string)>();
         Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
@@ -110,6 +172,7 @@ public partial class DataValidatorBase : FluxorComponent
         StateHasChanged();
         UpdateStatus = "Ready";
 
+        isFirstPageLoad = false;
         AppLoading = false;
     }
 }

@@ -12,12 +12,11 @@ public class CostedReadingsToDailyAggregator : ICostedReadingsToDailyAggregator
             {
                 UtcTime = c.Key,
                 ReadingTotalCostPounds = c.Sum(d => d.CostPounds),
-                TariffAppliesFrom = c.First().TarrifAppliesFrom,
+                TariffAppliesFrom = c.First().TariffAppliesFrom,
                 TariffDailyStandingChargePence = c.First().TariffDailyStandingCharge,
                 PencePerKWh = c.Average(d => d.TariffPencePerKWh),
                 IsFixedCostPerHour = c.First().IsFixedCostPerHour,
                 KWh = c.Sum(d => d.KWh),
-                Forecast = c.First().IsForecast
             }
             );
 

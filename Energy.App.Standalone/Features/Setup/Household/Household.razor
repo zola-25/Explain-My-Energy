@@ -45,6 +45,8 @@
                                       Placeholder="Postal Area"
                                       Culture="@System.Globalization.CultureInfo.InvariantCulture"
                                       Required
+                                      HelperText="Enter the first two characters and select from the dropdown"
+                                      HelperTextOnFocus="true"
                                       Disabled="@AppConfig.IsDemoMode"
                                       ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                       MinCharacters="2"

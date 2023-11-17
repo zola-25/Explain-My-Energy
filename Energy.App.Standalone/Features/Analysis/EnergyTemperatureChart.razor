@@ -119,14 +119,14 @@
             var firstReadingTicks = firstReading.UtcTime.eToUnixTicksNoOffset();
             var latestReadingTicks = chartReadings.Last().DateTicks;
 
-            var temperatureIconPoints = WeatherState.Value.WeatherReadings
-                .Where(c => c.UtcTime.eToUnixTicksNoOffset() >= firstReadingTicks
-                        && c.UtcTime.eToUnixTicksNoOffset() <= latestReadingTicks)
+            var temperatureIconPoints = WeatherState.Value.WReadings
+                .Where(c => c.Utc.eToUnixTicksNoOffset() >= firstReadingTicks
+                        && c.Utc.eToUnixTicksNoOffset() <= latestReadingTicks)
                 .Select(c => new TemperaturePoint()
                     {
-                        DateTicks = c.UtcTime.eToUnixTicksNoOffset(),
-                        TemperatureCelsius = c.TemperatureAverage,
-                        TemperatureCelsiusUnmodified = c.TemperatureAverage,
+                        DateTicks = c.Utc.eToUnixTicksNoOffset(),
+                        TemperatureCelsius = c.TempAvg,
+                        TemperatureCelsiusUnmodified = c.TempAvg,
                         Summary = c.Summary ?? string.Empty,
 
                     }).ToList();

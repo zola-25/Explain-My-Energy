@@ -60,13 +60,13 @@ public class EnergyReadingRetriever : IEnergyReadingRetriever
             var utcTime = DateTime.ParseExact(energyReading.Timestamp,
                 "yyyy-MM-dd HH:mm",
                 DateTimeFormatInfo.InvariantInfo,
-                DateTimeStyles.AssumeUniversal);
+                DateTimeStyles.AssumeUniversal).ToUniversalTime();
 
 
             yield return new BasicReading()
             {
                 KWh = consumptionKWh,
-                UtcTime = utcTime,
+                Utc = utcTime,
             };
         }
     }

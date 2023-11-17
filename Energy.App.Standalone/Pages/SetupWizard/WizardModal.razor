@@ -3,16 +3,9 @@
 @using Energy.App.Standalone.Features.Setup.TermsAndConditions
 
 
-@* <MudOverlay @bind-Visible="_opened" AutoClose="false" Absolute="false"
-            DarkBackground="true"
-            ZIndex="1150"
-            LockScroll="false"
-            Class="overflow-scroll"
-            LockScrollClass="@String.Empty" />
- *@
 
 <MudDialog @bind-IsVisible="_opened" DisableSidePadding="true" DefaultFocus="DefaultFocus.LastChild" 
-Options="@(new DialogOptions() {  MaxWidth=MaxWidth.Large, CloseButton = false,NoHeader=true, CloseOnEscapeKey=true, DisableBackdropClick=true,  Position=DialogPosition.TopCenter })">
+Options="@(new DialogOptions() {  MaxWidth=MaxWidth.Medium, CloseButton = false,NoHeader=true, CloseOnEscapeKey=true, DisableBackdropClick=true,  Position=DialogPosition.TopCenter })">
 
     <DialogContent>
         @switch (CurrentStage)
@@ -75,10 +68,13 @@ Options="@(new DialogOptions() {  MaxWidth=MaxWidth.Large, CloseButton = false,N
 @code {
 
 
+    [Inject] AppStatus AppStatus { get; set; }
     [Inject] ILogger<WizardModal> Logger { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
 
     [Inject] IState<TermsAndConditionsState> TermsAndConditions { get; set; }
+
+    [Parameter] public SetupStage? OpenAt { get; set; }
 
     [Parameter] public bool Open { get; set; }
     [Parameter]
@@ -150,7 +146,14 @@ Options="@(new DialogOptions() {  MaxWidth=MaxWidth.Large, CloseButton = false,N
 
         AllStages = Extensions.eEnumValues<SetupStage>().ToArray();
 
-        CurrentStage = TermsAndConditions.Value.WelcomeScreenSeenAndDismissed ? AllStages[1] : AllStages[0];
+        if (OpenAt is not null)
+        {
+            CurrentStage = OpenAt.Value;
+        }
+        else
+        {
+            CurrentStage = TermsAndConditions.Value.WelcomeScreenSeenAndDismissed ? AllStages[1] : AllStages[0];
+        }
         SetBreadcrumbs();
 
     }

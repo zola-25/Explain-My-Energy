@@ -123,14 +123,14 @@ public class EnsureHeatingSetupAction
                     _ => throw new NotImplementedException()
                 };
 
-                var latestReadingDate = basicReadings.Last().UtcTime;
+                var latestReadingDate = basicReadings.Last().Utc;
 
-                var weatherReadings = _weatherState.Value.WeatherReadings;
+                var weatherReadings = _weatherState.Value.WReadings;
                 var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(DateTime.UtcNow);
                 int forgiveMissingDays = 10;
 
                 if (weatherReadings.eIsNullOrEmpty()
-                    || weatherReadings.Count(c => c.UtcTime <= DateTime.UtcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < numLowTempDays - forgiveMissingDays)
+                    || weatherReadings.Count(c => c.Utc <= DateTime.UtcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.Utc.Month)) < numLowTempDays - forgiveMissingDays)
                 {
                     string noSeasonalWeatherMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season historical weather readings";
@@ -152,7 +152,7 @@ public class EnsureHeatingSetupAction
                     return;
                 }
 
-                if (basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
+                if (basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.Utc.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
                 {
                     string noSeasonalEnergyReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season {heatingMeterType} readings";
@@ -205,7 +205,7 @@ public class EnsureHeatingSetupAction
                 string heatingForecastSetupMessage = reloadedCoefficients ? $"Heating Forecast Setup: new Temperature-Consumption relationship analysed"
                         : $"Heating Forecast Setup: Using cached Temperature-Consumption relationship";
 
-                string finalResultMessage = $"{heatingForecastSetupMessage}{Environment.NewLine}{loadingResultMessage}";
+                string finalResultMessage = $"{heatingForecastSetupMessage}";
 
                 dispatcher.Dispatch(new NotifyHeatingSetupFinishedAction(loadingSuccess, finalResultMessage));
 

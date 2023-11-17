@@ -86,9 +86,9 @@ public class LoadHeatingForecastAction
 
                 var latestReadingDate = heatingForecastState.LatestReadingDate;
 
-                var recentWeatherReadings = _weatherState.Value.WeatherReadings
-                    .Where(c => c.UtcTime >= AppWideForecastProperties.PredictionStartDate(latestReadingDate)
-                            && c.UtcTime <= AppWideForecastProperties.PredictionEndDate(latestReadingDate))
+                var recentWeatherReadings = _weatherState.Value.WReadings
+                    .Where(c => c.Utc >= AppWideForecastProperties.PredictionStartDate(latestReadingDate)
+                            && c.Utc <= AppWideForecastProperties.PredictionEndDate(latestReadingDate))
                     .ToList();
 
                 var coefficients = new Coefficients { C = heatingForecastState.C, Gradient = heatingForecastState.Gradient };
@@ -107,10 +107,10 @@ public class LoadHeatingForecastAction
                     (
                         c => new TemperaturePoint()
                         {
-                            UtcTime = c.UtcTime,
-                            DateTicks = c.UtcTime.eToUnixTicksNoOffset(),
-                            TemperatureCelsius = c.TemperatureAverage + degreeDifference,
-                            TemperatureCelsiusUnmodified = c.TemperatureAverage,
+                            UtcTime = c.Utc,
+                            DateTicks = c.Utc.eToUnixTicksNoOffset(),
+                            TemperatureCelsius = c.TempAvg + degreeDifference,
+                            TemperatureCelsiusUnmodified = c.TempAvg,
                             Summary = c.Summary ?? string.Empty
                         }
                     ).ToImmutableList();

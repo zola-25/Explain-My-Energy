@@ -1,20 +1,24 @@
-﻿namespace Energy.App.Standalone.Features.Setup.Weather.Store;
+﻿using System.Text.Json.Serialization;
+
+namespace Energy.App.Standalone.Features.Setup.Weather.Store;
 
 public record DailyWeatherRecord
 {
-    public string OutCode { get; init; }
-
-    public DateTime UtcTime { get; init; }
+    public DateTime Utc { get; init; }
     public string Summary { get; init; }
 
-    public decimal TemperatureAverage { get; init; }
+    public decimal TempAvg { get; init; }
 
-    public bool IsClimateForecast { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsClimate { get; init; }
 
-    public bool IsNearForecast { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsNear { get; init; }
 
-    public bool IsHistorical { get; init; }
-    public bool IsRecentForecast { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsHist { get; init; }
 
-    public DateTime Updated { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsRecent { get; init; }
+
 }

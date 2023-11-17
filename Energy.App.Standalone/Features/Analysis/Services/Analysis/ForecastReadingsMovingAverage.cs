@@ -33,19 +33,18 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
             ImmutableList<TariffDetailState> meterTariffs)
     {
 
-        var predictionDates = AppWideForecastProperties.PredictionDates(historicalReadings.Last().UtcTime);
+        var predictionDates = AppWideForecastProperties.PredictionDates(historicalReadings.Last().Utc);
 
         var movingAverages = GetMovingAverageHistoricalReadings(historicalReadings);
 
         var forecastReadings = (
                                from pred in predictionDates
                                join hist in movingAverages
-                                    on pred.DayOfYear equals hist.UtcTime.DayOfYear
+                                    on pred.DayOfYear equals hist.Utc.DayOfYear
                                select new BasicReading
                                {
-                                   Forecast = true,
                                    KWh = hist.KWh,
-                                   UtcTime = pred
+                                   Utc = pred
                                }).ToList();
 
 
@@ -57,7 +56,7 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
 
     private IEnumerable<BasicReading> GetMovingAverageHistoricalReadings(ImmutableList<BasicReading> historicalReadings)
     {
-        var latestReadingDate = historicalReadings.Last().UtcTime;
+        var latestReadingDate = historicalReadings.Last().Utc;
 
         var dayWindowSize = AppWideForecastProperties.MovingAverageWindowSizeDays;
         var hhWindowSize = AppWideForecastProperties.MovingAverageWindowSizeHalfHours;
@@ -66,8 +65,8 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
         var maxMovingAverageDate = latestReadingDate.AddTicks(TimeSpan.TicksPerDay * (-dayWindowSize)).Date;
 
         var movingAverageInputReadings = historicalReadings
-            .SkipWhile(c => c.UtcTime < minMovingAverageDate)
-            .Where(x => x.UtcTime < maxMovingAverageDate)
+            .SkipWhile(c => c.Utc < minMovingAverageDate)
+            .Where(x => x.Utc < maxMovingAverageDate)
             .ToArray();
 
         var firstWindowReadings = movingAverageInputReadings[..hhWindowSize].Select(c => (double)c.KWh);
@@ -82,8 +81,7 @@ public class ForecastReadingsMovingAverage : IForecastReadingsMovingAverage
             yield return new BasicReading
             {
                 KWh = (decimal)movingAverage,
-                UtcTime = historicalReading.UtcTime,
-                Forecast = true
+                Utc = historicalReading.Utc,
             };
             movingStats.Push((double)historicalReading.KWh);
         }

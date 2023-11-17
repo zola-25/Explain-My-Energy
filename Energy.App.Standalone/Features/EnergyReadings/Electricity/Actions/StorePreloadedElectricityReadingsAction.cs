@@ -18,7 +18,7 @@ public class StorePreloadedElectricityReadingsAction
     public static ElectricityReadingsState OnPreloadElectricityReadingsReducer(ElectricityReadingsState state, StorePreloadedElectricityReadingsAction action)
     {
         return state with { 
-            LastCheckedForNewReadings = action.DemoElectricityReadings.Last().UtcTime,
+            LastCheckedForNewReadings = action.DemoElectricityReadings.Last().Utc,
             Loading = false,
             BasicReadings = action.DemoElectricityReadings 
         };

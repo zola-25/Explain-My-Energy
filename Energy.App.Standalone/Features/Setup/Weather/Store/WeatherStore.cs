@@ -12,16 +12,16 @@ public record WeatherState
 {
     [property: JsonIgnore]
     public bool Loading { get; init; }
-    public ImmutableList<DailyWeatherRecord> WeatherReadings { get; init; }
+    public ImmutableList<DailyWeatherRecord> WReadings { get; init; }
 
-    public string OutCodeCharacters { get; init; }
+    public string OutCode { get; init; }
     public DateTime LastUpdated { get; init; }
 
     public WeatherState()
     {
-        OutCodeCharacters = String.Empty;
+        OutCode = String.Empty;
         Loading = false;
-        WeatherReadings = ImmutableList<DailyWeatherRecord>.Empty;
+        WReadings = ImmutableList<DailyWeatherRecord>.Empty;
         LastUpdated = DateTime.MinValue;
     }
 }

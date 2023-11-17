@@ -15,12 +15,11 @@ public class ForecastGenerator : IForecastGenerator
         var adjustedReadings = forecastWeatherReadings
             .SelectMany(c =>
             {
-                decimal adjustedKWh = coefficients.PredictConsumptionY(c.TemperatureAverage + degreeDifference);
+                decimal adjustedKWh = coefficients.PredictConsumptionY(c.TempAvg + degreeDifference);
                 adjustedKWh = adjustedKWh < 0 ? 0 : adjustedKWh;
                 return Enumerable.Range(0, 48).Select(i => new BasicReading
                 {
-                    Forecast = true,
-                    UtcTime = c.UtcTime.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
+                    Utc = c.Utc.AddTicks(TimeSpan.TicksPerMinute * 30 * i),
                     KWh = adjustedKWh / 48
                 });
             }).ToList();
