@@ -1,15 +1,16 @@
 import path from 'path'
 import { createRequire } from 'node:module';
+import dotenv from 'dotenv';
+
 const require = createRequire(import.meta.url);
 
 const packageJsonInfo = require('../package.json')
-
-
+dotenv.config({ path: path.resolve(process.cwd(), "src", '.env')});
 
 const { license, description, version, config } = packageJsonInfo
 const { fullApplicationName, licenseFilePath } = config
 
-
+const instrumentationKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 
 export default function (appEnv, appDemo) {
 
@@ -18,6 +19,7 @@ export default function (appEnv, appDemo) {
         description: description,
         ogType: 'website',
         ogHeadPrefix: 'og: http://ogp.me/ns#',
+        instrumentationKey: instrumentationKey,
     }
 
     let headerData;
