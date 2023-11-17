@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Api", "Energy.Api\Energy.Api.csproj", "{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,14 @@ Global
 		{7693E9B3-C3A7-4A16-A665-4316E566FFE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7693E9B3-C3A7-4A16-A665-4316E566FFE7}.Release|x64.ActiveCfg = Release|Any CPU
 		{7693E9B3-C3A7-4A16-A665-4316E566FFE7}.Release|x64.Build.0 = Release|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +97,7 @@ Global
 		{FC6B375C-B692-428E-892B-DF71584049F9} = {C265B938-A816-4407-A9D8-4A26FC60F816}
 		{9FCA55BC-50B0-445B-B8D1-0C7DAB05DB52} = {C265B938-A816-4407-A9D8-4A26FC60F816}
 		{7693E9B3-C3A7-4A16-A665-4316E566FFE7} = {6D421CD0-9BBF-4CF0-A8B4-F5E8B6A3FDFF}
+		{A7D5BCAB-9528-44F8-9E0A-D7E31ADBC678} = {CDEA7512-B914-4DBD-B915-1F45C5C8A69D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {26C2619D-A299-43C1-9215-933FF28AA611}
