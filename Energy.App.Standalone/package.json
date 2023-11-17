@@ -49,7 +49,7 @@
     "glob": "^10.3.4",
     "handlebars": "^4.7.8",
     "he": "^1.2.0",
-    "html-bundler-webpack-plugin": "^2.14.3",
+    "html-bundler-webpack-plugin": "^3.0.3",
     "isomorphic-dompurify": "^1.9.0",
     "license-checker-rseidelsohn": "^4.2.6",
     "marked": "^10.0.0",
