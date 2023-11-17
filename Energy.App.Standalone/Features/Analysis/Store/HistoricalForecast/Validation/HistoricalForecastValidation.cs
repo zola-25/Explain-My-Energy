@@ -52,8 +52,8 @@ public class HistoricalForecastValidation : IHistoricalForecastValidation
                 Message = $"No historical {meterType} readings"
             };
         }
-        var latestReadingDate = existingHistoricalReadings.Last().UtcTime;
-        var earliestReadingDate = existingHistoricalReadings.First().UtcTime;
+        var latestReadingDate = existingHistoricalReadings.Last().Utc;
+        var earliestReadingDate = existingHistoricalReadings.First().Utc;
 
         var numDays = (latestReadingDate - earliestReadingDate).TotalDays;
         if (numDays < 180)

@@ -18,7 +18,7 @@ public class StorePreloadedGasReadingsAction
     public static GasReadingsState OnPreloadGasReadingsReducer(GasReadingsState state, StorePreloadedGasReadingsAction action)
     {
         return state with { 
-            LastCheckedForNewReadings = action.DemoGasReadings.Last().UtcTime,
+            LastCheckedForNewReadings = action.DemoGasReadings.Last().Utc,
             Loading = false,
             BasicReadings = action.DemoGasReadings 
         };

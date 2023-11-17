@@ -86,7 +86,7 @@ public class CostCalculatorTests
 
         Assert.Equal(basicReadings.Count, calculatedCostedReadings.Count);
 
-        basicReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.UtcTime })
+        basicReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.Utc })
         .Should()
         .BeEquivalentTo(
             calculatedCostedReadings.Select(c => new SimpleReadingProperties { KWh = c.KWh, UtcTime = c.UtcTime }),
@@ -181,7 +181,7 @@ public class CostCalculatorTests
 
         var expectedReadingProperties = basicReadings.Select(c => new SimpleReadingProperties
         {
-            UtcTime = c.UtcTime,
+            UtcTime = c.Utc,
             KWh = c.KWh
         }).ToList();
 

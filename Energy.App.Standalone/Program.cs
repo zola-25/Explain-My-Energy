@@ -78,9 +78,8 @@ builder.Services.AddMudServices(config => {
 
 builder.Services.AddBlazoredLocalStorage(config => {
     config.JsonSerializerOptions.WriteIndented = false;
-}
-
-);
+    config.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+});
 builder.Services.AddScoped<IStringStateStorage, LocalStateStorage>();
 builder.Services.AddScoped<IStoreHandler, JsonStoreHandler>();
 

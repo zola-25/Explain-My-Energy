@@ -52,12 +52,12 @@
                 <MudButton OnClick="OnCheckAuthorizationClicked"
                            Variant="Variant.Filled" hidden="@AuthorizeSucceeded"><span class="fw-bolder">Check Authorization</span></MudButton>
             </div>
-            <div class="d-flex justify-end">
-                <MudLink Href="https://data.n3rgy.com/consumer-sign-up" Target="_blank" Underline="Underline.Hover" hidden="@AuthorizeSucceeded">Open Sign-up in a separate tab <i class="fa-solid fa-external-link" aria-hidden="true"></i></MudLink>
+
+            <div class="d-flex justify-end @(!AuthorizeSucceeded ? "invisible" : "visible")">
+                <MudLink Href="https://data.n3rgy.com/consumer-sign-up" Target="_blank" Underline="Underline.Hover">Open Sign-up in a separate tab <i class="fa-solid fa-external-link" aria-hidden="true"></i></MudLink>
             </div>
 
-
-            <div id="authorizationSuccess" class="d-flex justify-center mt-2" hidden="@(!AuthorizeSucceeded)">
+            <div id="authorizationSuccess" class="d-flex justify-center mt-2 @(!AuthorizeSucceeded ? "invisible" : "visible")">
 
                 <MudText Color="Color.Success" Typo="Typo.h5">Authorized</MudText>
 
@@ -67,7 +67,7 @@
                 }
             </div>
 
-            <div id="authorizationFailed" hidden="@(!AuthorizeFailed)">
+            <div id="authorizationFailed" class="@(!AuthorizeFailed ? "invisible" : "visible")">
                 <p class="text-warning">Authorization Failed</p>
                 <p>We could not access your smart meter data - have you completed the authorization process with n3rgy?</p>
                 <p>n3rgy responded with: @AuthorizeFailedMessage</p>

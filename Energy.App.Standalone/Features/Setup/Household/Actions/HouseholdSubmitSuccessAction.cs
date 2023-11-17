@@ -57,7 +57,7 @@ public class HouseholdSubmitSuccessAction
         {
             dispatcher.Dispatch(new NotifyHouseholdSavedSuccess());
 
-            bool outCodeCharactersChanged = action.OutCodeCharacters != _weatherState.Value.OC;
+            bool outCodeCharactersChanged = action.OutCodeCharacters != _weatherState.Value.OutCode;
 
             bool newHeatingMeterValid = _meterSetupState.Value[action.PrimaryHeatSource].SetupValid;
 

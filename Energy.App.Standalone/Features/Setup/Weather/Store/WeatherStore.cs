@@ -14,12 +14,12 @@ public record WeatherState
     public bool Loading { get; init; }
     public ImmutableList<DailyWeatherRecord> WReadings { get; init; }
 
-    public string OC { get; init; }
+    public string OutCode { get; init; }
     public DateTime LastUpdated { get; init; }
 
     public WeatherState()
     {
-        OC = String.Empty;
+        OutCode = String.Empty;
         Loading = false;
         WReadings = ImmutableList<DailyWeatherRecord>.Empty;
         LastUpdated = DateTime.MinValue;

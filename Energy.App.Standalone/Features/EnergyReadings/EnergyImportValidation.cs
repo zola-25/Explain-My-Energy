@@ -53,7 +53,7 @@ public class EnergyImportValidation : IEnergyImportValidation
             };
         }
 
-        var lastBasicReading = existingBasicReadings.Last().UtcTime;
+        var lastBasicReading = existingBasicReadings.Last().Utc;
         bool updateCosts = existingCostedReadings.eIsNullOrEmpty()
                            || existingCostedReadings.Last().UtcTime < lastBasicReading;
 

@@ -13,7 +13,6 @@ public static class Mapping
             IsHist = dailyWeatherReading.IsHistorical,
             IsNear = dailyWeatherReading.IsNearForecast,
             IsRecent = dailyWeatherReading.IsRecentForecast,
-            OC = dailyWeatherReading.OutCode,
             Summary = dailyWeatherReading.Summary,
             TempAvg = dailyWeatherReading.TemperatureAverage,
             Utc = dailyWeatherReading.UtcTime

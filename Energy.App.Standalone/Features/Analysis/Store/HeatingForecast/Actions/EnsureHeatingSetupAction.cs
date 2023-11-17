@@ -123,7 +123,7 @@ public class EnsureHeatingSetupAction
                     _ => throw new NotImplementedException()
                 };
 
-                var latestReadingDate = basicReadings.Last().UtcTime;
+                var latestReadingDate = basicReadings.Last().Utc;
 
                 var weatherReadings = _weatherState.Value.WReadings;
                 var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(DateTime.UtcNow);
@@ -152,7 +152,7 @@ public class EnsureHeatingSetupAction
                     return;
                 }
 
-                if (basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.UtcTime.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
+                if (basicReadings.Count(c => AppWideForecastProperties.LowTemperatureMonths.Contains(c.Utc.Month)) < (numLowTempDays - forgiveMissingDays) * 48)
                 {
                     string noSeasonalEnergyReadingsMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season {heatingMeterType} readings";

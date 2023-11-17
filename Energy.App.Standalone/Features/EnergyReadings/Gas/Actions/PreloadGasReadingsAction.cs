@@ -20,7 +20,7 @@ public class PreloadGasReadingsAction
         public override Task HandleAsync(PreloadGasReadingsAction action, IDispatcher dispatcher)
         {
             var gasReadings = action.DemoGasReadings.BasicReadings
-                .Where(c => c.UtcTime >= DateTime.UtcNow.AddYears(-1).AddDays(-30)).ToImmutableList();
+                .Where(c => c.Utc >= DateTime.UtcNow.AddYears(-1).AddDays(-30)).ToImmutableList();
     
             dispatcher.Dispatch(new StorePreloadedGasReadingsAction(gasReadings));
             return Task.CompletedTask;

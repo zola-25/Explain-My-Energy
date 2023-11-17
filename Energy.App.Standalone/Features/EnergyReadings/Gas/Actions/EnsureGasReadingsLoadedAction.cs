@@ -120,20 +120,20 @@ public class EnsureGasReadingsLoadedAction
                         message = validationResult.Message;
                         break;
                     case UpdateType.Update:
-                        var lastBasicReading = existingBasicReadings.Last().UtcTime;
+                        var lastBasicReading = existingBasicReadings.Last().Utc;
                         var newBasicReadings = await _energyReadingService.ImportFromDate(meterType, lastBasicReading.Date);
 
 
                         dispatcher.Dispatch(new GasUpdateLastReadingsCheckAction());
 
-                        bool anythingNew = newBasicReadings.Any() && newBasicReadings.Last().UtcTime > lastBasicReading;
+                        bool anythingNew = newBasicReadings.Any() && newBasicReadings.Last().Utc > lastBasicReading;
 
                         if (anythingNew)
                         {
                             var basicReadingsToUpdate = existingBasicReadings.ToList();
 
                             // just in case there is an overlap
-                            _ = basicReadingsToUpdate.RemoveAll(x => x.UtcTime >= newBasicReadings.First().UtcTime);
+                            _ = basicReadingsToUpdate.RemoveAll(x => x.Utc >= newBasicReadings.First().Utc);
                             basicReadingsToUpdate.AddRange(newBasicReadings);
 
                             var newCostedReadings = CalculateCostedReadings(basicReadingsToUpdate, meterSetup.TariffDetails);

@@ -184,7 +184,7 @@ public partial class AppSetupStatus
         if (readings.Count < 180 * 48)
         {
             return (false, $@"Ideally require at least 180 days of historical readings for historical forecasting.
-                                Currently first reading is {readings.First().UtcTime.eDateToDowShortMonthYY()}");
+                                Currently first reading is {readings.First().Utc.eDateToDowShortMonthYY()}");
         }
 
         if (HistoricalForecastState.Value[meterType].eIsNullOrEmpty())

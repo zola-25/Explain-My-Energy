@@ -7,18 +7,19 @@
 <MudGrid Justify="Justify.Center" Class="mb-15">
     <MudItem xs="12">
         <MudPaper Elevation="0" Class="p-2 mt-3 d-flex justify-end">
-            <WizardModal @bind-Open="OpenWizard">
+            <WizardModal @bind-Open="OpenWizard" OpenAt="OpenWizardAt">
             </WizardModal>
             <MudButton Class="ma-0 fw-bolder"
-                       Disabled="@AppStatus.IsDemoMode"
                        OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
                        Size="Size.Medium"
                        ButtonType="ButtonType.Button"
                        Variant="Variant.Filled"
                        Color="Color.Info"
-                       StartIcon="@Icons.Material.Filled.AutoFixHigh">Setup Wizard</MudButton>
-            <DocTooltipIcon OptionalRootClass="align-self-center" DocSnippetHeader="Setup Wizard" DocSnippetType="DocSnippetType.SetupWizard" IconTitle="Using the Setup Wizard" />
-
+                       StartIcon="@Icons.Material.Filled.AutoFixHigh">@( AppStatus.IsDemoMode ? "Welcome Screen" : "Setup Wizard")</MudButton>
+            @if (!AppStatus.IsDemoMode)
+            {
+                <DocTooltipIcon OptionalRootClass="align-self-center" DocSnippetHeader="Setup Wizard" DocSnippetType="DocSnippetType.SetupWizard" IconTitle="Using the Setup Wizard" />
+            }
 
         </MudPaper>
     </MudItem>
@@ -40,4 +41,14 @@
 </MudGrid>
 @code {
     bool OpenWizard = false;
+
+    SetupStage? OpenWizardAt = null;
+
+    protected override void OnInitialized()
+    {
+        if (AppStatus.IsDemoMode)
+        {
+            OpenWizardAt = SetupStage.WelcomeScreenSplash;
+        }
+    }
 }

@@ -16,7 +16,7 @@ public class ForecastCoefficientsCreator : IForecastCoefficientsCreator
 
         var dailyConsumptionPoints =
                 (from er in basicReadings
-                 group new { Readings = er } by er.UtcTime.Date
+                 group new { Readings = er } by er.Utc.Date
                     into daily
                  where daily.Count() == 48
                  join wr in dailyWeatherReadings on daily.Key equals wr.Utc

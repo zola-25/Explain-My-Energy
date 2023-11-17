@@ -50,7 +50,7 @@ public static class Data
             var readTime = start.AddTicks(TimeSpan.TicksPerMinute * 30 * i);
             var basicReading = new BasicReading
             {
-                UtcTime = readTime,
+                Utc = readTime,
                 KWh =
                 readTime.Hour % 6 == 0 ? 0.08m :
                 readTime.Hour % 2 == 0 ? 0.02m :
@@ -77,7 +77,7 @@ public static class Data
 
             return new BasicReading()
             {
-                UtcTime = utcTime,
+                Utc = utcTime,
                 KWh = kWhPerHalfHour
             };
         });

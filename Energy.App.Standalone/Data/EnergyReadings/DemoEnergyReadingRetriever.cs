@@ -39,16 +39,16 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
                 throw new NotImplementedException();
         }
 
-        var requestedDemoReadings = existingDemoReadings.Where(x => x.UtcTime >= startDate && x.UtcTime <= endDate).ToList();
+        var requestedDemoReadings = existingDemoReadings.Where(x => x.Utc >= startDate && x.Utc <= endDate).ToList();
 
         var demoReadingsLookup = GetDemoReadingsLookup(existingDemoReadings);
 
-        if (requestedDemoReadings.Last().UtcTime < endDate)
+        if (requestedDemoReadings.Last().Utc < endDate)
         {
             var random = new Random();
 
             // Get last year's data with slight variance for any future missing data
-            var readingDatesMissing = requestedDemoReadings.Last().UtcTime.eGenerateAllDatesBetween(endDate, true).ToList();
+            var readingDatesMissing = requestedDemoReadings.Last().Utc.eGenerateAllDatesBetween(endDate, true).ToList();
             var demoMissingBasicReadings = readingDatesMissing.SelectMany(x => {
 
                 return Enumerable.Range(0, 48).Select(i => {
@@ -60,13 +60,14 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
                     var lastYearsReading = demoReadingsLookup[missingReadingTimeSpan];
 
 
-                    decimal demoReadingKWh = 0;
-
-                    double randomFactor = 1 + (random.NextDouble() * 0.2 * (random.Next(2) == 1 ? 1 : -1));
-                    demoReadingKWh = lastYearsReading.KWh * (decimal)randomFactor; // just repeat historical zero KWh readings
+                    decimal demoReadingKWh = lastYearsReading.KWh;
+                    //if (lastYearsReading.KWh != 0) {
+                    //    double randomFactor = 1 + (random.NextDouble() * 0.2 * (random.Next(2) == 1 ? 1 : -1));
+                    //    demoReadingKWh = lastYearsReading.KWh * (decimal)randomFactor; // just repeat historical zero KWh readings
+                    //}
 
                     return new BasicReading() {
-                        UtcTime = missingReadingDateTime,
+                        Utc = missingReadingDateTime.ToUniversalTime(),
                         KWh = demoReadingKWh,
                     };
                 });
@@ -76,7 +77,7 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
             // ensure we don't include double entries for the same date/time
 
-            demoMissingBasicReadings.RemoveAll(c => c.UtcTime <= requestedDemoReadings.Last().UtcTime);
+            demoMissingBasicReadings.RemoveAll(c => c.Utc <= requestedDemoReadings.Last().Utc);
             requestedDemoReadings.AddRange(demoMissingBasicReadings);
         }
         return requestedDemoReadings;
@@ -84,12 +85,12 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
     private static Dictionary<TimeSpan, BasicReading> GetDemoReadingsLookup(IEnumerable<BasicReading> demoReadings)
     {
-        var beginningOfDemoDataYear = demoReadings.First().UtcTime;
+        var beginningOfDemoDataYear = demoReadings.First().Utc;
 
         var oneYearOfDemoReadings = demoReadings
-            .Where(c => c.UtcTime < beginningOfDemoDataYear.AddYears(1).AddTicks(-(TimeSpan.TicksPerMinute * 30)))
+            .Where(c => c.Utc < beginningOfDemoDataYear.AddYears(1).AddTicks(-(TimeSpan.TicksPerMinute * 30)))
             .ToList();
 
-        return oneYearOfDemoReadings.ToDictionary(c => c.UtcTime - beginningOfDemoDataYear);
+        return oneYearOfDemoReadings.ToDictionary(c => c.Utc - new DateTime(c.Utc.Year, 1, 1));
     }
 }

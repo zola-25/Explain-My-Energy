@@ -4,8 +4,6 @@ namespace Energy.App.Standalone.Features.Setup.Weather.Store;
 
 public record DailyWeatherRecord
 {
-    public string OC { get; init; }
-
     public DateTime Utc { get; init; }
     public string Summary { get; init; }
 

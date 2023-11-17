@@ -54,11 +54,16 @@ public class SetDefaultLocalState : ISetDefaultLocalState
 
         DemoMeterSetup = jsonDemoMeterSetup;
 
-        var jsonDemoGasReadings = await httpClient.GetFromJsonAsync<DemoGasReadings>("demo/gasReadings.json");
+        var jsonDemoGasReadings = await httpClient.GetFromJsonAsync<DemoGasReadings>("demo/gasReadingsDemoData.json", new System.Text.Json.JsonSerializerOptions {
+            Converters = { new UtcDateTimeJsonConverter() }
+        });
+
         DemoGasReadings = jsonDemoGasReadings;
         
 
-        var jsonDemoElecReadings = await httpClient.GetFromJsonAsync<DemoElectricityReadings>("demo/electricityReadings.json");
+        var jsonDemoElecReadings = await httpClient.GetFromJsonAsync<DemoElectricityReadings>("demo/electricityReadingsDemoData.json", new System.Text.Json.JsonSerializerOptions {
+            Converters = { new UtcDateTimeJsonConverter() }
+        });
 
         DemoElectricityReadings = jsonDemoElecReadings;
 

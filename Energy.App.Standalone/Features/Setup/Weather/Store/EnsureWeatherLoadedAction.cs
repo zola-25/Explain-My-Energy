@@ -42,7 +42,7 @@ public record EnsureWeatherLoadedAction
     {
         return state with
         {
-            OC = action.OutCode,
+            OutCode = action.OutCode,
             LastUpdated = DateTime.UtcNow,
             WReadings = action.ReloadedWeatherReadings.ToImmutableList()
         };
