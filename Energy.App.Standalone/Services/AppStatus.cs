@@ -1,17 +1,14 @@
 ﻿using Energy.App.Standalone.Extensions;
+using Energy.App.Standalone.Features.Setup.Household;
+using Energy.App.Standalone.Features.Setup.Meter.Store;
 
 namespace Energy.App.Standalone.Services;
 
 public class AppStatus
 {
-    public bool HadAutoRedirect { get; private set; }
     public bool IsDemoMode { get; init; }
     public string DocsUri { get; init; }
 
-    public void SetHadAutoRedirect()
-    {
-        HadAutoRedirect = true;
-    }
 
     public AppStatus(IConfiguration configuration)
     {

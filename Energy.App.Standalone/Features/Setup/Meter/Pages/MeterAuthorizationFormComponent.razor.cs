@@ -50,6 +50,12 @@ public partial class MeterAuthorizationFormComponent
         {
             await base.OnParametersSetAsync();
 
+            if(UserLockState.Value.LockingOrLocked)
+            {
+                ParametersSet = false;
+                return;
+            }
+
             if (FreshNavigation && _freshNavigation)
             {
                 if (AuthorizeFailed)

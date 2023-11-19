@@ -1,7 +1,6 @@
 @using Energy.App.Standalone.PageComponents
 @inherits FluxorComponent
-
-
+@inject IState<UserLockState> UserLockState
 @inject IDispatcher Dispatcher
 
 @if (ParametersSet)

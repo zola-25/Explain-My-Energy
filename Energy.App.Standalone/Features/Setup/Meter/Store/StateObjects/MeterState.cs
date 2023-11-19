@@ -20,4 +20,5 @@ public record MeterState
 
     public ImmutableList<TariffDetailState> TariffDetails { get; init; }
     public string AuthorizeFailedMessage { get; init; }
+    public bool MpxnLocked { get; internal set; }
 }

@@ -1,6 +1,7 @@
 ﻿@inherits FluxorComponent
 @inject IState<HouseholdState> HouseholdState
 @inject IDispatcher Dispatcher
+@inject IState<UserLockState> UserLockState
 @inject AppStatus AppConfig
 
 <MudOverlay @bind-Visible="Reloading" DarkBackground="true" ZIndex="9">
@@ -10,6 +11,10 @@
 
 </MudOverlay>
 
+
+@{
+    var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+}
 
 <div class="d-flex flex-wrap justify-space-between align-baseline">
     <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
@@ -52,16 +57,20 @@
             @if (context.Added)
             {
                 <div class="d-flex align-center">
-                    <MudButton Class="ma-1" Color="Color.Error" Disabled="@AppConfig.IsDemoMode" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
+                        <MudButton Class="ma-1" Color="Color.Error" Disabled="@(disableInputs)" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(async () => await RemoveMeterAsync(context.MeterType))">Remove</MudButton>
                     <DocTooltipIcon DocSnippetHeader="Remove Meter" DocSnippetType="DocSnippetType.ManualActionsRemoveMeter" IconTitle="Help for Updating or Removing Meters" />
                 </div>
             }
             else
             {
-                <MudButton aria-label="@($"Add {context.MeterType} Meter")" Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")" Disabled="@(!HouseholdState.Value.Saved || AppConfig.IsDemoMode)" Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">@($"Add {@context.MeterType}")</MudButton>
+                    <MudButton 
+                        aria-label="@($"Add {context.MeterType} Meter")" 
+                        Href="@(context.MeterType == MeterType.Electricity ? "/AddElectricityMeter" : "/AddGasMeter")"
+                               Disabled="@(!HouseholdState.Value.Saved || disableInputs)"
+                               Color="Color.Primary" ButtonType="ButtonType.Button" Variant="Variant.Filled" Size="Size.Small">@($"Add {@context.MeterType}")</MudButton>
             }
             </MudTd>
-        <MudTd DataLabel="MPxN">@context.Mpxn</MudTd>
+            <MudTd DataLabel="MPxN">@(UserLockState.Value.LockingOrLocked ? "Locked" : context.Mpxn)</MudTd>
         <MudTd DataLabel="Authorized">
             @if (context.Authorized)
             {
@@ -72,7 +81,7 @@
                 <MudTooltip ShowOnHover="true" Text="Authorize this meter with n3rgy">
                     <MudButton aria-label="@($"Authorize {context.MeterType} Meter")"
                                Href="@($"/MeterAuthorization/{context.MeterType}")"
-                               Color="Color.Default" Disabled="@(!context.Added || AppConfig.IsDemoMode)"
+                                   Color="Color.Default" Disabled="@(!context.Added || disableInputs)"
                                ButtonType="ButtonType.Button"
                                Variant="Variant.Filled"
                                Size="Size.Small">Authorize</MudButton>
@@ -110,10 +119,10 @@
                 <div class="d-flex align-center">
                     @if (context.LatestReadingsDate != null)
                     {
-                        <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || AppConfig.IsDemoMode" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                            <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || disableInputs" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
                                    Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
                     }
-                    <MudButton Class="ma-1" Disabled="@AppConfig.IsDemoMode"
+                        <MudButton Class="ma-1" Disabled="@disableInputs"
                                Color="Color.Error" ButtonType="ButtonType.Button" Variant="Variant.Outlined" Size="Size.Small" @onclick="@(() => DispatchReloadReadings(context.MeterType))">Reload All</MudButton>
                     <DocTooltipIcon DocSnippetHeader="Update or Reload" DocSnippetType="DocSnippetType.ManualActionsUpdateMeterData" IconTitle="Help for Updating or Reloading Readings" />
                 </div>
@@ -139,7 +148,7 @@
             <MudButton aria-label="@($"{context.MeterType} Meter Tariffs")" Href="@($"/Tariffs/{context.MeterType}")"
                        Target="_self"
                        Color="Color.Primary"
-                       Disabled="@(!context.Added || AppConfig.IsDemoMode)"
+                           Disabled="@(!context.Added || disableInputs)"
                        ButtonType="ButtonType.Button"
                        Variant="Variant.Filled"
                        Size="Size.Small">

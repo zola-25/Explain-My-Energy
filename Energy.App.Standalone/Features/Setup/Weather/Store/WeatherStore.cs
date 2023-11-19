@@ -16,10 +16,12 @@ public record WeatherState
 
     public string OutCode { get; init; }
     public DateTime LastUpdated { get; init; }
+    public bool OutCodeLocked { get; init; }
 
     public WeatherState()
     {
         OutCode = String.Empty;
+        OutCodeLocked = false;
         Loading = false;
         WReadings = ImmutableList<DailyWeatherRecord>.Empty;
         LastUpdated = DateTime.MinValue;

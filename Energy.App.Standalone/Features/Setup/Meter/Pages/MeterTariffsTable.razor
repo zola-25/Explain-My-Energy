@@ -1,6 +1,6 @@
 ﻿@inject IDispatcher Dispatcher
 @inject AppStatus AppConfig
-
+@inject IState<UserLockState> UserLockState
 @inherits FluxorComponent
 
 <MudTooltip ShowOnHover="true" Text="Return to Setup">
@@ -17,6 +17,10 @@
 </MudTooltip>
 
 
+@{
+    var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+}
+
 <div class="d-flex justify-center align-center flex-wrap">
     <MudText Class="d-flex fw-bolder" Align="Align.Center" Typo="Typo.h5">@MeterType Tariff History </MudText>
     <DocTooltipIcon DocSnippetHeader="Editing Tariffs" DocSnippetType="DocSnippetType.EditingTariffs" IconTitle="Help for Adding and Editing Tariffs" />
@@ -26,7 +30,7 @@
     <ToolBarContent>
         <MudSpacer />
         <MudIconButton OnClick="OnAddNewTariffClick"
-                       Disabled="@AppConfig.IsDemoMode"
+                       Disabled="disableInputs"
                        ButtonType="ButtonType.Button"
                        Color="Color.Primary"
                        Variant="Variant.Filled"
@@ -74,7 +78,7 @@
             <MudButton Variant="Variant.Filled"
                        Size="Size.Small"
                        Class="fw-bolder"
-                       Disabled="@AppConfig.IsDemoMode"
+                           Disabled="disableInputs"
                        OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
         </MudTd>
 
@@ -196,7 +200,7 @@
 
     private void SetTariffDetailRows()
     {
-        _tariffDetailRows = _tariffDetailState.Select((c, i) => new TariffDetailRow()
+        _tariffDetailRows = UserLockState.Value.LockingOrLocked ? new List<TariffDetailRow>() : _tariffDetailState.Select((c, i) => new TariffDetailRow()
             {
                 GlobalId = c.GlobalId,
                 IsHourOfDayFixed = c.IsHourOfDayFixed,

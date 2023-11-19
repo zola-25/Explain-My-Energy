@@ -1,30 +1,50 @@
 ﻿@page "/Setup"
 @using Blazored.LocalStorage;
 @inject AppStatus AppConfig
+@inject IState<UserLockState> UserLockState
 @inherits FluxorComponent
 
 
 <ExtendedPageTitle>App Setup</ExtendedPageTitle>
 
-
+@{
+    var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;    
+}
 
 <MudGrid Justify="Justify.Center" Class="mb-15">
     <MudItem xs="12">
 
-        <div class="d-flex justify-end align-baseline mt-2">
-            <MudButton Class="ma-0"
-                       ButtonType="ButtonType.Button"
-                       Disabled="@AppConfig.IsDemoMode"
-                       Size="Size.Small"
-                       Variant="Variant.Filled"
-                       OnClick="WipeAllAsync"
-                       Color="Color.Error"
-                       EndIcon="@Icons.Material.Filled.DeleteForever"
-                       title="Wipe all data?">
-                Wipe All Data
-            </MudButton>
-            <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
+        <div class="d-flex justify-space-between align-baseline mt-2">
+            <div class="d-flex flex-wrap justify-center">
+                <MudButton Class="ma-0"
+                           ButtonType="ButtonType.Button"
+                           Disabled="@AppConfig.IsDemoMode"
+                           Size="Size.Small"
+                           Variant="Variant.Filled"
+                           OnClick="@((c) => { _showLockStorageDialog = true; return Task.CompletedTask; })"
+                           Color="Color.Secondary"
+                           StartIcon="fa-solid fa-lock-open"
+                           title="Encrypt Data">
+                    Encrypt Data
+                </MudButton>
+                <DocTooltipIcon DocSnippetHeader="Encrypt Setup Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for password protecting your Setup Data" />
+                <LockStorageDialog @bind-Open="_showLockStorageDialog" />
+            </div>
 
+            <div class="d-flex flex-wrap justify-center">
+                <MudButton Class="ma-0"
+                           ButtonType="ButtonType.Button"
+                           Disabled="@disableInputs"
+                           Size="Size.Small"
+                           Variant="Variant.Filled"
+                           OnClick="WipeAllAsync"
+                           Color="Color.Error"
+                           EndIcon="@Icons.Material.Filled.DeleteForever"
+                           title="Wipe all data?">
+                    Wipe All Data
+                </MudButton>
+                <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
+            </div>
         </div>
 
     </MudItem>
@@ -41,7 +61,7 @@
         </MudPaper>
     </MudItem>
 
-    <MudItem xs="12" >
+    <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2">
             <WeatherDataInfo></WeatherDataInfo>
         </MudPaper>
@@ -92,6 +112,7 @@
         _showWipeError = !_showWipeError;
     }
     private bool _showWipeError = false;
+    private bool _showLockStorageDialog = false;
 
     private async void WipeAllAsync()
     {

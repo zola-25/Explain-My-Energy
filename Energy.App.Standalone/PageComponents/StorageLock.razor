@@ -1,0 +1,156 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Timers
+@using System.Text.RegularExpressions
+@implements IDisposable
+@inject IState<UserLockState> UserLockState
+
+<MudPaper Elevation="0" Class="p-2">
+
+    @if (!UserLockState.Value.LockingOrLocked)
+    {
+        <EditForm Model="@model" OnValidSubmit="LockData">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="my-3 d-flex align-baseline">
+                <label for="ixwdw2">Password</label>
+                <InputText id="ixwdw2" type="@inputType" @bind-Value="model.Input1" autocomplete="new-password" /><button aria-label="@visibleAria1" type="button" @onclick="ToggleTempVisibility">><i aria-hidden="true" class="@visibleIcon1"></i></button>
+                <sub>Atleast 9 characters with atleast one upper-case and one number</sub>
+            </div>
+            <div class="my-3 d-flex align-baseline">
+                <label for="ixwdw2">Confirm password</label>
+                <InputText id="ixwdw2" type="@inputType" @bind-Value="model.Input2" autocomplete="new-password" />
+                <sub>Confirm password</sub>
+            </div>
+            <div class="my-3 d-flex align-baseline">
+                <MudButton OnClick="LockData" Variant="Variant.Filled" Color="Color.Primary"  Class="mx-auto">Encrypt</MudButton>
+            </div>
+        </EditForm>
+
+    }
+    else if (locking)
+    {
+        <MudAlert Severity="Severity.Info">Locking data</MudAlert>
+    }
+    else
+    {
+        if (lockingError)
+        {
+            <MudAlert Severity="Severity.Error">Error locking data</MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">Setup Data Locked</MudAlert>
+        }
+    }
+
+</MudPaper>
+
+@{
+    var onBeforeInternalNavigation = locking ? BlockNavigationAsync : default(Func<LocationChangingContext, Task>);
+}
+<NavigationLock OnBeforeInternalNavigation="onBeforeInternalNavigation" ConfirmExternalNavigation="@locking"></NavigationLock>
+
+@code {
+
+    public async Task BlockNavigationAsync(LocationChangingContext context)
+    {
+        if (!locking)
+        {
+            return;
+        }
+        context.PreventNavigation();
+
+        await JSRuntime.InvokeVoidAsync("alert", "Locking your setup data, please hold on");
+    }
+
+
+
+    string visibleAria1 = "Password masked";
+    string visibleIcon1 = "fa-solid fa-eye-slash";
+
+    // MudBlazor.InputType inputType1 = MudBlazor.InputType.Password;
+    string inputType = "password";
+
+    bool field1Visible = false;
+    // MudTextField<string> field1;
+    Timer timer1;
+
+    StorageLockInputs model;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        model = new StorageLockInputs() { Input1 = String.Empty, Input2 = String.Empty };
+        // editFormContext = new(model);
+        // editFormContext.OnFieldChanged += HandleFieldChange;
+    }
+
+    // private async void HandleFieldChange(object sender, FieldChangedEventArgs fieldChangedEventArgs)
+    // {
+    //     formValid = editFormContext.Validate();
+    //     Console.WriteLine(formValid);
+    //     editFormContext.NotifyValidationStateChanged();
+    //     await InvokeAsync(StateHasChanged);
+    // }
+
+
+    private void ToggleTempVisibility(MouseEventArgs mouseEventArgs)
+    {
+        field1Visible = !field1Visible;
+        visibleIcon1 = field1Visible ? "fa-solid fa-eye" : "fa-solid fa-eye-slash";
+        visibleAria1 = field1Visible ? "Password not masked, plain text visible" : "Password masked";
+        // inputType1 = field1Visible ? MudBlazor.InputType.Text : MudBlazor.InputType.Password;
+        inputType = field1Visible ? "text" : "password";
+
+        if (field1Visible)
+        {
+            SetTimer1();
+        }
+        else
+        {
+            DisposeTimer1();
+        }
+    }
+
+    private void SetTimer1()
+    {
+        DisposeTimer1();
+        timer1 = new Timer(5000);
+        timer1.Elapsed += OnVisibilityTimeUp1;
+        timer1.AutoReset = false;
+        timer1.Enabled = true;
+        timer1.Start();
+    }
+
+    private async void OnVisibilityTimeUp1(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        DisposeTimer1();
+        field1Visible = false;
+        visibleIcon1 = "fa-solid fa-eye-slash";
+        visibleAria1 = "Password masked";
+        // inputType1 = MudBlazor.InputType.Password;
+        inputType = "password";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void DisposeTimer1()
+    {
+        if (timer1 != null)
+        {
+            timer1.Enabled = false;
+            timer1.Elapsed -= OnVisibilityTimeUp1;
+            timer1.Dispose();
+            timer1 = null;
+        }
+    }
+
+
+
+    public void Dispose()
+    {
+        DisposeTimer1();
+        // editFormContext.OnFieldChanged -= HandleFieldChange;
+        model.Input1 = null;
+        model.Input2 = null;
+        model = null;
+    }
+}

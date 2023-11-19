@@ -71,6 +71,11 @@ public partial class AppSetupStatus
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        if (UserLockState.Value.LockingOrLocked)
+        {
+            Ready = true;
+            return;
+        }
         Ready = false;
         SetupStage = SetupStageFlags.None;
         
