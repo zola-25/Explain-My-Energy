@@ -18,6 +18,9 @@ public record UserLockState
     [property: JsonIgnore]
     public bool LockingOrLocked => Unlocking || Locking || SetupDataLocked;
 
+    [property: JsonIgnore]
+    public bool LockingOrUnlocking => Unlocking || Locking;
+
     public UserLockState()
     {
         Unlocking = false;

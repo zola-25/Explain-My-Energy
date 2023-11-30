@@ -2,13 +2,15 @@
 @using Blazored.LocalStorage;
 @inject AppStatus AppConfig
 @inject IState<UserLockState> UserLockState
+@inject IState<HouseholdState> HouseholdState
 @inherits FluxorComponent
 
 
 <ExtendedPageTitle>App Setup</ExtendedPageTitle>
 
 @{
-    var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;    
+    bool disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+    bool householdSetup = HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
 }
 
 <MudGrid Justify="Justify.Center" Class="mb-15">
@@ -16,34 +18,37 @@
 
         <div class="d-flex justify-space-between align-baseline mt-2">
             <div class="d-flex flex-wrap justify-center">
-                <MudButton Class="ma-0"
-                           ButtonType="ButtonType.Button"
-                           Disabled="@AppConfig.IsDemoMode"
-                           Size="Size.Small"
-                           Variant="Variant.Filled"
-                           OnClick="@((c) => { _showLockStorageDialog = true; return Task.CompletedTask; })"
+                <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@(AppConfig.IsDemoMode || !householdSetup || UserLockState.Value.LockingOrUnlocking)"
+                           Size="Size.Small" Variant="Variant.Filled"
+                           OnClick="OpenLockOrUnlockDialog"
                            Color="Color.Secondary"
-                           StartIcon="fa-solid fa-lock-open"
-                           title="Encrypt Data">
-                    Encrypt Data
+                           title="@(UserLockState.Value.SetupDataLocked ? "Unlock Data" : "Lock Data")">
+
+                    @if (UserLockState.Value.LockingOrLocked)
+                    {
+                        <span><i class="fa-solid fa-lock-closed"></i> Unlock Data</span>
+                    }
+                    else
+                    {
+                        <span><i class="fa-solid fa-lock"></i> Lock Data</span>
+                    }
                 </MudButton>
-                <DocTooltipIcon DocSnippetHeader="Encrypt Setup Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for password protecting your Setup Data" />
+                <DocTooltipIcon DocSnippetHeader="Encrypt Setup Data"
+                                DocSnippetType="DocSnippetType.ManualActionsWipeAllData"
+                                IconTitle="Help for password protecting your Setup Data" />
                 <LockStorageDialog @bind-Open="_showLockStorageDialog" />
+                <UnlockStorageDialog @bind-Open="_showUnlockStorageDialog" />
             </div>
 
             <div class="d-flex flex-wrap justify-center">
-                <MudButton Class="ma-0"
-                           ButtonType="ButtonType.Button"
-                           Disabled="@disableInputs"
-                           Size="Size.Small"
-                           Variant="Variant.Filled"
-                           OnClick="WipeAllAsync"
-                           Color="Color.Error"
-                           EndIcon="@Icons.Material.Filled.DeleteForever"
-                           title="Wipe all data?">
+                <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@disableInputs" Size="Size.Small"
+                           Variant="Variant.Filled" OnClick="WipeAllAsync" Color="Color.Error"
+                           EndIcon="@Icons.Material.Filled.DeleteForever" title="Wipe all data?">
                     Wipe All Data
                 </MudButton>
-                <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
+                <DocTooltipIcon DocSnippetHeader="Wipe All Data"
+                                DocSnippetType="DocSnippetType.ManualActionsWipeAllData"
+                                IconTitle="Help for Wiping All User Data" />
             </div>
         </div>
 
@@ -107,12 +112,25 @@
 
     private MudMessageBox WipeAllDataBox { get; set; }
 
+    private void OpenLockOrUnlockDialog()
+    {
+        if (UserLockState.Value.SetupDataLocked)
+        {
+            _showUnlockStorageDialog = true;
+        }
+        else
+        {
+            _showLockStorageDialog = true;
+        }
+    }
+
     public void ToggleErrorPopover()
     {
         _showWipeError = !_showWipeError;
     }
     private bool _showWipeError = false;
     private bool _showLockStorageDialog = false;
+    private bool _showUnlockStorageDialog = false;
 
     private async void WipeAllAsync()
     {

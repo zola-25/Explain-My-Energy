@@ -1,17 +1,17 @@
 ﻿<MudDialog @bind-IsVisible="_opened" Options="DialogOptions" ClassActions="d-flex justify-end"  >
     <TitleContent>
         <div class="d-flex justify-end align-baseline">
-            <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="false" Class="mx-auto fw-bolder" Color="Color.Inherit">Encrypt Setup Data</MudText>
-            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0" OnClick="CloseModal">
+            <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="false" Class="mx-auto fw-bolder" Color="Color.Inherit">Lock Setup Data</MudText>
+            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0" OnClick="CloseModal" Disabled="disableClose" >
                 <i class="fa-solid fa-xmark fa-xl" aria-hidden="true"></i>
             </MudIconButton>
         </div>
     </TitleContent>
     <DialogContent>
-        <LockStorage />
+        <StorageLock Locking="LockingChange" />
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Default" Class="ma-3"
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Default" Class="ma-3" Disabled="disableClose"
                    OnClick="CloseModal">Close</MudButton>
     </DialogActions>
 </MudDialog>
@@ -19,10 +19,13 @@
 
     [Inject] ILogger<LockStorageDialog> Logger { get; set; }
 
+    [Inject] IState<UserLockState> UserLockState { get; set; }
     [Parameter] public bool Open { get; set; }
     [Parameter] public EventCallback<bool> OpenChanged { get; set; }
 
     bool _opened = false;
+
+    bool disableClose = false;
 
     private DialogOptions DialogOptions = new()
         {
@@ -35,6 +38,17 @@
             
         };
 
+    private void LockingChange(bool locking)
+    {
+        if (locking)
+        {
+            disableClose = true;
+        }
+        else
+        {
+            disableClose = false;
+        }
+    }
 
     protected override void OnParametersSet()
     {

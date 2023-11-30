@@ -8,24 +8,29 @@ export class StorageHelper {
         return Uint8Array.from(atob(base64), c => c.charCodeAt(0)).buffer;
     }
 
-    private static getEncoder(): TextEncoder { 
+    private static getEncoder(): TextEncoder {
         return new TextEncoder();
     }
 
     private static getDecoder(): TextDecoder {
         return new TextDecoder();
-    } 
+    }
 
-    public static async encrypt(data: string, password: string) : Promise<string> {
+    public static async verify(data: string, password: string, verificationCode: string): Promise<boolean> {
+        const decrypted = await this.decrypt(data, password);
+        return decrypted === verificationCode;
+    }
+
+    public static async encrypt(data: string, password: string): Promise<string> {
         return await this.encryptData(data, password);
     }
 
-    public static async decrypt(data: string, password: string) : Promise<string> {
+    public static async decrypt(data: string, password: string): Promise<string> {
         return await this.decryptData(data, password);
     }
 
-    private static async encryptData(data:string, password: string): Promise<string> {
-        try  {
+    private static async encryptData(data: string, password: string): Promise<string> {
+        try {
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const passwordKey = await this.getPasswordKey(password);
@@ -96,7 +101,7 @@ export class StorageHelper {
         }
     }
 
-    public static Load() : void {
+    public static Load(): void {
         window["StorageHelper"] = StorageHelper;
     }
 }

@@ -1,0 +1,185 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Timers
+@using System.Text.RegularExpressions
+@inherits FluxorComponent
+@inject IState<UserLockState> UserLockState
+
+<MudPaper Elevation="0" Class="p-2">
+
+    @if (!unlockComplete)
+    {
+        <EditForm Model="@model" OnValidSubmit="UnlockData">
+            <div class="my-3 d-flex justify-center">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            </div>
+            <div class="my-3 d-flex flex-wrap justify-start align-baseline px-0 px-sm-10">
+                <label id="label-ihdMacId" for="ihdMacIdUnlock" class="mud-typography mud-typography-body1">IHD MAC ID</label>
+                <div class="flex-1 d-flex flex-column ml-0 ml-sm-2">
+                    <div class="d-flex flex-1 align-centre  ">
+
+                        <InputText id="ihdMacIdUnlock" class="mud-typography mud-typography-body1 border-solid border-0 border-b-2 mud-border-default w-100percent minw-130px"
+                                   type="text"
+                                   @bind-Value="model.IhdMacId" autocomplete="username" />
+                    </div>
+                </div>
+            </div>
+            <div class="my-3 d-flex flex-wrap justify-start align-baseline px-5 px-sm-10">
+                <label id="label-unlock-password" for="i2slkap">Enter Password</label>
+                <div class="flex-1 d-flex flex-column ml-2">
+                    <div class="d-flex flex-1 align-centre border-solid border-0 border-b-2 mud-border-default ">
+
+                        <InputText id="i2slkap" class="mud-typography mud-typography-body1 w-100percent minw-130px" type="@inputType"
+                                   @bind-Value="model.Input" autocomplete="current-password" />
+                        <button class="mr-2" aria-label="@visibleAria" type="button" @onclick="ToggleTempVisibility">
+                            <i aria-hidden="true" class="@visibleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="my-3 d-flex align-baseline">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mx-auto">
+                    Unlock
+                </MudButton>
+            </div>
+        </EditForm>
+
+    }
+    @if (unlocking)
+    {
+        <MudAlert Severity="Severity.Info">Unlocking data</MudAlert>
+    }
+    else
+    {
+        if(inputError){
+            <MudAlert Severity="Severity.Warning">@unlockErrorMessage</MudAlert>
+        }
+        else if (unlockError)
+        {
+            <MudAlert Severity="householdOutCodeUnlockSeverity">@householdOutCodeUnlockResult</MudAlert>
+            <MudAlert Severity="householdIhdMacIdUnlockSeverity">@householdIhdMacIdUnlockResult</MudAlert>
+            <MudAlert Severity="weatherOutCodeUnlockSeverity">@weatherOutCodeUnlockResult</MudAlert>
+            <MudAlert Severity="gasMeterMpxnUnlockSeverity">@gasMeterMpxnUnlockResult</MudAlert>
+            <MudAlert Severity="electricityMeterMpxnUnlockSeverity">@electricityMeterMpxnUnlockResult</MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">Data unlocked</MudAlert>
+        }
+    }
+
+</MudPaper>
+
+@{
+    var onBeforeInternalNavigation = unlocking ? BlockNavigationAsync : default(Func<LocationChangingContext, Task>);
+}
+<NavigationLock OnBeforeInternalNavigation="onBeforeInternalNavigation" ConfirmExternalNavigation="@unlocking">
+</NavigationLock>
+
+@code {
+
+    public async Task BlockNavigationAsync(LocationChangingContext context)
+    {
+        if (!unlocking)
+        {
+            return;
+        }
+        context.PreventNavigation();
+
+        await JSRuntime.InvokeVoidAsync("alert", "Unlocking your setup data, please hold on");
+    }
+
+
+
+    string visibleAria = "Unmask password for 5 seconds";
+
+    string visibleIcon = "fa-solid fa-eye-slash";
+
+    string inputType = "password";
+
+    bool fieldVisible = false;
+    Timer timer;
+
+    StorageUnlockInputs model;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        model = new StorageUnlockInputs();
+    }
+
+    private void ToggleTempVisibility(MouseEventArgs mouseEventArgs)
+    {
+        fieldVisible = !fieldVisible;
+        visibleIcon = fieldVisible ? "fa-solid fa-eye icon-fade-out" : "fa-solid fa-eye-slash";
+        visibleAria = fieldVisible ? "Hide unmasked password" : "Unmask password for 5 seconds";
+        inputType = fieldVisible ? "text" : "password";
+
+        if (fieldVisible)
+        {
+            SetTimer();
+        }
+        else
+        {
+            DisposeTimer();
+        }
+    }
+
+    private void SetTimer()
+    {
+        DisposeTimer();
+        timer = new Timer(5000);
+        timer.Elapsed += OnVisibilityTimeUp;
+        timer.AutoReset = false;
+        timer.Enabled = true;
+        timer.Start();
+    }
+
+    private async void OnVisibilityTimeUp(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        DisposeTimer();
+        fieldVisible = false;
+        visibleIcon = "fa-solid fa-eye-slash";
+        visibleAria = "Unmask password for 5 seconds";
+        inputType = "password";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void DisposeTimer()
+    {
+        if (timer != null)
+        {
+            timer.Enabled = false;
+            timer.Elapsed -= OnVisibilityTimeUp;
+            timer.Dispose();
+            timer = null;
+        }
+    }
+
+
+
+    private bool _isDisposed;
+
+
+    protected override void Dispose(bool isDisposing)
+    {
+        if (!_isDisposed)
+        {
+            if (isDisposing)
+            {
+                DisposeTimer();
+                if (model != null)
+                {
+                    model.Input = null;
+                    model.IhdMacId = null;
+                    model = null;
+                }
+            }
+            _isDisposed = true;
+        }
+
+        base.Dispose(isDisposing);
+
+    }
+}

@@ -9,6 +9,7 @@ public class SetSetupDataLockedAction
     public static UserLockState Reduce(UserLockState state)
     {
         return state with { 
+            Unlocking = false,
             Locking = false,
             SetupDataLocked = true };
     }

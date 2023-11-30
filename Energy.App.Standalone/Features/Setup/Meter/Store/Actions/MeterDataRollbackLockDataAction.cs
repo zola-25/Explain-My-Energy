@@ -2,7 +2,7 @@
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions;
 
-public class StoreUnlockedMeterDataAction
+public class MeterDataRollbackLockDataAction
 {
     public bool UnlockGasMeter { get; init; }
     public bool UnlockElectricityMeter { get; init; }
@@ -10,7 +10,7 @@ public class StoreUnlockedMeterDataAction
     public string ElectricityMeterMpan { get; init; }
 
     [ReducerMethod]
-    public static MeterSetupState OnStoreUnlockedMeterDataReducer(MeterSetupState state, StoreUnlockedMeterDataAction action)
+    public static MeterSetupState OnStoreUnlockedMeterDataReducer(MeterSetupState state, MeterDataRollbackLockDataAction action)
     {
         string gasMeterMprn = action.UnlockGasMeter ? action.GasMeterMprn : state.GasMeter.Mpxn;
         string electricityMeterMpan = action.UnlockElectricityMeter ? action.ElectricityMeterMpan : state.ElectricityMeter.Mpxn;

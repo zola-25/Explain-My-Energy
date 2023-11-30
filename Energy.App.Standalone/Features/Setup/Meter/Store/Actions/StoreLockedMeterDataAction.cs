@@ -15,8 +15,8 @@ public class StoreLockedMeterDataAction
     [ReducerMethod]
     public static MeterSetupState OnStoreLockedMeterDataReducer(MeterSetupState state, StoreLockedMeterDataAction action)
     {
-        var gasMeterMprn = action.GasMeterIdLocked ? action.GasMeterMprn : state.GasMeter.Mpxn;
-        var electricityMeterMpan = action.ElectricityMeterIdLocked ? action.ElectricityMeterMpan : state.ElectricityMeter.Mpxn;
+        string gasMeterMprn = action.GasMeterIdLocked ? action.GasMeterMprn : state.GasMeter.Mpxn;
+        string electricityMeterMpan = action.ElectricityMeterIdLocked ? action.ElectricityMeterMpan : state.ElectricityMeter.Mpxn;
         return state with
         {
             GasMeter = state.GasMeter with

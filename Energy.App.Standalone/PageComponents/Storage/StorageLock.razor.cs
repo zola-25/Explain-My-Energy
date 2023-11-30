@@ -7,8 +7,9 @@ using Energy.App.Standalone.Features.Setup.Weather.Store;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 
-namespace Energy.App.Standalone.PageComponents;
+namespace Energy.App.Standalone.PageComponents.Storage;
 public partial class StorageLock
 {
     [Inject] ILogger<StorageLock> Logger { get; set; }
@@ -21,58 +22,78 @@ public partial class StorageLock
 
     [Inject] IState<HouseholdState> HouseholdState { get; set; }
 
-    // Navigation Lock while locking data
     [Inject] IDispatcher Dispatcher { get; set; }
-    
+
     bool locking = false;
+    bool inputError = false;
+    bool lockingError = false;
+    bool lockingSuccess = false;
+    string lockingErrorMessage = String.Empty;
 
-
-    private async void LockData()
+    private async ValueTask LockData()
     {
         locking = true;
+        inputError = false;
         lockingError = false;
+        lockingSuccess = false;
+        lockingErrorMessage = String.Empty;
 
-        string backupIHDMacId = HouseholdState.Value.IhdMacId.ToString();
-        string backupOutCode = HouseholdState.Value.OutCodeCharacters;
+
+        string backupIHDMacId = HouseholdState.Value.IhdMacId;
+        string backupHouseholdOutCode = HouseholdState.Value.OutCodeCharacters;
         string backupWeatherOutCode = WeatherState.Value.OutCode;
         string backupGasMeterMpxn = MeterSetupState.Value.GasMeter.Mpxn;
         string backupElectricityMeterMpxn = MeterSetupState.Value.ElectricityMeter.Mpxn;
 
+        string input = model.Input1;
+
         try
         {
+            if (String.IsNullOrWhiteSpace(input) || input.Length < 9 || input != model.Input2)
+            {
+                inputError = true;
+                lockingErrorMessage = "Please enter a valid password";
+                return;
+            }
+
+            if(!HouseholdState.Value.Saved || HouseholdState.Value.Invalid)
+            {
+                inputError = true;
+                lockingErrorMessage = "Please save your household details before locking";
+                return;
+            }
+
+            if(model.IhdMacId != HouseholdState.Value.IhdMacId)
+            {
+                inputError = true;
+                lockingErrorMessage = "IHD MAC ID has been modified from the one saved";
+                return;
+            }
+
             Dispatcher.Dispatch(new SetSetupDataBeginLockingAction());
 
-            string input = model.Input1;
-            if (String.IsNullOrWhiteSpace(input) || input.Length < 9)
-            {
-                throw new ApplicationException("Error with lock password");
-            }
+            string householdOutCode = HouseholdState.Value.OutCodeCharacters;
 
-            if (HouseholdState.Value.Saved && !HouseholdState.Value.Invalid && !String.IsNullOrWhiteSpace(HouseholdState.Value.OutCodeCharacters))
-            {
-                string householdOutCode = HouseholdState.Value.OutCodeCharacters.Trim().ToUpperInvariant();
-                string weatherOutCode = WeatherState.Value.OutCode.Trim().ToUpperInvariant();
+            string ihdMacId = HouseholdState.Value.IhdMacId;
 
-                if (householdOutCode != weatherOutCode)
-                {
-                    throw new ApplicationException("Error: Household and Weather OutCodes do not match");
-                }
-
-
-                string ihdMacId = HouseholdState.Value.IhdMacId;
-
-                string newOutCodeValue = await JSRuntime.InvokeAsync<string>("StorageHelper.encrypt", householdOutCode, input);
-                string newIhdMacIdValue = await JSRuntime.InvokeAsync<string>("StorageHelper.encrypt", ihdMacId, input);
+            string newWeatherOutCodeValue = await JSRuntime.InvokeAsync<string>("StorageHelper.encrypt", householdOutCode, input);
+            string newIhdMacIdValue = await JSRuntime.InvokeAsync<string>("StorageHelper.encrypt", ihdMacId, input);
 
 
 
-                Dispatcher.Dispatch(new HouseholdStoreLockedDataWithWeatherAction() {
-                    OutCodeCharacters = newOutCodeValue,
-                    OutCodeLocked = true,
-                    IhdMacId = newIhdMacIdValue,
-                    IhdMacIdLocked = true
-                });
-            }
+            Dispatcher.Dispatch(new HouseholdStoreLockedData() {
+                OutCodeCharacters = newWeatherOutCodeValue,
+                OutCodeLocked = true,
+                IhdMacId = newIhdMacIdValue,
+                IhdMacIdLocked = true
+            });
+
+            string weatherOutCode = WeatherState.Value.OutCode;
+
+            string newWeatherOutCode = await JSRuntime.InvokeAsync<string>("StorageHelper.encrypt", weatherOutCode, input);
+
+            Dispatcher.Dispatch(new StoreLockedWeatherOutcodeAction() { OutCode = newWeatherOutCode, OutCodeLocked = true });
+
 
             var metersSetup = MeterSetupState.Value.MeterStates.Where(m => (m.InitialSetupValid || m.SetupValid) && !String.IsNullOrWhiteSpace(m.Mpxn));
 
@@ -101,7 +122,7 @@ public partial class StorageLock
             }
             if (!(lockGasMeter || lockElectricityMeter))
             {
-                LockSuccess(ref input);
+                LockSuccess();
                 return;
             }
 
@@ -112,7 +133,7 @@ public partial class StorageLock
                 GasMeterMprn = newMprn
             });
 
-            LockSuccess(ref input);
+            LockSuccess();
         }
         catch (Exception ex)
         {
@@ -124,30 +145,35 @@ public partial class StorageLock
             try
             {
                 Dispatcher.Dispatch(new SetSetupDataBeginUnlockingAction());
-                Dispatcher.Dispatch(new HouseholdStoreUnlockedDataAction() { OutCodeCharacters = backupOutCode, IhdMacId = backupIHDMacId });
+                Dispatcher.Dispatch(new HouseholdRollbackLockDataAction() { OutCodeCharacters = backupHouseholdOutCode, IhdMacId = backupIHDMacId });
                 Dispatcher.Dispatch(new StoreUnlockedWeatherOutcodeAction() { OutCode = backupWeatherOutCode });
-                Dispatcher.Dispatch(new StoreUnlockedMeterDataAction() { ElectricityMeterMpan = backupElectricityMeterMpxn, GasMeterMprn = backupGasMeterMpxn });
+                Dispatcher.Dispatch(new MeterDataRollbackLockDataAction() { ElectricityMeterMpan = backupElectricityMeterMpxn, GasMeterMprn = backupGasMeterMpxn });
                 Dispatcher.Dispatch(new SetSetupDataUnlockedAction());
+                lockingErrorMessage = "Error locking data - all setup data remains unlocked. Please try again.";
             }
             catch (Exception rollbackEx)
             {
                 Logger.LogError(rollbackEx, "Error rolling back data");
+                lockingErrorMessage = "Critical Error locking data, unable to rollback - setup data may be partially encrypted.";
             }
         }
         finally
         {
+            input = null;
             locking = false;
         }
     }
 
-    bool lockingError = false;
 
-    void LockSuccess(ref string input)
+    void LockSuccess()
     {
-        input = null;
-        model.Input1 = String.Empty;
-        model.Input2 = String.Empty;
         Dispatcher.Dispatch(new SetSetupDataLockedAction());
+        if (model != null)
+        {
+            model.Input1 = null;
+            model.Input2 = null;
+        }
+        lockingSuccess = true;
         locking = false;
     }
 }

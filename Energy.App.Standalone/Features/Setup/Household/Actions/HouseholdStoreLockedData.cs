@@ -4,7 +4,7 @@ using Fluxor;
 
 namespace Energy.App.Standalone.Features.Setup.Household.Actions;
 
-public class HouseholdStoreLockedDataWithWeatherAction
+public class HouseholdStoreLockedData
 {
     public string OutCodeCharacters { get; init; }
     public string IhdMacId { get; init; }
@@ -13,7 +13,7 @@ public class HouseholdStoreLockedDataWithWeatherAction
 
 
     [ReducerMethod]
-    public static HouseholdState OnStoreOutCodeReducer(HouseholdState state, HouseholdStoreLockedDataWithWeatherAction action)
+    public static HouseholdState OnStoreOutCodeReducer(HouseholdState state, HouseholdStoreLockedData action)
     {
         var outCode = action.OutCodeLocked ? action.OutCodeCharacters : state.OutCodeCharacters;
         var ihdMacId = action.IhdMacIdLocked ? action.IhdMacId : state.IhdMacId;
@@ -24,14 +24,5 @@ public class HouseholdStoreLockedDataWithWeatherAction
             IhdMacId = ihdMacId,
             IhdMacIdLocked = action.IhdMacIdLocked
         };
-    }
-
-    public class LockedHouseholdEffects : Effect<HouseholdStoreLockedDataWithWeatherAction>
-    {
-        public override Task HandleAsync(HouseholdStoreLockedDataWithWeatherAction action, IDispatcher dispatcher)
-        {
-            dispatcher.Dispatch(new StoreLockedWeatherOutcodeAction() { OutCode = action.OutCodeCharacters, OutCodeLocked = action.OutCodeLocked });
-            return Task.CompletedTask;
-        }
     }
 }

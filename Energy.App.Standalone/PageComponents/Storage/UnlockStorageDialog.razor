@@ -1,0 +1,60 @@
+﻿<MudDialog @bind-IsVisible="_opened" Options="DialogOptions" ClassActions="d-flex justify-end"  >
+    <TitleContent>
+        <div class="d-flex justify-end align-baseline">
+            <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="false" Class="mx-auto fw-bolder" Color="Color.Inherit">Unlock Setup Data</MudText>
+            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0" OnClick="CloseModal">
+                <i class="fa-solid fa-xmark fa-xl" aria-hidden="true"></i>
+            </MudIconButton>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <StorageUnlock />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Default" Class="ma-3"
+                   OnClick="CloseModal">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+
+    [Inject] ILogger<LockStorageDialog> Logger { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+    [Parameter] public EventCallback<bool> OpenChanged { get; set; }
+
+    bool _opened = false;
+
+    private DialogOptions DialogOptions = new()
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseOnEscapeKey = false,
+            CloseButton = false,
+            Position = DialogPosition.TopCenter,
+            DisableBackdropClick = true,
+            
+        };
+
+
+    protected override void OnParametersSet()
+    {
+        _opened = Open;
+        @if (!_opened)
+        {
+            return;
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        try
+        {
+            _opened = false;
+            await OpenChanged.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error closing modal");
+        }
+    }
+}
