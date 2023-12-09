@@ -13,7 +13,6 @@ public class StoreUnlockedElectricityMprnAction {
             ElectricityMeter = state.ElectricityMeter with
             {
                 Mpxn = action.ElectricityMeterMprn,
-                MpxnLocked = false
             }
         };
     }

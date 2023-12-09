@@ -8,29 +8,30 @@
     @if (!lockingSuccess)
     {
         <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-            <div class="my-3 d-flex justify-center">
+            <div class="mt-1 d-flex justify-center">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
             </div>
-            <div class="my-3 d-flex flex-wrap justify-start align-baseline px-0 px-sm-10">
-                <label id="label-ihdMacId" for="ihdMacId" class="mud-typography mud-typography-body1">IHD MAC ID</label>
-                <div class="flex-1 d-flex flex-column ml-0 ml-sm-2">
-                    <div class="d-flex flex-1 align-centre  ">
+            <div class="d-flex flex-column flex-wrap justify-center align-center">
+                <CopyToClipboardTextField CopyString="model.IhdMacId" TooltipWrapperClass="ml-2" CopyToClipboardTooltip="Copy IHD MAC ID to Clipboard">
 
-                        <InputText id="ihdMacId" class="mud-typography mud-typography-body1 border-solid border-0 border-b-2 mud-border-default w-100percent minw-130px"
-                                   type="@inputTypeIhdMacId"
-                                   @bind-Value="model.IhdMacId" autocomplete="username" readonly />
-                        <button class="mr-2" aria-label="@visibleAriaIhdMacId" title="@visibleAriaIhdMacId" type="button" disabled="@locking"
-                                @onclick="ToggleIhdMacIdVisibility">
-                            <i aria-hidden="true" class="@visibleIconIhdMacId"></i>
-                        </button>
+                    <label id="label-ihdMacId" for="ihdMacId" class="mud-typography mud-typography-body1 fw-bolder">IHD MAC ID</label>
+                </CopyToClipboardTextField>
+
+                <div class="flex-1 d-flex flex-column ml-0 ml-sm-2">
+                    <div class="d-flex flex-1  align-content-center  ">
+                        <MudTextField id="ihdMacId"
+                                      Class="lock-password-ihd-mac-id"
+                                      @bind-Value="model.IhdMacId" autocomplete="username"
+                                      HelperText="Make sure you make a note of or save your IHD MAC ID, you will need it to unlock along with your password"
+                                      Variant="Variant.Outlined" MaxLength="16" InputType="InputType.Text" ReadOnly="true" Required="true" />
                     </div>
                 </div>
             </div>
-            <div class="my-3 d-flex flex-wrap justify-start align-baseline px-0 px-sm-10">
-                <label id="label-lock-password" class="mud-typography mud-typography-body1" for="ixwdw2">Password</label>
-                <div class="flex-1 d-flex flex-column ml-0 ml-sm-2">
-                    <div class="d-flex flex-1 align-centre  ">
+            <div class="mt-8 d-flex flex-wrap justify-start align-baseline px-0">
+                <label id="label-lock-password" class="label-lock-password mud-typography mud-typography-body1 fw-bolder mx-auto mx-sm-0" for="ixwdw2">Password:</label>
+                <div class="flex-1 d-flex flex-column ml-2">
+                    <div class="d-flex flex-1   ">
 
                         <InputText id="ixwdw2" class="mud-typography mud-typography-body1 border-solid border-0 border-b-2 mud-border-default w-100percent minw-130px" type="@inputType1"
                                    @bind-Value="model.Input1" autocomplete="new-password" readonly="@locking"
@@ -40,28 +41,32 @@
                             <i aria-hidden="true" class="@visibleIcon1"></i>
                         </button>
                     </div>
-                    <label for="ixwdw2" class="mud-typography mud-typography-caption flex-1 ml-1" id="label-lock-password-details">
-                        At least 9 characters with one upper-case and one number
+                    <label for="ixwdw2" class="mud-typography mud-typography-caption fw-bolder flex-1 ml-1" id="label-lock-password-details">
+                        Password requires at least 9 alphanumeric characters, with at least one upper-case and at least one number
                     </label>
                 </div>
             </div>
-            <div class="my-3 d-flex flex-wrap justify-start align-baseline px-0 px-sm-10">
-                <label id="label-lock-password-confirm" class="mud-typography mud-typography-body1" for="ixwdw3">
-                    Confirm
-                    password
+            <div class="mt-8 d-flex flex-wrap justify-start align-baseline px-0 ">
+                <label id="label-lock-password-confirm" class="mud-typography mud-typography-body1 fw-bolder  mx-auto mx-sm-0" for="ixwdw3">
+                    Confirm password:
                 </label>
-                <div class="flex-1 d-flex flex-column ml-0 ml-sm-2">
-                    <div class="d-flex flex-1 align-centre border-solid  ">
-                        <InputText id="ixwdw3" class="mud-typography mud-typography-body1 border-0 border-b-2 mud-border-default w-100percent minw-130px"
-                                   type="@inputType2" @bind-Value="model.Input2" autocomplete="new-password" readonly="@locking" />
+                <div class="flex-1 d-flex flex-column ml-2">
+                    <div class="d-flex flex-1  border-solid  ">
+                        <InputText id="ixwdw3"
+                                   class="mud-typography mud-typography-body1 border-0 border-b-2 mud-border-default w-100percent minw-130px"
+                                   type="@inputType2" aria-labelledby="label-lock-password-confirm label-lock-password-confirm-details"
+                                   @bind-Value="model.Input2" autocomplete="new-password" readonly="@locking" />
                         <button class="mr-2" aria-label="@visibleAria2" title="@visibleAria2" type="button" disabled="@locking"
                                 @onclick="ToggleTempVisibility2">
                             <i aria-hidden="true" class="@visibleIcon2"></i>
                         </button>
                     </div>
+                    <label for="ixwdw3" class="mud-typography mud-typography-caption fw-bolder flex-1 ml-1" id="label-lock-password-confirm-details">
+                        Ensure you save your password somewhere safe, you will need it to unlock your data with your IHD MAC ID
+                    </label>
                 </div>
             </div>
-            <div class="my-3 d-flex align-baseline">
+            <div class="my-7 my-sm-10 d-flex align-baseline">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mx-auto" Disabled="@locking">
                     Lock Data
                 </MudButton>
@@ -116,19 +121,15 @@
 
     string visibleAria1 = "Unmask password for 5 seconds";
     string visibleAria2 = "Unmask confirm password for 5 seconds";
-    string visibleAriaIhdMacId = "Unmask IHD MAC ID";
 
     string visibleIcon1 = "fa-solid fa-eye-slash";
     string visibleIcon2 = "fa-solid fa-eye-slash";
-    string visibleIconIhdMacId = "fa-solid fa-eye-slash";
 
     string inputType1 = "password";
     string inputType2 = "password";
-    string inputTypeIhdMacId = "password";
 
     bool field1Visible = false;
     bool field2Visible = false;
-    bool ihdMacIdVisible = false;
 
     Timer timer1;
     Timer timer2;
@@ -144,9 +145,8 @@
     {
         try
         {
-            await Locking.InvokeAsync(true);
             locking = true;
-            SetIhdMacIdVisibilityOff();
+            await Locking.InvokeAsync(true);
             SetVisibilityOff1();
             SetVisibilityOff2();
             await LockData();
@@ -164,35 +164,6 @@
         }
     }
 
-
-    private void ToggleIhdMacIdVisibility(MouseEventArgs mouseEventArgs)
-    {
-        ihdMacIdVisible = !ihdMacIdVisible;
-        if (ihdMacIdVisible)
-        {
-            SetIhdMacIdVisibilityOn();
-        }
-        else
-        {
-            SetIhdMacIdVisibilityOff();
-        }
-    }
-
-    private void SetIhdMacIdVisibilityOff()
-    {
-        ihdMacIdVisible = false;
-        visibleIconIhdMacId = "fa-solid fa-eye-slash";
-        visibleAriaIhdMacId = "Unmask IHD MAC ID";
-        inputTypeIhdMacId = "password";
-    }
-
-    private void SetIhdMacIdVisibilityOn()
-    {
-        ihdMacIdVisible = true;
-        visibleIconIhdMacId = "fa-solid fa-eye icon-fade-out";
-        visibleAriaIhdMacId = "Hide IHD MAC ID";
-        inputTypeIhdMacId = "text";
-    }
 
     private void ToggleTempVisibility1(MouseEventArgs mouseEventArgs)
     {

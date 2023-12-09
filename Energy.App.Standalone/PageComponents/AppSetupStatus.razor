@@ -21,15 +21,13 @@
         }
         else
         {
-            <MudListItem>
-                <MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert>
-                </MudListItem>
+            <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HouseholdSeverity">Household Setup: @HouseholdStatus</MudAlert></MudListItem>
             <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricitySeverity">Electricity Meter: @ElectricityStatus</MudAlert></MudListItem>
             <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasSeverity">Gas Meter: @GasStatus</MudAlert></MudListItem>
             <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityReadingsSeverity">Electricity Readings: @ElectricityReadingsStatus.Status</MudAlert></MudListItem>
-            <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Electricity Historical Forecast: @ElectricityHistoricalForecastStatus.Status</MudAlert></MudListItem>
             <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasReadingsSeverity">Gas Readings: @GasReadingsStatus.Status</MudAlert></MudListItem>
-            <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Gas Historical Forecast: @GasHistoricalForecastStatus.Status</MudAlert></MudListItem>
+            <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@ElectricityHistoricalForecastSeverity">Historical Forecast (Electricity): @ElectricityHistoricalForecastStatus.Status</MudAlert></MudListItem>
+            <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@GasHistoricalForecastSeverity">Historical Forecast (Gas): @GasHistoricalForecastStatus.Status</MudAlert></MudListItem>
             <MudListItem><MudAlert Variant="Variant.Outlined" Severity="@HeatingForecastSeverity">@HeatingForecastStatus.Status</MudAlert></MudListItem>
 
         }

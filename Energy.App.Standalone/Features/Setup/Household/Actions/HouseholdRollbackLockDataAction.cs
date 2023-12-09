@@ -12,8 +12,6 @@ public class HouseholdRollbackLockDataAction
     {
         return state with
         {
-            OutCodeLocked = false,
-            IhdMacIdLocked = false,
             OutCodeCharacters = action.OutCodeCharacters,
             IhdMacId = action.IhdMacId
         };

@@ -19,12 +19,10 @@ public class MeterDataRollbackLockDataAction
             GasMeter = state.GasMeter with
             {
                 Mpxn = gasMeterMprn,
-                MpxnLocked = false
             },
             ElectricityMeter = state.ElectricityMeter with
             {
                 Mpxn = electricityMeterMpan,
-                MpxnLocked = false
             }
         };
     }

@@ -10,7 +10,6 @@ public class HouseholdStoreUnlockedIhdMacIdAction
     {
         return state with
         {
-            IhdMacIdLocked = false,
             IhdMacId = action.IHDMacIDCharacters
         };
     }

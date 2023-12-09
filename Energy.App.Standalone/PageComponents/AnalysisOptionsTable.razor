@@ -1,4 +1,5 @@
 ﻿@inherits FluxorComponent
+@inject IState<UserLockState> UserLockState
 
 <div class="d-flex justify-space-between align-baseline">
     <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
@@ -40,35 +41,46 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Meter Type" Class="fw-bolder">@context.MeterType</MudTd>
-        @{
-            bool aMeterIsSetup = MeterSetupState.Value.MeterStates.Any(c => c.InitialSetupValid && c.SetupValid && c.Authorized && !c.Authorizing && !c.AuthorizeFailed);
-        }
-        @if(!aMeterIsSetup && context.MeterType == MeterType.Gas)
+        @if(UserLockState.Value.LockingOrLocked)
         {
             <MudTd colspan="8">
                 <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
-                    Setup a Meter to view enable the Analysis and change the Analysis Options as you need.
-                </MudText>
-                <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
-                    The different Analysis Options configured can then be viewed here.
+                    Setup Data is Locked
                 </MudText>
             </MudTd>
-        } 
-        else if (!aMeterIsSetup && context.MeterType == MeterType.Electricity)
-        {
-            <MudTd colspan="8"></MudTd>
         }
-        else 
+        else
         {
-            <MudTd DataLabel="Forecast Type">@(context.UseHistoricalForecast ? "Historical Moving Average" : "Temperature Dependent")</MudTd>
-            <MudTd DataLabel="Calendar Term">@context.CalendarTerm</MudTd>
-            <MudTd DataLabel="Highlight Set">@context.HighlightSet</MudTd>
-            <MudTd DataLabel="Toggle Source">@context.ToggleSource</MudTd>
-            <MudTd DataLabel="Highlight Start">@context.HighlightStart.eToString("ddd dnn MMM yyyy", true)</MudTd>
-            <MudTd DataLabel="Highlight End">@context.HighlightEnd.eToString("ddd dnn MMM yyyy", true)</MudTd>
-            <MudTd DataLabel="Show Cost">@context.ShowCost</MudTd>
-            <MudTd DataLabel="Degree difference">@(context.MeterType != HouseholdState.Value.PrimaryHeatSource ? "N/A" : context.DegreeDifference.ToString("+#;-#;0") + "°C")</MudTd>
+            bool aMeterIsSetup = MeterSetupState.Value.MeterStates.Any(c => c.SetupValid);
+
+            @if (!aMeterIsSetup && context.MeterType == MeterType.Gas)
+            {
+                <MudTd colspan="8">
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                        Setup a Meter to view enable the Analysis and change the Analysis Options as you need.
+                    </MudText>
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                        The different Analysis Options configured can then be viewed here.
+                    </MudText>
+                </MudTd>
+            }
+            else if (!aMeterIsSetup && context.MeterType == MeterType.Electricity)
+            {
+                <MudTd colspan="8"></MudTd>
+            }
+            else
+            {
+                <MudTd DataLabel="Forecast Type">@(context.UseHistoricalForecast ? "Historical Moving Average" : "Temperature Dependent")</MudTd>
+                <MudTd DataLabel="Calendar Term">@context.CalendarTerm</MudTd>
+                <MudTd DataLabel="Highlight Set">@context.HighlightSet</MudTd>
+                <MudTd DataLabel="Toggle Source">@context.ToggleSource</MudTd>
+                <MudTd DataLabel="Highlight Start">@context.HighlightStart.eToString("ddd dnn MMM yyyy", true)</MudTd>
+                <MudTd DataLabel="Highlight End">@context.HighlightEnd.eToString("ddd dnn MMM yyyy", true)</MudTd>
+                <MudTd DataLabel="Show Cost">@context.ShowCost</MudTd>
+                <MudTd DataLabel="Degree difference">@(context.MeterType != HouseholdState.Value.PrimaryHeatSource ? "N/A" : context.DegreeDifference.ToString("+#;-#;0") + "°C")</MudTd>
+            }
         }
+        
     </RowTemplate>
 </MudTable>
     @code {

@@ -3,6 +3,7 @@ using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.Meter.Store;
 using Energy.App.Standalone.Features.Setup.UserState;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
+using Energy.App.Standalone.PageComponents.Storage.StorageModels;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -25,39 +26,41 @@ public partial class StorageUnlock
 
     bool unlocking = false;
     bool unlockError = false;
-    bool unlockComplete = false;
+    bool unlockSuccess = false;
     bool inputError = false;
     string unlockErrorMessage = String.Empty;
 
-    bool householdOutCodeUnlockedSuccess = false;
-    bool householdIhdMacIdUnlockedSuccess = false;
-    bool weatherOutCodeUnlockedSuccess = false;
-    bool gasMeterMpxnUnlockedSuccess = false;
-    bool electricityMeterMpxnUnlockedSuccess = false;
-    Severity householdOutCodeUnlockSeverity => householdOutCodeUnlockedSuccess ? Severity.Info : Severity.Warning;
-    Severity householdIhdMacIdUnlockSeverity => householdIhdMacIdUnlockedSuccess ? Severity.Info : Severity.Warning;
-    Severity weatherOutCodeUnlockSeverity => weatherOutCodeUnlockedSuccess ? Severity.Info : Severity.Warning;
-    Severity gasMeterMpxnUnlockSeverity => gasMeterMpxnUnlockedSuccess ? Severity.Info : Severity.Warning;
-    Severity electricityMeterMpxnUnlockSeverity => electricityMeterMpxnUnlockedSuccess ? Severity.Info : Severity.Warning;
-
-    string householdOutCodeUnlockResult = "";
-    string householdIhdMacIdUnlockResult = "";
-    string weatherOutCodeUnlockResult = "";
-    string gasMeterMpxnUnlockResult = "";
-    string electricityMeterMpxnUnlockResult = "";
+    bool verified = false;
 
 
-    private async void UnlockData()
+    private Dictionary<LockableDataEnum, UnlockResult> unlockResults = new Dictionary<LockableDataEnum, UnlockResult>() {
+        { LockableDataEnum.HouseholdOutCode, new UnlockResult() { Success = false, Message = "Not attempted" } },
+        { LockableDataEnum.HouseholdIhdMacId, new UnlockResult() { Success = false, Message = "Not attempted" } },
+        { LockableDataEnum.WeatherOutCode, new UnlockResult() { Success = false, Message = "Not attempted" } },
+        { LockableDataEnum.GasMeterMprn, new UnlockResult() { Success = false, Message = "Not attempted" } },
+        { LockableDataEnum.ElectricityMeterMpan, new UnlockResult() { Success = false, Message = "Not attempted" } }
+    };
+
+    private void ResetUnlockResults()
+    {
+        unlockResults = new Dictionary<LockableDataEnum, UnlockResult>() {
+            { LockableDataEnum.HouseholdOutCode, new UnlockResult() { Success = false, Message = "Not attempted" } },
+            { LockableDataEnum.HouseholdIhdMacId, new UnlockResult() { Success = false, Message = "Not attempted" } },
+            { LockableDataEnum.WeatherOutCode, new UnlockResult() { Success = false, Message = "Not attempted" } },
+            { LockableDataEnum.GasMeterMprn, new UnlockResult() { Success = false, Message = "Not attempted" } },
+            { LockableDataEnum.ElectricityMeterMpan, new UnlockResult() { Success = false, Message = "Not attempted" } }
+        };
+    }
+
+    private async Task UnlockData()
     {
         unlocking = true;
-        unlockComplete = false;
+        ResetUnlockResults();
+        inputError = false;
+        unlockSuccess = false;
         unlockError = false;
-
-        householdOutCodeUnlockedSuccess = false;
-        householdIhdMacIdUnlockedSuccess = false;
-        weatherOutCodeUnlockedSuccess = false;
-        gasMeterMpxnUnlockedSuccess = false;
-        electricityMeterMpxnUnlockedSuccess = false;
+        unlockErrorMessage = String.Empty;
+        verified = false;
 
 
         string backupIHDMacId = HouseholdState.Value.IhdMacId;
@@ -84,19 +87,17 @@ public partial class StorageUnlock
                 unlockErrorMessage = "Please enter your IHD MAC ID";
                 return;
             }
+            await Task.Delay(TimeSpan.FromSeconds(1));
 
-            bool verified = await Verify(ihdMacIdInput, input);
+
+            verified = await VerifyAndUnlockIhdMacId(ihdMacIdInput, input);
             if (!verified)
             {
                 return;
             }
 
-
-            Dispatcher.Dispatch(new SetSetupDataBeginUnlockingAction());
-
             await UnlockHouseholdOutcode(backupHouseholdOutCode, input);
 
-            await UnlockHouseholdIhdMacId(backupIHDMacId, input);
             await UnlockWeatherOutCode(backupWeatherOutCode, input);
 
             await UnlockGasMeterMpxn(backupGasMeterMpxn, input);
@@ -104,13 +105,29 @@ public partial class StorageUnlock
 
             Dispatcher.Dispatch(new SetSetupDataUnlockedAction());
 
-            UnlockFinished();
+            unlockError = unlockResults.Any(x => !x.Value.Success);
+
+            if (!unlockError && model != null)
+            {
+                model.Input = null;
+                unlockSuccess = true;
+            }
+            unlocking = false;
         }
         catch (Exception ex)
-        {   // TODO: unlock if verified, keep locked if not
+        {
             unlockError = true;
-            Logger.LogError(ex, "Error unlocking data");
-            Dispatcher.Dispatch(new SetSetupDataLockedAction());
+            Logger.LogError(ex, "Unable to complete unlocking all data");
+
+            if (verified)
+            {
+                Dispatcher.Dispatch(new SetSetupDataUnlockedAction());
+                unlockErrorMessage = "Unable to complete unlocking all data";
+            }
+            else
+            {
+                Dispatcher.Dispatch(new SetSetupDataLockedAction());
+            }
         }
         finally
         {
@@ -118,272 +135,222 @@ public partial class StorageUnlock
         }
     }
 
-    private async Task<bool> Verify(string ihdMacIdInput, string input)
+    private async Task<bool> VerifyAndUnlockIhdMacId(string ihdMacIdInput, string input)
     {
         try
         {
             string lockedIhdMacId = HouseholdState.Value.IhdMacId;
-            bool verified = await JSRuntime.InvokeAsync<bool>("StorageHelper.verify", lockedIhdMacId, input, ihdMacIdInput);
-            if (!verified)
+            if (String.IsNullOrEmpty(lockedIhdMacId))
             {
+                verified = false;
                 inputError = true;
-                unlockErrorMessage = "Invalid password or IHD MAC ID";
+                unlockErrorMessage = "No encrypted household IHD Mac ID to unlock";
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Success = false;
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Message = "No encrypted household IHD Mac ID to unlock";
                 return false;
             }
-            else
+            string result = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedIhdMacId, input);
+            if (result != ihdMacIdInput)
             {
-                return true;
+                verified = false;
+                inputError = true;
+                unlockErrorMessage = "Invalid password or IHD MAC ID";
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Success = false;
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Message = "Invalid password or IHD MAC ID";
+                return false;
+            } 
+            else if (result.Length != 16)
+            {
+                verified = false;
+                inputError = true;
+                unlockErrorMessage = "Invalid IHD MAC ID";
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Success = false;
+                unlockResults[LockableDataEnum.HouseholdIhdMacId].Message = $"Unlocked IHD MAC ID is invalid - {result}";
+                return false;
             }
+
+            verified = true;
+
+            Dispatcher.Dispatch(new SetSetupDataBeginUnlockingAction());
+
+            unlockResults[LockableDataEnum.HouseholdIhdMacId].Success = true;
+            unlockResults[LockableDataEnum.HouseholdIhdMacId].Message = "Household IHD Mac ID unlocked successfully";
+
+            Dispatcher.Dispatch(new HouseholdStoreUnlockedIhdMacIdAction() { IHDMacIDCharacters = result });
+
+            return true;
+        }
+        catch (JSException)
+        {
+            verified = false;
+            Logger.LogError("Unable to verify password");
+
+            inputError = true;
+            unlockErrorMessage = "Unable to verify password";
+            return false;
         }
         catch (Exception ex)
         {
+            verified = false;
             Logger.LogError(ex, "Error verifying password");
-            unlockError = true;
+
+            inputError = true;
             unlockErrorMessage = "Error verifying password";
             return false;
         }
-    }
-
-    void UnlockFinished()
-    {
-        unlockError = !householdIhdMacIdUnlockedSuccess || !householdOutCodeUnlockedSuccess || !weatherOutCodeUnlockedSuccess || !gasMeterMpxnUnlockedSuccess || !electricityMeterMpxnUnlockedSuccess;
-
-        if (model != null)
-        {
-            model.Input = null;
-        }
-        unlocking = false;
     }
 
     private async Task UnlockGasMeterMpxn(string lockedGasMeterMpxn, string input)
     {
         try
         {
-            if (MeterSetupState.Value.GasMeter.MpxnLocked)
+            if (String.IsNullOrEmpty(lockedGasMeterMpxn))
             {
-                string gasMeterMpxn;
-                if (!String.IsNullOrEmpty(lockedGasMeterMpxn))
-                {
-                    gasMeterMpxn = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedGasMeterMpxn, input);
-                    if (gasMeterMpxn.eIsValidMprn())
-                    {
-                        gasMeterMpxnUnlockedSuccess = true;
-                        gasMeterMpxnUnlockResult = "Gas meter mpxn unlocked successfully";
-                    }
-                    else
-                    {
-                        gasMeterMpxnUnlockedSuccess = false;
-                        gasMeterMpxnUnlockResult = $"Unlocked gas meter MPRN is invalid - {gasMeterMpxn}";
-                    }
-                }
-                else
-                {
-                    gasMeterMpxnUnlockedSuccess = true;
-                    gasMeterMpxn = lockedGasMeterMpxn;
-                    gasMeterMpxnUnlockResult = "No gas meter MPRN to unlock";
-                }
-
-                Dispatcher.Dispatch(new StoreUnlockedGasMprnAction() { GasMeterMprn = gasMeterMpxn });
+                unlockResults[LockableDataEnum.GasMeterMprn].Success = true;
+                unlockResults[LockableDataEnum.GasMeterMprn].Message = "No gas meter MPRN to unlock";
             }
             else
             {
-                gasMeterMpxnUnlockResult = "Gas meter MPRN already unlocked";
-                gasMeterMpxnUnlockedSuccess = true;
+                string gasMeterMpxn = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedGasMeterMpxn, input);
+                if (gasMeterMpxn.eIsValidMprn())
+                {
+                    unlockResults[LockableDataEnum.GasMeterMprn].Success = true;
+                    unlockResults[LockableDataEnum.GasMeterMprn].Message = "Gas meter mpxn unlocked successfully";
+                    Dispatcher.Dispatch(new StoreUnlockedGasMprnAction() { GasMeterMprn = gasMeterMpxn });
+                }
+                else
+                {
+                    unlockResults[LockableDataEnum.GasMeterMprn].Success = false;
+                    unlockResults[LockableDataEnum.GasMeterMprn].Message = $"Unlocked gas meter MPRN is invalid - {gasMeterMpxn}";
+                }
             }
-
+        }
+        catch (JSException)
+        {
+            Logger.LogError("Unable to decrypt gas meter MPRN");
+            unlockResults[LockableDataEnum.GasMeterMprn].Success = false;
+            unlockResults[LockableDataEnum.GasMeterMprn].Message = "Unable to decrypt gas meter MPRN";
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error unlocking gas meter MPRN");
-            gasMeterMpxnUnlockedSuccess = false;
-            Dispatcher.Dispatch(new StoreUnlockedGasMprnAction() { GasMeterMprn = lockedGasMeterMpxn });
-            gasMeterMpxnUnlockResult = "Error unlocking gas meter MPRN - enabling access anyway";
-        }
 
+            unlockResults[LockableDataEnum.GasMeterMprn].Success = false;
+            unlockResults[LockableDataEnum.GasMeterMprn].Message = "Error unlocking gas meter MPRN";
+        }
     }
 
     private async Task UnlockElectricityMeterMpxn(string lockedElectricityMeterMpxn, string input)
     {
         try
         {
-            if (MeterSetupState.Value.ElectricityMeter.MpxnLocked)
+            if (String.IsNullOrEmpty(lockedElectricityMeterMpxn))
             {
-                string electricityMeterMpxn;
-                if (!String.IsNullOrEmpty(lockedElectricityMeterMpxn))
-                {
-                    electricityMeterMpxn = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedElectricityMeterMpxn, input);
-                    if (electricityMeterMpxn.eIsValidMpan())
-                    {
-                        electricityMeterMpxnUnlockedSuccess = true;
-                        electricityMeterMpxnUnlockResult = "Electricity meter mpxn unlocked successfully";
-                    }
-                    else
-                    {
-                        electricityMeterMpxnUnlockedSuccess = false;
-                        electricityMeterMpxnUnlockResult = $"Unlocked electricity meter MPAN is invalid - {electricityMeterMpxn}";
-                    }
-                }
-                else
-                {
-                    electricityMeterMpxnUnlockedSuccess = true;
-                    electricityMeterMpxn = lockedElectricityMeterMpxn;
-                    electricityMeterMpxnUnlockResult = "No electricity meter MPAN to unlock";
-                }
-
-                Dispatcher.Dispatch(new StoreUnlockedElectricityMprnAction() { ElectricityMeterMprn = electricityMeterMpxn });
+                unlockResults[LockableDataEnum.ElectricityMeterMpan].Success = true;
+                unlockResults[LockableDataEnum.ElectricityMeterMpan].Message = "No electricity meter MPAN to unlock";
             }
             else
             {
-                electricityMeterMpxnUnlockResult = "Electricity meter mpxn already unlocked";
-                electricityMeterMpxnUnlockedSuccess = true;
+                string electricityMeterMpxn = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedElectricityMeterMpxn, input);
+                if (electricityMeterMpxn.eIsValidMpan())
+                {
+                    unlockResults[LockableDataEnum.ElectricityMeterMpan].Success = true;
+                    unlockResults[LockableDataEnum.ElectricityMeterMpan].Message = "Electricity meter MPAN unlocked successfully";
+                    Dispatcher.Dispatch(new StoreUnlockedElectricityMprnAction() { ElectricityMeterMprn = electricityMeterMpxn });
+                }
+                else
+                {
+                    unlockResults[LockableDataEnum.ElectricityMeterMpan].Success = false;
+                    unlockResults[LockableDataEnum.ElectricityMeterMpan].Message = $"Unlocked electricity meter MPAN is invalid - {electricityMeterMpxn}";
+                }
             }
         }
+        catch (JSException)
+        {
+            Logger.LogError("Unable to decrypt electricity meter mpxn");
+            unlockResults[LockableDataEnum.ElectricityMeterMpan].Success = false;
+            unlockResults[LockableDataEnum.ElectricityMeterMpan].Message = "Unable to decrypt electricity meter mpxn";
+        }
+
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error unlocking electricity meter mpxn");
-            electricityMeterMpxnUnlockedSuccess = false;
-            Dispatcher.Dispatch(new StoreUnlockedElectricityMprnAction() { ElectricityMeterMprn = lockedElectricityMeterMpxn });
-            electricityMeterMpxnUnlockResult = "Error unlocking electricity meter mpxn - enabling access anyway";
+            unlockResults[LockableDataEnum.ElectricityMeterMpan].Success = false;
+            unlockResults[LockableDataEnum.ElectricityMeterMpan].Message = "Error unlocking electricity meter mpxn";
         }
-
     }
 
     private async Task UnlockWeatherOutCode(string lockedWeatherOutCode, string input)
     {
         try
         {
-            if (WeatherState.Value.OutCodeLocked)
+            if (String.IsNullOrEmpty(lockedWeatherOutCode))
             {
-                string weatherOutCode;
-                if (!String.IsNullOrEmpty(lockedWeatherOutCode))
-                {
-                    weatherOutCode = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedWeatherOutCode, input);
-                    if(weatherOutCode.eIsValidOutcode())
-                    {
-                        weatherOutCodeUnlockedSuccess = true;
-                        weatherOutCodeUnlockResult = "Weather postal area unlocked successfully";
-                    }
-                    else
-                    {
-                        weatherOutCodeUnlockedSuccess = false;
-                        weatherOutCodeUnlockResult = $"Unlocked weather postal area is invalid - {weatherOutCode}";
-                    }
-                }
-                else
-                {
-                    weatherOutCodeUnlockedSuccess = true;
-                    weatherOutCode = lockedWeatherOutCode;
-                    weatherOutCodeUnlockResult = "No weather postal area to unlock";
-                }
-
-                Dispatcher.Dispatch(new StoreUnlockedWeatherOutcodeAction() { OutCode = weatherOutCode });
+                unlockResults[LockableDataEnum.WeatherOutCode].Success = true;
+                unlockResults[LockableDataEnum.WeatherOutCode].Message = "No weather postal area to unlock";
             }
             else
             {
-                weatherOutCodeUnlockResult = "Weather postal area already unlocked";
-                weatherOutCodeUnlockedSuccess = true;
+                string weatherOutCode = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedWeatherOutCode, input);
+                if (weatherOutCode.eIsValidOutcode())
+                {
+                    unlockResults[LockableDataEnum.WeatherOutCode].Success = true;
+                    unlockResults[LockableDataEnum.WeatherOutCode].Message = "Weather postal area unlocked successfully";
+                    Dispatcher.Dispatch(new StoreUnlockedWeatherOutcodeAction() { OutCode = weatherOutCode });
 
+                }
+                else
+                {
+                    unlockResults[LockableDataEnum.WeatherOutCode].Success = false;
+                    unlockResults[LockableDataEnum.WeatherOutCode].Message = $"Unlocked weather postal area is invalid - {weatherOutCode}";
+                }
             }
-
+        }
+        catch (JSException)
+        {
+            Logger.LogError("Unable to decrypt weather postal area");
+            unlockResults[LockableDataEnum.WeatherOutCode].Success = false;
+            unlockResults[LockableDataEnum.WeatherOutCode].Message = "Unable to decrypt weather postal area";
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error unlocking weather postal area");
-            weatherOutCodeUnlockedSuccess = false;
-            Dispatcher.Dispatch(new StoreUnlockedWeatherOutcodeAction() { OutCode = lockedWeatherOutCode });
-            weatherOutCodeUnlockResult = "Error unlocking weather postal area - enabling access anyway";
-        }
-
-    }
-
-    private async Task UnlockHouseholdIhdMacId(string lockedIHDMacId, string input)
-    {
-        try
-        {
-            if (HouseholdState.Value.IhdMacIdLocked)
-            {
-                string ihdMacId;
-                if (!String.IsNullOrEmpty(lockedIHDMacId))
-                {
-                    ihdMacId = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedIHDMacId, input);
-                    if(ihdMacId.Length != 16)
-                    {
-                        householdIhdMacIdUnlockedSuccess = false;
-                        householdIhdMacIdUnlockResult = $"Unlocked IHD MAC ID is invalid - {ihdMacId}";
-                    }
-                    else
-                    {
-                        householdIhdMacIdUnlockedSuccess = true;
-                        householdIhdMacIdUnlockResult = "Household IHD Mac ID unlocked successfully";
-                    }
-
-                }
-                else
-                {
-                    householdIhdMacIdUnlockedSuccess = true;
-                    ihdMacId = lockedIHDMacId;
-                    householdIhdMacIdUnlockResult = "No household IHD Mac ID to unlock";
-                }
-
-                Dispatcher.Dispatch(new HouseholdStoreUnlockedIhdMacIdAction() { IHDMacIDCharacters = ihdMacId });
-            }
-            else
-            {
-                householdIhdMacIdUnlockResult = "Household IHD Mac ID already unlocked";
-                householdIhdMacIdUnlockedSuccess = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error unlocking household IHD Mac ID");
-            householdIhdMacIdUnlockedSuccess = false;
-            Dispatcher.Dispatch(new HouseholdStoreUnlockedIhdMacIdAction() { IHDMacIDCharacters = lockedIHDMacId });
-            householdIhdMacIdUnlockResult = "Error unlocking household IHD Mac ID - enabling access anyway";
+            unlockResults[LockableDataEnum.WeatherOutCode].Success = false;
+            unlockResults[LockableDataEnum.WeatherOutCode].Message = "Error unlocking weather postal area";
         }
     }
+
 
     private async Task UnlockHouseholdOutcode(string lockedHouseholdOutcode, string input)
     {
         try
         {
-            if (HouseholdState.Value.OutCodeLocked)
+            if (String.IsNullOrEmpty(lockedHouseholdOutcode))
             {
-                string householdOutCode;
-                if (!String.IsNullOrEmpty(lockedHouseholdOutcode))
-                {
-                    householdOutCode = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedHouseholdOutcode, input);
-                    if(householdOutCode.eIsValidOutcode())
-                    {
-                        householdOutCodeUnlockedSuccess = true;
-                        householdOutCodeUnlockResult = "Household postal area unlocked successfully";
-                    }
-                    else
-                    {
-                        householdOutCodeUnlockedSuccess = false;
-                        householdOutCodeUnlockResult = $"Unlocked household postal area is invalid - {householdOutCode}";
-                    }
-                }
-                else
-                {
-                    householdOutCodeUnlockedSuccess = true;
-                    householdOutCode = lockedHouseholdOutcode;
-                    householdOutCodeUnlockResult = "No household postal area to unlock";
-                }
+                unlockResults[LockableDataEnum.HouseholdOutCode].Success = false;
+                unlockResults[LockableDataEnum.HouseholdOutCode].Message = "No household postal area to unlock";
 
+                return;
+            }
+            string householdOutCode = await JSRuntime.InvokeAsync<string>("StorageHelper.decrypt", lockedHouseholdOutcode, input);
+            if (householdOutCode.eIsValidOutcode())
+            {
+                unlockResults[LockableDataEnum.HouseholdOutCode].Success = true;
+                unlockResults[LockableDataEnum.HouseholdOutCode].Message = "Household postal area unlocked successfully";
                 Dispatcher.Dispatch(new HouseholdStoreUnlockedOutCodeAction() { OutCodeCharacters = householdOutCode });
             }
             else
             {
-                householdOutCodeUnlockResult = "Household postal area already unlocked";
-                householdOutCodeUnlockedSuccess = true;
+                unlockResults[LockableDataEnum.HouseholdOutCode].Success = false;
+                unlockResults[LockableDataEnum.HouseholdOutCode].Message = $"Unlocked household postal area is invalid - {householdOutCode}";
             }
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error unlocking household outcode");
-            householdOutCodeUnlockedSuccess = false;
-            Dispatcher.Dispatch(new HouseholdStoreUnlockedOutCodeAction() { OutCodeCharacters = lockedHouseholdOutcode });
-            householdOutCodeUnlockResult = "Error unlocking household outcode - enabling access anyway";
+            Logger.LogError(ex, "Error unlocking household postal area");
+
+            unlockResults[LockableDataEnum.HouseholdOutCode].Success = false;
+            unlockResults[LockableDataEnum.HouseholdOutCode].Message = "Error unlocking household postal area";
         }
     }
 

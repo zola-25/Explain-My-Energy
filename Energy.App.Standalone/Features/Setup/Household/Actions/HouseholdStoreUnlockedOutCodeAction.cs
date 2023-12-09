@@ -12,7 +12,6 @@ public class HouseholdStoreUnlockedOutCodeAction
     {
         return state with
         {
-            OutCodeLocked = false,
             OutCodeCharacters = action.OutCodeCharacters
         };
     }

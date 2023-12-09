@@ -6,6 +6,7 @@ using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.App.Standalone.DTOs;
 using Energy.App.Standalone.DTOs.Tariffs;
 
+
 namespace Energy.App.Standalone.Extensions;
 
 public static class Extensions

@@ -12,7 +12,6 @@ public class StoreUnlockedGasMprnAction {
             GasMeter = state.GasMeter with
             {
                 Mpxn = action.GasMeterMprn,
-                MpxnLocked = false
             }
         };
     }

@@ -17,9 +17,6 @@ public record HouseholdState
 
     public MeterType PrimaryHeatSource { get; init; }
 
-    public bool OutCodeLocked { get; init; }
-    public bool IhdMacIdLocked { get; init; }
-
     public HouseholdState()
     {
         Saved = false;
@@ -28,8 +25,6 @@ public record HouseholdState
         IhdMacId = null;
         OutCodeCharacters = null;
         PrimaryHeatSource = MeterType.Gas;
-        OutCodeLocked = false;
-        IhdMacIdLocked = false;
     }
 }
 

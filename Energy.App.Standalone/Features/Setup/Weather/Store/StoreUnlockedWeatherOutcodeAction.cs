@@ -12,7 +12,6 @@ public class StoreUnlockedWeatherOutcodeAction
         return state with
         {
             OutCode = action.OutCode,
-            OutCodeLocked = false
         };
     }
 }

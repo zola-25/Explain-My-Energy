@@ -21,101 +21,107 @@
     var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
 }
 
-<div class="d-flex justify-center align-center flex-wrap">
-    <MudText Class="d-flex fw-bolder" Align="Align.Center" Typo="Typo.h5">@MeterType Tariff History </MudText>
-    <DocTooltipIcon DocSnippetHeader="Editing Tariffs" DocSnippetType="DocSnippetType.EditingTariffs" IconTitle="Help for Adding and Editing Tariffs" />
-</div>
-
-<MudTable Items="@_tariffDetailRows" Elevation="0">
-    <ToolBarContent>
-        <MudSpacer />
-        <MudIconButton OnClick="OnAddNewTariffClick"
-                       Disabled="disableInputs"
-                       ButtonType="ButtonType.Button"
-                       Color="Color.Primary"
-                       Variant="Variant.Filled"
-                       Class="rounded-circle mr-5"
-                       Icon="@Icons.Material.Filled.Add"
-                       Title="Add Tariff Period"></MudIconButton>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh></MudTh>
-
-        <MudTh Class="fw-bolder">Tariff Type</MudTh>
-        <MudTh Class="fw-bolder">Applies From</MudTh>
-        <MudTh Class="fw-bolder">Unit Rate (p/kWh)</MudTh>
-        <MudTh Class="fw-bolder">Daily Standing Charge (p/Day)</MudTh>
-        <MudTh></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>
-            @if (!context.IsHourOfDayFixed)
-            {
-                <MudButton Variant="Variant.Outlined"
-                           Size="Size.Small"
-                           OnClick="@(() => context.ShowHourOfDayRows = !context.ShowHourOfDayRows)">
-                    @((context.ShowHourOfDayRows) ? "Hide" : "Show") Hourly Rates
-                </MudButton>
-            }
-        </MudTd>
-        <MudTd DataLabel="Tariff Type">
-            @(context.IsHourOfDayFixed ? "Fixed Daily Rate" : "Variable Day Rate")
-        </MudTd>
-
-        <MudTd DataLabel="Applies From">@context.DateAppliesFrom.eToLongDateString()</MudTd>
-        <MudTd DataLabel="Unit Rate (p/kWh)">
-            @if (context.IsHourOfDayFixed)
-            {
-                @context.PencePerKWh.ePenceRateDisplay()
-            }
-            else
-            {
-                @("N/A")
-            }
-        </MudTd>
-        <MudTd DataLabel="Daily Standing Charge (p/Day)">@context.DailyStandingChargePence.ePenceRateDisplay()</MudTd>
-        <MudTd DataLabel="Edit">
-            <MudButton Variant="Variant.Filled"
-                       Size="Size.Small"
-                       Class="fw-bolder"
+@if (UserLockState.Value.LockingOrLocked)
+{
+    <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">Setup Data is Locked</MudText>
+}
+else
+{
+    <div class="d-flex justify-center align-center flex-wrap">
+        <MudText Class="d-flex fw-bolder" Align="Align.Center" Typo="Typo.h5">@MeterType Tariff History </MudText>
+        <DocTooltipIcon DocSnippetHeader="Editing Tariffs" DocSnippetType="DocSnippetType.EditingTariffs" IconTitle="Help for Adding and Editing Tariffs" />
+    </div>
+    <MudTable Items="@_tariffDetailRows" Elevation="0">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudIconButton OnClick="OnAddNewTariffClick"
                            Disabled="disableInputs"
-                       OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
-        </MudTd>
+                           ButtonType="ButtonType.Button"
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"
+                           Class="rounded-circle mr-5"
+                           Icon="@Icons.Material.Filled.Add"
+                           Title="Add Tariff Period"></MudIconButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh></MudTh>
 
-    </RowTemplate>
-    <ChildRowContent>
-        @if (context.ShowHourOfDayRows)
-        {
-            <MudTr>
-                <td colspan="5">
-                    <MudCard Elevation="0">
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.body1">Variable Rates applying from <strong>@context.DateAppliesFrom.eToLongDateString()</strong></MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                        <MudCardContent Class="pa-0">
-                            <MudTable Items="@context.HourOfDayPrices"
-                                      Context="hourOfDayContext">
+            <MudTh Class="fw-bolder">Tariff Type</MudTh>
+            <MudTh Class="fw-bolder">Applies From</MudTh>
+            <MudTh Class="fw-bolder">Unit Rate (p/kWh)</MudTh>
+            <MudTh Class="fw-bolder">Daily Standing Charge (p/Day)</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
 
-                                <HeaderContent>
-                                    <MudTh>Hour of Day (24hr)</MudTh>
-                                    <MudTh>Unit Rate (p/kWh)</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Hour of Day (24hr)">@hourOfDayContext.HourOfDay.eTimeSpanToString()</MudTd>
-                                    <MudTd DataLabel="Unit Rate (p/kWh)">@hourOfDayContext.PencePerKWh.ePenceRateDisplay()</MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </MudCardContent>
-                    </MudCard>
-                </td>
-            </MudTr>
-        }
-    </ChildRowContent>
-</MudTable>
+                @if (!context.IsHourOfDayFixed)
+                {
+                    <MudButton Variant="Variant.Outlined"
+                               Size="Size.Small"
+                               OnClick="@(() => context.ShowHourOfDayRows = !context.ShowHourOfDayRows)">
+                        @((context.ShowHourOfDayRows) ? "Hide" : "Show") Hourly Rates
+                    </MudButton>
+                }
+            </MudTd>
+            <MudTd DataLabel="Tariff Type">
+                @(context.IsHourOfDayFixed ? "Fixed Daily Rate" : "Variable Day Rate")
+            </MudTd>
 
+            <MudTd DataLabel="Applies From">@context.DateAppliesFrom.eToLongDateString()</MudTd>
+                <MudTd DataLabel="Unit Rate (p/kWh)">
+                    @if (context.IsHourOfDayFixed)
+                {
+                    @context.PencePerKWh.ePenceRateDisplay()
+                }
+                else
+                {
+                    @("N/A")
+                }
+            </MudTd>
+            <MudTd DataLabel="Daily Standing Charge (p/Day)">@context.DailyStandingChargePence.ePenceRateDisplay()</MudTd>
+                <MudTd DataLabel="Edit">
+                    <MudButton Variant="Variant.Filled"
+                               Size="Size.Small"
+                               Class="fw-bolder"
+                               Disabled="disableInputs"
+                               OnClick="@(() => OnEditTariffClick(context))">Edit</MudButton>
+                </MudTd>
 
+            </RowTemplate>
+            <ChildRowContent>
+                @if (context.ShowHourOfDayRows)
+            {
+                <MudTr>
+                    <td colspan="5">
+                        <MudCard Elevation="0">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText Typo="Typo.body1">Variable Rates applying from <strong>@context.DateAppliesFrom.eToLongDateString()</strong></MudText>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent Class="pa-0">
+                                <MudTable Items="@context.HourOfDayPrices"
+                                          Context="hourOfDayContext">
+
+                                    <HeaderContent>
+                                        <MudTh>Hour of Day (24hr)</MudTh>
+                                        <MudTh>Unit Rate (p/kWh)</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Hour of Day (24hr)">@hourOfDayContext.HourOfDay.eTimeSpanToString()</MudTd>
+                                        <MudTd DataLabel="Unit Rate (p/kWh)">@hourOfDayContext.PencePerKWh.ePenceRateDisplay()</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            </MudCardContent>
+                        </MudCard>
+                    </td>
+                </MudTr>
+            }
+        </ChildRowContent>
+    </MudTable>
+
+}
 
 <MudDialog @bind-IsVisible="_showEditDialogue" Options="new DialogOptions() {CloseButton = true, CloseOnEscapeKey = true, FullWidth = true }">
     <TitleContent>

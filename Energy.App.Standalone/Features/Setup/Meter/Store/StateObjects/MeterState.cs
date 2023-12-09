@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
@@ -16,9 +17,9 @@ public record MeterState
     public bool Authorizing { get; init; }
 
     public bool AuthorizeFailed { get; init; }
-    public bool SetupValid { get; init; }
+    [property: JsonIgnore]
+    public bool SetupValid => InitialSetupValid && Authorized && !AuthorizeFailed && !Authorizing;
 
     public ImmutableList<TariffDetailState> TariffDetails { get; init; }
     public string AuthorizeFailedMessage { get; init; }
-    public bool MpxnLocked { get; internal set; }
 }

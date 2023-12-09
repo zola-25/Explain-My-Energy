@@ -13,6 +13,7 @@ using System.Collections.Immutable;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Setup.TermsAndConditions;
+using Energy.App.Standalone.Features.Setup.Household.Actions;
 
 namespace Energy.App.Standalone.PageComponents;
 public partial class AppSetupStatus
@@ -34,97 +35,49 @@ public partial class AppSetupStatus
 
     bool OpenWizard = false;
 
+    bool HouseholdSetupValid => !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
+    string HouseholdStatus => HouseholdSetupValid ? " Valid" : "Setup Required";
+    Severity HouseholdSeverity => HouseholdSetupValid ? Severity.Success : Severity.Warning;
 
-    bool HouseholdSetupValid;
-    string HouseholdStatus;
-    Severity HouseholdSeverity;
-
-    bool GasMeterSetupValid;
-    Severity GasSeverity;
-    string GasStatus;
-
-
-    bool ElectricityMeterSetupValid;
-    string ElectricityStatus;
-    Severity ElectricitySeverity;
+    bool GasMeterSetupValid => MeterSetupState.Value[MeterType.Gas].SetupValid;
+    Severity GasSeverity => GasMeterSetupValid ? Severity.Success : Severity.Warning;
+    string GasStatus => GasMeterSetupValid ? "Setup Valid" : MeterSetupState.Value[MeterType.Gas].InitialSetupValid ? "Authorization Required" : "Setup Required";
 
 
+    bool ElectricityMeterSetupValid => MeterSetupState.Value[MeterType.Electricity].SetupValid;
+    string ElectricityStatus => ElectricityMeterSetupValid ? "Setup Valid" : MeterSetupState.Value[MeterType.Electricity].InitialSetupValid ? "Authorization Required" : "Setup Required";
+    Severity ElectricitySeverity => ElectricityMeterSetupValid ? Severity.Success : Severity.Warning;
 
-    (bool Valid, string Status) ElectricityReadingsStatus;
-    (bool Valid, string Status) GasReadingsStatus;
 
-    Severity ElectricityReadingsSeverity;
-    Severity GasReadingsSeverity;
 
-    (bool Valid, string Status) GasHistoricalForecastStatus;
-    Severity GasHistoricalForecastSeverity;
+    (bool Valid, string Status) ElectricityReadingsStatus => GetMeterReadingsStatus(MeterType.Electricity);
+    (bool Valid, string Status) GasReadingsStatus => GetMeterReadingsStatus(MeterType.Gas);
 
-    (bool Valid, string Status) ElectricityHistoricalForecastStatus;
-    Severity ElectricityHistoricalForecastSeverity;
+    Severity ElectricityReadingsSeverity => ElectricityReadingsStatus.Valid ? Severity.Success : Severity.Warning;
+    Severity GasReadingsSeverity => GasReadingsStatus.Valid ? Severity.Success : Severity.Warning;
 
-    (bool Valid, string Status) HeatingForecastStatus;
+    (bool Valid, string Status) GasHistoricalForecastStatus => GetHistoricalForecastStatus(MeterType.Gas);
+    Severity GasHistoricalForecastSeverity => GasHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
-    Severity HeatingForecastSeverity;
+    (bool Valid, string Status) ElectricityHistoricalForecastStatus => GetHistoricalForecastStatus(MeterType.Electricity);
+    Severity ElectricityHistoricalForecastSeverity => ElectricityHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
 
-    SetupStageFlags SetupStage;
+    (bool Valid, string Status) HeatingForecastStatus => GetHeatingForecastStatus();
+
+    Severity HeatingForecastSeverity => HeatingForecastStatus.Valid ? Severity.Success : Severity.Warning;
+
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        Ready = false;
         if (UserLockState.Value.LockingOrLocked)
         {
             Ready = true;
             return;
         }
-        Ready = false;
-        SetupStage = SetupStageFlags.None;
-        
-        HouseholdSetupValid = !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;
-        HouseholdStatus = HouseholdSetupValid ? " Valid" : "Setup Required";
-        HouseholdSeverity = HouseholdSetupValid ? Severity.Success : Severity.Warning;
 
-        SetupStage |= HouseholdSetupValid ? 0 : SetupStageFlags.HouseholdNotSetup;
-
-        var gasMeterState = MeterSetupState.Value[MeterType.Gas];
-        SetupStage |= gasMeterState.InitialSetupValid ? 0 : SetupStageFlags.GasMeterNotSetup;
-
-        SetupStage |= gasMeterState.Authorized ? 0 : SetupStageFlags.GasMeterNotAuthorized;
-
-
-        GasMeterSetupValid = gasMeterState.SetupValid;
-        GasStatus = GasMeterSetupValid ? "Setup Valid" : "Setup Required";
-        GasSeverity = GasMeterSetupValid ? Severity.Success : Severity.Warning;
-
-        var electricityMeterState = MeterSetupState.Value[MeterType.Electricity];
-
-        SetupStage |= electricityMeterState.InitialSetupValid ? 0 : SetupStageFlags.ElectricityMeterNotSetup;
-        SetupStage |= electricityMeterState.Authorized ? 0 : SetupStageFlags.ElectricityMeterNotAuthorized;
-
-
-        ElectricityMeterSetupValid = electricityMeterState.SetupValid;
-        ElectricityStatus = ElectricityMeterSetupValid ? "Setup Valid" : "Setup Required";
-        ElectricitySeverity = ElectricityMeterSetupValid ? Severity.Success : Severity.Warning;
-
-
-        ElectricityReadingsStatus = GetMeterReadingsStatus(MeterType.Electricity);
-        GasReadingsStatus = GetMeterReadingsStatus(MeterType.Gas);
-
-        ElectricityReadingsSeverity = ElectricityReadingsStatus.Valid ? Severity.Success : Severity.Warning;
-        GasReadingsSeverity = GasReadingsStatus.Valid ? Severity.Success : Severity.Warning;
-
-        ElectricityHistoricalForecastStatus = GetHistoricalForecastStatus(MeterType.Electricity);
-        GasHistoricalForecastStatus = GetHistoricalForecastStatus(MeterType.Gas);
-
-        ElectricityHistoricalForecastSeverity = ElectricityHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
-        GasHistoricalForecastSeverity = GasHistoricalForecastStatus.Valid ? Severity.Success : Severity.Warning;
-
-        HeatingForecastStatus = GetHeatingForecastStatus();
-        HeatingForecastSeverity = HeatingForecastStatus.Valid ? Severity.Success : Severity.Warning;
-
-        var termsAccepted = TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed;
-        bool defaultOpenWizard = !termsAccepted;
-        OpenWizard = OpenWizard || defaultOpenWizard;
-
+        OpenWizard = OpenWizard || !TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed;
 
         Ready = true;
     }
@@ -153,9 +106,13 @@ public partial class AppSetupStatus
 
     (bool Valid, string Status) GetMeterReadingsStatus(MeterType meterType)
     {
-        if (!MeterSetupState.Value[meterType].SetupValid)
+        if (!MeterSetupState.Value[meterType].InitialSetupValid)
         {
             return (false, "Requires Meter Setup");
+        }
+        if (!MeterSetupState.Value[meterType].SetupValid)
+        {
+            return (false, "Requires Meter Authorization");
         }
 
         var costedReadings = GetCostedReadings(meterType);
@@ -166,7 +123,7 @@ public partial class AppSetupStatus
 
         var first = costedReadings.First().UtcTime;
         var last = costedReadings.Last().UtcTime;
-        string rangeText = $"Data available from {first.eDateToDowShortMonthYY()} to {last.eDateToDowShortMonthYY()}";
+        string rangeText = $"Data available {first.eDateToDowShortMonthYY()} - {last.eDateToDowShortMonthYY()}";
         return (true, rangeText);
     }
 
@@ -175,9 +132,14 @@ public partial class AppSetupStatus
 
     (bool Valid, string Status) GetHistoricalForecastStatus(MeterType meterType)
     {
-        if (!MeterSetupState.Value[meterType].SetupValid)
+        if (!MeterSetupState.Value[meterType].InitialSetupValid)
         {
             return (false, "Requires Meter Setup");
+        }
+
+        if (!MeterSetupState.Value[meterType].SetupValid)
+        {
+            return (false, "Requires Meter Authorization");
         }
 
         var readings = GetBasicReadings(meterType);
@@ -197,17 +159,31 @@ public partial class AppSetupStatus
             return (false, $"No historical forecast calculated for {meterType} Meter");
         }
 
-        return (true, $"From {HistoricalForecastState.Value[meterType].First().UtcTime.eDateToDowShortMonthYY()} to {HistoricalForecastState.Value[meterType].Last().UtcTime.eDateToDowShortMonthYY()}");
+        return (true, $"Forecast range available {HistoricalForecastState.Value[meterType].First().UtcTime.eDateToDowShortMonthYY()} - {HistoricalForecastState.Value[meterType].Last().UtcTime.eDateToDowShortMonthYY()}");
     }
 
-
-    private (bool Valid, string Status) GetHeatingForecastStatus()
-    {
+    
+    private (bool Valid, string Status) GetHeatingForecastStatus() {
         var heatSourceMeterType = HouseholdState.Value.PrimaryHeatSource;
-        var (Valid, Status) = GetMeterReadingsStatus(heatSourceMeterType);
-        if (!Valid)
+
+        (bool valid, string status) = GetHeatingForecastStatusWithoutMeterName(heatSourceMeterType);
+        
+        string statusText = GetMeterHeatingForecastStatusText(heatSourceMeterType, status);
+        
+        return (valid, statusText);
+    }
+
+    private string GetMeterHeatingForecastStatusText(MeterType meterType, string appendingStatusText)
+    {
+        return $"Temperature-based Forecast ({meterType}): {appendingStatusText}";
+    }
+
+    private (bool valid, string status) GetHeatingForecastStatusWithoutMeterName(MeterType heatSourceMeterType)
+    {
+        (bool valid, string meterReadingsStatus) = GetMeterReadingsStatus(heatSourceMeterType);
+        if (!valid)
         {
-            return (false, Status);
+            return (false, meterReadingsStatus);
         }
 
         if (!HeatingForecastState.Value.SavedCoefficients)
@@ -225,14 +201,13 @@ public partial class AppSetupStatus
             return (false, "Forecast daily costs not loaded");
         }
 
-        return (true, $@"Heating forecast range: {HeatingForecastState.Value.ForecastDailyCosts.First().UtcTime.eDateToDowShortMonthYY()}
-                        to {HeatingForecastState.Value.ForecastDailyCosts.Last().UtcTime.eDateToDowShortMonthYY()}");
+        return (true, $@"Forecast range available {HeatingForecastState.Value.ForecastDailyCosts.First().UtcTime.eDateToDowShortMonthYY()}
+                        - {HeatingForecastState.Value.ForecastDailyCosts.Last().UtcTime.eDateToDowShortMonthYY()}");
     }
 
     private ImmutableList<CostedReading> GetCostedReadings(MeterType meterType)
     {
-        return meterType switch
-        {
+        return meterType switch {
             MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings,
             MeterType.Gas => GasReadingsState.Value.CostedReadings,
             _ => throw new NotImplementedException(),
@@ -241,8 +216,7 @@ public partial class AppSetupStatus
 
     private ImmutableList<BasicReading> GetBasicReadings(MeterType meterType)
     {
-        return meterType switch
-        {
+        return meterType switch {
             MeterType.Electricity => ElectricityReadingsState.Value.BasicReadings,
             MeterType.Gas => GasReadingsState.Value.BasicReadings,
             _ => throw new NotImplementedException(),

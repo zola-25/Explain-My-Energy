@@ -16,20 +16,7 @@ export class StorageHelper {
         return new TextDecoder();
     }
 
-    public static async verify(data: string, password: string, verificationCode: string): Promise<boolean> {
-        const decrypted = await this.decrypt(data, password);
-        return decrypted === verificationCode;
-    }
-
     public static async encrypt(data: string, password: string): Promise<string> {
-        return await this.encryptData(data, password);
-    }
-
-    public static async decrypt(data: string, password: string): Promise<string> {
-        return await this.decryptData(data, password);
-    }
-
-    private static async encryptData(data: string, password: string): Promise<string> {
         try {
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -51,32 +38,12 @@ export class StorageHelper {
             const base64buff = this.buff_to_base64(buff.buffer);
             return base64buff;
         }
-        catch (e) {
-            console.error(e);
-            return "";
+        catch (e: any) {
+            throw Error("Error encountered encrypting data");
         }
     }
 
-    private static getPasswordKey(password: string): Promise<CryptoKey> {
-        return window.crypto.subtle.importKey("raw", this.getEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
-    }
-
-    private static deriveKey(passwordKey: CryptoKey, salt: ArrayBuffer, keyUsage: KeyUsage): Promise<CryptoKey> {
-        return window.crypto.subtle.deriveKey(
-            {
-                name: "PBKDF2",
-                salt,
-                iterations: 250000,
-                hash: "SHA-256"
-            },
-            passwordKey,
-            { name: "AES-GCM", length: 256 },
-            false,
-            [keyUsage]
-        );
-    }
-
-    private static async decryptData(data: string, password: string): Promise<string> {
+    public static async decrypt(data: string, password: string): Promise<string> {
         try {
             const encryptDataBuff = this.base64_to_buff(data);
             const salt = encryptDataBuff.slice(0, 16);
@@ -95,10 +62,29 @@ export class StorageHelper {
             );
             return this.getDecoder().decode(decrypted);
         }
-        catch (e) {
-            console.error(e);
-            return "";
+        catch (e: any) {
+            throw Error("Error encountered when decrypting");
         }
+    }
+
+
+    private static getPasswordKey(password: string): Promise<CryptoKey> {
+        return window.crypto.subtle.importKey("raw", this.getEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+    }
+
+    private static deriveKey(passwordKey: CryptoKey, salt: ArrayBuffer, keyUsage: KeyUsage): Promise<CryptoKey> {
+        return window.crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt,
+                iterations: 250000,
+                hash: "SHA-256"
+            },
+            passwordKey,
+            { name: "AES-GCM", length: 256 },
+            false,
+            [keyUsage]
+        );
     }
 
     public static Load(): void {

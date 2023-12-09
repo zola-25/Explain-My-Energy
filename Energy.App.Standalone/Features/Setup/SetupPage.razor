@@ -3,6 +3,7 @@
 @inject AppStatus AppConfig
 @inject IState<UserLockState> UserLockState
 @inject IState<HouseholdState> HouseholdState
+@inject IState<WeatherState> WeatherState
 @inherits FluxorComponent
 
 
@@ -11,41 +12,53 @@
 @{
     bool disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
     bool householdSetup = HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
+
+    bool householdOrWeatherInvalid = !householdSetup || String.IsNullOrEmpty(WeatherState.Value.OutCode) || !String.Equals(WeatherState.Value.OutCode.Trim(), HouseholdState.Value.OutCodeCharacters.Trim(), StringComparison.InvariantCultureIgnoreCase);
+    bool unlockedWithHouseholdOrWeatherInvalid = (!UserLockState.Value.SetupDataLocked && householdOrWeatherInvalid);
 }
 
 <MudGrid Justify="Justify.Center" Class="mb-15">
     <MudItem xs="12">
 
-        <div class="d-flex justify-space-between align-baseline mt-2">
-            <div class="d-flex flex-wrap justify-center">
-                <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@(AppConfig.IsDemoMode || !householdSetup || UserLockState.Value.LockingOrUnlocking)"
-                           Size="Size.Small" Variant="Variant.Filled"
-                           OnClick="OpenLockOrUnlockDialog"
-                           Color="Color.Secondary"
-                           title="@(UserLockState.Value.SetupDataLocked ? "Unlock Data" : "Lock Data")">
+        <div class="d-flex flex-wrap justify-space-between align-baseline mt-2">
+            <div class="d-flex flex-wrap align-center justify-center">
+                <div class="d-flex flex-1 flex-column align-baseline">
+                    <MudButton Class="ma-0" ButtonType="ButtonType.Button"
+                               Disabled="@(AppConfig.IsDemoMode || UserLockState.Value.LockingOrUnlocking || unlockedWithHouseholdOrWeatherInvalid)"
+                               Size="Size.Small" Variant="Variant.Filled"
+                               OnClick="OpenLockOrUnlockDialog"
+                               Color="Color.Secondary"
+                               title="@(UserLockState.Value.SetupDataLocked ? "Unlock Data" : "Lock Data")">
 
-                    @if (UserLockState.Value.LockingOrLocked)
+                        @if (UserLockState.Value.LockingOrLocked)
+                        {
+                            <span><i class="fa-solid fa-lock"></i> Unlock Data</span>
+                        }
+                        else
+                        {
+                            <span><i class="fa-solid fa-lock-open"></i> Lock Data</span>
+                        }
+                    </MudButton>
+                    @if (unlockedWithHouseholdOrWeatherInvalid)
                     {
-                        <span><i class="fa-solid fa-lock-closed"></i> Unlock Data</span>
+                        <MudText Typo="Typo.caption">Available when household and weather data loaded</MudText>
                     }
-                    else
-                    {
-                        <span><i class="fa-solid fa-lock"></i> Lock Data</span>
-                    }
-                </MudButton>
-                <DocTooltipIcon DocSnippetHeader="Encrypt Setup Data"
-                                DocSnippetType="DocSnippetType.ManualActionsWipeAllData"
-                                IconTitle="Help for password protecting your Setup Data" />
-                <LockStorageDialog @bind-Open="_showLockStorageDialog" />
-                <UnlockStorageDialog @bind-Open="_showUnlockStorageDialog" />
+                </div>
+                <DocTooltipIcon DocSnippetHeader="Lock App & Setup Data"
+                                DocSnippetType="DocSnippetType.ManualActionsLockData"
+                                IconTitle="Lock the app and secure your Setup Data, with a password and your IHD MAC ID" />
+                <LockStorageDialog @bind-Open="@_showLockStorageDialog" />
+                <UnlockStorageDialog @bind-Open="@_showUnlockStorageDialog" />
             </div>
 
-            <div class="d-flex flex-wrap justify-center">
-                <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@disableInputs" Size="Size.Small"
-                           Variant="Variant.Filled" OnClick="WipeAllAsync" Color="Color.Error"
-                           EndIcon="@Icons.Material.Filled.DeleteForever" title="Wipe all data?">
-                    Wipe All Data
-                </MudButton>
+            <div class="d-flex flex-wrap align-center justify-center">
+                <div class="d-flex flex-1 flex-column align-baseline">
+                    <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@disableInputs" Size="Size.Small"
+                               Variant="Variant.Filled" OnClick="WipeAllAsync" Color="Color.Error"
+                               EndIcon="@Icons.Material.Filled.DeleteForever" title="Wipe all data?">
+                        Wipe All Data
+                    </MudButton>
+                </div>
                 <DocTooltipIcon DocSnippetHeader="Wipe All Data"
                                 DocSnippetType="DocSnippetType.ManualActionsWipeAllData"
                                 IconTitle="Help for Wiping All User Data" />

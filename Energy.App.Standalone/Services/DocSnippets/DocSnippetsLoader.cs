@@ -36,6 +36,7 @@ public class DocSnippetsLoader
         {DocSnippetType.ManualActionsUpdateMeterData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#update-or-reload-meter-readings" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
         {DocSnippetType.ManualActionsRemoveMeter, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#removing-meters" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
         {DocSnippetType.ManualActionsWipeAllData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#wipe-all-data" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
+        {DocSnippetType.ManualActionsLockData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#lock-setup-data" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
         {DocSnippetType.EditingTariffs, new SnippetCreationDetails { Subpath = "setup/tariffs.html", Anchor = "#editing-tariffs" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
         {DocSnippetType.AnalysisOptionsStatus, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#analysis-options-status" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
         {DocSnippetType.AnalysisOptionsChartKWhVsCost, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#chart-kwh-vs-cost" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },

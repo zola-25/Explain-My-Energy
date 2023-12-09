@@ -1,17 +1,24 @@
-﻿<MudDialog @bind-IsVisible="_opened" Options="DialogOptions" ClassActions="d-flex justify-end"  >
+﻿@inherits FluxorComponent
+
+<MudDialog @bind-IsVisible="_opened" Options="DialogOptions" ClassActions="d-flex justify-end">
     <TitleContent>
+        
         <div class="d-flex justify-end align-baseline">
             <MudText Typo="Typo.h6" Align="Align.Center" GutterBottom="false" Class="mx-auto fw-bolder" Color="Color.Inherit">Unlock Setup Data</MudText>
-            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0" OnClick="CloseModal">
+            
+            
+            <MudIconButton Color="Color.Inherit" Size="Size.Medium" Title="Close" Class="me-0"
+                            OnClick="CloseModal" ClickPropagation="false" DisableElevation="@disableClose" DisableRipple="@disableClose" Disabled="@disableClose">
                 <i class="fa-solid fa-xmark fa-xl" aria-hidden="true"></i>
             </MudIconButton>
         </div>
     </TitleContent>
     <DialogContent>
-        <StorageUnlock />
+        <StorageUnlock Unlocking="UnlockingChange" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Default" Class="ma-3"
+                   Disabled="@disableClose"
                    OnClick="CloseModal">Close</MudButton>
     </DialogActions>
 </MudDialog>
@@ -22,7 +29,10 @@
     [Parameter] public bool Open { get; set; }
     [Parameter] public EventCallback<bool> OpenChanged { get; set; }
 
+
     bool _opened = false;
+
+    bool disableClose = false;
 
     private DialogOptions DialogOptions = new()
         {
@@ -32,9 +42,20 @@
             CloseButton = false,
             Position = DialogPosition.TopCenter,
             DisableBackdropClick = true,
-            
         };
 
+    private async void UnlockingChange(bool unlocking)
+    {
+        if (unlocking)
+        {
+            disableClose = true;
+        }
+        else
+        {
+            disableClose = false;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
 
     protected override void OnParametersSet()
     {
@@ -49,6 +70,10 @@
     {
         try
         {
+            if (disableClose)
+            {
+                return;
+            }
             _opened = false;
             await OpenChanged.InvokeAsync(false);
         }
