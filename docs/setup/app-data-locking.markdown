@@ -9,15 +9,49 @@ parent: Setup
 
 This page has two sections. 
 
-The first goes into comprehensive detail on the data stored by the app; the risks and benefits of storing data on a local device; which data items are sensitive and which are not; and avoiding any risk of accidentally (or intentionally) breaking Data Protection laws.
+- [Data Stored - Sensitivity and Risks](#data-stored---sensitivity-and-risks) goes into comprehensive detail on the data stored by the app; the risks and benefits of storing data on a local device; which data items are sensitive and which are not; and avoiding any risk of accidentally (or intentionally) breaking Data Protection laws.
 
-The second section explains the app's 'Lock' feature, which allows you to encrypt certain Setup Data with a password, and disable the app's features until the correct password is entered along with the correct IHD MAC ID.
+- [Locking and Unlocking](#locking-the-app) explains the app's 'Lock' feature, which allows you to encrypt certain Setup Data with a password, and disable the app's features until the correct password is entered along with the correct IHD MAC ID.
 
 ## Data Stored - Sensitivity and Risks
 
-To function, the app requires your In-Home Device (IHD) MAC ID, your Postal Area (the first 3-4 digits of a Post Code), and your Gas and Electricity MPRN/MPAN numbers. In normal use, with the app 'unlocked', this data is stored in your browser's local storage. While browsers do not allow other websites or web-based apps to access this data, it is possible for someone with access to your computer to view this data. Browser vulnerabilities such as Cross-Site Scripting (XSS) attacks, or devices compromised with malware, could also potentially allow this data to be accessed by malicious actors.
+To function, the app requires your In-Home Device (IHD) MAC ID, your Postal Area (the first 3-4 digits of a Post Code), and your Gas and Electricity MPRN/MPAN numbers. In normal use, with the app 'Unlocked', this data is stored in your browser's local storage. While browsers do not allow other websites or web applications to access this data, it is possible for someone with access to your computer to view this data. 
 
-At the same time, as this app is intentionally designed to not use server-side storage. Storing your setup details solely on your device means there is no risk of a third-party data breach exposing this data to the public, as has happened to numerous established technology companies in recent years, including LinkedIn, Adobe, and even LastPass, a password manager with several million users - with every user having some potentially sensitive data exposed - some still encrypted, such as passwords, but other details such as password websites and payment card details were exposed as plaintext in the breach.
+### Rationale
+
+Explain My Energy intended to be as accessible as possible, requiring the least amount of technical knowledge to use, as well as as only the the data that that it needs to function - no more, no less.
+
+As we use the web today, we are constantly being asked to create accounts, and provide personal details, to access services. This is not always necessary, some times not legal, and often not in our best interests. It is also disempowering, as we are forced to trust third-parties with our data, and have no control over how they use it, or how well they protect it.
+
+#### A Story about LastPass
+
+Data breaches are common, and suddenly we find our email addresses suddenly receiving spam - or in some cases, our passwords, payment card details, and other sensitive data, being exposed to the public. Notable companies that have suffered data breaches include LinkedIn, Adobe, and even LastPass, a password manager with several million users. In that breach, every LastPass user had sensitive data exposed - passwords were still encrypted, but other details, such as the ***website addresses linked to the passwords***, and the user's ***payment card details*** for their LastPass subscription, were exposed as **plaintext** in the breach.
+
+The most unlucky users were the ones that had been with LastPass the longest. Like all password storage, LastPass require the user just one large master password to unlock all the passwords a user might save. This master password it doesn't store, a creates a hash code from it, and stores that instead. Hash functions used for passwords usually repeat the hashing many thousands of times, to make it computationally expensive to attempt to guess the hash code by making many guesses and chancing upon a match. T
+
+The number of iterations is meant to increase as the computational power generally available increases. But LastPass hadn't automatically increased the number of iterations for older accounts, and so the older the account, the easier it was to use typical hacking techniques crack the password. And so older accounts got hacked.
+
+And of course, the breach only needed to happen once, and the data remains exposed forever. Computational power increases, but the hashing algorithm that was used to create the hash of each user's password, the hash that was exposed, remains the same forever. So time is on the side of the hackers. As as a cruel twist - the number of iterations was also exposed as plaintext - so the hackers knew which accounts were the easiest to crack.
+
+For ever LastPass user, the only option to ensure security for the dozens or hundreds of accounts and services a user might have, it to change every single account  password. 
+
+It took me weeks.
+
+### One less user account
+
+So with that said, maybe it's time to reduce the number of accounts we have to create to use minor apps or simply buy from an web-shop. Of course, there are many valid reasons for requiring users to part with their email address and a hastily created password. One of them is proving a user's authenticity - are they the same person who created the account.
+
+This app is intentionally designed to avoid requiring user accounts, whether it be a dedicated server, or a Third-Party Authentication Providers such as those offered by Google, Facebook, Microsoft or Apple. 
+
+
+
+Vulnerabilities such as Cross-Site Scripting (XSS) attacks, or devices compromised with malware, could also potentially allow this data to be accessed by malicious actors.
+
+At the same time, as 
+
+Storing your setup details solely on your device means there is no risk of a third-party data breach exposing this data to the public, as has happened to numerous established technology companies in recent years. 
+
+This includes LinkedIn, Adobe, and even LastPass, a password manager with several million users. In that breach, every LastPass user had sensitive data exposed - passwords were still encrypted, but other details, such as the ***website addresses linked to the passwords***, and the user's ***payment card details*** for their LastPass subscription, were exposed as **plaintext** in the breach.
 
 The only truly sensitive data item stored in by the app is your IHD MAC ID. Most property's meter numbers, MPRNs and MPANs, are publicly available, and the Postal Area, being only half a Post Code, in almost all cases will cover a large area with many properties. However, the IHD MAC ID is unique to your property, and is even relied upon by n3rgy as proof of authenticity when authorizing data access for your meters.
 
