@@ -82,16 +82,21 @@
              <MudCardActions Class="d-flex flex-column align-start ">
                  <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@(disableInputs || _submitting)" Color="Color.Primary">@_saveButtonText</MudButton>
 
-                    <MudText Class="mx-auto mt-3 fw-bold" Color="Color.Default" hidden="@(!_submitting)">
-                        Saving
-                    </MudText>
-                    <MudText Class="mx-auto mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
-                        <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
-                </MudText>
-                <MudText Class="mx-auto mt-3 fw-bold" Color="@_weatherLoadingColor" hidden="@(!_loadingWeatherData)">
-                    <i class="fa-solid fa-temperature-half" aria-hidden="true"></i> @weatherDataLoadMessage
-                </MudText>
-
+                    <div class="@(_submitting ? "d-flex mx-auto mt-3" : "d-none")">
+                        <MudText Class="fw-bold" Color="Color.Default">
+                            Saving
+                        </MudText>
+                    </div>
+                    <div class="@(_submitSuccessful ? "d-flex mx-auto mt-3 fw-bold" : "d-none")">
+                        <MudText class="fw-bold" Color="Color.Success">
+                            <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
+                        </MudText>
+                    </div>
+                    <div class="@(_loadingWeatherData ? "d-flex mx-auto mt-3" : "d-none")">
+                        <MudText Class="fw-bold" Color="@_weatherLoadingColor">
+                            <i class="fa-solid fa-temperature-half" aria-hidden="true"></i> @weatherDataLoadMessage
+                        </MudText>
+                    </div>
             </MudCardActions>
         </MudCard>
     </EditForm>
@@ -115,7 +120,6 @@
     bool _submitting;
     bool _submitSuccessful;
     bool _loadingWeatherData;
-    bool _loadingWeatherDataSuccess;
     string weatherDataLoadMessage = string.Empty;
 
     Color _weatherLoadingColor = Color.Default;
@@ -143,13 +147,11 @@
             {
                 _weatherLoadingColor = Color.Info;
                 weatherDataLoadMessage = "Weather Data Loaded";
-                _loadingWeatherDataSuccess = true;
             }
             else
             {
                 _weatherLoadingColor = Color.Warning;
                 weatherDataLoadMessage = "Weather Data Failed to Load";
-                _loadingWeatherDataSuccess = false;
             }
         });
         SubscribeToAction<SetSetupDataLockedAction>((action) =>
@@ -225,7 +227,6 @@
         _submitSuccessful = false;
         _saveResponseMessage = string.Empty;
         _loadingWeatherData = false;
-        _loadingWeatherDataSuccess = false;
 
         await Task.Delay(TimeSpan.FromSeconds(2));
 
