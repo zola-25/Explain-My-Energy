@@ -52,7 +52,7 @@
     "html-bundler-webpack-plugin": "^3.0.3",
     "isomorphic-dompurify": "^1.9.0",
     "license-checker-rseidelsohn": "^4.2.6",
-    "marked": "^10.0.0",
+    "marked": "^11.0.1",
     "mocha": "^10.2.0",
     "mocha-junit-reporter": "^2.2.1",
     "postcss": "^8.4.31",
