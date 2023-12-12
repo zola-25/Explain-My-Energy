@@ -26,6 +26,7 @@ public class AddGasAction
                 GlobalId = Guid.NewGuid(),
                 InitialSetupValid = true,
                 Authorized = false,
+                MeterType = MeterType.Gas,
                 Mpxn = addSuccessAction.Meter.Mpxn,
                 TariffDetails = DefaultTariffData.GetDefaultTariffs(MeterType.Gas, ExampleTariffType.StandardFixedDaily)
             }

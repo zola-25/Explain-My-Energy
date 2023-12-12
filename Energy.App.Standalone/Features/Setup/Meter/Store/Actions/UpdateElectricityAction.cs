@@ -24,9 +24,7 @@ public class UpdateElectricityAction
             {
                 InitialSetupValid = true,
                 Authorized = false,
-                MeterType = MeterType.Electricity,
                 Mpxn = updateSuccessAction.Meter.Mpxn,
-
             }
         };
 

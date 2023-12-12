@@ -1,5 +1,11 @@
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
+@inject IState<UserLockState> UserLockState
+@inject AppStatus AppConfig
+
+@{
+    var disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+}
 
 @if (_ready)
 {
@@ -15,42 +21,45 @@
                 <div class="d-flex flex-column justify-start flex-grow-1 gap-4">
 
                     <div class="d-flex flex-row align-baseline">
-                        <MudTextField For="@(() => _electricityMeter.Mpxn)" Label="Electricity Meter MPAN" @bind-Value="@_electricityMeter.Mpxn" Placeholder="Enter your MPAN number here"
+                        <MudTextField For="@(() => _electricityMeter.Mpxn)" id="add-electricity-mpan" name="add-electricity-mpan" Disabled="disableInputs" Label=" Electricity Meter MPAN"   @bind-Value="@_electricityMeter.Mpxn" Placeholder="Enter your MPAN number here"
                                                 Required></MudTextField>
                          <DocTooltipIcon DocSnippetHeader="Electricity Meter MPAN" DocSnippetType="DocSnippetType.ElectricityMeterMPAN" IconTitle="Help for Electricity Meter Setup" />
                      </div>
-                     <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
-                </div>
-                <div id="national-grid-iframe-container" class="mt-5 @(!_hideNationalGrid ? "toggled" : "")">
-                    <MudText Typo="Typo.body1" Class="d-flex flex-column justify-center align-center mb-2">
-                        <p>Don't know your Electricity Meter's MPAN number?</p>
-                        <p>
-                            Quickly find it via by toggling the National Grid lookup service:   <MudButton StartIcon="@Icons.Material.Filled.Bolt" Size="Size.Small"
-                                                                                                            Variant="_hideNationalGrid ? Variant.Outlined : Variant.Filled"
-                                                                                                            Color="Color.Default"
-                                                                                                            title="@(_hideNationalGrid ? "Show the National Grid Service" : "Hide the National Grid Service")"
-                                                                                                            OnClick="ToggleNationalGrid">@(_hideNationalGrid ? "Show Lookup" : "Hide Lookup Service")</MudButton>
-                        </p>
-                        <p>The service can be also accessed in a separate tab at <MudLink Href="https://supplier.nationalgrid.co.uk" Target="_blank">supplier.nationalgrid.co.uk <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></MudLink></p>
-                    </MudText>
-                    <iframe id="iframeNationalGrid" hidden="@_hideNationalGrid"
-                            src="https://supplier.nationalgrid.co.uk"></iframe>
-                </div>
+                     <MudButton Class="mx-auto" Disabled="disableInputs" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(_addingNotUpdating ? "Add" : "Update")</MudButton>
+                 </div>
 
-
-                </MudCardContent>
-                <MudCardActions Class="d-flex flex-column align-start align-baseline">
-
-                    <div aria-hidden="@(!_submitSuccessful)" class="@(_submitSuccessful ? "visible" : "invisible") mx-auto  mud-typography-h6 mud-success-text mt-2 ">
-                        <span class="mx-auto">
-                            <i class="fa-solid fa-check" aria-hidden="true"></i>
-                            Electricity Meter Valid - proceed to authorize access to n3rgy.com?
-                        </span>
+                 @if (!UserLockState.Value.LockingOrLocked)
+                {
+                    <div id="national-grid-iframe-container" class="mt-5 @(!_hideNationalGrid ? "toggled" : "")">
+                        <MudText Typo="Typo.body1" Class="d-flex flex-column justify-center align-center mb-2">
+                            <p>Don't know your Electricity Meter's MPAN number?</p>
+                            <p>
+                                Quickly find it via by toggling the National Grid lookup service:   <MudButton StartIcon="@Icons.Material.Filled.Bolt" Size="Size.Small"
+                                                                                                               Variant="_hideNationalGrid ? Variant.Outlined : Variant.Filled"
+                                                                                                               Color="Color.Default"
+                                                                                                               title="@(_hideNationalGrid ? "Show the National Grid Service" : "Hide the National Grid Service")"
+                                                                                                               OnClick="ToggleNationalGrid">@(_hideNationalGrid ? "Show Lookup" : "Hide Lookup Service")</MudButton>
+                            </p>
+                            <p>The service can be also accessed in a separate tab at <MudLink Href="https://supplier.nationalgrid.co.uk" Target="_blank">supplier.nationalgrid.co.uk <i aria-hidden="true" class="fa-solid fa-arrow-up-right-from-square"></i></MudLink></p>
+                        </MudText>
+                        <iframe id="iframeNationalGrid" hidden="@_hideNationalGrid"
+                                src="https://supplier.nationalgrid.co.uk"></iframe>
                     </div>
+                }
 
-                </MudCardActions>
-            </MudCard>
-        </EditForm>
+            </MudCardContent>
+            <MudCardActions Class="d-flex flex-column align-start align-baseline">
+
+                <div aria-hidden="@(!_submitSuccessful)" class="@(_submitSuccessful ? "visible" : "invisible") mx-auto  mud-typography-h6 mud-success-text mt-2 ">
+                    <span class="mx-auto">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                        Electricity Meter Valid - proceed to authorize access to n3rgy.com?
+                    </span>
+                </div>
+
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
 }
 @code {
     [Inject] IState<MeterSetupState> MeterSetupState { get; set; }
@@ -88,7 +97,7 @@
         {
             _addingNotUpdating = true;
         }
-        _electricityMeter = meterState.eMapToMeterDto();
+        _electricityMeter = meterState.eMapToMeterDto(UserLockState.Value.LockingOrLocked ? "Locked" : null);
         _ready = true;
     }
 

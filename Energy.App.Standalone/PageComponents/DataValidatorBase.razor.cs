@@ -5,7 +5,9 @@ using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Features.Setup.Household;
 using Energy.App.Standalone.Features.Setup.TermsAndConditions;
+using Energy.App.Standalone.Features.Setup.UserState;
 using Energy.App.Standalone.Features.Setup.Weather.Store;
+using Energy.App.Standalone.Services;
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Microsoft.AspNetCore.Components;
@@ -35,13 +37,12 @@ public partial class DataValidatorBase : FluxorComponent
     IState<HouseholdState> HouseholdState { get; set; }
     [Inject]
     IState<TermsAndConditionsState> TermsAndConditionsState { get; set; }
-    
-    [Inject]
-    NavigationManager  NavigationManager { get; set; }
 
+    [Inject]
+    IState<UserLockState> UserLockState { get; set; }
+    
     protected override void Dispose(bool disposing)
     {
-        
         base.Dispose(disposing);
     }
 
@@ -63,12 +64,12 @@ public partial class DataValidatorBase : FluxorComponent
         StateHasChanged();
 
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
-        
+
         SubscribeToAction<EnsureWeatherLoadedAction>((action) => {
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
-                Snackbar.Add("Loading Weather Readings",  Severity.Info,
-                    options=> { options.HideIcon=true; },key: "Loading Weather Readings" );
+                Snackbar.Add("Loading Weather Readings", Severity.Info,
+                    options => { options.HideIcon = true; }, key: "Loading Weather Readings");
             }
         });
 
@@ -77,7 +78,7 @@ public partial class DataValidatorBase : FluxorComponent
             {
                 Snackbar.RemoveByKey("Loading Weather Readings");
                 Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning,
-                    options=> { options.HideIcon=true; } );
+                    options => { options.HideIcon = true; });
             }
         });
 
@@ -85,7 +86,7 @@ public partial class DataValidatorBase : FluxorComponent
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
                 Snackbar.Add("Loading Gas Readings", Severity.Info,
-                    options=> { options.HideIcon=true; },key: "Loading Gas Readings" );
+                    options => { options.HideIcon = true; }, key: "Loading Gas Readings");
             }
         });
 
@@ -94,7 +95,7 @@ public partial class DataValidatorBase : FluxorComponent
             {
                 Snackbar.RemoveByKey("Loading Gas Readings");
                 Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning,
-                    options=> { options.HideIcon=true; });
+                    options => { options.HideIcon = true; });
             }
         });
 
@@ -102,7 +103,7 @@ public partial class DataValidatorBase : FluxorComponent
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
                 Snackbar.Add("Loading Electricity Readings", Severity.Info,
-                    options=> { options.HideIcon=true; },key: "Loading Electricity Readings" );
+                    options => { options.HideIcon = true; }, key: "Loading Electricity Readings");
             }
         });
 
@@ -117,7 +118,7 @@ public partial class DataValidatorBase : FluxorComponent
         });
 
         SubscribeToAction<NotifyHeatingSetupFinishedAction>((action) => {
-           
+
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
                 Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
@@ -125,7 +126,7 @@ public partial class DataValidatorBase : FluxorComponent
         });
 
         SubscribeToAction<NotifyHeatingForecastFinishedAction>((action) => {
-            
+
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
                 Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
@@ -133,13 +134,13 @@ public partial class DataValidatorBase : FluxorComponent
         });
 
         SubscribeToAction<NotifyElectricityForecastResult>((action) => {
-            
+
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
                 Snackbar.Add(action.Message, action.Success ? Severity.Info : Severity.Warning, options => { options.HideIcon = true; });
             }
         });
-        SubscribeToAction<NotifyGasForecastResult>((action ) => {
+        SubscribeToAction<NotifyGasForecastResult>((action) => {
 
             if (TermsAndConditionsState.Value.WelcomeScreenSeenAndDismissed && !isFirstPageLoad)
             {
@@ -147,6 +148,11 @@ public partial class DataValidatorBase : FluxorComponent
             }
         });
 
+        if (UserLockState.Value.LockingOrLocked)
+        {
+            await LoadingFinished();
+            return;
+        }
 
         var weatherReadingCompletion = new TaskCompletionSource<(bool, string)>();
         Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherReadingCompletion));
@@ -166,8 +172,11 @@ public partial class DataValidatorBase : FluxorComponent
 
         await Task.WhenAll(gasReadingsCompletion.Task, electricityReadingsCompletion.Task);
 
+        await LoadingFinished();
+    }
 
-
+    private async Task LoadingFinished()
+    {
         await Task.Delay(1);
         StateHasChanged();
         UpdateStatus = "Ready";

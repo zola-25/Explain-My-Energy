@@ -17,7 +17,6 @@ public static class Utilities
             AuthorizeFailed = false,
             MeterType = meterType,
             Mpxn = null,
-            SetupValid = false,
             TariffDetails = ImmutableList<TariffDetailState>.Empty,
             InitialSetupValid = false,
             AuthorizeFailedMessage = null,

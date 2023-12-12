@@ -1,11 +1,12 @@
 ﻿@inherits FluxorComponent
-@implements IAsyncDisposable
+@inject ILogger<EnergyOnlyChart> Logger
 @inject IJSRuntime JsRuntime
 
 <div class="d-flex flex-row align-center justify-center">
     <MudText Typo="Typo.h4" Align="Align.Center" Class="d-flex eme-focus">@MeterType Meter Analysis</MudText>
     <DocTooltipIcon DocSnippetHeader="Temperature-independent Chart"
-                    DocSnippetType="DocSnippetType.ChartTemperatureIndependent" IconTitle="Help for the Temperature-independent Chart" />
+        DocSnippetType="DocSnippetType.ChartTemperatureIndependent"
+        IconTitle="Help for the Temperature-independent Chart" />
 </div>
 @if (_ready)
 {
@@ -47,12 +48,14 @@
         switch (MeterType)
         {
             case MeterType.Electricity:
-                SubscribeToAction<ElectricityAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
+                SubscribeToAction<ElectricityAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start,
+                action.End));
                 SubscribeToAction<ElectricityAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<ElectricityAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
                 break;
             case MeterType.Gas:
-                SubscribeToAction<GasAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start, action.End));
+                SubscribeToAction<GasAnalysisOptionsSetHighlightRangeAction>(action => OnHighlightRangeHandler(action.Start,
+                action.End));
                 SubscribeToAction<GasAnalysisOptionsRemoveHighlightRangeAction>(_ => OnRemoveHighlightRangeHandler());
                 SubscribeToAction<GasAnalysisOptionsShowCostAction>(c => OnToggledCostChangedHandler(c.ShowCost));
                 break;
@@ -74,103 +77,150 @@
         var latestReadingWeekStart = latestReadingTime.eStartOfWeek(DayOfWeek.Monday);
 
         var lastDate = forecastDailyCosts.Last().UtcTime.eStartOfWeek(DayOfWeek.Monday).AddDays(-1);
-        var applicableForecastCosts = forecastDailyCosts.Where(c => c.UtcTime >= latestReadingWeekStart && c.UtcTime <= lastDate);
+        var applicableForecastCosts = forecastDailyCosts.Where(c => c.UtcTime >= latestReadingWeekStart && c.UtcTime <=
+        lastDate);
 
         var forecastChartReadings = applicableForecastCosts.Select(Mapping.MapToChartReading).ToList();
         return forecastChartReadings;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
+        try
         {
-            var costedReadings = MeterType switch
+            if (firstRender)
             {
-                MeterType.Gas => GasReadingsState.Value.CostedReadings,
-                MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            var latestReading = costedReadings.Last();
-            var firstReading = costedReadings.First();
-
-            var chartReadings = costedReadings.Select(Mapping.MapToChartReading).ToList();
-
-            var forecastChartReadings = GetChartDailyForecastReadings(latestReading.UtcTime);
-
-            var firstReadingTicks = firstReading.UtcTime.eToUnixTicksNoOffset();
-            var latestReadingTicks = chartReadings.Last().DateTicks;
-
-
-            var highlightSet = AnalysisOptions.Value[MeterType].HighlightSet;
-            var meterChartProfile = new MeterChartProfile()
+                var costedReadings = MeterType switch
                 {
-                    ShowCost = AnalysisOptions.Value[MeterType].ShowCost,
-                    GlobalId = MeterGlobalId,
-                    LatestReading = latestReadingTicks,
-                    MostRecentWeekStart = latestReadingTicks,
-                    ProfileStart = chartReadings.First().DateTicks,
-                    OneMonthInTheFuture = latestReading.UtcTime.AddMonths(1).eToUnixTicksNoOffset(),
-                    ProfileEnd = forecastChartReadings.Last().DateTicks,
-                    ChartReadings = chartReadings,
-                    ChartDailyForecastReadings = forecastChartReadings,
-                    HighlightStart = highlightSet ? AnalysisOptions.Value[MeterType].HighlightStart?.eToUnixTicksNoOffset() : null,
-                    HighlightEnd = highlightSet ? AnalysisOptions.Value[MeterType].HighlightEnd?.eToUnixTicksNoOffset() : null
+                    MeterType.Gas => GasReadingsState.Value.CostedReadings,
+                    MeterType.Electricity => ElectricityReadingsState.Value.CostedReadings,
+                    _ => throw new ArgumentOutOfRangeException()
                 };
 
-            _latestReadingTime = latestReading.UtcTime;
+                var latestReading = costedReadings.Last();
+                var firstReading = costedReadings.First();
+
+                var chartReadings = costedReadings.Select(Mapping.MapToChartReading).ToList();
+
+                var forecastChartReadings = GetChartDailyForecastReadings(latestReading.UtcTime);
+
+                var firstReadingTicks = firstReading.UtcTime.eToUnixTicksNoOffset();
+                var latestReadingTicks = chartReadings.Last().DateTicks;
 
 
-            await JsRuntime.InvokeVoidAsync("ChartFunctions.setEnergyOnlyChart", $"profile-chart-meter-{MeterGlobalId}", meterChartProfile);
+                var highlightSet = AnalysisOptions.Value[MeterType].HighlightSet;
+                var meterChartProfile = new MeterChartProfile()
+                    {
+                        ShowCost = AnalysisOptions.Value[MeterType].ShowCost,
+                        GlobalId = MeterGlobalId,
+                        LatestReading = latestReadingTicks,
+                        MostRecentWeekStart = latestReadingTicks,
+                        ProfileStart = chartReadings.First().DateTicks,
+                        OneMonthInTheFuture = latestReading.UtcTime.AddMonths(1).eToUnixTicksNoOffset(),
+                        ProfileEnd = forecastChartReadings.Last().DateTicks,
+                        ChartReadings = chartReadings,
+                        ChartDailyForecastReadings = forecastChartReadings,
+                        HighlightStart = highlightSet ? AnalysisOptions.Value[MeterType].HighlightStart?.eToUnixTicksNoOffset() : null,
+                        HighlightEnd = highlightSet ? AnalysisOptions.Value[MeterType].HighlightEnd?.eToUnixTicksNoOffset() : null
+                    };
+
+                _latestReadingTime = latestReading.UtcTime;
 
 
-            _chartRendered = true;
+                var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+                jsInProcess.InvokeVoid("ChartFunctions.setEnergyOnlyChart", $"profile-chart-meter-{MeterGlobalId}", meterChartProfile);
+
+
+                _chartRendered = true;
+            }
         }
-    }
-
-    private async void OnHighlightRangeHandler(DateTime start, DateTime end)
-    {
-        if (!_chartRendered)
+        catch (Exception ex)
         {
-            return;
+            Logger.LogError(ex, ex.Message);
         }
-
-        long startTicks = start.eToUnixTicksNoOffset();
-        long endTicks = end.eToUnixTicksNoOffset();
-
-
-        await JsRuntime.InvokeVoidAsync(
-            "ChartFunctions.highlightRange",
-            $"profile-chart-meter-{MeterGlobalId}",
-            startTicks,
-            endTicks);
     }
 
-    private async void OnRemoveHighlightRangeHandler()
+    private void OnHighlightRangeHandler(DateTime start, DateTime end)
     {
-        if (!_chartRendered)
+        try
         {
-            return;
+            if (!_chartRendered)
+            {
+                return;
+            }
+
+            long startTicks = start.eToUnixTicksNoOffset();
+            long endTicks = end.eToUnixTicksNoOffset();
+
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid("ChartFunctions.highlightRange", $"profile-chart-meter-{MeterGlobalId}", startTicks, endTicks);
         }
-
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
-    }
-
-
-    private async void OnToggledCostChangedHandler(bool showCost)
-    {
-        if (!_chartRendered)
+        catch (Exception ex)
         {
-            return;
+            Logger.LogError(ex, ex.Message);
         }
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
     }
 
-    public async ValueTask DisposeAsync()
+    private void OnRemoveHighlightRangeHandler()
     {
-        base.Dispose();
-        await JsRuntime.InvokeVoidAsync("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
-        _ready = false;
+        try
+        {
+            if (!_chartRendered)
+            {
+                return;
+            }
+
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid("ChartFunctions.removeHighlight", $"profile-chart-meter-{MeterGlobalId}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
     }
+
+
+    private void OnToggledCostChangedHandler(bool showCost)
+    {
+        try
+        {
+            if (!_chartRendered)
+            {
+                return;
+            }
+
+            var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+            jsInProcess.InvokeVoid("ChartFunctions.toggleCostSeries", $"profile-chart-meter-{MeterGlobalId}", showCost);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, ex.Message);
+        }
+    }
+
+    private bool _isDisposed;
+
+    protected override void Dispose(bool isDisposing)
+    {
+        if (!_isDisposed)
+        {
+            if (isDisposing)
+            {
+                try
+                {
+                    var jsInProcess = (IJSInProcessRuntime)JsRuntime;
+                    jsInProcess.InvokeVoid("ChartFunctions.dispose", $"profile-chart-meter-{MeterGlobalId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, ex.Message);
+                }
+                _ready = false;
+            }
+            _isDisposed = true;
+        }
+        base.Dispose(isDisposing);
+    }
+
 
 }

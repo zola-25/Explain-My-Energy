@@ -27,7 +27,6 @@ public class AuthorizeMeterAction
                 {
                     Authorizing = true,
                     Authorized = false,
-                    SetupValid = false
                 }
             },
             MeterType.Gas => meterSetupState with
@@ -36,7 +35,6 @@ public class AuthorizeMeterAction
                 {
                     Authorizing = true,
                     Authorized = false,
-                    SetupValid = false
                 }
             },
             _ => throw new ArgumentException(nameof(action.MeterType)),

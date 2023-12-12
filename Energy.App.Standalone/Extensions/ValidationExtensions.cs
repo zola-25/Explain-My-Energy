@@ -44,6 +44,11 @@ public static class ValidationExtensions
 
     public static bool eIsValidMprn(this string meterIdentifier)
     {
+        if (meterIdentifier == null || meterIdentifier.Length < 6)
+        {
+            return false;
+        }
+
         if (!meterIdentifier.eIsDigitsOnly())
         {
             return false;
@@ -76,5 +81,35 @@ public static class ValidationExtensions
     public static bool eIsNotValidMprn(this string meterIdentifier)
     {
         return !meterIdentifier.eIsValidMprn();
+    }
+
+    public static bool eIsValidOutcode(this string outcode)
+    {
+        if (String.IsNullOrWhiteSpace(outcode) || outcode.Length > 5)
+        {
+            return false;
+        }
+        // check starts with letter and contains at least one digit
+        if(outcode[0].eIsLetter() && outcode.eContainsDigit())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public static bool eContainsDigit(this string str)
+    {
+        foreach (char c in str)
+        {
+            if (c >= '0' && c <= '9')
+                return true;
+        }
+
+        return false;
+    }
+
+    public static bool eIsLetter(this char c)
+    {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 }
