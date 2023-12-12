@@ -32,17 +32,13 @@
 
                         @if (UserLockState.Value.LockingOrLocked)
                         {
-                            <span><i class="fa-solid fa-lock"></i> Unlock Data</span>
+                            <span>Unlock Data <i aria-hidden="true" class="fa-solid fa-lock"></i></span>
                         }
                         else
                         {
-                            <span><i class="fa-solid fa-lock-open"></i> Lock Data</span>
+                            <span>Lock Data <i aria-hidden="true" class="fa-solid fa-lock-open"></i></span>
                         }
                     </MudButton>
-                    @if (unlockedWithHouseholdOrWeatherInvalid)
-                    {
-                        <MudText Typo="Typo.caption">Available when household and weather data loaded</MudText>
-                    }
                 </div>
                 <DocTooltipIcon DocSnippetHeader="Lock App & Setup Data"
                                 DocSnippetType="@DocSnippetType.LockingData"
