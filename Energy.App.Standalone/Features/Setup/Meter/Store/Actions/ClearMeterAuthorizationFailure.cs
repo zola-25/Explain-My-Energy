@@ -23,7 +23,7 @@ public class ClearMeterAuthorizationFailure
                 ElectricityMeter = meterSetupState[action.MeterType] with
                 {
                     AuthorizeFailed = false,
-                    AuthorizeFailedMessage = string.Empty
+                    AuthorizeFailedMessage = null
                 }
             },
             MeterType.Gas => meterSetupState with
@@ -31,7 +31,7 @@ public class ClearMeterAuthorizationFailure
                 GasMeter = meterSetupState[action.MeterType] with
                 {
                     AuthorizeFailed = false,
-                    AuthorizeFailedMessage = string.Empty
+                    AuthorizeFailedMessage = null
                 }
             },
             _ => throw new ArgumentException(nameof(action.MeterType)),

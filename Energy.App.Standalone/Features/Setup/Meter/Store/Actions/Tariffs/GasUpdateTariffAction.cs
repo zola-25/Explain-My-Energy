@@ -1,6 +1,7 @@
 ﻿using Energy.App.Standalone.DTOs.Tariffs;
 using Energy.App.Standalone.Extensions;
 using Fluxor;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions.Tariffs;
 
@@ -17,15 +18,16 @@ public class GasUpdateTariffAction
     [ReducerMethod]
     public static MeterSetupState Store(MeterSetupState state, GasUpdateTariffAction action)
     {
-        var newTariffState = action.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
+        var updatedTariffState = action.TariffDetail.eMapToTariffState(addGuidForNewTariff: false);
         // insert the new tariff after the last DateAppliesFrom index
-        int index = state.GasMeter.TariffDetails.FindIndex(c => c.GlobalId == newTariffState.GlobalId);
-
+        int index = state.GasMeter.TariffDetails.FindIndex(c => c.GlobalId == updatedTariffState.GlobalId);
+        var toUpdate = state.GasMeter.TariffDetails.ToList();
+        toUpdate[index] = updatedTariffState;
         return state with
         {
             GasMeter = state.GasMeter with
             {
-                TariffDetails = state.GasMeter.TariffDetails.SetItem(index, newTariffState)
+                TariffDetails = toUpdate.OrderByDescending(c => c.DateAppliesFrom).ToImmutableList()
             }
         };
     }

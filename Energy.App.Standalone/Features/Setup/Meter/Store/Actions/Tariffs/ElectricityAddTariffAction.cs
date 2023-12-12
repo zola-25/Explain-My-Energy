@@ -1,6 +1,7 @@
 ﻿using Energy.App.Standalone.DTOs.Tariffs;
 using Energy.App.Standalone.Extensions;
 using Fluxor;
+using System.Collections.Immutable;
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Store.Actions.Tariffs;
 
@@ -18,17 +19,16 @@ public class ElectricityAddTariffAction
     public static MeterSetupState Store(MeterSetupState state, ElectricityAddTariffAction action)
     {
         var newTariffState = action.TariffDetail.eMapToTariffState(addGuidForNewTariff: true);
-        // insert the new tariff after the last DateAppliesFrom index
-        var index = state.ElectricityMeter.TariffDetails.FindLastIndex(x => x.DateAppliesFrom < newTariffState.DateAppliesFrom);
 
+        var tariffsByDate = state.ElectricityMeter.TariffDetails.Append(newTariffState).OrderByDescending(c => c.DateAppliesFrom.Value).ToImmutableList();
+        
         return state with
         {
             ElectricityMeter = state.ElectricityMeter with
             {
-                TariffDetails = state.ElectricityMeter.TariffDetails.Insert(index + 1, newTariffState)
+                TariffDetails = tariffsByDate
             }
         };
     }
 }
 
-// write the same classes for gas

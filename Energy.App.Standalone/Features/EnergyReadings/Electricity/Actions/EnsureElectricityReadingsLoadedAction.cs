@@ -219,8 +219,8 @@ public class EnsureElectricityReadingsLoadedAction
                     }
                     (bool, string)[] forecastResults = await Task.WhenAll(historicalForecastCompletion.Task, heatingForecastCompletion.Task);
 
-                    valid = valid && forecastResults.All(c => c.Item1);
-                    message = String.Join(Environment.NewLine, message.eYield().Concat(forecastResults.Select(c => c.Item2)));
+                    valid = forecastResults.All(c => c.Item1);
+                    message = valid ? $"{meterType} Forecasts: Completed" : $"{meterType} Forecasts: Error Encountered";
                 }
 
                 dispatcher.Dispatch(new NotifyElectricityLoadingFinished(valid, message));

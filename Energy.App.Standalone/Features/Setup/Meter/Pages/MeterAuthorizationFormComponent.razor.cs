@@ -8,6 +8,9 @@ using Energy.App.Standalone.PageComponents;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Energy.App.Standalone.Features.Analysis.Store.HistoricalForecast.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
+using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 
 
 namespace Energy.App.Standalone.Features.Setup.Meter.Pages;
@@ -41,17 +44,62 @@ public partial class MeterAuthorizationFormComponent
     string AuthorizeFailedMessage => MeterSetupState.Value[MeterType].AuthorizeFailedMessage;
 
     bool ParametersSet;
-
+    bool readingsLoadedSuccess = false;
+    bool readingsLoadingComplete = false;
 
     private bool _freshNavigation = true;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<NotifyGasLoadingFinished>(OnGasLoadingFinished);
+        SubscribeToAction<NotifyElectricityLoadingFinished>(OnElectricityLoadingFinished);
+    }
+
+    private void OnElectricityLoadingFinished(NotifyElectricityLoadingFinished finished)
+    {
+        if(MeterType != MeterType.Electricity)
+        {
+            return;
+        }
+        readingsLoadedSuccess = finished.Success;
+        if(!finished.Success)
+        {
+            Logger.LogError("Error loading Electricity Readings: {ErrorMessage}", finished.Message);
+        }
+        readingsLoadingComplete = true;
+    }
+
+    private void OnGasLoadingFinished(NotifyGasLoadingFinished finished)
+    {
+        if(MeterType != MeterType.Gas)
+        {
+            return;
+        }
+        readingsLoadedSuccess = finished.Success;
+        if(!finished.Success)
+        {
+            Logger.LogError("Error loading Gas Readings: {ErrorMessage}", finished.Message);
+        }
+        readingsLoadingComplete = true;
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         try
         {
             await base.OnParametersSetAsync();
 
+            if(UserLockState.Value.LockingOrLocked)
+            {
+                ParametersSet = false;
+                return;
+            }
+
             if (FreshNavigation && _freshNavigation)
             {
+                readingsLoadedSuccess = false;
+                readingsLoadingComplete = false;
                 if (AuthorizeFailed)
                 {
                     Dispatcher.Dispatch(new ClearMeterAuthorizationFailure(MeterType));
@@ -76,6 +124,9 @@ public partial class MeterAuthorizationFormComponent
     {
         try
         {
+            readingsLoadedSuccess = false;
+            readingsLoadingComplete = false;
+
             if (ParametersSet)
             {
                 Dispatcher.Dispatch(new AuthorizeMeterAction(MeterType));

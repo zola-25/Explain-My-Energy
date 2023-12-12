@@ -1,9 +1,12 @@
 ﻿@inherits FluxorComponent
 @inject IDispatcher Dispatcher
+@inject IState<UserLockState> UserLockState
 @inject AppStatus AppConfig
 
 @if (_readyToInteract)
 {
+    bool disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+
     <EditForm Model="@_householdDetails" OnValidSubmit="HandleValidSubmit">
 
         <MudCard Elevation="0">
@@ -18,10 +21,12 @@
                                     Placeholder="Select Move-in Date"
                                     FixDay="1"
                                     @bind-Date:after="@(() => { _openTo = OpenTo.Month; })"
-                                    Disabled="@AppConfig.IsDemoMode"
+                                    Disabled="@disableInputs"
                                     OpenTo="@_openTo"
+                                    Label="Move-in Date"
                                     AnchorOrigin="Origin.CenterRight"
                                     TransformOrigin="Origin.CenterRight"
+                                    ReadOnly="@_submitting"
                                     Clearable="true"
                                     DisableToolbar="@_disableToolbar"
                                     DateFormat="MMMM yyyy"
@@ -32,7 +37,11 @@
 
                  <div class="my-3 d-flex align-baseline">
                      <MudTextField For="@(() => _householdDetails.IhdMacId)"
-                     @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@AppConfig.IsDemoMode"
+                                   ReadOnly="@_submitting"
+                                   Converter="@uppercaseConverter"
+                                   T="string"
+                                   Label="IHD MAC ID"
+                                   @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@(disableInputs)"
                                    Placeholder="IHD MAC ID"></MudTextField>
                      <DocTooltipIcon DocSnippetHeader="In-Home Device MAC ID" DocSnippetType="DocSnippetType.HouseholdIHD" IconTitle="Help for IHD MAC ID" />
 
@@ -41,13 +50,17 @@
                      <MudAutocomplete @bind-Value="_householdDetails.OutCode"
                                       For="@(() => _householdDetails.OutCode)"
                                       T="OutCode" CoerceText="true"
+                                      ReadOnly="@_submitting"
+                                      Label="Postal Area"
+                                      MaxLength="5"
                                       Clearable="true"
                                       Placeholder="Postal Area"
                                       Culture="@System.Globalization.CultureInfo.InvariantCulture"
-                                      Required
+                                              Required
                                       HelperText="Enter the first two characters and select from the dropdown"
                                       HelperTextOnFocus="true"
-                                      Disabled="@AppConfig.IsDemoMode"
+                                      Disabled="@(disableInputs)"
+                                      UserAttributes="@(new(){{"autocomplete", "off"}})"
                                       ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                       MinCharacters="2"
                                       OnClearButtonClick="ClearPostalArea"
@@ -60,21 +73,33 @@
                  </div>
                  <div class="d-flex align-baseline justify-center">
                      <MudRadioGroup Name="Primary Heat Source" T="MeterType" For="@(() => _householdDetails.PrimaryHeatSource)"
-                                    Disabled="@AppConfig.IsDemoMode" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource">
+                                    Disabled="@disableInputs" Required @bind-SelectedOption="@_householdDetails.PrimaryHeatSource" ReadOnly="@_submitting">
                          <MudRadio T="MeterType" Option="MeterType.Gas">Gas</MudRadio>
                          <MudRadio T="MeterType" Option="MeterType.Electricity">Electricity</MudRadio>
                      </MudRadioGroup>
                  </div>
              </MudCardContent>
              <MudCardActions Class="d-flex flex-column align-start ">
-                 <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@AppConfig.IsDemoMode" Color="Color.Primary">@_saveButtonText</MudButton>
+                 <MudButton Class="mx-auto" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Size="Size.Medium" Disabled="@(disableInputs || _submitting)" Color="Color.Primary">@_saveButtonText</MudButton>
 
-                 <MudText Class="mx-auto mt-3 fw-bold" Color="Color.Success" hidden="@(!_submitSuccessful)">
-                     <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
-                 </MudText>
-             </MudCardActions>
-         </MudCard>
-     </EditForm>
+                    <div class="@(_submitting ? "d-flex mx-auto mt-3" : "d-none")">
+                        <MudText Class="fw-bold" Color="Color.Default">
+                            Saving
+                        </MudText>
+                    </div>
+                    <div class="@(_submitSuccessful ? "d-flex mx-auto mt-3 fw-bold" : "d-none")">
+                        <MudText class="fw-bold" Color="Color.Success">
+                            <i class="fa-solid fa-check" aria-hidden="true"></i> @_saveResponseMessage
+                        </MudText>
+                    </div>
+                    <div class="@(_loadingWeatherData ? "d-flex mx-auto mt-3" : "d-none")">
+                        <MudText Class="fw-bold" Color="@_weatherLoadingColor">
+                            <i class="fa-solid fa-temperature-half" aria-hidden="true"></i> @weatherDataLoadMessage
+                        </MudText>
+                    </div>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
 }
 @code {
 
@@ -85,11 +110,22 @@
 
     HouseholdDetails _householdDetails = new();
 
+    Converter<string> uppercaseConverter = new Converter<string>
+        {
+            SetFunc = value => value?.ToUpperInvariant(),
+            GetFunc = text => (text ?? "").ToUpperInvariant(),
+        };
+
     string _saveResponseMessage = string.Empty;
+    bool _submitting;
     bool _submitSuccessful;
+    bool _loadingWeatherData;
+    string weatherDataLoadMessage = string.Empty;
+
+    Color _weatherLoadingColor = Color.Default;
 
     bool _readyToInteract;
-    private string _saveButtonText;
+    string _saveButtonText;
 
     protected override void OnInitialized()
     {
@@ -98,21 +134,55 @@
 
         SetHouseholdInputs();
         SubscribeToAction<NotifyHouseholdSavedSuccess>(ShowSuccessMessage);
+        SubscribeToAction<EnsureWeatherLoadedAction>((action) =>
+        {
+            _loadingWeatherData = true;
+            _weatherLoadingColor = Color.Default;
+            weatherDataLoadMessage = "Loading Weather Data..";
 
+        });
+        SubscribeToAction<NotifyWeatherLoadingFinished>((action) =>
+        {
+            if (action.Success)
+            {
+                _weatherLoadingColor = Color.Info;
+                weatherDataLoadMessage = "Weather Data Loaded";
+            }
+            else
+            {
+                _weatherLoadingColor = Color.Warning;
+                weatherDataLoadMessage = "Weather Data Failed to Load";
+            }
+        });
+        SubscribeToAction<SetSetupDataLockedAction>((action) =>
+        {
+            SetHouseholdInputs();
+        });
+        SubscribeToAction<SetSetupDataUnlockedAction>((action) =>
+        {
+            SetHouseholdInputs();
+        });
         _readyToInteract = true;
     }
 
     OpenTo _openTo = OpenTo.Year;
+
+
+    private HouseholdDetails GetHouseholdDetails()
+    {
+        return new HouseholdDetails()
+            {
+                IhdMacId = UserLockState.Value.LockingOrLocked ? "Locked" : HouseholdState.Value.IhdMacId,
+                MoveInDate = UserLockState.Value.LockingOrLocked ? new DateTime(1900, 1, 1) : HouseholdState.Value.MoveInDate,
+                OutCode = UserLockState.Value.LockingOrLocked ? new OutCode() { OutCodeCharacters = "Locked" } : new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
+                PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
+            };
+    }
     private void SetHouseholdInputs()
     {
         _openTo = HouseholdState.Value.MoveInDate is null ? OpenTo.Year : OpenTo.Month;
-        _householdDetails = new HouseholdDetails()
-            {
-                IhdMacId = HouseholdState.Value.IhdMacId,
-                MoveInDate = HouseholdState.Value.MoveInDate,
-                OutCode = new OutCode() { OutCodeCharacters = HouseholdState.Value.OutCodeCharacters },
-                PrimaryHeatSource = HouseholdState.Value.PrimaryHeatSource
-            };
+
+        _householdDetails = GetHouseholdDetails();
         _saveButtonText = HouseholdState.Value.Saved ? "Update" : "Save";
     }
 
@@ -139,6 +209,7 @@
 
     private void ShowSuccessMessage(NotifyHouseholdSavedSuccess _)
     {
+        _submitting = false;
         _submitSuccessful = true;
         _saveResponseMessage = "Household Details Saved";
     }
@@ -150,8 +221,15 @@
         public int Height { get; set; }
     }
 
-    private void HandleValidSubmit()
+    private async void HandleValidSubmit()
     {
+        _submitting = true;
+        _submitSuccessful = false;
+        _saveResponseMessage = string.Empty;
+        _loadingWeatherData = false;
+
+        await Task.Delay(TimeSpan.FromSeconds(2));
+
         Dispatcher.Dispatch(new HouseholdSubmitSuccessAction(
             _householdDetails.MoveInDate,
             _householdDetails.IhdMacId,

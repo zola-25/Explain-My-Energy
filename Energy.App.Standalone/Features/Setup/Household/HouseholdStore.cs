@@ -28,20 +28,3 @@ public record HouseholdState
     }
 }
 
-public static class CreateUtilities
-{
-    public static HouseholdState Create()
-    {
-
-
-        return new HouseholdState()
-        {
-            Saved = false,
-            Invalid = false,
-            MoveInDate = null,
-            IhdMacId = null,
-            OutCodeCharacters = null,
-            PrimaryHeatSource = MeterType.Gas
-        };
-    }
-}

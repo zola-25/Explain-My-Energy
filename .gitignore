@@ -399,6 +399,7 @@ FodyWeavers.xsd
 
 # Local History for Visual Studio Code
 .history/
+.history/**/*
 
 # Windows Installer files from build outputs
 *.cab
@@ -422,3 +423,4 @@ Energy.App.Standalone/webAssets/**/*
 
 *.pem
 *.key
+/omnisharp.json

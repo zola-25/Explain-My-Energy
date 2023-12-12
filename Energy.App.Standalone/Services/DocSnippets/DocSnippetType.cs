@@ -16,6 +16,7 @@ public enum DocSnippetType
     ManualActionsUpdateMeterData,
     ManualActionsRemoveMeter,
     ManualActionsWipeAllData,
+    LockingData,
     EditingTariffs,
     AnalysisOptionsStatus,
     AnalysisOptionsChartKWhVsCost,
