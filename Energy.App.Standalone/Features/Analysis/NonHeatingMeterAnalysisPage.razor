@@ -1,8 +1,17 @@
 ﻿@page "/Meter/{MeterTypeName}"
 @inherits FluxorComponent
+@inject IState<UserLockState> UserLockState
 
 <ExtendedPageTitle>@MeterTypeName Analysis</ExtendedPageTitle>
-@if (_ready)
+@if (UserLockState.Value.LockingOrLocked)
+{
+    <MudPaper Elevation="2" Class="mt-5 mb-10">
+        <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+            Setup Data is Locked
+        </MudText>
+    </MudPaper>
+}
+else if (_ready)
 {
     <MeterAnalysisTemplate MeterType="_meterType" PrimaryHeatSource="false">
         <EnergyChart>

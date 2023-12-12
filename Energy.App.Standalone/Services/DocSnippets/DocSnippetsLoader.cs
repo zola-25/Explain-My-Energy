@@ -1,4 +1,5 @@
-﻿using AngleSharp.Html.Dom;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using Energy.Shared;
 using Ganss.Xss;
 using HtmlAgilityPack;
@@ -13,37 +14,38 @@ public class DocSnippetsLoader
     private static readonly Dictionary<DocSnippetType, SnippetLoadResult> SavedSnippets = new();
 
     private static readonly HtmlSanitizerOptions DefaultHtmlSanitizerOptions =
-        new()
-        {
+        new() {
             AllowedTags = new HashSet<string>() { "div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "a", "span", "em", "strong", "ul", "ol", "li" },
             AllowedAttributes = new HashSet<string>() { "href", "alt" },
             UriAttributes = new HashSet<string>() { "href" },
             AllowedSchemes = new HashSet<string>() { "https" },
         };
 
-    private static readonly Dictionary<DocSnippetType, SnippetCreationDetails> SnippetCreationDetailsLookup = new() {
-        {DocSnippetType.AppSetupStatus, new SnippetCreationDetails { Subpath = "setup/app-setup-status.html", Anchor = "#app-setup-status", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions } },
-        {DocSnippetType.SetupWizard, new SnippetCreationDetails { Subpath = "setup/setup-wizard.html", Anchor = "#setup-wizard", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions } },
-        {DocSnippetType.HouseholdIHD, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#smart-meter-ihd-mac-id", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions } },
-        {DocSnippetType.HouseholdMoveInDate, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#move-in-date" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.HouseholdPostalArea, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#postal-area" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.HouseholdPrimaryHeatingSource, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#primary-heating-source" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.GasMeterMPRN, new SnippetCreationDetails { Subpath = "setup/gas-meter.html", Anchor = "#gas-meter-mprn" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ElectricityMeterMPAN, new SnippetCreationDetails { Subpath = "setup/electricity-meter.html", Anchor = "#electricity-meter-mpan" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AuthorizationN3rgyPage, new SnippetCreationDetails { Subpath = "setup/authorization.html", Anchor = "#authorization-process" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.WeatherDataStatus, new SnippetCreationDetails { Subpath = "setup/local-weather.html", Anchor = "#weather-data-status" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.WeatherDataTable, new SnippetCreationDetails { Subpath = "setup/local-weather.html", Anchor = "#weather-data-table" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ManualActionsUpdateMeterData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#update-or-reload-meter-readings" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ManualActionsRemoveMeter, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#removing-meters" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ManualActionsWipeAllData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#wipe-all-data" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.EditingTariffs, new SnippetCreationDetails { Subpath = "setup/tariffs.html", Anchor = "#editing-tariffs" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AnalysisOptionsStatus, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#analysis-options-status" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AnalysisOptionsChartKWhVsCost, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#chart-kwh-vs-cost" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AnalysisOptionsAnalysisTerm, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#analysis-term" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AnalysisOptionsTemperatureVsHistorical, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#temperature-forecast-vs-historical" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.AnalysisOptionsAdjustingForecast, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#adjusting-temperature-forecast" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ChartTemperatureDependent, new SnippetCreationDetails { Subpath = "analysis/understanding-chart-data.html", Anchor = "#temperature-dependent-energy-chart" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions} },
-        {DocSnippetType.ChartTemperatureIndependent, new SnippetCreationDetails { Subpath = "analysis/understanding-chart-data.html", Anchor = "#temperature-independent-energy-chart" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions  } },
+    private static readonly Dictionary<DocSnippetType, SnippetCreationDetails> SnippetCreationDetailsLookup = new()
+    {
+        {DocSnippetType.AppSetupStatus, new SnippetCreationDetails { Subpath = "setup/app-setup-status.html", Anchor = "#app-setup-status", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.SetupWizard, new SnippetCreationDetails { Subpath = "setup/setup-wizard.html", Anchor = "#setup-wizard", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.HouseholdIHD, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#smart-meter-ihd-mac-id", HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.HouseholdMoveInDate, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#move-in-date" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.HouseholdPostalArea, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#postal-area" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.HouseholdPrimaryHeatingSource, new SnippetCreationDetails { Subpath = "setup/household.html", Anchor = "#primary-heating-source" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.GasMeterMPRN, new SnippetCreationDetails { Subpath = "setup/gas-meter.html", Anchor = "#gas-meter-mprn" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ElectricityMeterMPAN, new SnippetCreationDetails { Subpath = "setup/electricity-meter.html", Anchor = "#electricity-meter-mpan" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AuthorizationN3rgyPage, new SnippetCreationDetails { Subpath = "setup/authorization.html", Anchor = "#authorization-process" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.WeatherDataStatus, new SnippetCreationDetails { Subpath = "setup/local-weather.html", Anchor = "#weather-data-status" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.WeatherDataTable, new SnippetCreationDetails { Subpath = "setup/local-weather.html", Anchor = "#weather-data-table" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ManualActionsUpdateMeterData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#update-or-reload-meter-readings" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ManualActionsRemoveMeter, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#removing-meters" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ManualActionsWipeAllData, new SnippetCreationDetails { Subpath = "setup/manual-actions.html", Anchor = "#wipe-all-data" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.LockingData, new SnippetCreationDetails { Subpath = "setup/app-data-locking.html", Anchor = "#locking-the-app" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = String.Empty } },
+        {DocSnippetType.EditingTariffs, new SnippetCreationDetails { Subpath = "setup/tariffs.html", Anchor = "#editing-tariffs" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AnalysisOptionsStatus, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#analysis-options-status" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AnalysisOptionsChartKWhVsCost, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#chart-kwh-vs-cost" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AnalysisOptionsAnalysisTerm, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#analysis-term" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AnalysisOptionsTemperatureVsHistorical, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#temperature-forecast-vs-historical" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.AnalysisOptionsAdjustingForecast, new SnippetCreationDetails { Subpath = "analysis/analysis-options.html", Anchor = "#adjusting-temperature-forecast" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ChartTemperatureDependent, new SnippetCreationDetails { Subpath = "analysis/understanding-chart-data.html", Anchor = "#temperature-dependent-energy-chart" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
+        {DocSnippetType.ChartTemperatureIndependent, new SnippetCreationDetails { Subpath = "analysis/understanding-chart-data.html", Anchor = "#temperature-independent-energy-chart" , HtmlSanitizerOptions = DefaultHtmlSanitizerOptions, EndNodeStartsWith = "h" } },
     };
 
     private record SnippetCreationDetails
@@ -51,8 +53,11 @@ public class DocSnippetsLoader
         public string Subpath { get; init; }
         public string Anchor { get; init; }
 
+        public string EndNodeStartsWith { get; init; }
         public HtmlSanitizerOptions HtmlSanitizerOptions { get; init; }
     }
+
+
 
     private enum SnippetLoadSource
     {
@@ -179,7 +184,7 @@ public class DocSnippetsLoader
                     }
                 };
 
-                var newSnippet = GetSnippetFromAnchorNode(snippetNode, sourceUrl, htmlSanitizer);
+                var newSnippet = GetSnippetFromAnchorNode(snippetNode, sourceUrl, snippetCreationDetails.EndNodeStartsWith, htmlSanitizer);
                 SaveSnippet(docSnippet, newSnippet);
             }
             catch (Exception ex)
@@ -211,7 +216,7 @@ public class DocSnippetsLoader
         }
     }
 
-    private static SnippetLoadResult GetSnippetFromAnchorNode(HtmlNode snippetNode, string sourceUrl, HtmlSanitizer htmlSanitizer)
+    private static SnippetLoadResult GetSnippetFromAnchorNode(HtmlNode snippetNode, string sourceUrl, string endNodeStartsWith, HtmlSanitizer htmlSanitizer)
     {
 
         var current = snippetNode;
@@ -222,7 +227,7 @@ public class DocSnippetsLoader
             current = current.NextSibling;
 
             // Stop if you reach another header element (h1, h2, ..., h6).
-            if (current != null && current.Name.StartsWith("h"))
+            if (current != null && !String.IsNullOrEmpty(endNodeStartsWith) && current.Name.StartsWith(endNodeStartsWith))
             {
                 break;
             }

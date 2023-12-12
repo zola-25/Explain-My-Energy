@@ -15,6 +15,9 @@ As explained in the warning popup, this will delete all your data saved in your 
 
 It will reset the application to its initial state, and you will need to re-enter your household details and re-authorize your meters. You will be redirected to the initial Welcome page.
 
+## Locking the Application
+
+This features locks the application and encrypts sensitive data - see [App Data Locking](./app-data-locking) for more details.
 
 ## Removing Meters
 

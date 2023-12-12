@@ -86,6 +86,8 @@ The application is designed to be as accurate and easy-to-use as possible, but t
 > When using the app, your energy usage data, smart meter IHD MAC ID, and meter serial numbers are stored in your browser's local storage and not encrypted. Other sites, or applications, cannot access this data, but if someone has gained access to your device, or your device's security is compromised (with malware for example), this data could be accessed.
 > 
 > Without any assumption of your IT knowledge, standard device security measures apply - don't set up this app with your energy details on a publicly shared device or a device you don't trust, and keep your device, anti-virus and browser up to date (especially Windows devices - but this is likely all enabled by default).
+>
+> There is now the ability to 'Lock' the application when not in use, which will encrypt sensitive data and prevent access to the application without a password. This provides an additional layer of security, but is not a substitute for good device security. See the page [App Locking](./setup/app-data-locking) for more details.
 
 
 

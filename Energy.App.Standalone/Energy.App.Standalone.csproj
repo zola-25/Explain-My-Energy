@@ -54,6 +54,8 @@
 		<TrimmerRootAssembly Include="AngleSharp" />
 		<TrimmerRootAssembly Include="HtmlAgilityPack" />
 		<TrimmerRootAssembly Include="System.Collections.Immutable" />
+		<TrimmerRootAssembly Include="System.ComponentModel.DataAnnotations" />
+		<TrimmerRootAssembly Include="System.ComponentModel.Annotations" />
 	</ItemGroup>
 
 	<PropertyGroup>

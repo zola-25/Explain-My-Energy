@@ -26,12 +26,12 @@ h1:focus {
 }
 
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    border-bottom: 2px solid #26b050;
 }
 
 
 .invalid {
-    outline: 1px solid red;
+    border-bottom: 2px solid red;
 }
 
 .validation-message {
@@ -141,14 +141,22 @@ h1:focus {
     height: 90%;
 }
 
-.spinner {
-    margin: 100px auto;
+
+@mixin spinner-y-margin($margin) {
+    margin: $margin auto;
     width: 40px;
     height: 40px;
     position: relative;
 }
+.spinner {
+    @include spinner-y-margin(100px);
+}
 
-.spinner::before {
+.spinner-authorization {
+    @include spinner-y-margin(20px);
+}
+
+.spinner::before, .spinner-authorization::before {
     content: '';
     display: block;
     width: 100%;
@@ -167,6 +175,19 @@ h1:focus {
     100% {
         transform: rotate(360deg);
     }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.1;
+    }
+}
+
+.icon-fade-out {
+    animation: fadeOut 5s linear;
 }
 
 /* helpers */
@@ -216,6 +237,10 @@ h1:focus {
     width: 150px !important;
 }
 
+.minw-130px {
+    min-width: 130px !important;
+}
+
 .w-Inherit {
     width: inherit !important;
 }
@@ -223,6 +248,42 @@ h1:focus {
 .right-align-input {
     input {
         text-align: right;
+    }
+}
+
+.unlock-ihd-mac-id {
+    width: calc(100% - 25px);
+}
+
+.label-unlock-ihd-mac-id {
+    min-width: 118px;
+    @media (max-width: 392px) {
+        text-align: center;
+    }
+}
+
+.label-lock-password {
+    min-width: 139px;
+    @media (max-width: 422px) {
+        text-align: center;
+    }
+}
+
+.lock-password-ihd-mac-id {
+    .mud-input-control-helper-container > p {
+        text-align: center;
+        color: var(--mud-palette-text-primary);
+        font-size: var(--mud-typography-caption-size);
+        font-family: var(--mud-typography-caption-family);
+        font-weight: var(--mud-typography-caption-weight);
+        line-height: var(--mud-typography-caption-lineheight);
+        letter-spacing: var(--mud-typography-caption-letterspacing);
+        text-transform: var(--mud-typography-caption-text-transform);
+        font-weight: bolder;
+    }
+
+    input {
+        text-align: center;
     }
 }
 

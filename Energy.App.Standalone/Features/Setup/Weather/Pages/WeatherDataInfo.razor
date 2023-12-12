@@ -1,8 +1,9 @@
-﻿@inherits FluxorComponent
+﻿@namespace Energy.App.Standalone.Features.Setup.Weather.Pages
+@inherits FluxorComponent
 @inject IState<WeatherState> WeatherState
 @inject IState<HouseholdState> HouseholdState
+@inject IState<UserLockState> UserLockState
 @inject IDispatcher Dispatcher
-
 <div class="d-flex flex-wrap justify-space-between align-baseline">
     <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
         <MudText Typo="Typo.h5" Class=" fw-bolder">Weather Data Status</MudText>
@@ -31,6 +32,13 @@
             <MudTd colspan="5">
                 <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
                     Complete Household setup to view your imported local Weather Data
+                </MudText>
+            </MudTd>
+        }
+        else if (UserLockState.Value.LockingOrLocked) {
+            <MudTd colspan="5">
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                    Setup Data is Locked
                 </MudText>
             </MudTd>
         }
@@ -90,7 +98,7 @@
 
             </MudTd>
             <MudTd DataLabel="View Weather Data">
-                <MudButton Href="/WeatherDataTable" Color="Color.Secondary" Variant="Variant.Filled">View Data</MudButton>
+                <MudButton Href="/WeatherDataTable" Color="Color.Secondary" Disabled="UserLockState.Value.LockingOrLocked" Variant=" Variant.Filled">View Data</MudButton>
             </MudTd>
         }
     </RowTemplate>
