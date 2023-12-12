@@ -53,7 +53,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       
       - name: Install wasm-tools
-        run: dotnet workload install wasm-tools
+        run: dotnet workload install wasm-tools-net7
       
       - name: Restore for .NET dependencies required for client setup tests
         working-directory: ./
