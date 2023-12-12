@@ -85,7 +85,7 @@ public class TermDateRanges : ITermDateRanges
         {
             CalendarTerm.Week => GetNextWeekStartingDate(),
             CalendarTerm.Day => today.AddDays(1),
-            CalendarTerm.Month => new DateTime(today.Year, today.Month + 1, 1),
+            CalendarTerm.Month => new DateTime(today.Year, today.Month, 1).AddMonths(1),
             _ => throw new ArgumentOutOfRangeException(nameof(duration), duration, null)
         };
 

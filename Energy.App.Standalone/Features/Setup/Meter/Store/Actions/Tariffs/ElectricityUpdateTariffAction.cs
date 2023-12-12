@@ -29,7 +29,7 @@ public class ElectricityUpdateTariffAction
         {
             ElectricityMeter = state.ElectricityMeter with
             {
-                TariffDetails = toUpdate.OrderBy(c => c.DateAppliesFrom).ToImmutableList()
+                TariffDetails = toUpdate.OrderByDescending(c => c.DateAppliesFrom).ToImmutableList()
             }
         };
     }

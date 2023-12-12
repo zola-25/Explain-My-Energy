@@ -1,30 +1,68 @@
 ﻿@page "/Setup"
 @using Blazored.LocalStorage;
 @inject AppStatus AppConfig
+@inject IState<UserLockState> UserLockState
+@inject IState<HouseholdState> HouseholdState
+@inject IState<WeatherState> WeatherState
 @inherits FluxorComponent
 
 
 <ExtendedPageTitle>App Setup</ExtendedPageTitle>
 
+@{
+    bool disableInputs = AppConfig.IsDemoMode || UserLockState.Value.LockingOrLocked;
+    bool householdSetup = HouseholdState.Value.Saved && !HouseholdState.Value.Invalid;
 
+    bool householdOrWeatherInvalid = !householdSetup || String.IsNullOrEmpty(WeatherState.Value.OutCode) || !String.Equals(WeatherState.Value.OutCode.Trim(), HouseholdState.Value.OutCodeCharacters.Trim(), StringComparison.InvariantCultureIgnoreCase);
+    bool unlockedWithHouseholdOrWeatherInvalid = (!UserLockState.Value.SetupDataLocked && householdOrWeatherInvalid);
+}
 
 <MudGrid Justify="Justify.Center" Class="mb-15">
     <MudItem xs="12">
 
-        <div class="d-flex justify-end align-baseline mt-2">
-            <MudButton Class="ma-0"
-                       ButtonType="ButtonType.Button"
-                       Disabled="@AppConfig.IsDemoMode"
-                       Size="Size.Small"
-                       Variant="Variant.Filled"
-                       OnClick="WipeAllAsync"
-                       Color="Color.Error"
-                       EndIcon="@Icons.Material.Filled.DeleteForever"
-                       title="Wipe all data?">
-                Wipe All Data
-            </MudButton>
-            <DocTooltipIcon DocSnippetHeader="Wipe All Data" DocSnippetType="DocSnippetType.ManualActionsWipeAllData" IconTitle="Help for Wiping All User Data" />
+        <div class="d-flex flex-wrap justify-space-between align-baseline mt-2">
+            <div class="d-flex flex-wrap align-center justify-center">
+                <div class="d-flex flex-1 flex-column align-baseline">
+                    <MudButton Class="ma-0" ButtonType="ButtonType.Button"
+                               Disabled="@(AppConfig.IsDemoMode || UserLockState.Value.LockingOrUnlocking || unlockedWithHouseholdOrWeatherInvalid)"
+                               Size="Size.Small" Variant="Variant.Filled"
+                               OnClick="OpenLockOrUnlockDialog"
+                               Color="Color.Secondary"
+                               title="@(UserLockState.Value.SetupDataLocked ? "Unlock Data" : "Lock Data")">
 
+                        @if (UserLockState.Value.LockingOrLocked)
+                        {
+                            <span><i class="fa-solid fa-lock"></i> Unlock Data</span>
+                        }
+                        else
+                        {
+                            <span><i class="fa-solid fa-lock-open"></i> Lock Data</span>
+                        }
+                    </MudButton>
+                    @if (unlockedWithHouseholdOrWeatherInvalid)
+                    {
+                        <MudText Typo="Typo.caption">Available when household and weather data loaded</MudText>
+                    }
+                </div>
+                <DocTooltipIcon DocSnippetHeader="Lock App & Setup Data"
+                                DocSnippetType="@DocSnippetType.LockingData"
+                                IconTitle="Lock the app and secure your Setup Data, with a password and your IHD MAC ID" />
+                <LockStorageDialog @bind-Open="@_showLockStorageDialog" />
+                <UnlockStorageDialog @bind-Open="@_showUnlockStorageDialog" />
+            </div>
+
+            <div class="d-flex flex-wrap align-center justify-center">
+                <div class="d-flex flex-1 flex-column align-baseline">
+                    <MudButton Class="ma-0" ButtonType="ButtonType.Button" Disabled="@disableInputs" Size="Size.Small"
+                               Variant="Variant.Filled" OnClick="WipeAllAsync" Color="Color.Error"
+                               EndIcon="@Icons.Material.Filled.DeleteForever" title="Wipe all data?">
+                        Wipe All Data
+                    </MudButton>
+                </div>
+                <DocTooltipIcon DocSnippetHeader="Wipe All Data"
+                                DocSnippetType="DocSnippetType.ManualActionsWipeAllData"
+                                IconTitle="Help for Wiping All User Data" />
+            </div>
         </div>
 
     </MudItem>
@@ -41,7 +79,7 @@
         </MudPaper>
     </MudItem>
 
-    <MudItem xs="12" >
+    <MudItem xs="12">
         <MudPaper Elevation="2" Class="p-2">
             <WeatherDataInfo></WeatherDataInfo>
         </MudPaper>
@@ -87,11 +125,25 @@
 
     private MudMessageBox WipeAllDataBox { get; set; }
 
+    private void OpenLockOrUnlockDialog()
+    {
+        if (UserLockState.Value.SetupDataLocked)
+        {
+            _showUnlockStorageDialog = true;
+        }
+        else
+        {
+            _showLockStorageDialog = true;
+        }
+    }
+
     public void ToggleErrorPopover()
     {
         _showWipeError = !_showWipeError;
     }
     private bool _showWipeError = false;
+    private bool _showLockStorageDialog = false;
+    private bool _showUnlockStorageDialog = false;
 
     private async void WipeAllAsync()
     {

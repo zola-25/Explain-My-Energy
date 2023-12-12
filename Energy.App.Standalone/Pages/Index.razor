@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Energy.App.Standalone.Pages.SetupWizard
 @inject AppStatus AppStatus
+@inject IState<UserLockState> UserLockState
 
 <ExtendedPageTitle>Welcome</ExtendedPageTitle>
 
@@ -13,6 +14,7 @@
                        OnClick="@((c) => { OpenWizard = true; return Task.CompletedTask; })"
                        Size="Size.Medium"
                        ButtonType="ButtonType.Button"
+                       Disabled="@UserLockState.Value.LockingOrLocked"
                        Variant="Variant.Filled"
                        Color="Color.Info"
                        StartIcon="@Icons.Material.Filled.AutoFixHigh">@( AppStatus.IsDemoMode ? "Welcome Screen" : "Setup Wizard")</MudButton>

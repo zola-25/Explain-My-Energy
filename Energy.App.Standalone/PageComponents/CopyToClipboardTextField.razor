@@ -3,32 +3,41 @@
     <div class="flex-grow-1">
         @ChildContent
     </div>
-    <div class="ml-5">
+    <div class="@TooltipWrapperClass">
         <MudTooltip Inline="true" Placement="Placement.Top">
             <TooltipContent>
-                <MudText Typo="Typo.body2">@copyToClipboardTooltip</MudText>
+                <MudText Typo="Typo.body2">@copyToClipboardTooltipField</MudText>
             </TooltipContent>
             <ChildContent>
-                <MudIconButton Color="Color.Info" Title="Copy to Clipboard?" Icon="@copyToClipboardIcon" Size="Size.Small"
+                    <MudIconButton Color="Color.Info" Title="@($"{copyToClipboardTooltipField}?")" Icon="@copyToClipboardIcon" Size="Size.Small"
                         OnClick="CopyToClipboardClick" Variant="Variant.Outlined" />
             </ChildContent>
         </MudTooltip>
     </div>
 </div>
-@code {
+    @code {
 
     [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; }
 
     [Parameter, EditorRequired] public string CopyString { get; set; }
 
+    [Parameter] public string TooltipWrapperClass { get; set; } = "ml-5";
+    [Parameter] public string CopyToClipboardTooltip { get; set; } = "Copy to Clipboard";
+
+
     [Inject] IJSRuntime JS { get; set; }
     [Inject] ILogger<CopyToClipboardTextField> Logger { get; set; }
 
-
+    string copyToClipboardTooltipField = "Copy to Clipboard";
     string copyToClipboardIcon = Icons.Material.Outlined.ContentCopy;
-    string copyToClipboardTooltip = "Copy to Clipboard";
 
     private IJSObjectReference module;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        copyToClipboardTooltipField = CopyToClipboardTooltip;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -48,11 +57,11 @@
             if (copied)
             {
                 copyToClipboardIcon = Icons.Material.Filled.CheckCircle;
-                copyToClipboardTooltip = "Copied";
+                copyToClipboardTooltipField = "Copied";
                 StateHasChanged();
                 await Task.Delay(5000);
                 copyToClipboardIcon = Icons.Material.Outlined.ContentCopy;
-                copyToClipboardTooltip = "Copy to Clipboard";
+                copyToClipboardTooltipField = CopyToClipboardTooltip;
             }
         }
         catch (Exception ex)
