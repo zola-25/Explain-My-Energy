@@ -1,7 +1,9 @@
 ﻿@page "/WeatherDataTable"
+@namespace Energy.App.Standalone.Features.Setup.Weather.Pages
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 @inject IState<WeatherState> WeatherState
+@inject IState<UserLockState> UserLockState
 
 
 <ExtendedPageTitle>Weather Data</ExtendedPageTitle>
@@ -23,62 +25,75 @@
                                 DocSnippetType="DocSnippetType.WeatherDataTable" IconTitle="Help for Weather Data Table" />
             </div>
         </MudItem>
-        <MudItem xs="12">
-            <div class="d-flex flex-wrap justify-center align-center mt-5 ">
 
-                <MudButton Class="fw-bolder" Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadWeatherData">Load/Reload Data</MudButton>
-                <MudText Align="Align.Center" Class="ml-3 fw-bolder" Typo="Typo.h6">Postal Area: @Outcode</MudText>
+        @if (UserLockState.Value.LockingOrLocked)
+        {
+            <MudItem xs="12">
+                <MudPaper Elevation="0" Class="mt-5 mb-10">
+                    <MudText Typo="Typo.body1" Align="Align.Center" Class="fw-bolder">
+                        Setup Data is Locked
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        }
+        else
+        {
+            <MudItem xs="12">
+                <div class="d-flex flex-wrap justify-center align-center mt-5 ">
 
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Elevation="2" Class="mt-5 mb-10">
+                    <MudButton Class="fw-bolder" Disabled="UserLockState.Value.LockingOrLocked" Variant=" Variant.Filled" Color="Color.Primary" OnClick="LoadWeatherData">Load/Reload Data</MudButton>
+                    <MudText Align="Align.Center" Class="ml-3 fw-bolder" Typo="Typo.h6">Postal Area: @Outcode</MudText>
 
-                @if (WeatherState.Value.Loading)
-                {
-                    <p><em>Loading...</em></p>
-                }
-                else if (!WeatherState.Value.WReadings.Any())
-                {
-                    <p><em>No weather readings loaded</em></p>
-                }
-                else
-                {
-                    <MudTable T="DailyWeatherRecord" ReadOnly="true" Virtualize="true"  
-                            Items="WeatherState.Value.WReadings" 
-                            FixedHeader="true"  
-                            Height="85vh" 
-                            Breakpoint="Breakpoint.Sm" 
-                            
-                            AllowUnsorted="true"  
-                            SortLabel="Sort By" 
-                            Striped="true">
-                        <HeaderContent>
-                            <MudTh Class="fw-bold"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<DailyWeatherRecord, object>(c=>c.Utc)">Date</MudTableSortLabel></MudTh>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.TempAvg)">Temp. Avg ℃</MudTableSortLabel></MudTh>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="mt-5 mb-10">
 
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsHist)">Historical?</MudTableSortLabel></MudTh>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsRecent)">Recent Forecast?</MudTableSortLabel></MudTh>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsNear)">Near Term Forecast?</MudTableSortLabel></MudTh>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsClimate)">Climate Forecast?</MudTableSortLabel></MudTh>
-                            <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.Summary)">Weather Code Summary</MudTableSortLabel></MudTh>
+                    @if (WeatherState.Value.Loading)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else if (!WeatherState.Value.WReadings.Any())
+                    {
+                        <p><em>No weather readings loaded</em></p>
+                    }
+                    else
+                    {
+                        <MudTable T="DailyWeatherRecord" ReadOnly="true" Virtualize="true"
+                                  Items="WeatherState.Value.WReadings"
+                                  FixedHeader="true"
+                                  Height="85vh"
+                                  Breakpoint="Breakpoint.Sm"
+                                  AllowUnsorted="true"
+                                  SortLabel="Sort By"
+                                  Striped="true">
+                            <HeaderContent>
+                                <MudTh Class="fw-bold"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<DailyWeatherRecord, object>(c=>c.Utc)">Date</MudTableSortLabel></MudTh>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.TempAvg)">Temp. Avg ℃</MudTableSortLabel></MudTh>
 
-                        </HeaderContent>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsHist)">Historical?</MudTableSortLabel></MudTh>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsRecent)">Recent Forecast?</MudTableSortLabel></MudTh>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsNear)">Near Term Forecast?</MudTableSortLabel></MudTh>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.IsClimate)">Climate Forecast?</MudTableSortLabel></MudTh>
+                                <MudTh Class="fw-bold"><MudTableSortLabel SortBy="new Func<DailyWeatherRecord, object>(c=>c.Summary)">Weather Code Summary</MudTableSortLabel></MudTh>
 
-                        <RowTemplate>
-                            <MudTd DataLabel="Date">@context.Utc.eDateToDowShortMonthYY()</MudTd>
-                            <MudTd DataLabel="Temp. Avg ℃">@context.TempAvg</MudTd>
-                            <MudTd DataLabel="Historical?">@context.IsHist</MudTd>
-                            <MudTd DataLabel="Recent Forecast?">@context.IsRecent</MudTd>
-                            <MudTd DataLabel="Near Term Forecast?">@context.IsNear</MudTd>
-                            <MudTd DataLabel="Climate Forecast?">@context.IsClimate</MudTd>
-                            <MudTd DataLabel="Summary">@context.Summary</MudTd>
+                            </HeaderContent>
 
-                        </RowTemplate>
-                    </MudTable>
-                }
-            </MudPaper>
-        </MudItem>
+                            <RowTemplate>
+                                <MudTd DataLabel="Date">@context.Utc.eDateToDowShortMonthYY()</MudTd>
+                                    <MudTd DataLabel="Temp. Avg ℃">@context.TempAvg</MudTd>
+                                    <MudTd DataLabel="Historical?">@context.IsHist</MudTd>
+                                    <MudTd DataLabel="Recent Forecast?">@context.IsRecent</MudTd>
+                                    <MudTd DataLabel="Near Term Forecast?">@context.IsNear</MudTd>
+                                    <MudTd DataLabel="Climate Forecast?">@context.IsClimate</MudTd>
+                                    <MudTd DataLabel="Summary">@context.Summary</MudTd>
+
+                                </RowTemplate>
+                            </MudTable>
+                    }
+                </MudPaper>
+            </MudItem>
+        }
     </MudGrid>
 </MudPaper>
 @code {

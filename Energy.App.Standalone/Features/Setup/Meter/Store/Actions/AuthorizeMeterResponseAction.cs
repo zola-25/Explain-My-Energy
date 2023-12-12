@@ -31,7 +31,6 @@ public class AuthorizeMeterResponseAction
                     Authorized = action.AuthorizeSuccess,
                     AuthorizeFailed = !action.AuthorizeSuccess,
                     Authorizing = false,
-                    SetupValid = action.AuthorizeSuccess && meterState.InitialSetupValid,
                     AuthorizeFailedMessage = action.FailureMessage
                 }
             },
@@ -42,7 +41,6 @@ public class AuthorizeMeterResponseAction
                     Authorized = action.AuthorizeSuccess,
                     AuthorizeFailed = !action.AuthorizeSuccess,
                     Authorizing = false,
-                    SetupValid = action.AuthorizeSuccess && meterState.InitialSetupValid,
                     AuthorizeFailedMessage = action.FailureMessage
                 }
             },

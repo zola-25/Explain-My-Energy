@@ -1,4 +1,5 @@
-﻿@inherits FluxorComponent
+﻿@namespace Energy.App.Standalone.Shared
+@inherits FluxorComponent
 
 <MudPaper Class="py-0" Elevation="0" UserAttributes="@(new() { {"id","main-nav"}, {"role", "navigation" }, {"aria-label", "Main Site Links"}})">
     <MudNavMenu Color="Color.Info" Bordered="true" Class="d-flex flex-column">
@@ -60,6 +61,7 @@
 
 @code {
 
+    [Inject] IState<UserLockState> UserLockState { get; set; }
 
     [Inject] AppStatus AppStatus { get; set; }
 
@@ -73,8 +75,8 @@
 
     MeterType HeaterMeterType => HouseholdState.Value.PrimaryHeatSource;
 
-    bool GasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid;
-    bool ElectricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid;
+    bool GasDisabled => !MeterSetupState.Value[MeterType.Gas].Authorized || !MeterSetupState.Value[MeterType.Gas].SetupValid || UserLockState.Value.LockingOrLocked;
+    bool ElectricityDisabled => !MeterSetupState.Value[MeterType.Electricity].Authorized || !MeterSetupState.Value[MeterType.Electricity].SetupValid || UserLockState.Value.LockingOrLocked;
 
     string GasHref => HeatingMeterIsGas ? "/HeatingMeter/Gas" : "/Meter/Gas";
     string ElectricityHref => HeatingMeterIsElectricity ? "/HeatingMeter/Electricity" : "/Meter/Electricity";
@@ -85,12 +87,14 @@
 
     public string GasTooltipText()
     {
-        return GasDisabled ? "Configure in Household Setup" : "Show analysis";
+        // if locked show Application Is Locked, if not configured show Configure in Household Setup, if configured show Show analysis
+        return GasDisabled ? UserLockState.Value.LockingOrLocked ? "Application Is Locked" : "Configure in Household Setup" : "Show analysis";
     }
 
     public string ElectricityTooltipText()
     {
-        return ElectricityDisabled ? "Configure in Household Setup" : "Show analysis";
+        // if locked show Application Is Locked, if not configured show Configure in Household Setup, if configured show Show analysis
+        return ElectricityDisabled ? UserLockState.Value.LockingOrLocked ? "Application Is Locked" : "Configure in Household Setup" : "Show analysis";
     }
 
     private bool HouseholdSetupValid => !HouseholdState.Value.Invalid && HouseholdState.Value.Saved;

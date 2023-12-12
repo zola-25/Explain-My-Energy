@@ -6,6 +6,7 @@ using Energy.App.Standalone.Features.Setup.Meter.Store.StateObjects;
 using Energy.App.Standalone.DTOs;
 using Energy.App.Standalone.DTOs.Tariffs;
 
+
 namespace Energy.App.Standalone.Extensions;
 
 public static class Extensions
@@ -318,14 +319,14 @@ public static class Extensions
         };
     }
 
-    public static Meter eMapToMeterDto(this MeterState meter)
+    public static Meter eMapToMeterDto(this MeterState meter, string mpxnOverride = null)
     {
         return new Meter
         {
             Authorized = meter.Authorized,
             GlobalId = meter.GlobalId,
             MeterType = meter.MeterType,
-            Mpxn = meter.Mpxn,
+            Mpxn = mpxnOverride ?? meter.Mpxn,
         };
     }
 

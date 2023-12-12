@@ -22,21 +22,23 @@ public class PreloadMeterSetupStateAction
         return state with {
             ElectricityMeter = new MeterState {
                 Authorized = true,
+                AuthorizeFailed = false,
+                Authorizing = false,
                 GlobalId = action.DemoMeterSetup.ElectricityMeter.GlobalId,
                 MeterType = action.DemoMeterSetup.ElectricityMeter.MeterType,
                 Mpxn = action.DemoMeterSetup.ElectricityMeter.Mpxn,
                 InitialSetupValid = true,
-                SetupValid = true,
                 AuthorizeFailedMessage = null,
                 TariffDetails = DefaultTariffData.GetDefaultTariffs(MeterType.Electricity, ExampleTariffType.StandardFixedDaily)
             },
             GasMeter = new MeterState {
                 Authorized = true,
+                AuthorizeFailed = false,
+                Authorizing = false,
                 GlobalId = action.DemoMeterSetup.GasMeter.GlobalId,
                 MeterType = action.DemoMeterSetup.GasMeter.MeterType,
                 Mpxn = action.DemoMeterSetup.GasMeter.Mpxn,
                 InitialSetupValid = true,
-                SetupValid = true,
                 AuthorizeFailedMessage = null,
                 TariffDetails = DefaultTariffData.GetDefaultTariffs(MeterType.Gas, ExampleTariffType.StandardFixedDaily)
             },

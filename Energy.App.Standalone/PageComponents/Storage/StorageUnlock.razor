@@ -1,0 +1,412 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Timers
+@using System.Text.RegularExpressions
+@using Energy.App.Standalone.Extensions
+@inherits FluxorComponent
+@inject IState<UserLockState> UserLockState
+
+<MudPaper Elevation="0" Class="p-2">
+
+    @if (!unlockSuccess)
+    {
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <div class="mt-1 d-flex justify-center">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            </div>
+            <div class="mt-3 d-flex flex-wrap justify-start align-baseline px-0">
+                <label id="label-ihdMacId"
+                       for="ihdMacIdUnlock"
+                       class="d-flex label-unlock-ihd-mac-id mud-typography mud-typography-body1 mx-auto mx-sm-0 fw-bolder">IHD MAC ID:</label>
+                <div class="flex-1 d-flex flex-column ml-2">
+                    <div class="d-flex flex-1">
+
+                        <InputText id="ihdMacIdUnlock" class="unlock-ihd-mac-id mud-typography mud-typography-body1 border-solid border-0 border-b-2 mud-border-default minw-130px"
+                                   type="text"
+                                   aria-labelledby="label-ihdMacId label-ihdMacId-details"
+                                   readonly="@unlocking"
+                                   @bind-Value="model.IhdMacId" autocomplete="username" />
+                    </div>
+                    <label for="ihdMacIdUnlock" class="mud-typography mud-typography-caption fw-bolder flex-1 ml-1" id="label-ihdMacId-details">
+                        Your IHD MAC ID number
+                    </label>
+                </div>
+            </div>
+            <div class="mt-8 d-flex flex-wrap justify-start align-baseline px-0 ">
+                <label id="label-unlock-password" class="d-flex mud-typography mud-typography-body1 mx-auto mx-sm-0 fw-bolder " for="i2slkap">Enter Password:</label>
+                <div class="flex-1 d-flex flex-column ml-2">
+                    <div class="d-flex flex-1">
+
+                        <InputText id="i2slkap"
+                                   class="mud-typography mud-typography-body1 border-0 border-b-2 mud-border-default w-100percent minw-130px"
+                                   type="@inputType"
+                                   aria-labelledby="label-unlock-password label-unlock-password-details"
+                                   @bind-Value="model.Input" autocomplete="current-password" readonly="@unlocking" />
+                        <button class="mr-2" aria-label="@visibleAria" type="button" @onclick="ToggleTempVisibility" disabled="@unlocking">
+                            <i aria-hidden="true" class="@visibleIcon"></i>
+                        </button>
+                    </div>
+                    <label for="i2slkap" class="mud-typography mud-typography-caption fw-bolder flex-1 ml-1" id="label-unlock-password-details">
+                        The password that was used to lock the data
+                    </label>
+                </div>
+
+            </div>
+            <div class="my-7 my-sm-10 d-flex align-baseline">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mx-auto" Disabled="@unlocking">
+                    Unlock
+                </MudButton>
+            </div>
+        </EditForm>
+
+    }
+    @if (unlocking)
+    {
+        <MudAlert Severity="Severity.Info">Unlocking data</MudAlert>
+    }
+    else
+    {
+        if (inputError)
+        {
+            <MudAlert Severity="Severity.Warning">@unlockErrorMessage</MudAlert>
+        }
+        else if (unlockError && verified)
+        {
+            <MudAlert Severity="Severity.Error">Major Error encountered: @unlockErrorMessage</MudAlert>
+
+            @foreach (var lockDataEnum in Energy.App.Standalone.Extensions.Extensions.eEnumValues<LockableDataEnum>())
+            {
+                if (!unlockResults[lockDataEnum].Success)
+                {
+                    <MudAlert Class="my-2" Dense="true" Variant="Variant.Outlined" Severity="Severity.Error">Error unlocking @(lockDataEnum.eEnumToFormatted()): @unlockResults[lockDataEnum].Message</MudAlert>
+                }
+            }
+        }
+        else if (unlockSuccess && verified)
+        {
+            <MudAlert Variant="Variant.Text" Severity="Severity.Success" Class="mt-2 fw-bolder">Data unlocked</MudAlert>
+
+            @if (reloadingUnlockedData || reloadComplete)
+            {
+                <div class="mt-5 mt-sm-10">
+
+                    @if (reloadError)
+                    {
+                        <MudAlert Severity="Severity.Warning" Class="my-2 fw-bolder">@reloadStatus</MudAlert>
+                    }
+                    else if (reloadingUnlockedData)
+                    {
+                        <MudAlert Variant="Variant.Outlined"  Severity="Severity.Info" Class="mb-5 fw-bolder">@reloadStatus</MudAlert>
+                    }
+                    else if (reloadComplete)
+                    {
+                        <MudAlert Variant="Variant.Outlined"  Severity="Severity.Info" Class="mb-5 fw-bolder">@reloadStatus</MudAlert>
+                    }
+
+
+
+                    @if (weatherReload && !weatherReloadComplete)
+                    {
+                        <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Info" Class="my-1 fw-bolder">Updating weather data</MudAlert>
+                    }
+                    else if (weatherReload && weatherReloadComplete && weatherReloadSuccess)
+                    {
+                        <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Success" Class="my-1 fw-bolder">Weather data</MudAlert>
+                    }
+                    else if (weatherReload && weatherReloadComplete && !weatherReloadSuccess)
+                    {
+                        <MudAlert Severity="Severity.Warning" Class="my-2 fw-bolder">Unable to update weather data - try manual reloading</MudAlert>
+                    }
+
+                    @if (gasReload && !gasReloadComplete)
+                    {
+                        <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Info" Class="my-1 fw-bolder">Updating gas data</MudAlert>
+                    }
+                    else if (gasReload && gasReloadComplete && gasReloadSuccess)
+                    {
+                        <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Success" Class="my-1 fw-bolder">Gas data</MudAlert>
+                    }
+                    else if (gasReload && gasReloadComplete && !gasReloadSuccess)
+                    {
+                        <MudAlert Severity="Severity.Warning" Class="my-2 fw-bolder">Unable to update gas data - try manual reloading</MudAlert>
+                    }
+
+                    @if (electricityReload && !electricityReloadComplete)
+                    {
+                    <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Info" Class="my-1 fw-bolder">Updating electricity data</MudAlert>
+                     }
+                     else if (electricityReload && electricityReloadComplete && electricityReloadSuccess)
+                     {
+                     <MudAlert Variant="Variant.Outlined" Dense Severity="Severity.Success" Class="my-1 fw-bolder">Electricity data</MudAlert>
+                     }
+                     else if (electricityReload && electricityReloadComplete && !electricityReloadSuccess)
+                     {
+                     <MudAlert Severity="Severity.Warning" Class="my-2 fw-bolder">Unable to update electricity data - try manual reloading</MudAlert>
+                     }
+
+                     @if (!reloadComplete)
+                    {
+                        <div class="spinner my-5"></div>
+                    }
+                </div>
+            }
+        }
+    }
+
+</MudPaper>
+
+@{
+    var onBeforeInternalNavigation = unlocking ? BlockNavigationAsync : default(Func<LocationChangingContext, Task>);
+}
+<NavigationLock OnBeforeInternalNavigation="onBeforeInternalNavigation" ConfirmExternalNavigation="@unlocking">
+</NavigationLock>
+
+@code {
+
+    public async Task BlockNavigationAsync(LocationChangingContext context)
+    {
+        if (!unlocking)
+        {
+            return;
+        }
+        context.PreventNavigation();
+
+        await JSRuntime.InvokeVoidAsync("alert", "Unlocking your setup data, please hold on");
+    }
+
+    [Parameter, EditorRequired] public EventCallback<bool> Unlocking { get; set; }
+
+
+    string visibleAria = "Unmask password for 5 seconds";
+    string visibleIcon = "fa-solid fa-eye-slash";
+    string inputType = "password";
+    bool fieldVisible = false;
+    Timer timer;
+
+    StorageUnlockInputs model;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        model = new StorageUnlockInputs();
+    }
+
+    private async void OnValidSubmit()
+    {
+        try
+        {
+            unlocking = true;
+            await Unlocking.InvokeAsync(true);
+            SetVisibilityOff();
+            await UnlockData();
+        }
+        catch (Exception ex)
+        {
+            unlockError = true;
+            Logger.LogError(ex, "Error unlocking data");
+            unlockErrorMessage = "Error unlocking data";
+        }
+        finally
+        {
+            if (!unlockError && !inputError)
+            {
+                await ReloadUnlockData();
+
+                unlockSuccess = true;
+            }
+            unlocking = false;
+            await Unlocking.InvokeAsync(false);
+        }
+    }
+
+    bool reloadError = false;
+    bool reloadComplete = false;
+    bool reloadingUnlockedData = false;
+    string reloadStatus = "Updating unlocked data";
+
+    bool weatherReload = false;
+    bool weatherReloadSuccess = false;
+    bool weatherReloadComplete = false;
+
+    bool gasReload = false;
+    bool gasReloadSuccess = false;
+    bool gasReloadComplete = false;
+
+    bool electricityReload = false;
+    bool electricityReloadSuccess = false;
+    bool electricityReloadComplete = false;
+
+    private async ValueTask ReloadUnlockData()
+    {
+        try
+        {
+            reloadError = false;
+            reloadComplete = false;
+
+            weatherReload = false;
+            weatherReloadComplete = false;
+            weatherReloadSuccess = false;
+
+            gasReload = false;
+            gasReloadComplete = false;
+            gasReloadSuccess = false;
+
+            electricityReload = false;
+            electricityReloadComplete = false;
+            electricityReloadSuccess = false;
+
+            reloadStatus = "Updating unlocked data";
+            reloadingUnlockedData = true;
+            var weatherReadingState = WeatherState.Value;
+            if (!String.IsNullOrEmpty(weatherReadingState.OutCode))
+            {
+                weatherReload = true;
+            }
+            var gasMeterState = MeterSetupState.Value.GasMeter;
+            if (!String.IsNullOrEmpty(gasMeterState.Mpxn) && gasMeterState.InitialSetupValid && gasMeterState.SetupValid)
+            {
+                gasReload = true;
+            }
+            var electricityMeterState = MeterSetupState.Value.ElectricityMeter;
+            if (!String.IsNullOrEmpty(electricityMeterState.Mpxn) && electricityMeterState.InitialSetupValid && electricityMeterState.SetupValid)
+            {
+                electricityReload = true;
+            }
+
+            if (weatherReload)
+            {
+                reloadStatus = "Updating weather data";
+                StateHasChanged();
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
+
+                var weatherCompletion = new TaskCompletionSource<(bool success, string message)>();
+                Dispatcher.Dispatch(new EnsureWeatherLoadedAction(false, weatherCompletion));
+                (weatherReloadSuccess, _) = await weatherCompletion.Task;
+                weatherReloadComplete = true;
+
+            }
+            if (gasReload)
+            {
+                reloadStatus = "Updating gas data";
+                StateHasChanged();
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
+
+                var gasCompletion = new TaskCompletionSource<(bool success, string message)>();
+                Dispatcher.Dispatch(new EnsureGasReadingsLoadedAction(false, gasCompletion));
+                (gasReloadSuccess, _) = await gasCompletion.Task;
+                gasReloadComplete = true;
+            }
+
+            if (electricityReload)
+            {
+                reloadStatus = "Updating electricity data";
+                StateHasChanged();
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
+
+                var electricityCompletion = new TaskCompletionSource<(bool success, string message)>();
+                Dispatcher.Dispatch(new EnsureElectricityReadingsLoadedAction(false, electricityCompletion));
+                (electricityReloadSuccess, _) = await electricityCompletion.Task;
+                electricityReloadComplete = true;
+            }
+
+            reloadStatus = "Unlocked data updated:";
+        }
+        catch (Exception ex)
+        {
+            reloadError = true;
+            Logger.LogError(ex, "Error updating unlocked data");
+            reloadStatus = "Error updating unlocked data";
+        }
+        finally
+        {
+            reloadingUnlockedData = false;
+            reloadComplete = true;
+        }
+    }
+
+    private void SetVisibilityOff()
+    {
+        fieldVisible = false;
+        visibleIcon = "fa-solid fa-eye-slash";
+        visibleAria = "Unmask password for 5 seconds";
+        inputType = "password";
+        DisposeTimer();
+    }
+
+    private void SetVisibilityOn()
+    {
+        fieldVisible = true;
+        visibleIcon = "fa-solid fa-eye icon-fade-out";
+        visibleAria = "Hide unmasked password";
+        inputType = "text";
+        SetTimer();
+    }
+
+    private void ToggleTempVisibility(MouseEventArgs mouseEventArgs)
+    {
+        fieldVisible = !fieldVisible;
+        if (fieldVisible)
+        {
+            SetVisibilityOn();
+        }
+        else
+        {
+            SetVisibilityOff();
+        }
+    }
+
+    private void SetTimer()
+    {
+        DisposeTimer();
+        timer = new Timer(5000);
+        timer.Elapsed += OnVisibilityTimeUp;
+        timer.AutoReset = false;
+        timer.Enabled = true;
+        timer.Start();
+    }
+
+    private async void OnVisibilityTimeUp(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        DisposeTimer();
+        fieldVisible = false;
+        visibleIcon = "fa-solid fa-eye-slash";
+        visibleAria = "Unmask password for 5 seconds";
+        inputType = "password";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void DisposeTimer()
+    {
+        if (timer != null)
+        {
+            timer.Enabled = false;
+            timer.Elapsed -= OnVisibilityTimeUp;
+            timer.Dispose();
+            timer = null;
+        }
+    }
+
+
+
+    private bool _isDisposed;
+
+
+    protected override void Dispose(bool isDisposing)
+    {
+        if (!_isDisposed)
+        {
+            if (isDisposing)
+            {
+                DisposeTimer();
+                if (model != null)
+                {
+                    model = null;
+                }
+            }
+            _isDisposed = true;
+        }
+
+        base.Dispose(isDisposing);
+
+    }
+}
