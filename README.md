@@ -26,8 +26,6 @@ However both the main app and the demo site have been tested on iPhone 13\* and 
 
 Initial App download size comes with the territory of Blazor WebAssembly apps right now. App size has been reduced with the cautious use of the [.NET Trimmer](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options?pivots=dotnet-7-0), but there may be more to gain here. 
 
-I'm also looking at migrating the storage to use IndexedDB, which *should* drastically improve the app's mobile browser support, but this is work in progress.
-
 > [!NOTE]
 > **\*WebKit** based browsers such as Safari display intermittent issues using test emulators, regardless of the platform, but appear to be working fine in the wild.
 
@@ -36,11 +34,13 @@ I'm also looking at migrating the storage to use IndexedDB, which *should* drast
 > [!IMPORTANT]
 > Be aware that all data is stored unencrypted in the browser's local storage. No personal data is requested or stored by the application, but to function, the app requires a smart meter IHD (In Home Device) MAC ID, and energy meter MPAN and MPRN numbers. The documentation has more details on these numbers on the [setup page](https://docs.explainmyenergy.net/setup.html).
 > 
-> Data stored in browser local storage is only accessible by the web app that created it, but the usual precautions apply - don't use this app on a shared device or a device that you don't trust, and keep your device, anti-virus and browser up to date.
+> > There is a feature to lock and encrypt potentially sensitive data, given a user provided password: [app lock docs](https://docs.explainmyenergy.net/setup/app-data-locking.html).
+> > This doesn't require server-held user accounts or third-party authentication providers.
 > 
+> Data stored in browser local storage is only accessible by the web app that created it, and XSS attack risks have been minimized - however, don't use this app on a shared device or a device that you don't trust.
 > 
-> > There's a plan in place to encrypt this setup data with a user-provided strong password.
-> > This won't require server-held user accounts or third-party authentication providers, which has always been the aim
+
+
 
 ## Getting Started
 

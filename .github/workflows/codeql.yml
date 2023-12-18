@@ -56,7 +56,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ env.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -64,10 +64,10 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{ env.language }}"
   analyzeDotNet:
@@ -118,7 +118,7 @@ jobs:
           npm run buildDev
           
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: ${{ env.language }}
           # If you wish to specify custom queries, you can do so here or in a config file.
@@ -132,7 +132,7 @@ jobs:
           dotnet build --no-restore
           
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ env.language }}"
 
