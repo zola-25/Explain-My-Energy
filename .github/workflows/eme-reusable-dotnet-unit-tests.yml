@@ -12,7 +12,7 @@ on:
         description: 'The .NET SDK version to use'
         required: true
         type: string
-        default: '7.0.400'
+        default: '8.0.100'
       
 
 env:
@@ -42,7 +42,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       
       - name: Install wasm-tools
-        run: dotnet workload install wasm-tools-net7
+        run: dotnet workload install wasm-tools
 
       - name: Restore and Build
         working-directory: ./

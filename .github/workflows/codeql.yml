@@ -80,7 +80,7 @@ jobs:
         security-events: write
      env:
         language: 'csharp'
-        DOTNET_VERSION: '7.0.401'
+        DOTNET_VERSION: '8.0.100'
         NODE_VERSION: '18.x'
           # CodeQL supports [ 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift' ]
           # Use only 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -95,7 +95,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Install wasm-tools
-        run: dotnet workload install wasm-tools-net7
+        run: dotnet workload install wasm-tools
         
       - name: SetupNode
         uses: actions/setup-node@v4
