@@ -2,7 +2,9 @@
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 using Energy.App.Standalone.Services.FluxorPersist.Demo.JsonModels;
+using MudBlazor;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace Energy.App.Standalone.Services.FluxorPersist.Demo;
 
@@ -54,7 +56,7 @@ public class SetDefaultLocalState : ISetDefaultLocalState
 
         DemoMeterSetup = jsonDemoMeterSetup;
 
-        var jsonDemoGasReadings = await httpClient.GetFromJsonAsync<DemoGasReadings>("demo/gasReadingsDemoData.json", new System.Text.Json.JsonSerializerOptions {
+        var jsonDemoGasReadings = await httpClient.GetFromJsonAsync<DemoGasReadings>("demo/gasReadingsDemoData.json",new System.Text.Json.JsonSerializerOptions {
             Converters = { new UtcDateTimeJsonConverter() }
         });
 
