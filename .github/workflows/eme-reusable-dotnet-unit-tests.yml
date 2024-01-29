@@ -57,7 +57,7 @@ jobs:
           dotnet test Energy.Test --no-build --configuration Release --logger:"trx;LogFileName=TestResults.trx" --verbosity normal
 
       - name: Test Report
-        uses: dorny/test-reporter@afe6793191b75b608954023a46831a3fe10048d4
+        uses: dorny/test-reporter@eaa763f6ffc21c7a37837f56cd5f9737f27fc6c8
         if: success() || failure()
         with:
           name: Test Results ${{inputs.os}}
