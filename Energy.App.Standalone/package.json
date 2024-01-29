@@ -39,7 +39,7 @@
     "@typescript-eslint/parser": "^6.7.0",
     "async-exit-hook": "^2.0.1",
     "autoprefixer": "^10.4.15",
-    "chai": "^4.3.8",
+    "chai": "^5.0.3",
     "cheerio": "^1.0.0-rc.12",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
