@@ -8,28 +8,34 @@ updates:
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     target-branch: "main"
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
     groups:
       nuget:
+        applies-to: version-updates
         update-types: 
+          - "major"
           - "minor"
+          - "patch"
           
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/Energy.App.Standalone" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     target-branch: "main"
     ignore:
       - dependency-name: "*" 
         update-types: ["version-update:semver-patch"]
     groups:
       npm:
+        applies-to: version-updates
         update-types: 
+          - "major"
           - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
