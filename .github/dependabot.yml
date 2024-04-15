@@ -17,6 +17,7 @@ updates:
       nuget:
         applies-to: version-updates
         update-types: 
+          - "major"
           - "minor"
           - "patch"
           
@@ -32,6 +33,7 @@ updates:
       npm:
         applies-to: version-updates
         update-types: 
+          - "major"
           - "minor"
           - "patch"
 
