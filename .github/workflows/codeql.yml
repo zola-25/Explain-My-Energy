@@ -80,8 +80,8 @@ jobs:
         security-events: write
      env:
         language: 'csharp'
-        DOTNET_VERSION: '8.0.100'
-        NODE_VERSION: '18.x'
+        DOTNET_VERSION: '8.0.x'
+        NODE_VERSION: '20.x'
           # CodeQL supports [ 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift' ]
           # Use only 'java-kotlin' to analyze code written in Java, Kotlin or both
           # Use only 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
