@@ -5,13 +5,15 @@
     <MudText Typo="Typo.body1" Align="Align.Start">
         <div class="welcome-screen-content">
             <p>
-                <strong>Explain My Energy</strong> is a free, open-source web application, for UK users, to help understand both existing
-                energy bills and forecast future energy costs and consumption. Full documentation is available at <MudLink Target="_blank" Href="https://docs.explainmyenergy.net">docs.explainmyenergy.net <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink>
+                <strong><em>As the n3rgy consumer API has been shut down, this project has been deprecated</em></strong>                
             </p>
+                
             <ul>
-
-                @if (AppStatus.IsDemoMode)
+                <li>This site remains live for demonstration purposes only</li>
+                <li>Full documentation is available at <MudLink Target="_blank" Href="https://docs.explainmyenergy.net">docs.explainmyenergy.net <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink></li>
+                @* @if (AppStatus.IsDemoMode)
                 {
+                    
                     <li>This is a <strong>Demo Version</strong> of the app, with example data. No setup functionality is available, instead you can explore the app and see the analysis and typical setup data required.</li>
                     <li>The live version, with full functionality, is available at <MudLink Href="https://explainmyenergy.net">explainmyenergy.net</MudLink></li>
                 }
@@ -33,7 +35,7 @@
                 </li>
                 <li>
                     <strong>Acknowledgements:</strong> This app functions thanks to <MudLink Target="_blank" Href="https://www.amcharts.com">amcharts5 <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink>, <MudLink Target="_blank" Href="https://www.n3rgy.com/consumer/">n3rgy.com <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink>, <MudLink Target="_blank" Href="https://open-meteo.com">open-meteo.com <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink>, <MudLink Target="_blank" Href="https://postcodes.io">postcodes.io <i aria-hidden="true" class="fa-solid fa-external-link fa-xs"></i></MudLink>
-                </li>
+                </li> *@
             </ul>
 
             <MudDialog @bind-IsVisible="TermsDialogVisible" Options="DialogOptions" ClassActions="d-flex justify-center">
@@ -59,7 +61,7 @@
                 </DialogActions>
             </MudDialog>
 
-            <p><strong>Getting Started</strong></p>
+            @* <p><strong>Getting Started</strong></p>
 
             @if (AppStatus.IsDemoMode)
             {
@@ -71,7 +73,7 @@
                     <li>The Setup Wizard provides a simple step-by-step process to configuring the application.</li>
                     <li>Otherwise feel free to explore the application and set up your home and meters manually.</li>
                 </ul>
-            }
+            } *@
         </div>
 
     </MudText>
