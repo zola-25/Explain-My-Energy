@@ -9,6 +9,10 @@ nav_order: 1
 
 # Explain My Energy Documentation
 
+{: .warning }
+> *As the n3rgy consumer API has been shut down, this project has been deprecated*
+>
+> *The demo site remains live -* [demo.explainmyenergy.net](https://demo.explainmyenergy.net)
 
 ## Introduction
 

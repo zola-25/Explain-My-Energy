@@ -2,6 +2,11 @@
 
 # Explain My Energy
 
+> [!WARNING]
+> *As the n3rgy consumer API has been shut down, this project has been deprecated*
+>
+> *The demo site remains live -* [demo.explainmyenergy.net](https://demo.explainmyenergy.net)
+
 This is an open-source hobby project that provides a standalone, serverless Blazor WebAssembly app to enable UK-based users easy access to detailed insights on their energy usage and energy costs.
 
 Full documentation can be found at [docs.explainmyenergy.net](https://docs.explainmyenergy.net/)
