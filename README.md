@@ -1,5 +1,17 @@
 ![CodeQL](https://github.com/zola-25/Explain-My-Energy/actions/workflows/codeql.yml/badge.svg) ![Main App Playwright Tests](https://dev.azure.com/eme-devops-crunchy/Explain%20My%20Energy/_apis/build/status%2FFull%20App%20Deploy%20and%20Test?branchName=main&stageName=Deploy_production_app_Playwright_Testing&jobName=Run%20Playwright%20Tests%20Production)
 
+# Developer Quick-start
+
+Many client side files are generated at build time. The dotnet tool `nuget-license` is required. Then a NodeJS script can be used to build the necessary client side files:
+
+```bash
+cd ./Energy.App.Standalone
+dotnet tool install nuget-license
+npm install
+npm run buildDevDemo
+```
+Then use `dotnet run` or an IDE to build & run the application.
+
 # Explain My Energy
 
 > [!WARNING]

@@ -89,7 +89,11 @@ try {
 
     fs.writeFileSync(tempLicenseOverridePackageNamesFile, JSON.stringify(licenseInfoOverrideParsed.map(c => c.PackageName)), 'utf8');
 
-    const dotnetProjectLicensesArgs = ['tool', 'run', 'dotnet-project-licenses','-i', projectCsprojPath, '-u', '-t', '-o', '-j', '--use-project-assets-json', '--outfile', tempPackageLicenseJsonFileOutput, '--packages-filter', tempLicenseOverridePackageNamesFile, '--manual-package-information', licenseInfoOverrideFile, '--licenseurl-to-license-mappings', licenseUrlToLicenseTypeOverrideFile]
+    const dotnetProjectLicensesArgs = ['tool', 'run', 'nuget-license','-i', projectCsprojPath, '-t', 
+        '-o', 'Json', 
+        '--file-output', tempPackageLicenseJsonFileOutput, 
+        //'--override-package-information', licenseInfoOverrideFile, 
+        '--licenseurl-to-license-mappings', licenseUrlToLicenseTypeOverrideFile]
     
     spawnSync("dotnet", dotnetProjectLicensesArgs, { shell: false, stdio: 'inherit', cwd: tempLicenseOutputFolder });
 
@@ -98,22 +102,23 @@ try {
     const encodedPackageInfosWithLicenseText = [];
     for (const parsedPackageInfo of parsedPackageInfos) {
 
-        const licenseTextFilePath = path.join(licensePlainTextFolder, `${parsedPackageInfo.LicenseType}.txt`);
+        const licenseTextFilePath = path.join(licensePlainTextFolder, `${parsedPackageInfo.License}.txt`);
 
         if (!fs.existsSync(licenseTextFilePath)) {
-            throw new Error(`License text file not found: ${licenseTextFilePath}`);
+            console.warn(`License text file not found: ${licenseTextFilePath}`);
+            continue; // Skip this package if the license text file does not exist
         }
         const licensePlainText = fs.readFileSync(licenseTextFilePath, 'utf8');
         const licensePlainTextEncoded = he.encode(licensePlainText, { strict: true });
 
-        const AuthorsJoined = parsedPackageInfo.Authors && parsedPackageInfo.Authors.length > 0 ? "Authors: " + parsedPackageInfo.Authors.join(', ') : '';
+        const AuthorsJoined = parsedPackageInfo.Authors && parsedPackageInfo.Authors.length > 0 ? "Authors: " + parsedPackageInfo.Authors : '';
         const AuthorsEncoded = he.encode(AuthorsJoined, { strict: true });
 
-        const LicenseTypeEncoded = he.encode(parsedPackageInfo.LicenseType, { strict: true });
+        const LicenseTypeEncoded = he.encode(parsedPackageInfo.License, { strict: true });
 
         const CopyrightEncoded = he.encode(parsedPackageInfo.Copyright, { strict: true });
 
-        const PackageNameEncoded = he.encode(parsedPackageInfo.PackageName, { strict: true });
+        const PackageNameEncoded = he.encode(parsedPackageInfo.PackageId, { strict: true });
 
         const encodedPackageInfo = { PackageName: PackageNameEncoded, Copyright: CopyrightEncoded, LicenseType: LicenseTypeEncoded, Authors: AuthorsEncoded, LicenseTextEncodedToInsert: licensePlainTextEncoded };
 

@@ -64,11 +64,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<ClientEnv>Development</ClientEnv>
+		<ClientEnv>DemoDevelopment</ClientEnv>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<ClientEnv>Development</ClientEnv>
+		<ClientEnv>DemoDevelopment</ClientEnv>
 	</PropertyGroup>
 
 	<Target Name="CopyCustomFiles" BeforeTargets="BeforeBuild">

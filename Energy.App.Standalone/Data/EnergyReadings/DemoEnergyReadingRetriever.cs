@@ -57,8 +57,13 @@ public class DemoEnergyReadingRetriever : IEnergyReadingRetriever
 
                     var missingReadingTimeSpan = missingReadingDateTime - new DateTime(missingReadingDateTime.Year,1,1);
 
-                    var lastYearsReading = demoReadingsLookup[missingReadingTimeSpan];
-
+                    if (!demoReadingsLookup.TryGetValue(missingReadingTimeSpan, out var lastYearsReading))
+                    {
+                        return new BasicReading() {
+                            Utc = missingReadingDateTime.ToUniversalTime(),
+                            KWh = 0,
+                        };
+                    }
 
                     decimal demoReadingKWh = lastYearsReading.KWh;
                     //if (lastYearsReading.KWh != 0) {
