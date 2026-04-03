@@ -1,6 +1,9 @@
-![CodeQL](https://github.com/zola-25/Explain-My-Energy/actions/workflows/codeql.yml/badge.svg) ![Main App Playwright Tests](https://dev.azure.com/eme-devops-crunchy/Explain%20My%20Energy/_apis/build/status%2FFull%20App%20Deploy%20and%20Test?branchName=main&stageName=Deploy_production_app_Playwright_Testing&jobName=Run%20Playwright%20Tests%20Production)
-
 # Developer Quick-start
+
+> [!WARNING]
+> *As the n3rgy consumer API has been shut down, this project has been deprecated*
+>
+> *The application can be used in Demo mode with Demo data pre-loaded*
 
 Many client side files are generated at build time. The dotnet tool `nuget-license` is required. Then a NodeJS script can be used to build the necessary client side files:
 
@@ -10,14 +13,9 @@ dotnet tool install nuget-license
 npm install
 npm run buildDevDemo
 ```
-Then use `dotnet run` or an IDE to build & run the application.
+Then use `dotnet run -p:ClientEnv=DemoDevelopment` or an IDE to build & run the application.
 
 # Explain My Energy
-
-> [!WARNING]
-> *As the n3rgy consumer API has been shut down, this project has been deprecated*
->
-> *The demo site remains live -* [demo.explainmyenergy.net](https://demo.explainmyenergy.net)
 
 This is an open-source hobby project that provides a standalone, serverless Blazor WebAssembly app to enable UK-based users easy access to detailed insights on their energy usage and energy costs.
 
@@ -57,13 +55,4 @@ Initial App download size comes with the territory of Blazor WebAssembly apps ri
 > Data stored in browser local storage is only accessible by the web app that created it, and XSS attack risks have been minimized - however, don't use this app on a shared device or a device that you don't trust.
 > 
 
-
-
-## Getting Started
-
-There's comprehensive documentation at [docs.explainmyenergy.net](https://docs.explainmyenergy.net/). 
-
-Exploring the **demo** implementation, pre-configured with dummy data and requiring no setup, is recommended and available at [demo.explainmyenergy.net](https://demo.explainmyenergy.net/)
-
-The **live** version that you can to analyze your own energy data, is available at [explainmyenergy.net](https://explainmyenergy.net/)
 

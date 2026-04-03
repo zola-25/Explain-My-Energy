@@ -30,11 +30,6 @@
 		<ProjectReference Include="..\Energy.WeatherReadings\Energy.WeatherReadings.csproj" />
 	</ItemGroup>
 
-
-	<Target Name="CollectMudBlazorStaticAssets" DependsOnTargets="ResolveStaticWebAssetsInputs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
-		<Copy SourceFiles="%(StaticWebAsset.Identity)" DestinationFolder="wwwroot/temp" Condition="$([System.String]::Copy(%(StaticWebAsset.Identity)).Contains('mudblazor'))" />
-	</Target>
-
 	<PropertyGroup>
 		<!-- Enable trimming -->
 		<PublishTrimmed>true</PublishTrimmed>
