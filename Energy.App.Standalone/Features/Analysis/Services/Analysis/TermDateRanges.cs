@@ -1,5 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.Interfaces;
+using Energy.Shared;
 
 namespace Energy.App.Standalone.Features.Analysis.Services.Analysis;
 
@@ -10,9 +11,9 @@ public class TermDateRanges : ITermDateRanges
         Today = DateTime.SpecifyKind(today, DateTimeKind.Utc);
     }
 
-    public TermDateRanges()
+    public TermDateRanges(TimeProvider timeProvider)
     {
-        Today = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
+        Today = DateTime.SpecifyKind(timeProvider.eUtcToday(), DateTimeKind.Utc);
     }
 
     public DateTime Today { get; set; }

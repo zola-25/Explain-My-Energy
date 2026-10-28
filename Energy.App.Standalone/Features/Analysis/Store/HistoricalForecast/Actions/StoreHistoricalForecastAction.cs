@@ -9,11 +9,13 @@ public class StoreHistoricalForecastAction
 {
     public MeterType MeterType { get; }
     public ImmutableList<DailyCostedReading> ForecastDailyCosts { get; }
+    public DateTime LastUpdate { get; }
 
-    public StoreHistoricalForecastAction(MeterType meterType, ImmutableList<DailyCostedReading> forecastDailyCosts)
+    public StoreHistoricalForecastAction(MeterType meterType, ImmutableList<DailyCostedReading> forecastDailyCosts, DateTime lastUpdate)
     {
         MeterType = meterType;
         ForecastDailyCosts = forecastDailyCosts;
+        LastUpdate = lastUpdate;
     }
 
     [ReducerMethod]
@@ -24,12 +26,12 @@ public class StoreHistoricalForecastAction
             MeterType.Electricity => state with
             {
                 ElectricityForecastDailyCosts = action.ForecastDailyCosts,
-                ElectricityLastUpdate = DateTime.UtcNow
+                ElectricityLastUpdate = action.LastUpdate
             },
             MeterType.Gas => state with
             {
                 GasForecastDailyCosts = action.ForecastDailyCosts,
-                GasLastUpdate = DateTime.UtcNow
+                GasLastUpdate = action.LastUpdate
             },
             _ => throw new NotImplementedException(nameof(action.MeterType)),
         };

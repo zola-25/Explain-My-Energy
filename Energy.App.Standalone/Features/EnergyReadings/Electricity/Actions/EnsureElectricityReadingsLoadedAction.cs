@@ -43,12 +43,12 @@ public class EnsureElectricityReadingsLoadedAction
         };
     }
 
-    [ReducerMethod(typeof(ElectricityUpdateLastReadingsCheckAction))]
-    public static ElectricityReadingsState UpdateLastReadingsCheckReducer(ElectricityReadingsState state)
+    [ReducerMethod]
+    public static ElectricityReadingsState UpdateLastReadingsCheckReducer(ElectricityReadingsState state, ElectricityUpdateLastReadingsCheckAction action)
     {
         return state with
         {
-            LastCheckedForNewReadings = DateTime.UtcNow,
+            LastCheckedForNewReadings = action.LastCheckedForNewReadings,
         };
     }
 
@@ -59,7 +59,7 @@ public class EnsureElectricityReadingsLoadedAction
         {
             BasicReadings = action.BasicReadings,
             CostedReadings = action.CostedReadings,
-            LastCheckedForNewReadings = DateTime.UtcNow,
+            LastCheckedForNewReadings = action.LastCheckedForNewReadings,
         };
     }
 
@@ -82,6 +82,7 @@ public class EnsureElectricityReadingsLoadedAction
         private readonly ICostCalculator _costCalculator;
         private readonly IEnergyReadingService _energyReadingService;
         private readonly ILogger<EnsureElectricityReadingsLoadedEffect> _logger;
+        private readonly TimeProvider _timeProvider;
 
         public EnsureElectricityReadingsLoadedEffect(IState<MeterSetupState> meterSetupState,
                       IState<ElectricityReadingsState> electricityReadingsState,
@@ -89,7 +90,8 @@ public class EnsureElectricityReadingsLoadedAction
                       ICostCalculator costCalculator,
                       IEnergyReadingService energyReadingService,
                       ILogger<EnsureElectricityReadingsLoadedEffect> logger,
-                      IState<HouseholdState> householdState)
+                      IState<HouseholdState> householdState,
+                      TimeProvider timeProvider)
         {
             _meterSetupState = meterSetupState;
             _electricityReadingsState = electricityReadingsState;
@@ -98,6 +100,7 @@ public class EnsureElectricityReadingsLoadedAction
             _energyReadingService = energyReadingService;
             _logger = logger;
             _householdState = householdState;
+            _timeProvider = timeProvider;
         }
 
         public override async Task HandleAsync(EnsureElectricityReadingsLoadedAction action, IDispatcher dispatcher)
@@ -126,7 +129,7 @@ public class EnsureElectricityReadingsLoadedAction
                         var lastBasicReading = existingBasicReadings.Last().Utc;
                         var newBasicReadings = await _energyReadingService.ImportFromDate(meterType, lastBasicReading.Date);
 
-                        dispatcher.Dispatch(new ElectricityUpdateLastReadingsCheckAction());
+                        dispatcher.Dispatch(new ElectricityUpdateLastReadingsCheckAction(_timeProvider.eUtcNow()));
 
                         bool anythingNew = newBasicReadings.Any() && newBasicReadings.Last().Utc > lastBasicReading;
 
@@ -139,7 +142,7 @@ public class EnsureElectricityReadingsLoadedAction
                             basicReadingsToUpdate.AddRange(newBasicReadings);
 
                             var newCostedReadings = CalculateCostedReadings(basicReadingsToUpdate, meterSetup.TariffDetails);
-                            dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(basicReadingsToUpdate.ToImmutableList(), newCostedReadings));
+                            dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(basicReadingsToUpdate.ToImmutableList(), newCostedReadings, _timeProvider.eUtcNow()));
 
                             fullReloadForecasts = true;
                             message = $"{meterType} Readings: Updated {newBasicReadings.Count} readings";
@@ -167,7 +170,7 @@ public class EnsureElectricityReadingsLoadedAction
                         var reloadedBasicReadings = (await _energyReadingService.ImportFromMoveInOrPreviousYear(meterType)).ToImmutableList();
                         var reloadedCostedReadings = CalculateCostedReadings(reloadedBasicReadings, meterSetup.TariffDetails);
 
-                        dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(reloadedBasicReadings, reloadedCostedReadings));
+                        dispatcher.Dispatch(new ElectricityStoreReloadedReadingsAndCostsAction(reloadedBasicReadings, reloadedCostedReadings, _timeProvider.eUtcNow()));
 
                         message = $"{meterType} Readings: Loaded {reloadedBasicReadings.Count} readings";
 

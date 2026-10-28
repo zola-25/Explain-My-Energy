@@ -2,4 +2,10 @@
 
 public class ElectricityUpdateLastReadingsCheckAction
 {
+    public DateTime LastCheckedForNewReadings { get; }
+
+    public ElectricityUpdateLastReadingsCheckAction(DateTime lastCheckedForNewReadings)
+    {
+        LastCheckedForNewReadings = lastCheckedForNewReadings;
+    }
 }

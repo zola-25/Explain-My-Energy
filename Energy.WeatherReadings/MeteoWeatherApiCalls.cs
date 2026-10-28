@@ -10,11 +10,14 @@ public class MeteoWeatherApiCalls : IMeteoWeatherApiCalls
 {
 
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly TimeProvider _timeProvider;
 
     public MeteoWeatherApiCalls(
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        TimeProvider timeProvider)
     {
         _httpClientFactory = httpClientFactory;
+        _timeProvider = timeProvider;
     }
 
     public async Task LoadHistorical(OutCodeWeatherUpdateRanges outCodeUpdateRange, List<DailyWeatherReading> dailyWeatherReadings)
@@ -109,7 +112,7 @@ public class MeteoWeatherApiCalls : IMeteoWeatherApiCalls
                     IsHistorical = true,
                     IsNearForecast = false,
                     IsRecentForecast = false,
-                    Updated = DateTime.UtcNow
+                    Updated = _timeProvider.eUtcNow()
                 };
                 dailyWeatherReadings.Add(reading);
             }
@@ -200,9 +203,9 @@ public class MeteoWeatherApiCalls : IMeteoWeatherApiCalls
                     OutCode = outCodeUpdateRange.OutCode,
                     IsClimateForecast = false,
                     IsHistorical = false,
-                    IsNearForecast = readDate >= DateTime.UtcNow,
-                    IsRecentForecast = readDate < DateTime.UtcNow,
-                    Updated = DateTime.UtcNow
+                    IsNearForecast = readDate >= _timeProvider.eUtcNow(),
+                    IsRecentForecast = readDate < _timeProvider.eUtcNow(),
+                    Updated = _timeProvider.eUtcNow()
                 };
                 dailyWeatherReadings.Add(reading);
             }
@@ -267,7 +270,7 @@ public class MeteoWeatherApiCalls : IMeteoWeatherApiCalls
                     WindSpeed = windspeed_10m_max[i],
                     TotalRain = rain_sum[i],
                     TotalSnowfall = snowfall_sum[i],
-                    Updated = DateTime.UtcNow,
+                    Updated = _timeProvider.eUtcNow(),
                     IsNearForecast = false,
                     IsRecentForecast = false,
                     IsClimateForecast = true,

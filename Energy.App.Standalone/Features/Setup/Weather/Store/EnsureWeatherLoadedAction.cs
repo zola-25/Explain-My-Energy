@@ -2,6 +2,7 @@
 using Energy.App.Standalone.Data.Weather.Interfaces;
 using Energy.App.Standalone.Extensions;
 using Energy.App.Standalone.Features.Setup.Household;
+using Energy.Shared;
 using Energy.WeatherReadings.Interfaces;
 using Fluxor;
 
@@ -43,7 +44,7 @@ public record EnsureWeatherLoadedAction
         return state with
         {
             OutCode = action.OutCode,
-            LastUpdated = DateTime.UtcNow,
+            LastUpdated = action.LastUpdated,
             WReadings = action.ReloadedWeatherReadings.ToImmutableList()
         };
     }
@@ -55,7 +56,7 @@ public record EnsureWeatherLoadedAction
 
         return state with
         {
-            LastUpdated = DateTime.UtcNow,
+            LastUpdated = action.LastUpdated,
             WReadings = state.WReadings
                 .RemoveAll(c => c.Utc >= firstUpdateDate)
                 .AddRange(action.UpdatedWeatherReadings)
@@ -67,14 +68,17 @@ public record EnsureWeatherLoadedAction
         private readonly IState<HouseholdState> _householdState;
         private readonly IState<WeatherState> _weatherState;
         private readonly IWeatherDataService _weatherDataService;
+        private readonly TimeProvider _timeProvider;
 
         public Effect(IState<HouseholdState> householdState,
                       IState<WeatherState> weatherState,
-                      IWeatherDataService weatherDataService)
+                      IWeatherDataService weatherDataService,
+                      TimeProvider timeProvider)
         {
             _householdState = householdState;
             _weatherState = weatherState;
             _weatherDataService = weatherDataService;
+            _timeProvider = timeProvider;
         }
 
         public override async Task HandleAsync(EnsureWeatherLoadedAction action, IDispatcher dispatcher)
@@ -96,7 +100,7 @@ public record EnsureWeatherLoadedAction
 
                 var results = await _weatherDataService.GetForOutCode(outCode);
 
-                dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode));
+                dispatcher.Dispatch(new StoreWeatherReloadedReadingsAction(results, outCode, _timeProvider.eUtcNow()));
 
                 var message = $"Loaded {results.Count} days of weather data for {outCode}";
                 dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));
@@ -111,7 +115,7 @@ public record EnsureWeatherLoadedAction
                 var latestHistoricalReading = _weatherState.Value.WReadings.FindLast(c => c.IsHist)?.
                     Utc;
 
-                if (_weatherState.Value.LastUpdated < DateTime.UtcNow.Date.AddDays(-1))
+                if (_weatherState.Value.LastUpdated < _timeProvider.eUtcToday().AddDays(-1))
                 {
 
                     var results = await _weatherDataService.GetForOutCode(outCode, latestHistoricalReading, latestReading);
@@ -124,7 +128,7 @@ public record EnsureWeatherLoadedAction
                         return;
                     }
 
-                    dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results, outCode));
+                    dispatcher.Dispatch(new StoreWeatherUpdatedReadingsAction(results, outCode, _timeProvider.eUtcNow()));
 
                     var message = $"Updated {results.Count} new days of weather data for {outCode}";
                     dispatcher.Dispatch(new NotifyWeatherLoadingFinished(true, message));

@@ -11,11 +11,13 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<N3rgyEnergyDataService> _logger;
+    private readonly TimeProvider _timeProvider;
 
-    public N3rgyEnergyDataService(IHttpClientFactory httpClientFactory, ILogger<N3rgyEnergyDataService> logger)
+    public N3rgyEnergyDataService(IHttpClientFactory httpClientFactory, ILogger<N3rgyEnergyDataService> logger, TimeProvider timeProvider)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     private HttpClient GetHttpClient(MeterType meterType)
@@ -72,8 +74,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
     public async Task TestAccessWithException(MeterType meterType,
         string mac, CancellationToken ctx = default)
     {
-        DateTime startDate = DateTime.UtcNow.Date.AddDays(-4);
-        DateTime endDate = DateTime.UtcNow.Date.AddDays(-3);
+        DateTime startDate = _timeProvider.eUtcToday().AddDays(-4);
+        DateTime endDate = _timeProvider.eUtcToday().AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -91,8 +93,8 @@ public class N3rgyEnergyDataService : IN3rgyEnergyDataService
     public async Task<HttpResponseMessage> TestAccess(MeterType meterType,
         string mac, CancellationToken ctx = default)
     {
-        DateTime startDate = DateTime.UtcNow.Date.AddDays(-4);
-        DateTime endDate = DateTime.UtcNow.Date.AddDays(-3);
+        DateTime startDate = _timeProvider.eUtcToday().AddDays(-4);
+        DateTime endDate = _timeProvider.eUtcToday().AddDays(-3);
         using HttpClient httpClient = GetHttpClient(meterType);
         httpClient.DefaultRequestHeaders.Add("authorization", mac);
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

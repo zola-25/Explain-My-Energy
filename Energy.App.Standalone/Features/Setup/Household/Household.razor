@@ -2,6 +2,7 @@
 @inject IDispatcher Dispatcher
 @inject IState<UserLockState> UserLockState
 @inject AppStatus AppConfig
+@inject TimeProvider TimeProvider
 
 @if (_readyToInteract)
 {
@@ -9,7 +10,7 @@
 
     <EditForm Model="@_householdDetails" OnValidSubmit="HandleValidSubmit">
 
-        <MudCard Elevation="0">
+        <MudCard Elevation="0" data-testid="household-setup">
             <MudCardHeader>
                 <MudText Class="fw-bolder" Typo="Typo.h5">Household Setup</MudText>
             </MudCardHeader>
@@ -24,13 +25,14 @@
                                     Disabled="@disableInputs"
                                     OpenTo="@_openTo"
                                     Label="Move-in Date"
+                                    aria-label="Move-in Date"
                                     AnchorOrigin="Origin.CenterRight"
                                     TransformOrigin="Origin.CenterRight"
                                     ReadOnly="@_submitting"
                                     Clearable="true"
                                     DisableToolbar="@_disableToolbar"
                                     DateFormat="MMMM yyyy"
-                                    MaxDate="DateTime.Today"></MudDatePicker>
+                                    MaxDate="TimeProvider.eToday()"></MudDatePicker>
                      <DocTooltipIcon DocSnippetHeader="Move-in Date" DocSnippetType="DocSnippetType.HouseholdMoveInDate" IconTitle="Help for Move-in Date" />
 
                  </div>
@@ -41,6 +43,7 @@
                                    Converter="@uppercaseConverter"
                                    T="string"
                                    Label="IHD MAC ID"
+                                   aria-label="IHD MAC ID"
                                    @bind-Value="@_householdDetails.IhdMacId" Required Disabled="@(disableInputs)"
                                    Placeholder="IHD MAC ID"></MudTextField>
                      <DocTooltipIcon DocSnippetHeader="In-Home Device MAC ID" DocSnippetType="DocSnippetType.HouseholdIHD" IconTitle="Help for IHD MAC ID" />
@@ -60,7 +63,7 @@
                                       HelperText="Enter the first two characters and select from the dropdown"
                                       HelperTextOnFocus="true"
                                       Disabled="@(disableInputs)"
-                                      UserAttributes="@(new(){{"autocomplete", "off"}})"
+                                      UserAttributes="@(new(){{"autocomplete", "off"}, {"aria-label", "Postal Area"}})"
                                       ShowProgressIndicator="true" ToStringFunc="@(outCode => outCode.OutCodeCharacters)"
                                       MinCharacters="2"
                                       OnClearButtonClick="ClearPostalArea"

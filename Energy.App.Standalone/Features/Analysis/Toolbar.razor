@@ -22,19 +22,21 @@
     <MudPaper Elevation="0" Class="term-mud-select-min-width d-flex align-center ma-2">
         <MudTooltip Placement="Placement.Top" Text="Show the analyses below as Day, Week or Month periods">
 
-            <MudSelect  Class="w-100percent"
-                       Value="_calendarTerm"
-                       ValueChanged="TermChanged"
-                       Label="Change Term"
-                       Variant="Variant.Text"
-                       T="CalendarTerm"
-                       OpenIcon="@Icons.Material.Filled.AccessTime"
-                       AdornmentColor="Color.Dark">
-                @foreach (CalendarTerm term in Enum.GetValues(typeof(CalendarTerm)))
-                {
-                    <MudSelectItem Value="@term">@term.TermAdjective()</MudSelectItem>
-                }
-            </MudSelect>
+            <div data-testid="term-select">
+                <MudSelect  Class="w-100percent"
+                           Value="_calendarTerm"
+                           ValueChanged="TermChanged"
+                           Label="Change Term"
+                           Variant="Variant.Text"
+                           T="CalendarTerm"
+                           OpenIcon="@Icons.Material.Filled.AccessTime"
+                           AdornmentColor="Color.Dark">
+                    @foreach (CalendarTerm term in Enum.GetValues(typeof(CalendarTerm)))
+                    {
+                        <MudSelectItem Value="@term" role="option">@term.TermAdjective()</MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
         </MudTooltip>
         <DocTooltipIcon DocSnippetHeader="Aggregate Analysis Term"
                         DocSnippetType="DocSnippetType.AnalysisOptionsAnalysisTerm" IconTitle="Help for Setting Aggregate Analysis Term" />
@@ -70,6 +72,7 @@
                                  Class="right-align-input w-150px"
                                  T="decimal"
                                  Label="Adjust Forecast" Variant="Variant.Text"
+                                 aria-label="Adjust Forecast"
                                  Step="1"
                                  Adornment="Adornment.End"
                                  AdornmentText="°C" />

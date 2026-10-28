@@ -28,13 +28,15 @@ public class EnsureElectricityHistoricalForecastAction
         private readonly IForecastReadingsMovingAverage _forecastReadingsMovingAverage;
         private readonly IHistoricalForecastValidation _historicalForecastValidation;
         private readonly ILogger<EnsureElectricityHistoricalForecastEffect> _logger;
+        private readonly TimeProvider _timeProvider;
 
         public EnsureElectricityHistoricalForecastEffect(IState<HistoricalForecastState> state,
                       IState<ElectricityReadingsState> electricityReadingsState,
                       IState<MeterSetupState> meterSetupState,
                       IForecastReadingsMovingAverage forecastReadingsMovingAverage,
                       IHistoricalForecastValidation historicalForecastValidation,
-                      ILogger<EnsureElectricityHistoricalForecastEffect> logger)
+                      ILogger<EnsureElectricityHistoricalForecastEffect> logger,
+                      TimeProvider timeProvider)
         {
             _state = state;
             _electricityReadingsState = electricityReadingsState;
@@ -42,6 +44,7 @@ public class EnsureElectricityHistoricalForecastAction
             _forecastReadingsMovingAverage = forecastReadingsMovingAverage;
             _historicalForecastValidation = historicalForecastValidation;
             _logger = logger;
+            _timeProvider = timeProvider;
         }
 
         public override Task HandleAsync(EnsureElectricityHistoricalForecastAction action, IDispatcher dispatcher)
@@ -76,7 +79,7 @@ public class EnsureElectricityHistoricalForecastAction
 
                 var forecastDailyCostedReadings = _forecastReadingsMovingAverage.GetDailyCostedReadings(historicalBasicReadings, meterTariffs);
 
-                dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings));
+                dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings, _timeProvider.eUtcNow()));
 
                 string resultMessage = $"{meterType} Historical Forecast created with {forecastDailyCostedReadings.Count} daily readings";
                 dispatcher.Dispatch(new NotifyElectricityForecastResult(true, resultMessage));

@@ -127,15 +127,15 @@ public static class Extensions
         };
     }
 
-    public static TariffDetailState eCurrentTariffState(this IEnumerable<TariffDetailState> tariffDetails)
+    public static TariffDetailState eCurrentTariffState(this IEnumerable<TariffDetailState> tariffDetails, DateTime today)
     {
-        return tariffDetails.Where(c => DateTime.Today >= (c.DateAppliesFrom ?? DateTime.MaxValue))
+        return tariffDetails.Where(c => today >= (c.DateAppliesFrom ?? DateTime.MaxValue))
             .MaxBy(c => c.DateAppliesFrom);
     }
 
-    public static TariffDetail eCurrentTariff(this IEnumerable<TariffDetail> tariffDetails)
+    public static TariffDetail eCurrentTariff(this IEnumerable<TariffDetail> tariffDetails, DateTime today)
     {
-        return tariffDetails.Where(c => DateTime.Today >= (c.DateAppliesFrom ?? DateTime.MaxValue))
+        return tariffDetails.Where(c => today >= (c.DateAppliesFrom ?? DateTime.MaxValue))
             .MaxBy(c => c.DateAppliesFrom);
     }
 
@@ -225,9 +225,9 @@ public static class Extensions
         return date.eToString("ddd dnn MMM yy", true);
     }
 
-    public static bool eUpToDate(this DateTime? latestReading)
+    public static bool eUpToDate(this DateTime? latestReading, DateTime today)
     {
-        return latestReading.HasValue && latestReading >= DateTime.Today.AddDays(-1).Date;
+        return latestReading.HasValue && latestReading >= today.AddDays(-1).Date;
     }
 
     public static IEnumerable<DateTime> eGenerateAllDatesBetween(this DateTime startDate, DateTime endDate, bool endDateInclusive = true)

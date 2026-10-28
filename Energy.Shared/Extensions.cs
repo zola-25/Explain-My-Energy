@@ -25,6 +25,30 @@ public static class Extensions
 
         return queryStringBuilder.ToString();
     }
+    /// <summary>
+    /// Equivalent of <see cref="DateTime.UtcNow"/>
+    /// </summary>
+    public static DateTime eUtcNow(this TimeProvider timeProvider)
+    {
+        return timeProvider.GetUtcNow().UtcDateTime;
+    }
+
+    /// <summary>
+    /// Equivalent of <see cref="DateTime.UtcNow"/>.Date
+    /// </summary>
+    public static DateTime eUtcToday(this TimeProvider timeProvider)
+    {
+        return timeProvider.GetUtcNow().UtcDateTime.Date;
+    }
+
+    /// <summary>
+    /// Equivalent of <see cref="DateTime.Today"/>
+    /// </summary>
+    public static DateTime eToday(this TimeProvider timeProvider)
+    {
+        return timeProvider.GetLocalNow().DateTime.Date;
+    }
+
     public static List<T> eItemToList<T>(this T item)
     {
         return new List<T> { item };

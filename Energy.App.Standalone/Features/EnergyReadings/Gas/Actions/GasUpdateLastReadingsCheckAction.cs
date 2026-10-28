@@ -2,4 +2,10 @@
 
 public class GasUpdateLastReadingsCheckAction
 {
+    public DateTime LastCheckedForNewReadings { get; }
+
+    public GasUpdateLastReadingsCheckAction(DateTime lastCheckedForNewReadings)
+    {
+        LastCheckedForNewReadings = lastCheckedForNewReadings;
+    }
 }
