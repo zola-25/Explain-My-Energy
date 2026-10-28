@@ -16,6 +16,13 @@ public class EnergyImportValidationResult
 
 public class EnergyImportValidation : IEnergyImportValidation
 {
+    private readonly TimeProvider _timeProvider;
+
+    public EnergyImportValidation(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
     public EnergyImportValidationResult Validate(MeterState meterSetup,
                                                     bool forceReload,
                                                     DateTime lastReadingsCheck,
@@ -57,9 +64,9 @@ public class EnergyImportValidation : IEnergyImportValidation
         bool updateCosts = existingCostedReadings.eIsNullOrEmpty()
                            || existingCostedReadings.Last().UtcTime < lastBasicReading;
 
-        var timeSinceLastReadingsCheck = DateTime.UtcNow - lastReadingsCheck;
+        var timeSinceLastReadingsCheck = _timeProvider.eUtcNow() - lastReadingsCheck;
 
-        if (lastBasicReading < DateTime.UtcNow.Date.AddDays(-1) && timeSinceLastReadingsCheck.TotalHours >= 6)
+        if (lastBasicReading < _timeProvider.eUtcToday().AddDays(-1) && timeSinceLastReadingsCheck.TotalHours >= 6)
         {
             return new EnergyImportValidationResult
             {

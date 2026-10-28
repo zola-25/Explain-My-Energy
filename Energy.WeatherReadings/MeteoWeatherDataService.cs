@@ -10,13 +10,15 @@ public class MeteoWeatherDataService : IMeteoWeatherDataService
     private readonly IOutCodeLocationLookup _outCodeLocationLookup;
     private readonly IMeteoWeatherApiCalls _weatherApiCalls;
     private readonly ILogger<MeteoWeatherDataService> _logger;
+    private readonly TimeProvider _timeProvider;
 
 
-    public MeteoWeatherDataService(IOutCodeLocationLookup outCodeLocationLookup, IMeteoWeatherApiCalls weatherApiCalls, ILogger<MeteoWeatherDataService> logger)
+    public MeteoWeatherDataService(IOutCodeLocationLookup outCodeLocationLookup, IMeteoWeatherApiCalls weatherApiCalls, ILogger<MeteoWeatherDataService> logger, TimeProvider timeProvider)
     {
         _outCodeLocationLookup = outCodeLocationLookup;
         _weatherApiCalls = weatherApiCalls;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     public async Task<List<DailyWeatherReading>> GetForOutCode(string outCode, DateTime? latestHistorical = null, DateTime? latestReading = null)
@@ -30,7 +32,7 @@ public class MeteoWeatherDataService : IMeteoWeatherDataService
             Longitude = outCodeLocation.Longitude,
             Latitude = outCodeLocation.Latitude,
             OutCode = outCodeLocation.OutCode,
-            UtcToday = DateTime.UtcNow.Date
+            UtcToday = _timeProvider.eUtcToday()
         };
 
         return await GetWeatherReadingsFromMeteo(weatherUpdateRange);

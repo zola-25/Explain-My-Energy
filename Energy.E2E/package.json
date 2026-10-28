@@ -1,0 +1,21 @@
+{
+  "name": "explain-my-energy-e2e",
+  "version": "1.0.0",
+  "description": "Playwright end-to-end tests for the Explain My Energy demo app",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:ui": "playwright test --project=chromium --ui",
+    "report": "playwright show-report",
+    "record-weather": "playwright test --project=record-weather",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "24.19.2",
+    "typescript": "5.9.3"
+  }
+}

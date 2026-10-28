@@ -9,23 +9,25 @@ public class EnergyReadingService : IEnergyReadingService
 {
     private readonly IState<HouseholdState> _householdState;
     private readonly IEnergyReadingRetriever _energyReadingRetriever;
+    private readonly TimeProvider _timeProvider;
 
-    public EnergyReadingService(IState<HouseholdState> householdState, IEnergyReadingRetriever energyReadingRetriever)
+    public EnergyReadingService(IState<HouseholdState> householdState, IEnergyReadingRetriever energyReadingRetriever, TimeProvider timeProvider)
     {
         _householdState = householdState;
         this._energyReadingRetriever = energyReadingRetriever;
+        _timeProvider = timeProvider;
     }
 
     public async Task<List<BasicReading>> ImportFromMoveInOrPreviousYear(MeterType meterType, CancellationToken ctx = default)
     {
 
-        var earliestDate = DateTime.UtcNow.AddYears(-1).AddDays(-30).Date;
+        var earliestDate = _timeProvider.eUtcNow().AddYears(-1).AddDays(-30).Date;
         var startDate = _householdState.Value.MoveInDate.Value < earliestDate ? earliestDate : _householdState.Value.MoveInDate.Value;
 
         string macId = _householdState.Value.IhdMacId;
 
 
-        var meterReadings = await _energyReadingRetriever.GetMeterReadings(startDate, DateTime.Today, macId, meterType);
+        var meterReadings = await _energyReadingRetriever.GetMeterReadings(startDate, _timeProvider.eToday(), macId, meterType);
         return meterReadings;
     }
 
@@ -35,7 +37,7 @@ public class EnergyReadingService : IEnergyReadingService
 
 
         var meterReadings = await _energyReadingRetriever.GetMeterReadings(fromDate,
-                                                                                 DateTime.Today,
+                                                                                 _timeProvider.eToday(),
                                                                                  macId,
                                                                                  meterType);
         return meterReadings;

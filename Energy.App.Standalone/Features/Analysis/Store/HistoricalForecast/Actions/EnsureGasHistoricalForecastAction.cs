@@ -31,13 +31,15 @@ public class EnsureGasHistoricalForecastAction
         private readonly IForecastReadingsMovingAverage _forecastReadingsMovingAverage;
         private readonly IHistoricalForecastValidation _historicalForecastValidation;
         private readonly ILogger<EnsureGasHistoricalForecastEffect> _logger;
+        private readonly TimeProvider _timeProvider;
 
         public EnsureGasHistoricalForecastEffect(IState<HistoricalForecastState> state,
                       IState<GasReadingsState> gasReadingsState,
                       IState<MeterSetupState> meterSetupState,
                       IForecastReadingsMovingAverage forecastReadingsMovingAverage,
                       IHistoricalForecastValidation historicalForecastValidation,
-                      ILogger<EnsureGasHistoricalForecastEffect> logger)
+                      ILogger<EnsureGasHistoricalForecastEffect> logger,
+                      TimeProvider timeProvider)
         {
             _state = state;
             _gasReadingsState = gasReadingsState;
@@ -45,6 +47,7 @@ public class EnsureGasHistoricalForecastAction
             _forecastReadingsMovingAverage = forecastReadingsMovingAverage;
             _historicalForecastValidation = historicalForecastValidation;
             _logger = logger;
+            _timeProvider = timeProvider;
         }
 
         public override Task HandleAsync(EnsureGasHistoricalForecastAction action, IDispatcher dispatcher)
@@ -80,7 +83,7 @@ public class EnsureGasHistoricalForecastAction
 
                 var forecastDailyCostedReadings = _forecastReadingsMovingAverage.GetDailyCostedReadings(historicalBasicReadings, meterTariffs);
 
-                dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings));
+                dispatcher.Dispatch(new StoreHistoricalForecastAction(meterType, forecastDailyCostedReadings, _timeProvider.eUtcNow()));
 
                 string resultMessage = @$"{meterType} Historical Forecast created 
                                             with {forecastDailyCostedReadings.Count} daily readings";

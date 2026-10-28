@@ -39,12 +39,12 @@ public class EnsureGasReadingsLoadedAction
         };
     }
 
-    [ReducerMethod(typeof(GasUpdateLastReadingsCheckAction))]
-    public static GasReadingsState UpdateLastReadingsCheckReducer(GasReadingsState state)
+    [ReducerMethod]
+    public static GasReadingsState UpdateLastReadingsCheckReducer(GasReadingsState state, GasUpdateLastReadingsCheckAction action)
     {
         return state with
         {
-            LastCheckedForNewReadings = DateTime.UtcNow,
+            LastCheckedForNewReadings = action.LastCheckedForNewReadings,
         };
     }
 
@@ -56,7 +56,7 @@ public class EnsureGasReadingsLoadedAction
         {
             BasicReadings = action.BasicReadings,
             CostedReadings = action.CostedReadings,
-            LastCheckedForNewReadings = DateTime.UtcNow,
+            LastCheckedForNewReadings = action.LastCheckedForNewReadings,
         };
     }
 
@@ -79,6 +79,7 @@ public class EnsureGasReadingsLoadedAction
         private readonly ICostCalculator _costCalculator;
         private readonly IEnergyReadingService _energyReadingService;
         private readonly ILogger<EnsureGasReadingsLoadedEffect> _logger;
+        private readonly TimeProvider _timeProvider;
 
         public EnsureGasReadingsLoadedEffect(IState<MeterSetupState> meterSetupState,
                                              IState<GasReadingsState> gasReadingsState,
@@ -86,7 +87,8 @@ public class EnsureGasReadingsLoadedAction
                                              ICostCalculator costCalculator,
                                              IEnergyReadingService energyReadingService,
                                              ILogger<EnsureGasReadingsLoadedEffect> logger,
-                                             IState<HouseholdState> householdState)
+                                             IState<HouseholdState> householdState,
+                                             TimeProvider timeProvider)
         {
             _meterSetupState = meterSetupState;
             _gasReadingsState = gasReadingsState;
@@ -95,6 +97,7 @@ public class EnsureGasReadingsLoadedAction
             _energyReadingService = energyReadingService;
             _logger = logger;
             _householdState = householdState;
+            _timeProvider = timeProvider;
         }
 
         public override async Task HandleAsync(EnsureGasReadingsLoadedAction action, IDispatcher dispatcher)
@@ -124,7 +127,7 @@ public class EnsureGasReadingsLoadedAction
                         var newBasicReadings = await _energyReadingService.ImportFromDate(meterType, lastBasicReading.Date);
 
 
-                        dispatcher.Dispatch(new GasUpdateLastReadingsCheckAction());
+                        dispatcher.Dispatch(new GasUpdateLastReadingsCheckAction(_timeProvider.eUtcNow()));
 
                         bool anythingNew = newBasicReadings.Any() && newBasicReadings.Last().Utc > lastBasicReading;
 
@@ -137,7 +140,7 @@ public class EnsureGasReadingsLoadedAction
                             basicReadingsToUpdate.AddRange(newBasicReadings);
 
                             var newCostedReadings = CalculateCostedReadings(basicReadingsToUpdate, meterSetup.TariffDetails);
-                            dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(basicReadingsToUpdate.ToImmutableList(), newCostedReadings));
+                            dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(basicReadingsToUpdate.ToImmutableList(), newCostedReadings, _timeProvider.eUtcNow()));
 
                             fullReloadForecasts = true;
                             message = $"{meterType} Readings: Updated {newBasicReadings.Count} readings";
@@ -166,7 +169,7 @@ public class EnsureGasReadingsLoadedAction
                         var reloadedBasicReadings = (await _energyReadingService.ImportFromMoveInOrPreviousYear(meterType)).ToImmutableList();
                         var reloadedCostedReadings = CalculateCostedReadings(reloadedBasicReadings, meterSetup.TariffDetails);
 
-                        dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(reloadedBasicReadings, reloadedCostedReadings));
+                        dispatcher.Dispatch(new GasStoreReloadedReadingsAndCostsAction(reloadedBasicReadings, reloadedCostedReadings, _timeProvider.eUtcNow()));
 
                         message = $"{meterType} Readings: Loaded {reloadedBasicReadings.Count} readings";
 

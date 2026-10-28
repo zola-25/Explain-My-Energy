@@ -23,6 +23,8 @@ public partial class MeterSetupTable
 
     [Inject] private IState<MeterSetupState> MeterSetupState { get; set; }
 
+    [Inject] private TimeProvider TimeProvider { get; set; }
+
 
     private Dictionary<MeterType, MeterStatus> _meterStatusList;
     private record MeterStatus
@@ -130,7 +132,7 @@ public partial class MeterSetupTable
     }
 
 
-    private static TariffInfo GetTariffInfo(MeterState meterState)
+    private TariffInfo GetTariffInfo(MeterState meterState)
     {
         List<TariffDetailState> tariffDetailState = meterState.TariffDetails.ToList();
 
@@ -140,7 +142,7 @@ public partial class MeterSetupTable
         TariffDetailState currentTariff = null;
         if (hasAnyTariffs)
         {
-            currentTariff = tariffDetailState.eCurrentTariffState();
+            currentTariff = tariffDetailState.eCurrentTariffState(TimeProvider.eToday());
         }
 
         string tariffStandingChargeText = string.Empty;

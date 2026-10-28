@@ -1,5 +1,6 @@
 ﻿using Energy.n3rgyApi.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -32,6 +33,8 @@ public static class ServiceInitialization
 
 
         services.Configure(config);
+
+        services.TryAddSingleton(TimeProvider.System);
 
         services.AddHttpClient("n3rgy-electricity", (s, c) =>
         {

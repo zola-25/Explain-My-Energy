@@ -8,13 +8,16 @@ public class GasStoreReloadedReadingsAndCostsAction
 {
     public ImmutableList<CostedReading> CostedReadings { get; }
     public ImmutableList<BasicReading> BasicReadings { get; }
+    public DateTime LastCheckedForNewReadings { get; }
 
     public GasStoreReloadedReadingsAndCostsAction(
         ImmutableList<BasicReading> basicReadings,
-        ImmutableList<CostedReading> costedReadings
+        ImmutableList<CostedReading> costedReadings,
+        DateTime lastCheckedForNewReadings
         )
     {
         CostedReadings = costedReadings;
         BasicReadings = basicReadings;
+        LastCheckedForNewReadings = lastCheckedForNewReadings;
     }
 }

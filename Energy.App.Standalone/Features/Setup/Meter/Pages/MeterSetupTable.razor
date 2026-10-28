@@ -106,7 +106,7 @@
                         }
                         else if (context.LatestReadingsDate != null)
                         {
-                            @if (context.LatestReadingsDate.eUpToDate())
+                            @if (context.LatestReadingsDate.eUpToDate(TimeProvider.eToday()))
                             {
                                 <MudText>Up to Date</MudText>
                             }
@@ -128,7 +128,7 @@
                         <div class="d-flex align-center">
                             @if (context.LatestReadingsDate != null)
                             {
-                                <MudButton Disabled="context.LatestReadingsDate.eUpToDate() || disableInputs" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
+                                <MudButton Disabled="context.LatestReadingsDate.eUpToDate(TimeProvider.eToday()) || disableInputs" Class="ma-1" Color="Color.Primary" ButtonType="ButtonType.Button"
                                            Variant="Variant.Outlined" Size="Size.Small" @onclick="@((e) => DispatchUpdateReadings(context.MeterType))">Update</MudButton>
                             }
                             <MudButton Class="ma-1" Disabled="@disableInputs"

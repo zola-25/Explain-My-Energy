@@ -15,6 +15,7 @@ using Energy.App.Standalone.Services.FluxorPersist;
 using Energy.App.Standalone.Services.FluxorPersist.Demo;
 using Energy.App.Standalone.Services.FluxorPersist.Demo.Interfaces;
 using Energy.n3rgyApi;
+using Energy.Shared;
 using Energy.WeatherReadings;
 using Fluxor;
 using Fluxor.Persist.Middleware;
@@ -26,6 +27,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using Polly.Extensions.Http;
 using Polly;
+using System.Globalization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -36,6 +38,7 @@ builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.H
 
 await AddAppSettings(builder, "appsettings.json");
 
+builder.Services.AddSingleton(GetTimeProvider(builder.Configuration));
 
 builder.Services.AddWeatherDataService();
 builder.Services.AddN3rgyServices();
@@ -158,6 +161,19 @@ static async ValueTask AddAppSettings(WebAssemblyHostBuilder builder, string app
     using var stream = await response.Content.ReadAsStreamAsync();
 
     builder.Configuration.AddJsonStream(stream);
+}
+
+// App:FixedUtcNow freezes the app's current time, so date-dependent analysis is repeatable (e.g. for testing)
+static TimeProvider GetTimeProvider(IConfiguration configuration)
+{
+    string fixedUtcNow = configuration["App:FixedUtcNow"];
+    if (string.IsNullOrWhiteSpace(fixedUtcNow))
+    {
+        return TimeProvider.System;
+    }
+
+    Console.WriteLine($"Using fixed current time: {fixedUtcNow}");
+    return new FixedTimeProvider(DateTimeOffset.Parse(fixedUtcNow, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal));
 }
 
 static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()

@@ -1,0 +1,21 @@
+{
+    "fixedUtcNow": "2026-10-27T12:00:00Z",
+    "responses": [
+        {
+            "url": "https://api.postcodes.io/outcodes/SW1A",
+            "file": "api.postcodes.io.json"
+        },
+        {
+            "url": "https://archive-api.open-meteo.com/v1/archive?latitude=51.50455391034481&longitude=-0.13223425517241374&start_date=2025-09-27&end_date=2026-08-28&models=best_match&daily=weathercode%2Ctemperature_2m_max%2Ctemperature_2m_min%2Ctemperature_2m_mean%2Capparent_temperature_max%2Capparent_temperature_min%2Capparent_temperature_mean%2Csunrise%2Csunset%2Cwindspeed_10m_max%2Crain_sum%2Csnowfall_sum&timezone=GMT&timeformat=unixtime",
+            "file": "archive-api.open-meteo.com.json"
+        },
+        {
+            "url": "https://api.open-meteo.com/v1/forecast?latitude=51.50455391034481&longitude=-0.13223425517241374&models=best_match&daily=weathercode%2Ctemperature_2m_max%2Ctemperature_2m_min%2Capparent_temperature_max%2Capparent_temperature_min%2Csunrise%2Csunset%2Crain_sum%2Csnowfall_sum%2Cwindspeed_10m_max&timeformat=unixtime&start_date=2026-08-29&end_date=2026-11-08&timezone=GMT",
+            "file": "api.open-meteo.com.json"
+        },
+        {
+            "url": "https://climate-api.open-meteo.com/v1/climate?latitude=51.50455391034481&longitude=-0.13223425517241374&start_date=2026-11-09&end_date=2027-04-27&daily=temperature_2m_mean%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cwindspeed_10m_max%2Crain_sum%2Csnowfall_sum&models=EC_Earth3P_HR&timeformat=unixtime",
+            "file": "climate-api.open-meteo.com.json"
+        }
+    ]
+}

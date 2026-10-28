@@ -4,6 +4,7 @@
 @inject IState<HouseholdState> HouseholdState
 @inject IState<UserLockState> UserLockState
 @inject IDispatcher Dispatcher
+@inject TimeProvider TimeProvider
 <div class="d-flex flex-wrap justify-space-between align-baseline">
     <MudPaper Class="d-flex ma-3 align-center" Elevation="0">
         <MudText Typo="Typo.h5" Class=" fw-bolder">Weather Data Status</MudText>
@@ -61,12 +62,12 @@
                     Utc;
                 }
 
-                @if (latestReading >= DateTime.UtcNow.Date.AddDays(-1))
+                @if (latestReading >= TimeProvider.eUtcToday().AddDays(-1))
                 {
                     <MudTooltip Text="Up to date">
                         <div class="d-flex align-center">
                             @latestReading.eDateToDowShortMonthYY()
-                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success"></MudIcon>
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" data-testid="weather-up-to-date"></MudIcon>
                         </div>
                     </MudTooltip>
                 }

@@ -1,6 +1,7 @@
 ﻿@inject IDispatcher Dispatcher
 @inject AppStatus AppConfig
 @inject IState<UserLockState> UserLockState
+@inject TimeProvider TimeProvider
 @inherits FluxorComponent
 
 <MudTooltip ShowOnHover="true" Text="Return to Setup">
@@ -183,13 +184,13 @@ else
 
     private void OnAddNewTariffClick()
     {
-        var exampleTariff = DefaultTariffData.GetCurrentExampleTariff(MeterType, ExampleTariffType.StandardFixedDaily);
+        var exampleTariff = DefaultTariffData.GetCurrentExampleTariff(MeterType, ExampleTariffType.StandardFixedDaily, TimeProvider.eToday());
         _addEditTariffDetail = new TariffDetail()
             {
                 IsHourOfDayFixed = exampleTariff.IsHourOfDayFixed,
                 PencePerKWh = exampleTariff.PencePerKWh,
                 DailyStandingChargePence = exampleTariff.DailyStandingChargePence,
-                DateAppliesFrom = DateTime.Today,
+                DateAppliesFrom = TimeProvider.eToday(),
                 HourOfDayPrices = exampleTariff.DefaultHourOfDayPrices.Select(c => new HourOfDayPrice()
                 {
                     PencePerKWh = c.PencePerKWh,

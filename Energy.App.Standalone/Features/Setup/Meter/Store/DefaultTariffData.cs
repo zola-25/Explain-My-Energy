@@ -8,9 +8,9 @@ namespace Energy.App.Standalone.Features.Setup.Meter.Store;
 
 public static class DefaultTariffData
 {
-    public static DefaultTariffDetail GetCurrentExampleTariff(MeterType meterType, ExampleTariffType exampleTariffType)
+    public static DefaultTariffDetail GetCurrentExampleTariff(MeterType meterType, ExampleTariffType exampleTariffType, DateTime today)
     {
-        return DefaultTariffs.Where(c => c.MeterType == meterType && c.ExampleTariffType == exampleTariffType && DateTime.Today >= c.DateAppliesFrom)
+        return DefaultTariffs.Where(c => c.MeterType == meterType && c.ExampleTariffType == exampleTariffType && today >= c.DateAppliesFrom)
             .OrderByDescending(c => c.DateAppliesFrom)
             .First();
     }

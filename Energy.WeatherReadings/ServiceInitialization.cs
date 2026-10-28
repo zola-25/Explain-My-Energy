@@ -1,5 +1,6 @@
 ﻿using Energy.WeatherReadings.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -37,6 +38,8 @@ public static class ServiceInitialization
 
 
         services.Configure(config);
+
+        services.TryAddSingleton(TimeProvider.System);
 
         services.AddTransient<IMeteoWeatherApiCalls, MeteoWeatherApiCalls>();
         services.AddTransient<IMeteoWeatherDataService, MeteoWeatherDataService>();

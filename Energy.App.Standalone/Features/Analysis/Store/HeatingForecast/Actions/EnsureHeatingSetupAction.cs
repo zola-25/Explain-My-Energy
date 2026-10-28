@@ -70,6 +70,7 @@ public class EnsureHeatingSetupAction
         private readonly IState<ElectricityReadingsState> _electricityReadingsState;
         private readonly IForecastCoefficientsCreator _forecastCoefficientsCreator;
         private readonly ILogger<EnsureHeatingSetupActionEffect> _logger;
+        private readonly TimeProvider _timeProvider;
 
         public EnsureHeatingSetupActionEffect(IState<HouseholdState> householdState,
                                               IState<WeatherState> weatherState,
@@ -79,7 +80,8 @@ public class EnsureHeatingSetupAction
                                               IState<GasReadingsState> gasReadingsState,
                                               IState<ElectricityReadingsState> electricityReadingsState,
                                               IForecastCoefficientsCreator forecastCoefficientsCreator,
-                                              ILogger<EnsureHeatingSetupActionEffect> logger)
+                                              ILogger<EnsureHeatingSetupActionEffect> logger,
+                                              TimeProvider timeProvider)
         {
             _householdState = householdState;
             _weatherState = weatherState;
@@ -90,6 +92,7 @@ public class EnsureHeatingSetupAction
             _electricityReadingsState = electricityReadingsState;
             _forecastCoefficientsCreator = forecastCoefficientsCreator;
             _logger = logger;
+            _timeProvider = timeProvider;
         }
 
         public override async Task HandleAsync(EnsureHeatingSetupAction action, IDispatcher dispatcher)
@@ -126,11 +129,12 @@ public class EnsureHeatingSetupAction
                 var latestReadingDate = basicReadings.Last().Utc;
 
                 var weatherReadings = _weatherState.Value.WReadings;
-                var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(DateTime.UtcNow);
+                var utcNow = _timeProvider.eUtcNow();
+                var numLowTempDays = AppWideForecastProperties.GetLowTemperatureDays(utcNow);
                 int forgiveMissingDays = 10;
 
                 if (weatherReadings.eIsNullOrEmpty()
-                    || weatherReadings.Count(c => c.Utc <= DateTime.UtcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.Utc.Month)) < numLowTempDays - forgiveMissingDays)
+                    || weatherReadings.Count(c => c.Utc <= utcNow && AppWideForecastProperties.LowTemperatureMonths.Contains(c.Utc.Month)) < numLowTempDays - forgiveMissingDays)
                 {
                     string noSeasonalWeatherMessage = @$"Heating Forecast Setup: Cannot create heating forecast for {heatingMeterType} Meter 
                                         as there are many missing cold season historical weather readings";
@@ -190,7 +194,7 @@ public class EnsureHeatingSetupAction
                     || action.ForceReloadHeatingForecast
                     || heatingForecastState.ForecastWeatherReadings.eIsNullOrEmpty()
                     || heatingForecastState.ForecastDailyCosts.eIsNullOrEmpty()
-                    || heatingForecastState.ForecastsUpdatedWithReadingDate < DateTime.UtcNow.Date.AddDays(-1))
+                    || heatingForecastState.ForecastsUpdatedWithReadingDate < utcNow.Date.AddDays(-1))
                 {
                     dispatcher.Dispatch(new LoadHeatingForecastAction(degreeDifference, loadHeatingCompletion));
                 }

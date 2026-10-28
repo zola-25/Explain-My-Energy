@@ -15,6 +15,13 @@ public class HistoricalForecastValidationResult
 }
 public class HistoricalForecastValidation : IHistoricalForecastValidation
 {
+    private readonly TimeProvider _timeProvider;
+
+    public HistoricalForecastValidation(TimeProvider timeProvider)
+    {
+        _timeProvider = timeProvider;
+    }
+
     public HistoricalForecastValidationResult Validate(MeterState meterSetup,
                                                        bool forceRefresh,
                                                        DateTime lastUpdate,
@@ -69,7 +76,7 @@ public class HistoricalForecastValidation : IHistoricalForecastValidation
         if (!forceRefresh
             && existingForecastReadings.eIsNotNullOrEmpty()
             && existingForecastReadings.Count >= 180
-            && lastUpdate > DateTime.UtcNow.Date.AddDays(-7))
+            && lastUpdate > _timeProvider.eUtcToday().AddDays(-7))
         {
             return new HistoricalForecastValidationResult
             {

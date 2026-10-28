@@ -1,6 +1,7 @@
 ﻿using Energy.App.Standalone.Features.EnergyReadings.Electricity.Actions;
 using Energy.App.Standalone.Features.EnergyReadings.Gas.Actions;
 using Energy.App.Standalone.Services.FluxorPersist.Demo.JsonModels;
+using Energy.Shared;
 using Fluxor;
 using System.Collections.Immutable;
 
@@ -17,11 +18,17 @@ public class PreloadElectricityReadingsAction
 
     public class PreloadDemoDataEffects : Effect<PreloadElectricityReadingsAction>
     {
+        private readonly TimeProvider _timeProvider;
+
+        public PreloadDemoDataEffects(TimeProvider timeProvider)
+        {
+            _timeProvider = timeProvider;
+        }
 
         public override Task HandleAsync(PreloadElectricityReadingsAction action, IDispatcher dispatcher)
         {
             var gasReadings = action.DemoElectricityReadings.BasicReadings
-                .Where(c => c.Utc >= DateTime.UtcNow.AddYears(-1).AddDays(-30))
+                .Where(c => c.Utc >= _timeProvider.eUtcNow().AddYears(-1).AddDays(-30))
                 .ToImmutableList();
 
             dispatcher.Dispatch(new StorePreloadedElectricityReadingsAction(gasReadings));

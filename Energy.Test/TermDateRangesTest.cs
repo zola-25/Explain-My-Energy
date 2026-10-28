@@ -1,5 +1,6 @@
 ﻿using Energy.App.Standalone.Features.Analysis.Services.Analysis;
 using Energy.App.Standalone.Features.Analysis.Services.Analysis.AnalysisModels;
+using Energy.Shared;
 
 namespace Energy.Test;
 
@@ -89,6 +90,18 @@ public class TermDateRangesTest
             default:
                 throw new ArgumentOutOfRangeException(nameof(period), period, null);
         }
+    }
+
+    [Fact]
+    public void TodayIsTheUtcDateFromTheTimeProvider()
+    {
+        // 23:30 at UTC-1 is 00:30 UTC the next day
+        var timeProvider = new FixedTimeProvider(new DateTimeOffset(2026, 10, 27, 23, 30, 0, TimeSpan.FromHours(-1)));
+
+        var termDateRanges = new TermDateRanges(timeProvider);
+
+        Assert.Equal(new DateTime(2026, 10, 28), termDateRanges.Today);
+        Assert.Equal(DateTimeKind.Utc, termDateRanges.Today.Kind);
     }
 
     //
